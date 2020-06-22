@@ -1,0 +1,149 @@
+package ai.dstack.core.backend.resources.stacks
+
+import ai.dstack.core.api.model.Permission
+import ai.dstack.core.api.services.*
+import ai.dstack.core.backend.resources.*
+import ai.dstack.core.backend.resources.payload.UpdatePermissionPayload
+import ai.dstack.core.backend.resources.users.emailToVerificationCode
+import mu.KLogging
+import javax.inject.Inject
+import javax.ws.rs.Consumes
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.container.ResourceContext
+import javax.ws.rs.core.Context
+import javax.ws.rs.core.HttpHeaders
+import javax.ws.rs.core.Response
+
+@Path("/permissions")
+class PermissionResources {
+    @Context
+    private lateinit var resourceContext: ResourceContext
+
+    @Inject
+    private lateinit var userService: UserService
+
+    @Inject
+    private lateinit var sessionService: SessionService
+
+    @Inject
+    private lateinit var stackService: StackService
+
+    @Inject
+    private lateinit var dashboardService: DashboardService
+
+    @Inject
+    private lateinit var permissionService: PermissionService
+
+    @Inject
+    private lateinit var emailService: EmailService
+
+    companion object : KLogging()
+
+    @POST
+    @Path("add")
+    @Consumes(JSON_UTF8)
+    @Produces(JSON_UTF8)
+    fun addPermission(payload: UpdatePermissionPayload?, @Context headers: HttpHeaders): Response {
+        logger.debug { "payload: $payload" }
+        return if (payload.isMalformed) {
+            malformedRequest()
+        } else {
+            val session = headers.bearer?.let { sessionService.get(it) }
+            val user = session?.let { userService.get(it.userName) }
+            val (userNameOrEmail, invitedUser) = if (payload!!.user != null) {
+                val invitedUser = userService.get(payload.user!!)
+                Pair(invitedUser?.name, invitedUser)
+            } else {
+                val invitedUser = userService.findByEmail(payload.email!!)
+                Pair(invitedUser?.name ?: payload.email, invitedUser)
+            }
+            if (session == null || !session.valid || user == null) {
+                badCredentials()
+            } else if (!user.verified) {
+                userNotVerified()
+            } else if (userNameOrEmail == null) {
+                userNotFound()
+            } else {
+                val (u, obj) = payload.path!!.parseStackPath()
+                val isDashboard = obj.startsWith("d/")
+                val (stack, dashboard) = Pair(
+                    if (!isDashboard) stackService.get(u, obj) else null,
+                    if (isDashboard) dashboardService.get(u, obj.substringAfter("d/")) else null
+                )
+                when {
+                    !isDashboard && stack == null -> stackNotFound()
+                    isDashboard && dashboard == null -> dashboardNotFound()
+                    u != user.name -> badCredentials()
+                    else -> {
+                        sessionService.renew(session)
+                        val p = permissionService.get(payload.path, userNameOrEmail)
+                        if (p == null && user.name != payload.user) {
+                            val permission = Permission(payload.path, userNameOrEmail)
+                            permissionService.add(permission)
+                            if (emailService !is NonAvailable) {
+                                // TODO: Send invite emails with a 1 minute delay (via SQS)
+                                if (invitedUser != null) {
+                                    emailService.sendInviteEmail(user, payload.path, invitedUser)
+                                } else {
+                                    emailService.sendInviteEmail(
+                                        user, payload.path, permission.emailOrThrow,
+                                        permission.emailOrThrow.emailToVerificationCode
+                                    )
+                                }
+                            }
+                        }
+                        ok()
+                    }
+                }
+            }
+        }
+    }
+
+    @POST
+    @Path("delete")
+    @Consumes(JSON_UTF8)
+    @Produces(JSON_UTF8)
+    fun deletePermission(payload: UpdatePermissionPayload?, @Context headers: HttpHeaders): Response {
+        logger.debug { "payload: $payload" }
+        return if (payload.isMalformed) {
+            malformedRequest()
+        } else {
+            val session = headers.bearer?.let { sessionService.get(it) }
+            val user = session?.let { userService.get(it.userName) }
+            if (session == null || !session.valid || user == null) {
+                badCredentials()
+            } else if (!user.verified) {
+                userNotVerified()
+            } else {
+                val (u, obj) = payload!!.path!!.parseStackPath()
+                val isDashboard = obj.startsWith("d/")
+                val (stack, dashboard) = Pair(
+                    if (!isDashboard) stackService.get(u, obj) else null,
+                    if (isDashboard) dashboardService.get(u, obj.substringAfter("d/")) else null
+                )
+                when {
+                    !isDashboard && stack == null -> stackNotFound()
+                    isDashboard && dashboard == null -> dashboardNotFound()
+                    u != user.name -> badCredentials()
+                    else -> {
+                        sessionService.renew(session)
+                        val p = if (payload.user != null)
+                            permissionService.get(payload.path!!, payload.user)
+                        else
+                            permissionService.get(payload.path!!, payload.email!!) ?: userService.findByEmail(payload.email)
+                                ?.let {
+                                    permissionService.get(payload.path, it.name)
+                                }
+
+                        if (p != null) {
+                            permissionService.delete(p)
+                        }
+                        ok()
+                    }
+                }
+            }
+        }
+    }
+}
