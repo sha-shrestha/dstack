@@ -6,7 +6,6 @@ pluginManagement {
     }
 }
 
-include(Modules.CORE_API.id)
-include(Modules.CORE_BACKEND.id)
-include(Modules.CORE_BACKEND_LOCAL.id)
-include(Modules.CORE_BACKEND_LOCAL_SERVER.id)
+include(Modules.SERVER_BASE.id)
+include(Modules.SERVER_BASE_LOCAL.id)
+include(Modules.SERVER_LOCAL_CLI.id)

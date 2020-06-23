@@ -10,6 +10,7 @@ allprojects {
     apply(plugin = "idea")
 
     group = "ai.dstack"
+    version = "0.1-SNAPSHOT"
 
     repositories {
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
