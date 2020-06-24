@@ -5,6 +5,11 @@ plugins {
     kotlin("jvm") version Deps.KOTLIN_VERSION
 }
 
+println("Printing all environment variables:\n")
+System.getenv().forEach {
+    println("\"${it.key}\" = \"${it.value}\"")
+}
+
 val globalArtifactsBuildDir: File by extra { buildDir }
 allprojects {
     apply(plugin = "idea")
