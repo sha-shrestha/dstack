@@ -22,7 +22,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-  publish snapshot:
+  publish-snapshot:
 
     needs: build
     runs-on: ubuntu-latest
