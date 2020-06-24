@@ -1,0 +1,25 @@
+@import "styles/variables.css";
+.confirm {
+    position: relative;
+    height: 100vh;
+}
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    line-height: 18px;
+    text-align: center;
+    & .text {
+        color: var(--color-red);
+        margin-bottom: 4px;
+        text-transform: capitalize;
+    }
+}

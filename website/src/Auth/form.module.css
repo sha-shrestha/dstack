@@ -1,0 +1,76 @@
+@import "styles/variables.css";
+@import "styles/media.css";
+
+.form {
+    width: 100%;
+    max-width: 340px;
+    align-self: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+.title {
+    font-weight: 500;
+    @media (--mobile) {
+        font-size: 20px;
+        line-height: 23px;
+    }
+    @media (--desktop) {
+        font-size: 28px;
+        line-height: 32px;
+    }
+}
+.subtitle {
+    @media (--mobile) {
+        margin-top: 14px;
+        font-size: 12px;
+        line-height: 18px;
+    }
+    @media (--desktop) {
+        margin-top: 20px;
+        font-size: 16px;
+        line-height: 24px;
+    }
+}
+.field {
+    @media (--mobile) {
+        margin-top: 31px;
+        & + .field {
+            margin-top: 4px;
+        }
+    }
+    @media (--desktop) {
+        margin-top: 24px;
+        & + .field {
+            margin-top: 4px;
+        }
+    }
+}
+.plan {
+    padding-bottom: 20px;
+    position: relative;
+    &-label {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        font-size: 12px;
+        line-height: 24px;
+        text-align: right;
+        color: var(--color-green);
+    }
+}
+.button {
+    @media (--mobile) {
+
+    }
+    @media (--desktop) {
+        margin-top: 10px;
+    }
+}
+p {
+    margin-top: 20px;
+    text-align: center;
+    & + p {
+        margin-top: 10px;
+    }
+}

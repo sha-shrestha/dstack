@@ -1,0 +1,38 @@
+@import "styles/variables.css";
+.copy {
+    position: relative;
+}
+.message {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 4px);
+    height: 26px;
+    padding-left: 14px;
+    padding-right: 14px;
+    font-size: 12px;
+    line-height: 26px;
+    color: var(--color-green);
+    background: var(--color-white);
+    box-shadow: 0 4px 20px rgba(65, 50, 90, .06);
+    transform: translateY(-50%);
+    border-radius: 4px;
+    transition: opacity .2s;
+    white-space: nowrap;
+    &:not(:global(.is-show)) {
+        opacity: 0;
+    }
+}
+.button {
+    font-size: 14px;
+    line-height: 16px;
+    color: var(--color-light-gray);
+    transition: color .2s;
+    cursor: pointer;
+    &:hover {
+        color: var(--color-light-blue);
+    }
+    & .icon {
+        font-size: 14px;
+        margin-right: 2px;
+    }
+}

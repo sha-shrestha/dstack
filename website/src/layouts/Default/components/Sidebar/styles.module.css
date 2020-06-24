@@ -1,0 +1,116 @@
+@import "styles/variables.css";
+@import "styles/media.css";
+
+.sidebar {
+    @media (--mobile) {
+        z-index: var(--sidebar-z-index);
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 217px;
+        padding-top: 58px;
+        padding-bottom: 20px;
+        background-color: var(--color-white);
+        box-shadow: 5px 0 20px rgba(0, 0, 0, .05);
+        transition: transform .2s ease-in-out;
+        &:not(:global(.show)) {
+            transform: translateX(calc(-100% - 25px));
+        }
+        &:global(.show) {
+            transform: translateX(0);
+        }
+    }
+    @media (--desktop) {
+        background-color: var(--color-translated-white);
+    }
+}
+.close {
+    position: absolute;
+    top: 12px;
+    left: 20px;
+    width: 22px;
+    height: 22px;
+    font-size: 20px;
+    text-align: center;
+    color: var(--color-light-gray);
+    @media (--desktop) {
+        display: none;
+    }
+}
+.logo {
+    margin-top: 30px;
+    margin-left: 30px;
+    transition: opacity .2s ease;
+    &:hover {
+        opacity: .7;
+    }
+    @media (--mobile) {
+        display: none;
+    }
+}
+.links {
+    @media (--mobile) {
+        margin: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    @media (--desktop) {
+        margin-top: 30px;
+        padding-left: 50px;
+        padding-right: 30px;
+    }
+}
+.item {
+    list-style: none;
+    &:nth-child(n+2) {
+        @media (--mobile) {
+            margin-top: 18px;
+        }
+        @media (--desktop) {
+            margin-top: 22px;
+        }
+    }
+    a {
+        display: flex;
+        color: var(--color-dark-gray);
+        @media (--desktop) {
+            &:not(:global(.active)) {
+                & .icon {
+                    opacity: .3;
+                }
+                & .label {
+                    opacity: .8;
+                }
+            }
+            &:hover {
+                color: var(--color-dark-gray);
+                & .icon {
+                    opacity: 1;
+                }
+                & .label {
+                    opacity: 1;
+                }
+            }
+            &:global(.active) {
+                & .icon {
+                    opacity: 1;
+                }
+                & .label {
+                    font-weight: 500;
+                    opacity: 1;
+                }
+            }
+        }
+        & .sub {
+            font-size: 12px;
+            line-height: 12px;
+            padding-left: 4px;
+        }
+        & .label {
+            font-size: 14px;
+            line-height: 16px;
+            transition: opacity .2s;
+        }
+    }
+}

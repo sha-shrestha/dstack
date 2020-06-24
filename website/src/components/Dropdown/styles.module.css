@@ -1,0 +1,46 @@
+@import "styles/variables.css";
+.dropdown {
+    position: relative;
+}
+.button {
+    width: 15px;
+    height: 15px;
+    font-size: 14px;
+    line-height: 15px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--color-dark-gray);
+    transition: opacity .2s;
+    opacity: .7;
+    &:hover {
+        opacity: 1;
+    }
+}
+.menu {
+    z-index: var(--dropdown-z-index);
+    min-width: 126px;
+    max-height: 230px;
+    overflow-y: auto;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background: var(--color-white);
+    box-shadow: 0 8px 24px rgba(31, 42, 81, .12);
+    border-radius: 4px;
+    transition: opacity .2s;
+    &:not(:global(.show)) {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+.item {
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 14px;
+    line-height: 26px;
+    color: var(--color-dark-gray);
+    transition: background-color .2s;
+    cursor: pointer;
+    &:hover {
+        background-color: var(--color-translated-white);
+    }
+}

@@ -1,0 +1,4 @@
+/node_modules/
+/src/config/local.js
+/flow-typed/
+/.idea/

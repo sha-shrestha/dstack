@@ -1,0 +1,14 @@
+@import "styles/variables.css";
+
+.tooltip {
+    z-index: var(--dropdown-z-index);
+    padding: 12px 15px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 280px;
+    font-size: 14px;
+    line-height: 20px;
+    background: var(--color-white);
+    box-shadow: 0 8px 24px rgba(31, 42, 81, 0.12);
+    border-radius: 4px;
+}

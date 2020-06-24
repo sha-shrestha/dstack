@@ -1,0 +1,19 @@
+@import "styles/variables.css";
+.filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: -20px;
+}
+.select {
+    @media (--desktop) {
+        margin-top: -18px;
+    }
+}
+.field {
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    &:nth-last-child(n+2) {
+        margin-right: 14px;
+    }
+}

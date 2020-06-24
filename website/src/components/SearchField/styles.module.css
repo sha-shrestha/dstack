@@ -1,0 +1,49 @@
+@import "styles/variables.css";
+.search {
+    position: relative;
+    &:global(.is-dark) {
+        .field {
+            & input {
+                font-size: 12px;
+                border-color: transparent !important;
+                background-color: rgba(180, 184, 199, 0.12);
+            }
+        }
+    }
+}
+.field {
+    width: 100%;
+    min-width: 250px;
+    padding-bottom: 0;
+    & input {
+        padding-left: 15px !important;
+        padding-right: 36px !important;
+    }
+}
+.clear,
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    line-height: 20px;
+    color: var(--color-light-gray);
+    transition: opacity .2s;
+    cursor: pointer;
+    &:hover {
+        opacity: .7;
+    }
+}
+.clear {
+    position: absolute;
+    top: 50%;
+    right: 11px;
+    transform: translateY(-50%);
+}
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+}

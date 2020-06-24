@@ -1,0 +1,62 @@
+@import "styles/media.css";
+
+:root {
+    --sidebar-width: 228px;
+}
+
+.layout {
+    position: relative;
+    @media (--mobile) {
+
+    }
+    @media (--desktop) {
+        height: 100vh;
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+                "sidebar header"
+                "sidebar main  ";
+    }
+}
+.sidebar {
+    @media (--mobile) {
+
+    }
+    @media (--desktop) {
+        grid-area: sidebar;
+    }
+}
+.progress {
+    position: fixed;
+    top: 0;
+    right: 0;
+    @media (--mobile) {
+        left: 0;
+    }
+    @media (--desktop) {
+        left: var(--sidebar-width);
+    }
+}
+.header {
+    @media (--mobile) {
+
+    }
+    @media (--desktop) {
+        grid-area: header;
+    }
+}
+.main {
+    margin-top: 16px;
+    @media (--mobile) {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    @media (--desktop) {
+        grid-area: main;
+        overflow-y: auto;
+        padding-left: 30px;
+        padding-right: 30px;
+        padding-bottom: 20px;
+    }
+}

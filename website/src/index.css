@@ -1,0 +1,46 @@
+@import "styles/variables.css";
+@import "styles/plain-text.css";
+@import "styles/rc-tooltip.css";
+
+body {
+    margin: 0;
+    padding-bottom: 0;
+    font-family: 'SF Pro Display', 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #fff;
+    color: var(--color-dark-gray);
+    -webkit-font-smoothing: antialiased;
+}
+a {
+    color: var(--color-blue);
+    text-decoration: none;
+    &:hover {
+        color: var(--color-light-blue);
+    }
+}
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.red-text {
+    color: var(--color-red);
+}
+.green-text {
+    color: var(--color-green);
+}
+
+@keyframes loader-pulse {
+    0% {
+        opacity: .6;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: .6;
+    }
+}

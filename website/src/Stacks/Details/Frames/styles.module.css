@@ -1,0 +1,116 @@
+@import "styles/variables.css";
+@import "styles/media.css";
+
+.frames {
+    display: flex;
+    align-items: center;
+}
+.frames-dropdown {
+    position: relative;
+}
+.button {
+    display: flex;
+    cursor: pointer;
+    & :global(.mdi) {
+        margin-left: 4px;
+        font-size: 14px;
+        line-height: 22px;
+    }
+}
+.name {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--color-dark-gray);
+}
+.label {
+    margin-left: 6px;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--color-light-gray);
+}
+.dropdown {
+    z-index: var(--dropdown-z-index);
+    max-height: 136px;
+    overflow-y: auto;
+    position: absolute;
+    top: 100%;
+    left: -15px;
+    width: 280px;
+    padding-top: 6px;
+    padding-bottom: 13px;
+    background: var(--color-white);
+    box-shadow: 0 8px 24px rgba(31, 42, 81, .12);
+    border-radius: 4px;
+    transition: opacity .2s;
+    &:not(:global(.show)) {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+.item {
+    display: flex;
+    align-items: center;
+    height: 34px;
+    padding-left: 15px;
+    padding-right: 15px;
+    transition: background-color .2s;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(180, 184, 199, .1);
+        & .mark {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+}
+.mark {
+    font-size: 12px;
+    line-height: 22px;
+    margin-left: auto;
+    color: var(--color-light-gray);
+    opacity: 0;
+    pointer-events: none;
+    transition: color .2s, opacity .2s;
+    &:hover {
+        color: var(--color-blue);
+    }
+}
+.info {
+    position: relative;
+    display: flex;
+    margin-left: 6px;
+    & :global(.mdi) {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        font-size: 14px;
+        text-align: center;
+        color: var(--color-light-gray);
+        background: rgba(180, 184, 199, .15);
+        border-radius: 50%;
+    }
+}
+.modal {
+    & .description {
+        font-size: 14px;
+        line-height: 22px;
+        @media (--mobile) {
+            margin-top: 10px;
+        }
+        @media (--desktop) {
+            margin-top: 20px;
+        }
+    }
+    & .buttons {
+        margin-top: 20px;
+        display: flex;
+        & .button {
+            &:nth-child(n+2) {
+                margin-left: 12px;
+            }
+        }
+    }
+}
+
+
