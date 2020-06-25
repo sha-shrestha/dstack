@@ -39,7 +39,7 @@ const ConfirmEmail = ({fetchUser, loading, error, history, verifyUser, location}
         <div className={css.confirm}>
             {error && !loading && <div className={css.message}>
                 <div className={css.text}>{error}</div>
-                <Link to={routes.authSignUp()}>{t('signUp')}</Link>
+                <Link to={routes.authLogin()}>{t('signIn')}</Link>
             </div>}
 
             {loading && <Loader />}
