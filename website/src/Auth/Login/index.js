@@ -1,12 +1,10 @@
 // @flow
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Auth from 'Auth';
 import TextField from 'components/form/TextField';
 import Button from 'components/Button';
-import routes from 'routes';
 import {login} from './actions';
 import {fetchUser} from 'App/actions';
 
@@ -79,14 +77,6 @@ const Login = ({login, loading, errors, history: {push}, fetchUser}: Props) => {
                 >
                     {loading ? t('loggingIn') :  t('logIn')}
                 </Button>
-
-                <p>
-                    <Link to={routes.authForgetPassword()}>{t('forgotPassword')}</Link>
-                </p>
-
-                <p>
-                    {t('dontHaveAnAccount')} <Link to={routes.authSignUp()}>{t('signUp')}</Link>
-                </p>
             </form>
         </Auth>
     );
