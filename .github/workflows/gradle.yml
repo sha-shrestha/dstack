@@ -46,7 +46,7 @@ jobs:
         with:
           name: website-dist
       - name: Copy website dist
-          run: cp -a website-dist/** server-base-local/src/main/resources/website
+        run: cp -a website-dist/** server-base-local/src/main/resources/website
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
