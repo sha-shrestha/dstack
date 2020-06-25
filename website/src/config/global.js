@@ -1,36 +1,6 @@
-const production = {
-    APP_URL: 'https://dstack.ai',
-    API_URL: 'https://api.dstack.ai',
-    GA_ID: 'UA-4493451-5',
-};
-
-const staging = {
-    APP_URL: 'https://stgn.dstack.ai',
-    API_URL: 'https://api.stgn.dstack.ai',
-    GA_ID: '',
-};
-
-const host = {
+export default {
     API_URL: '/api',
     GA_ID: '',
-
-    CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
-        const origin = window ? window.location.origin : '';
-
-        return `dstack config --token ${token} --user ${userName} --server ${origin}/api`;
-    },
-
-    CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => {
-        const origin = window ? window.location.origin : '';
-
-        return `dstack::configure(user = "${userName}", token = "${token}", persist = "global"`
-            + `, server = "${origin}/api")`;
-    },
-};
-
-export default {
-    APP_URL: 'http://localhost:3000',
-    API_URL: 'https://api.stgn.dstack.ai',
     DOCS_URL: 'http://docs.dstack.ai',
 
     LOGIN_URL: '/users/login',
@@ -58,15 +28,16 @@ export default {
     DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
     DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
 
-    CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => (
-        `dstack config --token ${token} --user ${userName}`
-    ),
+    CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
+        const origin = window ? window.location.origin : '';
 
-    CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => (
-        `dstack::configure(user = "${userName}", token = "${token}", persist = "global")`
-    ),
+        return `dstack config --token ${token} --user ${userName} --server ${origin}/api`;
+    },
 
-    ...(process.env.REACT_APP_STAGE === 'production' ? production : {}),
-    ...(process.env.REACT_APP_STAGE === 'staging' ? staging : {}),
-    ...(process.env.REACT_APP_STAGE === 'host' ? host : {}),
+    CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => {
+        const origin = window ? window.location.origin : '';
+
+        return `dstack::configure(user = "${userName}", token = "${token}", persist = "global"`
+            + `, server = "${origin}/api")`;
+    },
 };

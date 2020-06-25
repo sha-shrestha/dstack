@@ -104,9 +104,7 @@
   },
   "scripts": {
     "start": "node --max_old_space_size=4096 scripts/start.js",
-    "build": "REACT_APP_STAGE=staging node scripts/build.js",
-    "build:production": "REACT_APP_STAGE=production node scripts/build.js",
-    "build:host": "REACT_APP_STAGE=host node scripts/build.js",
+    "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "flow": "flow"
   },
