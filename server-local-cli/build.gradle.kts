@@ -14,7 +14,7 @@ plugins {
 }
 
 springBoot {
-    mainClassName = "ai.dstack.server.local.cli.LauncherKt"
+    mainClassName = "ai.dstack.server.local.LauncherKt"
 }
 
 buildscript {

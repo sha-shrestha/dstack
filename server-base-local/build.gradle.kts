@@ -17,20 +17,15 @@ tasks {
     }
 
     val npmBuild by registering(Exec::class) {
-//        dependsOn(npmInstall)
+        dependsOn(npmInstall)
         workingDir = File("../website")
         commandLine = listOf("npm", "run-script", "build")
     }
 
-    val buildWebsite by registering(Sync::class) {
-//        dependsOn(npmBuild)
+    val copyWebsite by registering(Sync::class) {
         from("../website/build")
         into("src/main/resources/website")
     }
-
-    val processResources by tasks
-
-    processResources.dependsOn(buildWebsite)
 }
 
 publishing {
