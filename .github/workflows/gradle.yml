@@ -18,12 +18,17 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install Packages
-        working-directory: ./website
+      - name: Install packages
+        working-directory: website
         run: npm install
-      - name: Build page
-        working-directory: ./website
+      - name: Build website
+        working-directory: website
         run: npm run build
+      - name: Upload website dist
+          uses: actions/upload-artifact@v1
+          with:
+            name: website-dist
+            path: website/build
 
   build-server:
 
@@ -36,10 +41,16 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Download website dist
+      uses: actions/download-artifact@v1
+      with:
+        name: website-dist
+    - name: Copy website dist
+        run: cp -a website-dist/** server-base-local/src/main/resources/website
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew copyWebsite build
+      run: ./gradlew build
 
   publish-snapshot:
 
@@ -53,6 +64,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Download website dist
+        uses: actions/download-artifact@v1
+        with:
+          name: website-dist
+      - name: Copy website dist
+          run: cp -a website-dist/** server-base-local/src/main/resources/website
       - name: Publish with Gradle
         run: ./gradlew publish
         env:
