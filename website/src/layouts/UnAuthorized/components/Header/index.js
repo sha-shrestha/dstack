@@ -14,7 +14,6 @@ type Props = {
 const Header = ({className, history: {push}}: Props) => {
     const {t} = useTranslation();
     const logIn = () => push(routes.authLogin());
-    const signUp = () => push(routes.authSignUp());
 
     return <div className={cx(css.header, className)}>
         <Link to="/" className={css.logo}>
@@ -27,13 +26,6 @@ const Header = ({className, history: {push}}: Props) => {
                 color="primary"
                 onClick={logIn}
             >{t('logIn')}</Button>
-
-            <Button
-                className={css.button}
-                color="primary"
-                variant="contained"
-                onClick={signUp}
-            >{t('signUp')}</Button>
         </div>
     </div>;
 };
