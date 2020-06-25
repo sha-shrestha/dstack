@@ -22,8 +22,7 @@ tasks {
         commandLine = listOf("npm", "run-script", "build")
     }
 
-    val buildWebsite by registering(Sync::class) {
-        dependsOn(npmBuild)
+    val copyWebsite by registering(Sync::class) {
         from("../website/build")
         into("src/main/resources/website")
     }
