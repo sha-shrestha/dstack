@@ -11,6 +11,7 @@ dependencies {
 
 plugins {
     id("org.springframework.boot") version "2.2.6.RELEASE"
+    `maven-publish`
 }
 
 springBoot {
@@ -29,3 +30,38 @@ buildscript {
 }
 
 apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+
+tasks {
+    val npmInstall by registering(Exec::class) {
+        workingDir = File("../website")
+        commandLine = listOf("npm", "install")
+    }
+
+    val npmBuild by registering(Exec::class) {
+        dependsOn(npmInstall)
+        workingDir = File("../website")
+        commandLine = listOf("npm", "run-script", "build")
+    }
+
+    val copyWebsite by registering(Sync::class) {
+        from("../website/build")
+        into("src/main/resources/website")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("bootJava") {
+            artifact(tasks.getByName("bootJar"))
+        }
+    }
+    repositories {
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}

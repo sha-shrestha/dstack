@@ -10,24 +10,6 @@ dependencies {
     compile(project(Modules.SERVER_BASE.id))
 }
 
-tasks {
-    val npmInstall by registering(Exec::class) {
-        workingDir = File("../website")
-        commandLine = listOf("npm", "install")
-    }
-
-    val npmBuild by registering(Exec::class) {
-        dependsOn(npmInstall)
-        workingDir = File("../website")
-        commandLine = listOf("npm", "run-script", "build")
-    }
-
-    val copyWebsite by registering(Sync::class) {
-        from("../website/build")
-        into("src/main/resources/website")
-    }
-}
-
 publishing {
     publications {
         create<MavenPublication>("maven") {
