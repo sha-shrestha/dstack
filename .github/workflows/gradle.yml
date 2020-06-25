@@ -25,10 +25,10 @@ jobs:
         working-directory: website
         run: npm run build
       - name: Upload website dist
-          uses: actions/upload-artifact@v1
-          with:
-            name: website-dist
-            path: website/build
+        uses: actions/upload-artifact@v1
+        with:
+          name: website-dist
+          path: website/build
 
   build-server:
 
@@ -36,21 +36,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - name: Download website dist
-      uses: actions/download-artifact@v1
-      with:
-        name: website-dist
-    - name: Copy website dist
-        run: cp -a website-dist/** server-base-local/src/main/resources/website
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Download website dist
+        uses: actions/download-artifact@v1
+        with:
+          name: website-dist
+      - name: Copy website dist
+          run: cp -a website-dist/** server-base-local/src/main/resources/website
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
 
   publish-snapshot:
 
