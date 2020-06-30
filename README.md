@@ -5,8 +5,8 @@ How is dstack different from other frameworks:
  - It simplifies the process of creating applications by leveraging a) a declarative approach to defining application components; b) a tight integration with data science frameworks and tools.
 
 The key features of dstack:
-- Capabilities for building interactive applications (this currently includes dashboards and reports; the support for ML models is coming soon) 
-- Management of datasets (e.g. tracking revisions of datasets, pushing and pulling datasets)
+- Managing data science artifacts (e.g. tracking revisions of datasets, pushing and pulling datasets)
+- Building data science applications (this currently includes dashboards and reports; the support for ML models is coming soon) 
 
 ## How dstack works
 
@@ -43,7 +43,24 @@ The workflow in this case is the following:
 
 ### Use case #2: Building data science applications
 
-TBA
+A data science application is a specific kind of applications that solves domain-specific problems by leveraging data and data-science methods.
+ These methods may include data-wrangling, visualizations, statistical modeling, machine learning, etc.  
+
+There are several general use-cases for such data science applications:
+
+1. Dashboards
+2. Reports
+3. Machine learning prototypes
+
+In order to simplify the process of building data science applications (and entirely remove the need for development skills),
+    the framework builds on the engine for managing artifacts, described above, and offers data scientists a way to build
+    applications by combining already submitted artifacts (*Stacks*). In this case, data science applications are built
+    automatically on-the-fly based on the chosen artifacts, and the logic defined through a declarative approach.
+    
+Currently, dstack supports only simple types of applications, such as interactive dashboards and data reports. 
+    Soon, it's going to also support machine learning models, and custom callbacks.
+    
+TBA     
 
 ## Installation
 
@@ -67,7 +84,7 @@ install.packages("dstack")
 
 ## Quick start
 
-### Run a dstack server
+### Run a server
 
 TBA
 
@@ -75,19 +92,18 @@ TBA
 
 TBA
 
-### Push artifacts to server
+### Push artifacts
 
 TBA
 
-### Pull artifacts from server
+### Pull artifacts
 
 TBA
 
-### Accessing artifacts via the server's user interface
+### Building dashboards
 
 TBA
 
-### Building dashboards via the server's user interface
+## Roadmap
 
 TBA
-
