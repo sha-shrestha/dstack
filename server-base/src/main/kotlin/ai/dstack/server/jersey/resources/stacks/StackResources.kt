@@ -292,7 +292,7 @@ class StackResources {
                                             filePath = file,
                                             description = a.description,
                                             legacyType = type!!,
-                                            application = application!!,
+                                            application = application,
                                             contentType = contentType!!,
                                             length = length,
                                             index = index,
