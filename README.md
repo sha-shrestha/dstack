@@ -1,6 +1,6 @@
 **dstack is an open-source framework for Python and R for managing data science artifacts, and for building data science applications.**
 
-![Action Status](https://github.com/dstackai/dstack-server/workflows/Build%20with%20Gradle/badge.svg) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)  
+![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)  
 
 How is dstack different from other frameworks:
  - It is designed for data scientists and doesn't require development skills to build applications.   
