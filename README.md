@@ -39,28 +39,38 @@ The workflow in this case is the following:
 - Install the `dstack` package (e.g. via `pip` or `conda`)
 - Runs `dstack-server` (e.g. using the `dstack server` dstack CLI command)
 - Configure a dstack profile (e.g. using the `dstack config` dstack CLI command) 
-- Push or pull *Stack Frames* from Jupyter notebooks, Rmarkdown files or any Python or R scripts. Pushing and pulling is done via the `dstack` packages for Python or R. 
+- Push or pull *Stack Frames* from Jupyter notebooks, Rmarkdown files or any Python or R scripts. Pushing and pulling is done via the `dstack` packages for Python or R.
+
+The information on how to push artifacts to a dstack server, can be found in the [dstack-py](https://github.com/dstackai/dstack-py) an [dstack-r](https://github.com/dstackai/dstack-r) repositories correspondingly. 
 
 ### Use case #2: Building data science applications
 
-A data science application is a specific kind of applications that solves domain-specific problems by leveraging data and data-science methods.
- These methods may include data-wrangling, visualizations, statistical modeling, machine learning, etc.  
+A data science application is a specific kind of applications that solves domain-specific problems using data and data-science methods.
+ These data science methods may include data-wrangling, data visualizations, statistical modeling, machine learning, etc.  
 
 There are several general use-cases for such data science applications:
 
-1. Dashboards
-2. Reports
-3. Machine learning prototypes
+1. *Interactive reports* – a set data visualizations and interactive widgets, combined using a certain layout 
+2. *Live dashboards* – applications that fetch data from various data sources, turn it into visualizations and combine using a certain layout (not supported yet)
+3. *Machine learning applications* – applications that let users to interact with ML models (not supported yet)
 
-In order to simplify the process of building data science applications (and entirely remove the need for development skills),
-    the framework builds on the engine for managing artifacts, described above, and offers data scientists a way to build
-    applications by combining already submitted artifacts (*Stacks*). In this case, data science applications are built
-    automatically on-the-fly based on the chosen artifacts, and the logic defined through a declarative approach.
+Currently, dstack supports only *Interactive reports*. The support for *Live dashboards* and *Machine learning applications* is coming soon.
     
-Currently, dstack supports only simple types of applications, such as interactive dashboards and data reports. 
-    Soon, it's going to also support machine learning models, and custom callbacks.
+#### Interactive reports
+
+An interactive report can be currently built via the user interface of the `dstack-server` application.
+    In order to create a report, one must first create *Stacks* by pushing data via the `dstack` packages from Python or R.
+    The data can be dataframes (pandas, tidyverse, etc) or plots (matplotlib, plotly, ggplot, etc). 
+    Once the *Stacks* are pushed, the user must open the `dstack-server` application in a browser, go to *Dashboards*,
+    click *New dashboard*, and then select the *Stacks*. The `dstack-server` will automatically generate a dashboard
+    out of the chosen *Stacks*.
     
-TBA     
+It's important, that if any of the *Stacks* has multiple *Attachments* with parameters, the `dstack-server` application
+    will automatically generate interactive widgets to select these parameters and update the dashboard accordingly.
+    
+The information on how to push artifacts to a dstack server, can be found in the [dstack-py](https://github.com/dstackai/dstack-py) an [dstack-r](https://github.com/dstackai/dstack-r) repositories correspondingly.
+    
+An example of such an interactive report can be seen [here](https://dstack.ai/cheptsov/d/505d2087-9adc-49e3-88de-6b46079c394f).
 
 ## Installation
 
