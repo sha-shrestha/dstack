@@ -38,7 +38,8 @@ class AppConfigImpl : AppConfig {
 
     override val address: String
         get() {
-            return ((if (ssl) "https" else "http") + "://") + hostName + (if (port != null) ":${port}" else "")
+            val p = if (hostName == "localhost" || hostName == "127.0.0.1") internalPort else port
+            return ((if (ssl) "https" else "http") + "://") + hostName + (if (p != null) ":$p" else "")
         }
 
     override val schedulerQueueUrl: String
