@@ -1,4 +1,4 @@
-package ai.dstack.server.aws.resources
+package ai.dstack.server.jersey.resources.payload.resources
 
 import ai.dstack.server.jersey.resources.payload.PushPayload
 import ai.dstack.server.jersey.resources.payload.PushPayloadAttachment
@@ -19,7 +19,6 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = null,
                         size = null,
@@ -36,11 +35,10 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -56,11 +54,10 @@ class PushPayloadTest {
                         type = null,
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -76,11 +73,10 @@ class PushPayloadTest {
                         type = null,
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment("image/png", null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment("image/png", null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -88,24 +84,21 @@ class PushPayloadTest {
         ).isTrue()
 
         // type in attach
-        Truth.assertThat(
-                PushPayload(
-                        stack = "cheptsov/test",
-                        id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
-                        timestamp = 1576576185056296,
-                        type = null,
-                        application = null,
-                        contentType = null,
-                        storageFormat = null,
-                        index = null,
-                        attachments = listOf(
-                                PushPayloadAttachment("image/png", null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment("image/png", null, null, null, "hoho", null, null, emptyMap(), emptyMap())
-                        ),
-                        size = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
-        ).isFalse()
+        Truth.assertThat(PushPayload(
+                stack = "cheptsov/test",
+                id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
+                timestamp = 1576576185056296,
+                type = null,
+                application = null,
+                contentType = null,
+                index = null,
+                attachments = listOf(
+                        PushPayloadAttachment("image/png", null, null, "haha", null, null, emptyMap(), emptyMap()),
+                        PushPayloadAttachment("image/png", null, null, "hoho", null, null, emptyMap(), emptyMap())
+                ),
+                size = null,
+                message = null
+        ).migrateAttachmentType().isMalformed).isFalse()
 
         // no timestamp
         Truth.assertThat(
@@ -116,11 +109,10 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -136,11 +128,10 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -156,11 +147,10 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -176,10 +166,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -195,11 +184,10 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -215,7 +203,6 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = null,
                         attachments = null,
                         size = 1,
@@ -232,10 +219,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -251,10 +237,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, null, 10000L, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, null, 10000L, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -270,10 +255,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -289,10 +273,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -308,10 +291,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null
@@ -327,10 +309,9 @@ class PushPayloadTest {
                         type = "image/png",
                         application = null,
                         contentType = null,
-                        storageFormat = null,
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, null, null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, null, null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
                         message = null

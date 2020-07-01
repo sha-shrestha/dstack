@@ -5,8 +5,8 @@ import java.time.LocalDate
 import javax.persistence.*
 
 class AttachId(
-    var frame: String = "",
-    var index: Int = -1
+        var frame: String = "",
+        var index: Int = -1
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -29,8 +29,8 @@ class AttachId(
 
 @Entity
 @Table(
-    name = "attachs",
-    indexes = [Index(columnList = "frame_path", unique = false), Index(columnList = "created_date", unique = false)]
+        name = "attachs",
+        indexes = [Index(columnList = "frame_path", unique = false), Index(columnList = "created_date", unique = false)]
 )
 @IdClass(AttachId::class)
 class AttachmentItem(
@@ -45,17 +45,14 @@ class AttachmentItem(
     @Column
     var file: String,
 
-    @Column
-    var type: String,
+    @Column(name = "type")
+    var legacyType: String,
 
     @Column()
-    var application: String,
+    var application: String?,
 
     @Column(name = "content_type")
     var contentType: String,
-
-    @Column(name = "storage_format")
-    var storageFormat: String,
 
     @Column
     var length: Long,

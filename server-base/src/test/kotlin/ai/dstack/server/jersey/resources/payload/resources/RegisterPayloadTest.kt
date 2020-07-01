@@ -1,4 +1,4 @@
-package ai.dstack.server.aws.resources
+package ai.dstack.server.jersey.resources.payload.resources
 
 import ai.dstack.server.jersey.resources.payload.RegisterPayload
 import ai.dstack.server.jersey.resources.users.isMalformed

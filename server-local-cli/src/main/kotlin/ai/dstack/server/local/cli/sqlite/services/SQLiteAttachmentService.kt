@@ -49,19 +49,17 @@ class SQLiteAttachmentService @Autowired constructor(private val repository: Att
     private fun AttachmentItem.toAttachment(): Attachment {
         return this.let { a ->
             val values = AttachmentTypeMigration.migrate(
-                this.type,
+                this.legacyType,
                 this.application,
-                this.contentType,
-                this.storageFormat
+                this.contentType
             )
             Attachment(
                 a.frame,
                 a.file,
                 a.description,
-                values.type,
+                values.legacyType ?: "unknown",
                 values.application,
-                values.contentType,
-                values.storageFormat,
+                values.contentType ?: "unknown",
                 a.length,
                 a.index,
                 SQLITE_MAPPER.readValue(a.paramsJson,
@@ -75,20 +73,14 @@ class SQLiteAttachmentService @Autowired constructor(private val repository: Att
 
     private fun Attachment.toAttachmentItem(): AttachmentItem {
         return this.let { a ->
-            val values = AttachmentTypeMigration.migrate(
-                this.type,
-                this.application,
-                this.contentType,
-                this.storageFormat
-            )
+            val values = AttachmentTypeMigration.migrate(this.legacyType, this.application, this.contentType)
             AttachmentItem(
                 a.framePath,
                 a.index,
                 a.filePath,
-                values.type,
+                values.legacyType ?: "unknown",
                 values.application,
-                values.contentType,
-                values.storageFormat,
+                values.contentType ?: "unknown",
                 a.length,
                 a.description,
                 SQLITE_MAPPER.writeValueAsString(

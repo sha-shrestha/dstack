@@ -60,10 +60,9 @@ class FrameResources {
                                 attachments.map { a ->
                                     AttachmentInfo(
                                         a.description,
-                                        a.type,
+                                        a.legacyType,
                                         a.application,
                                         a.contentType,
-                                        a.storageFormat,
                                         a.params,
                                         a.settings,
                                         a.length

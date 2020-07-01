@@ -94,8 +94,8 @@ class StackResources {
     @Path("/{user}/{stack: .+}")
     @Produces(JSON_UTF8)
     fun stack(
-        @PathParam("user") u: String?, @PathParam("stack") s: String?,
-        @Context headers: HttpHeaders
+            @PathParam("user") u: String?, @PathParam("stack") s: String?,
+            @Context headers: HttpHeaders
     ): Response {
         logger.debug { "user: $u, stack: $s" }
         return if (u.isNullOrBlank() || s.isNullOrBlank()) {
@@ -120,47 +120,46 @@ class StackResources {
                     val frames = frameService.findByStackPath(stack.path)
                     session?.let { sessionService.renew(it) }
                     ok(
-                        GetStackStatus(
-                            StackInfo(stack.userName,
-                                stack.name,
-                                stack.private,
-                                head?.let {
-                                    val attachments = attachmentService.findByFrame(it.path)
-                                    FrameInfo(
-                                        it.id, it.timestampMillis,
-                                        attachments.map { a ->
-                                            AttachmentInfo(
-                                                a.description,
-                                                a.type,
-                                                a.application,
-                                                a.contentType,
-                                                a.storageFormat,
-                                                a.params,
-                                                a.settings,
-                                                a.length
-                                            )
-                                        }, it.message
+                            GetStackStatus(
+                                    StackInfo(stack.userName,
+                                            stack.name,
+                                            stack.private,
+                                            head?.let {
+                                                val attachments = attachmentService.findByFrame(it.path)
+                                                FrameInfo(
+                                                        it.id, it.timestampMillis,
+                                                        attachments.map { a ->
+                                                            AttachmentInfo(
+                                                                    a.description,
+                                                                    a.legacyType,
+                                                                    a.application,
+                                                                    a.contentType,
+                                                                    a.params,
+                                                                    a.settings,
+                                                                    a.length
+                                                            )
+                                                        }, it.message
+                                                )
+                                            },
+                                            if (owner) permissionService.findByPath(stack.path)
+                                                    .map {
+                                                        PermissionInfo(
+                                                                it.userName,
+                                                                it.email
+                                                        )
+                                                    }.toList() else null,
+                                            commentService.findByStackPath(stack.path).map {
+                                                CommentInfo(it.id, it.timestampMillis, it.userName, it.text)
+                                            },
+                                            frames.map {
+                                                BasicFrameInfo(
+                                                        it.id,
+                                                        it.timestampMillis,
+                                                        it.message
+                                                )
+                                            }
                                     )
-                                },
-                                if (owner) permissionService.findByPath(stack.path)
-                                    .map {
-                                        PermissionInfo(
-                                            it.userName,
-                                            it.email
-                                        )
-                                    }.toList() else null,
-                                commentService.findByStackPath(stack.path).map {
-                                    CommentInfo(it.id, it.timestampMillis, it.userName, it.text)
-                                },
-                                frames.map {
-                                    BasicFrameInfo(
-                                        it.id,
-                                        it.timestampMillis,
-                                        it.message
-                                    )
-                                }
                             )
-                        )
                     )
                 } else {
                     badCredentials()
@@ -200,21 +199,21 @@ class StackResources {
                                     || permissionService.get(stack.path, session.userName) != null)
                     permitted
                 }.plus(sharedStacks)
-                    .sortedWith(compareByDescending<Stack, Long?>(nullsFirst()) { it.head?.timestampMillis })
-                    .toList()
+                        .sortedWith(compareByDescending<Stack, Long?>(nullsFirst()) { it.head?.timestampMillis })
+                        .toList()
                 if (session != null) {
                     sessionService.renew(session)
                 }
                 ok(GetStacksStatus(permittedStacks.map { stack ->
                     BasicStackInfo(
-                        stack.userName, stack.name, stack.private, stack.head?.id,
-                        if (owner) permissionService.findByPath(stack.path)
-                            .map {
-                                PermissionInfo(
-                                    it.userName,
-                                    it.email
-                                )
-                            }.toList() else null
+                            stack.userName, stack.name, stack.private, stack.head?.id,
+                            if (owner) permissionService.findByPath(stack.path)
+                                    .map {
+                                        PermissionInfo(
+                                                it.userName,
+                                                it.email
+                                        )
+                                    }.toList() else null
                     )
                 }.toList()))
             }
@@ -229,7 +228,7 @@ class StackResources {
         val payload = p?.migrateAttachmentType()
         logger.debug {
             "payload: ${payload?.copy(attachments = payload.attachments?.map { it.copy(data = if (it.data != null) "(hidden)" else null) }
-                ?.toList())}"
+                    ?.toList())}"
         }
         return if (payload.isMalformed) {
             malformedRequest()
@@ -250,12 +249,12 @@ class StackResources {
                 }
                 if (frame == null) {
                     frame = Frame(
-                        stack.path, payload.id, payload.timestamp!!,
-                        if (payload.index == null && payload.attachments?.isNotEmpty() == true)
-                            payload.attachments.size
-                        else
-                            payload.size,
-                        payload.message?.let { if (it.isNotEmpty()) it else null }
+                            stack.path, payload.id, payload.timestamp!!,
+                            if (payload.index == null && payload.attachments?.isNotEmpty() == true)
+                                payload.attachments.size
+                            else
+                                payload.size,
+                            payload.message?.let { if (it.isNotEmpty()) it else null }
                     )
                     frameService.create(frame)
                 } else if (payload.size != null) {
@@ -270,7 +269,6 @@ class StackResources {
                             val type = a.type ?: payload.type
                             val application = a.application ?: payload.application
                             val contentType = a.contentType ?: payload.contentType
-                            val storageFormat = a.storageFormat ?: payload.storageFormat
                             val file = frame.path + "/" + index
                             val data = a.data?.let { DatatypeConverter.parseBase64Binary(a.data) }
                             val length = data?.count()?.toLong() ?: a.length!!
@@ -282,27 +280,26 @@ class StackResources {
                                     attachmentUploadInfos = mutableListOf()
                                 }
                                 attachmentUploadInfos!!.add(
-                                    AttachmentUploadInfo(
-                                        index,
-                                        uploadUrl.toString()
-                                    )
+                                        AttachmentUploadInfo(
+                                                index,
+                                                uploadUrl.toString()
+                                        )
                                 )
                             }
                             attachmentService.create(
-                                Attachment(
-                                    framePath = frame.path,
-                                    filePath = file,
-                                    description = a.description,
-                                    type = type!!,
-                                    application = application!!,
-                                    contentType = contentType!!,
-                                    storageFormat = storageFormat!!,
-                                    length = length,
-                                    index = index,
-                                    params = a.params.orEmpty().mapValues { it.value }.toMap(),
-                                    settings = a.settings.orEmpty().mapValues { it.value }.toMap(),
-                                    createdDate = LocalDate.now(ZoneOffset.UTC)
-                                )
+                                    Attachment(
+                                            framePath = frame.path,
+                                            filePath = file,
+                                            description = a.description,
+                                            legacyType = type!!,
+                                            application = application!!,
+                                            contentType = contentType!!,
+                                            length = length,
+                                            index = index,
+                                            params = a.params.orEmpty().mapValues { it.value }.toMap(),
+                                            settings = a.settings.orEmpty().mapValues { it.value }.toMap(),
+                                            createdDate = LocalDate.now(ZoneOffset.UTC)
+                                    )
                             )
 
                         } catch (e: EntityAlreadyExists) {
@@ -313,16 +310,16 @@ class StackResources {
                 // TODO: Update stack's head information asynchronously / eventually
                 if (frame.size != null) {
                     stackService.update(
-                        stack.copy(
-                            head = Head(frame.id, frame.timestampMillis)
-                        )
+                            stack.copy(
+                                    head = Head(frame.id, frame.timestampMillis)
+                            )
                     )
                 }
                 ok(
-                    PushStatus(
-                        "${config.address}/${user.name}/${stack.name}",
-                        attachmentUploadInfos
-                    )
+                        PushStatus(
+                                "${config.address}/${user.name}/${stack.name}",
+                                attachmentUploadInfos
+                        )
                 )
             }
         }
@@ -348,7 +345,7 @@ class StackResources {
                     badCredentials()
                 } else {
                     val isPrivate =
-                        !payload.private!! || user.settings.general.defaultAccessLevel == AccessLevel.Private
+                            !payload.private!! || user.settings.general.defaultAccessLevel == AccessLevel.Private
                     val stack = Stack(user.name, payload.name!!, isPrivate, null)
                     try {
                         sessionService.renew(session)
@@ -356,8 +353,8 @@ class StackResources {
                         ok()
                     } catch (e: EntityAlreadyExists) {
                         response(
-                            Response.Status.BAD_REQUEST,
-                            OpStatus("stack already exists")
+                                Response.Status.BAD_REQUEST,
+                                OpStatus("stack already exists")
                         )
                     }
                 }
@@ -424,20 +421,20 @@ class StackResources {
                     else -> {
                         sessionService.renew(session)
                         val comment = Comment(
-                            UUID.randomUUID().toString(), stack.path, session.userName,
-                            Instant.now().epochSecond, payload.text!!
+                                UUID.randomUUID().toString(), stack.path, session.userName,
+                                Instant.now().epochSecond, payload.text!!
                         )
                         commentService.create(comment)
                         if (user.settings.notifications.comments && stack.userName != session.userName
-                            && emailService !is NonAvailable
+                                && emailService !is NonAvailable
                         ) {
                             emailService.sendCommentEmail(user, comment)
                         }
                         ok(
-                            CreateCommentStatus(
-                                comment.id,
-                                comment.timestampMillis
-                            )
+                                CreateCommentStatus(
+                                        comment.id,
+                                        comment.timestampMillis
+                                )
                         )
                     }
                 }
@@ -526,10 +523,10 @@ class StackResources {
                                 frameNotFound()
                             } else {
                                 stackService.update(
-                                    stack.copy(
-                                        private = payload.private ?: stack.private,
-                                        head = Head(head.id, head.timestampMillis)
-                                    )
+                                        stack.copy(
+                                                private = payload.private ?: stack.private,
+                                                head = Head(head.id, head.timestampMillis)
+                                        )
                                 )
                                 ok()
                             }
@@ -548,34 +545,15 @@ class StackResources {
 }
 
 fun PushPayload.migrateAttachmentType(): PushPayload {
-    val values = AttachmentTypeMigration.migrate(
-        this.type,
-        this.application,
-        this.contentType,
-        this.storageFormat
-    )
-    return this.copy(
-        type = if (values.type != AttachmentTypeMigration.BLANK) values.type else null,
-        application = if (values.application != AttachmentTypeMigration.BLANK) values.application else null,
-        contentType = if (values.contentType != AttachmentTypeMigration.BLANK) values.contentType else null,
-        storageFormat = if (values.storageFormat != AttachmentTypeMigration.BLANK) values.storageFormat else null,
-        attachments = this.attachments?.map { it.migrateAttachmentType() }
+    val values = AttachmentTypeMigration.migrate(this.type, this.application, this.contentType)
+    return this.copy(type = values.legacyType, application = values.application, contentType = values.contentType,
+            attachments = this.attachments?.map { it.migrateAttachmentType() }
     )
 }
 
 fun PushPayloadAttachment.migrateAttachmentType(): PushPayloadAttachment {
-    val values = AttachmentTypeMigration.migrate(
-        this.type,
-        this.application,
-        this.contentType,
-        this.storageFormat
-    )
-    return this.copy(
-        type = if (values.type != AttachmentTypeMigration.BLANK) values.type else null,
-        application = if (values.application != AttachmentTypeMigration.BLANK) values.application else null,
-        contentType = if (values.contentType != AttachmentTypeMigration.BLANK) values.contentType else null,
-        storageFormat = if (values.storageFormat != AttachmentTypeMigration.BLANK) values.storageFormat else null
-    );
+    val values = AttachmentTypeMigration.migrate(this.type, this.application, this.contentType)
+    return this.copy(type = values.legacyType, application = values.application, contentType = values.contentType)
 }
 
 fun String.parseStackPath(): Pair<String, String> {
@@ -638,14 +616,12 @@ private val String?.isMalformedStackPath
 val PushPayload?.isMalformed: Boolean
     get() {
         val missingRequiredFields =
-            this?.stack.isNullOrBlank() || this?.id.isNullOrBlank() || this?.timestamp == null
+                this?.stack.isNullOrBlank() || this?.id.isNullOrBlank() || this?.timestamp == null
         val missingSize = this?.size == null
         val missingAttachments = (this?.attachments?.size ?: 0) == 0
-        val missingType = (this?.type == null || this.application == null ||
-                this.contentType == null || this.storageFormat == null)
+        val missingType = (this?.type == null || this.contentType == null)
                 && this?.attachments?.any {
-            it.type == null || it.application == null ||
-                    it.contentType == null || it.storageFormat == null
+            it.type == null || it.contentType == null
         } == true
         val containsMalformedAttachments = this?.attachments?.any {
             (it.data == null && it.length == null) ||

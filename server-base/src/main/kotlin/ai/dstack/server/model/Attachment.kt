@@ -6,11 +6,10 @@ data class Attachment(
     val framePath: String,
     val filePath: String,
     val description: String?,
-    @Deprecated("Is replaced by contentType, application, and storageFormat.")
-    val type: String,
-    val application: String,
+    @Deprecated("Will be dropped in August")
+    val legacyType: String,
+    val application: String?,
     val contentType: String,
-    val storageFormat: String,
     val length: Long,
     val index: Int,
     val params: Map<String, Any>,
@@ -22,6 +21,10 @@ data class Attachment(
             val framePathTokens = framePath.split("/")
             val prefix = framePathTokens.subList(0, framePathTokens.size - 1)
                 .joinToString("_").replace("[/\\-]".toRegex(), "_")
-            return "${prefix}_$index.$storageFormat"
+            return "${prefix}_$index.${contentType.toExtension()}"
         }
+
+    fun String.toExtension(): String {
+        return this.split("/".toRegex(), 2).last().split("[^\\w]").first()
+    }
 }
