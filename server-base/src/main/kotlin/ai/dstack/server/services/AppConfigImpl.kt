@@ -1,5 +1,6 @@
 package ai.dstack.server.services
 
+// TODO: Refactor: get rid out of all environment variables; remove all "dstackai_..." variables
 class AppConfigImpl : AppConfig {
     override val supportEmail: String
         get() {
@@ -49,7 +50,7 @@ class AppConfigImpl : AppConfig {
 
     override val dataDirectory: String
         get() {
-            return System.getenv("dstackai_data_dir") ?: "./data"
+            return System.getenv("dstackai_data_dir") ?: (if (hostName == "localhost" || hostName == "127.0.0.1") "./.dstack/data" else "./data")
         }
 
     override val fileDirectory: String
