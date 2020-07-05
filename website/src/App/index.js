@@ -5,12 +5,11 @@ import {connect} from 'react-redux';
 import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
 import routes from 'routes';
 import '@mdi/font/css/materialdesignicons.min.css';
+import 'dstack-react/dist/index.css';
 
-import Loader from 'components/Loader';
+import {NotFound, Loader} from 'dstack-react';
 import DefaultLayout from 'layouts/Default';
 import UnAuthorizedLayout from 'layouts/UnAuthorized';
-
-import NotFound from 'components/NotFound';
 
 import Login from 'Auth/Login';
 import ConfirmEmail from 'Auth/ConfirmEmail';

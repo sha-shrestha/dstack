@@ -1,9 +1,7 @@
 // @flow
 import React from 'react';
 import cx from 'classnames';
-import SelectField from 'components/form/SelectField';
-import CheckboxField from 'components/form/CheckboxField';
-import SliderField from 'components/form/SliderField';
+import {SelectField, CheckboxField, SliderField} from 'dstack-react';
 import css from './styles.module.css';
 
 type Props = {

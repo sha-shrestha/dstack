@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import routes from 'routes';
-import Loader from 'components/Loader';
+import {Loader} from 'dstack-react';
 import {verifyUser} from './actions';
 import {fetchUser} from 'App/actions';
 import {parseSearch} from 'utils';

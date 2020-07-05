@@ -2,7 +2,9 @@ import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import ProgressBar from 'components/ProgressBar';
+import {ProgressBar} from 'dstack-react';
+
+
 import css from './styles.module.css';
 
 const DefaultLayout = ({children, appProgressIsActive, appProgress}) => {

@@ -3,9 +3,8 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {connect} from 'react-redux';
+import {Tabs, CodeViewer} from 'dstack-react';
 import {get, isString} from 'lodash-es';
-import Tabs from 'components/Tabs';
-import CodeViewer from 'components/CodeViewer';
 import config from 'config';
 import css from 'Stacks/components/HowTo/styles.module.css';
 

@@ -6,7 +6,7 @@ import {useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import {connect} from 'react-redux';
 import {get} from 'lodash-es';
-import Dropdown from 'components/Dropdown';
+import {Dropdown} from 'dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import css from './styles.module.css';
 import routes from 'routes';

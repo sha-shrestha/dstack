@@ -4,12 +4,10 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {debounce as _debounce, get} from 'lodash-es';
-import Button from 'components/Button';
-import TextField from 'components/form/TextField';
+import {Button, TextField, Copy} from 'dstack-react';
 import {updateToken} from 'App/actions';
 import {updateSettings} from './actions';
 import css from './styles.module.css';
-import Copy from 'components/Copy';
 
 type Props = {
     updateToken: Function,

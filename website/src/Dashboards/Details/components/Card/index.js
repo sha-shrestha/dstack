@@ -7,9 +7,7 @@ import {Link} from 'react-router-dom';
 import cx from 'classnames';
 import {parseStackParams} from 'utils';
 import {useDebounce} from 'hooks';
-import Dropdown from 'components/Dropdown';
-import Button from 'components/Button';
-import Tooltip from 'components/Tooltip';
+import {Button, Dropdown, Tooltip} from 'dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import css from './styles.module.css';
 

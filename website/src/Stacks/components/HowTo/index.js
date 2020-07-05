@@ -3,10 +3,9 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {connect} from 'react-redux';
+import {CodeViewer, Tabs} from 'dstack-react';
 import {get} from 'lodash-es';
 import css from './styles.module.css';
-import Tabs from 'components/Tabs';
-import CodeViewer from 'components/CodeViewer';
 import config from 'config';
 
 export const reportPlotPythonCode = `import matplotlib.pyplot as plt
