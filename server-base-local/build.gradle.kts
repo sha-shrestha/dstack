@@ -18,7 +18,10 @@ publishing {
     }
     repositories {
         maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+            val prefix = "https://oss.sonatype.org/content/repositories"
+            val releasesRepoUrl = "$prefix/releases"
+            val snapshotsRepoUrl = "$prefix/snapshots"
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
             credentials {
                 username = System.getenv("MAVEN_USERNAME")
                 password = System.getenv("MAVEN_PASSWORD")

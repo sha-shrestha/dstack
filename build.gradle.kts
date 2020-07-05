@@ -15,7 +15,7 @@ allprojects {
     apply(plugin = "idea")
 
     group = "ai.dstack"
-    version = "0.1-SNAPSHOT"
+    version = project.findProperty("dstack_version")?.toString() ?: "0.1-SNAPSHOT"
 
     repositories {
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
