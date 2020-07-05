@@ -5,8 +5,14 @@ plugins {
     kotlin("jvm") version Deps.KOTLIN_VERSION
 }
 
+println()
 println("Printing all environment variables:\n")
 System.getenv().forEach {
+    println("\"${it.key}\" = \"${it.value}\"")
+}
+println()
+println("Printing all project properties:\n")
+project.properties.forEach {
     println("\"${it.key}\" = \"${it.value}\"")
 }
 
