@@ -11,6 +11,7 @@ dependencies {
 
 plugins {
     id("org.springframework.boot") version "2.2.6.RELEASE"
+    `java-library`
     `maven-publish`
     signing
 }
@@ -71,12 +72,15 @@ signing {
     sign(publications)
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("bootJava") {
             artifact(tasks.getByName("bootJar"))
-            artifact(sourceJar)
-            artifact(javadocJar)
 
             pom {
                 name.set("dstack Server Local CLI")

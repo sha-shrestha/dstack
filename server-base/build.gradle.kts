@@ -1,4 +1,5 @@
 plugins {
+    `java-library`
     `maven-publish`
     signing
 }
@@ -24,18 +25,6 @@ dependencies {
     testRuntime(Deps.junit_vintage_engine)
 }
 
-val sourceJar = task<Jar>("sourceJar") {
-    description = "Creates a JAR that contains the source code."
-    from(project.sourceSets["main"].allSource)
-    classifier = "sources"
-}
-val javadocJar = task<Jar>("javadocJar") {
-    dependsOn("javadoc")
-    description = "Creates a JAR that contains the javadocs."
-    from(tasks.named("javadoc"))
-    classifier = "javadoc"
-}
-
 val publications: PublicationContainer = (extensions.getByName("publishing") as PublishingExtension).publications
 
 signing {
@@ -45,12 +34,15 @@ signing {
     sign(publications)
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            artifact(sourceJar)
-            artifact(javadocJar)
 
             pom {
                 name.set("dstack Server Base")

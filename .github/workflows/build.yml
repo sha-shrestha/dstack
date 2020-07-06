@@ -124,7 +124,7 @@ jobs:
       - name: Publish with Gradle
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          ./gradlew -Pdstack_version=$VERSION clean publish
+          ./gradlew -Pdstack_version=$VERSION clean publish -Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
