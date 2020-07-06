@@ -393,8 +393,12 @@ class DashboardResources {
                     }
                     cardService.update(
                             cards.mapIndexed { index, card ->
-                                    index to card
-                            }.filter{ (index, card) ->
+                                stackHeads.computeIfAbsent(card.stackPath) {
+                                    val (u, s) = card.stackPath.parseStackPath()
+                                    stackService.get(u, s)?.head
+                                }
+                                index to card
+                            }.filter { (index, card) ->
                                 index != card.index
                             }.map { (index, card) ->
                                 card.copy(index = index).also {
@@ -409,25 +413,11 @@ class DashboardResources {
                                     dashboard.private,
                                     cards.map { card ->
                                         val head = stackHeads[card.stackPath]?.let { frameService.get(card.stackPath, it.id) }
-                                        CardInfo(card.stackPath,
+                                        BasicCardInfo(card.stackPath,
                                                 card.index,
                                                 card.title,
                                                 head?.let { h ->
-                                                    val attachs = attachmentService.findByFrame(h.path)
-                                                    FrameInfo(
-                                                            h.id, h.timestampMillis,
-                                                            attachs.map { a ->
-                                                                AttachmentInfo(
-                                                                        a.description,
-                                                                        a.legacyType,
-                                                                        a.application,
-                                                                        a.contentType,
-                                                                        a.params,
-                                                                        a.settings,
-                                                                        a.length
-                                                                )
-                                                            }, h.message
-                                                    )
+                                                    BasicFrameInfo(h.id, h.timestampMillis, h.message)
                                                 })
                                     }
                             )
@@ -505,7 +495,7 @@ class DashboardResources {
                                                 dashboard.title,
                                                 dashboard.private,
                                                 cards.map {
-                                                    CardInfo(
+                                                    BasicCardInfo(
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
@@ -534,7 +524,7 @@ class DashboardResources {
                                                 dashboard.title,
                                                 dashboard.private,
                                                 cards.map {
-                                                    CardInfo(
+                                                    BasicCardInfo(
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
@@ -596,7 +586,7 @@ class DashboardResources {
                                             dashboard.title,
                                             dashboard.private,
                                             cards.map {
-                                                CardInfo(
+                                                BasicCardInfo(
                                                         it.stackPath,
                                                         it.index,
                                                         it.title,

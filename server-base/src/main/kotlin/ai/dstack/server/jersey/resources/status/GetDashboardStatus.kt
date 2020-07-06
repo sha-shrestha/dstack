@@ -7,6 +7,13 @@ data class CardInfo(
     val head: FrameInfo?
 )
 
+data class BasicCardInfo(
+    val stack: String,
+    val index: Int,
+    val title: String,
+    val head: BasicFrameInfo?
+)
+
 data class DashboardInfo(
     val user: String,
     val id: String,
