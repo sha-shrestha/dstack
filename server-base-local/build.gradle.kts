@@ -10,10 +10,24 @@ dependencies {
     compile(project(Modules.SERVER_BASE.id))
 }
 
+val sourceJar = task<Jar>("sourceJar") {
+    description = "Creates a JAR that contains the source code."
+    from(project.sourceSets["main"].allSource)
+    classifier = "sources"
+}
+val javadocJar = task<Jar>("javadocJar") {
+    dependsOn("javadoc")
+    description = "Creates a JAR that contains the javadocs."
+    from(tasks.named("javadoc"))
+    classifier = "javadoc"
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            artifact(sourceJar)
+            artifact(javadocJar)
         }
     }
     repositories {
