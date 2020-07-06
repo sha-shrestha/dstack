@@ -9,6 +9,7 @@ import ai.dstack.server.jersey.resources.malformedRequest
 import ai.dstack.server.jersey.resources.ok
 import ai.dstack.server.jersey.resources.payload.*
 import ai.dstack.server.jersey.resources.status.*
+import ai.dstack.server.model.Head
 import mu.KLogging
 import java.time.Instant
 import java.util.*
@@ -34,13 +35,13 @@ private val DeleteDashboardPayload?.isMalformed: Boolean
             || this.user.isNullOrBlank()
             || this.id.isNullOrBlank()
 
-private val InsertCardPayload?.isMalformed: Boolean
+private val InsertCardsPayload?.isMalformed: Boolean
     get() = this == null
             || this.user.isNullOrBlank()
             || this.dashboard.isNullOrBlank()
-            || this.stack.isNullOrBlank()
             || this.index == null
             || this.index < 0
+            || this.cards?.none { it.stack.isNullOrBlank() } != true
 
 private val UpdateCardPayload?.isMalformed: Boolean
     get() = this == null
@@ -115,37 +116,37 @@ class DashboardResources {
                                     || permissionService.get(dashboard.path, session.userName) != null)
                     permitted
                 }.plus(sharedDashboards)
-                    .sortedByDescending { it.timestampMillis }
-                    .toList()
+                        .sortedByDescending { it.timestampMillis }
+                        .toList()
                 ok(GetDashboardsStatus(dashboards = permittedDashboards.map { dashboard ->
                     val cards = cardService.getByDashboardPath(dashboard.path)
                     DashboardBasicInfo(
-                        dashboard.userName, dashboard.id, dashboard.title, dashboard.private,
-                        cards.map { c ->
-                            // TODO: This is not optimal
-                            val (u, s) = c.stackPath.parseStackPath()
-                            val stack = stackService.get(u, s)
-                            CardBasicInfo(
-                                c.stackPath,
-                                c.index,
-                                c.title,
-                                stack?.let { s ->
-                                    s.head?.let { h ->
-                                        BasicFrameInfo(
-                                            h.id,
-                                            h.timestampMillis,
-                                            null
+                            dashboard.userName, dashboard.id, dashboard.title, dashboard.private,
+                            cards.map { c ->
+                                // TODO: This is not optimal
+                                val (u, s) = c.stackPath.parseStackPath()
+                                val stack = stackService.get(u, s)
+                                CardBasicInfo(
+                                        c.stackPath,
+                                        c.index,
+                                        c.title,
+                                        stack?.let { s ->
+                                            s.head?.let { h ->
+                                                BasicFrameInfo(
+                                                        h.id,
+                                                        h.timestampMillis,
+                                                        null
+                                                )
+                                            }
+                                        })
+                            },
+                            if (owner) permissionService.findByPath(dashboard.path)
+                                    .map {
+                                        PermissionInfo(
+                                                it.userName,
+                                                it.email
                                         )
-                                    }
-                                })
-                        },
-                        if (owner) permissionService.findByPath(dashboard.path)
-                            .map {
-                                PermissionInfo(
-                                    it.userName,
-                                    it.email
-                                )
-                            }.toList() else null
+                                    }.toList() else null
                     )
                 }))
             }
@@ -156,9 +157,9 @@ class DashboardResources {
     @Path("/{user}/{dashboard}")
     @Produces(JSON_UTF8)
     fun dashboard(
-        @PathParam("user") u: String?,
-        @PathParam("dashboard") d: String?,
-        @Context headers: HttpHeaders
+            @PathParam("user") u: String?,
+            @PathParam("dashboard") d: String?,
+            @Context headers: HttpHeaders
     ): Response {
         logger.debug { "user: $u, dashboard: $d" }
         return if (u.isNullOrBlank() || d.isNullOrBlank()) {
@@ -190,47 +191,47 @@ class DashboardResources {
                         val cards = cardService.getByDashboardPath(dashboard.path)
                         session?.let { sessionService.renew(it) }
                         ok(
-                            GetDashboardStatus(
-                                dashboard = DashboardInfo(
-                                    dashboard.userName,
-                                    dashboard.id,
-                                    dashboard.title,
-                                    dashboard.private,
-                                    cards.map {
-                                        // TODO: This is not optimal
-                                        val (u, s) = it.stackPath.parseStackPath()
-                                        val stack = stackService.get(u, s)
-                                        val head = stack?.head?.let { frameService.get(stack.path, it.id) }
-                                        CardInfo(it.stackPath,
-                                            it.index,
-                                            it.title,
-                                            head?.let { h ->
-                                                val attachments = attachmentService.findByFrame(h.path)
-                                                FrameInfo(
-                                                    h.id, h.timestampMillis,
-                                                    attachments.map { a ->
-                                                        AttachmentInfo(
-                                                            a.description,
-                                                            a.legacyType,
-                                                            a.application,
-                                                            a.contentType,
-                                                            a.params,
-                                                            a.settings,
-                                                            a.length
-                                                        )
-                                                    }, h.message
-                                                )
-                                            })
-                                    }.toList(),
-                                    if (owner) permissionService.findByPath(dashboard.path)
-                                        .map {
-                                            PermissionInfo(
-                                                it.userName,
-                                                it.email
-                                            )
-                                        }.toList() else null
+                                GetDashboardStatus(
+                                        dashboard = DashboardInfo(
+                                                dashboard.userName,
+                                                dashboard.id,
+                                                dashboard.title,
+                                                dashboard.private,
+                                                cards.map {
+                                                    // TODO: This is not optimal
+                                                    val (u, s) = it.stackPath.parseStackPath()
+                                                    val stack = stackService.get(u, s)
+                                                    val head = stack?.head?.let { frameService.get(stack.path, it.id) }
+                                                    CardInfo(it.stackPath,
+                                                            it.index,
+                                                            it.title,
+                                                            head?.let { h ->
+                                                                val attachments = attachmentService.findByFrame(h.path)
+                                                                FrameInfo(
+                                                                        h.id, h.timestampMillis,
+                                                                        attachments.map { a ->
+                                                                            AttachmentInfo(
+                                                                                    a.description,
+                                                                                    a.legacyType,
+                                                                                    a.application,
+                                                                                    a.contentType,
+                                                                                    a.params,
+                                                                                    a.settings,
+                                                                                    a.length
+                                                                            )
+                                                                        }, h.message
+                                                                )
+                                                            })
+                                                }.toList(),
+                                                if (owner) permissionService.findByPath(dashboard.path)
+                                                        .map {
+                                                            PermissionInfo(
+                                                                    it.userName,
+                                                                    it.email
+                                                            )
+                                                        }.toList() else null
+                                        )
                                 )
-                            )
                         )
                     }
                 }
@@ -250,30 +251,30 @@ class DashboardResources {
             val session = headers.bearer?.let { sessionService.get(it) }
             val user = session?.userName?.let { userService.get(it) }
             return if (session == null || !session.valid || user == null
-                || user.name != payload!!.user
+                    || user.name != payload!!.user
             ) {
                 badCredentials()
             } else if (!user.verified) {
                 userNotVerified()
             } else {
                 val dashboard = Dashboard(
-                    payload.user!!, UUID.randomUUID().toString(),
-                    payload.title.orEmpty(),
-                    Instant.now().epochSecond,
-                    payload.private ?: user.settings.general.defaultAccessLevel == AccessLevel.Private
+                        payload.user!!, UUID.randomUUID().toString(),
+                        payload.title.orEmpty(),
+                        Instant.now().epochSecond,
+                        payload.private ?: user.settings.general.defaultAccessLevel == AccessLevel.Private
                 )
                 dashboardService.create(dashboard)
                 return ok(
-                    GetDashboardStatus(
-                        DashboardInfo(
-                            dashboard.userName,
-                            dashboard.id,
-                            dashboard.title,
-                            dashboard.private,
-                            emptyList(),
-                            null
+                        GetDashboardStatus(
+                                DashboardInfo(
+                                        dashboard.userName,
+                                        dashboard.id,
+                                        dashboard.title,
+                                        dashboard.private,
+                                        emptyList(),
+                                        null
+                                )
                         )
-                    )
                 )
             }
         }
@@ -291,7 +292,7 @@ class DashboardResources {
             val session = headers.bearer?.let { sessionService.get(it) }
             val user = session?.userName?.let { userService.get(it) }
             return if (session == null || !session.valid || user == null
-                || user.name != payload!!.user
+                    || user.name != payload!!.user
             ) {
                 badCredentials()
             } else if (!user.verified) {
@@ -302,10 +303,10 @@ class DashboardResources {
                     dashboardNotFound()
                 } else {
                     dashboardService.update(
-                        dashboard.copy(
-                            title = payload.title ?: dashboard.title,
-                            private = payload.private ?: dashboard.private
-                        )
+                            dashboard.copy(
+                                    title = payload.title ?: dashboard.title,
+                                    private = payload.private ?: dashboard.private
+                            )
                     )
                     return ok()
                 }
@@ -325,7 +326,7 @@ class DashboardResources {
             val session = headers.bearer?.let { sessionService.get(it) }
             val user = session?.userName?.let { userService.get(it) }
             return if (session == null || !session.valid || user == null
-                || user.name != payload!!.user
+                    || user.name != payload!!.user
             ) {
                 badCredentials()
             } else if (!user.verified) {
@@ -348,9 +349,9 @@ class DashboardResources {
     @Produces(JSON_UTF8)
     @Consumes(JSON_UTF8)
     fun insertCard(
-        payload: InsertCardPayload?,
-        @QueryParam("attachments") attachments: Boolean?,
-        @Context headers: HttpHeaders
+            payload: InsertCardsPayload?,
+            @QueryParam("attachments") attachments: Boolean?,
+            @Context headers: HttpHeaders
     ): Response {
         logger.debug { payload }
         return if (payload.isMalformed) {
@@ -359,70 +360,78 @@ class DashboardResources {
             val session = headers.bearer?.let { sessionService.get(it) }
             val user = session?.userName?.let { userService.get(it) }
             return if (session == null || !session.valid || user == null
-                || user.name != payload!!.user
+                    || user.name != payload!!.user
             ) {
                 badCredentials()
             } else if (!user.verified) {
                 userNotVerified()
             } else {
                 val dashboard = dashboardService.get(payload.user!!, payload.dashboard!!)
+                val stackHeads = mutableMapOf<String, Head?>()
                 if (dashboard == null) {
                     dashboardNotFound()
                 } else {
-                    val (u, s) = payload.stack!!.parseStackPath()
-                    val stack = stackService.get(u, s)
-                    if (stack == null) {
-                        stackNotFound()
-                    } else {
-                        var index = payload.index!!
-                        val cards = cardService.getByDashboardPath(dashboard.path).toMutableList()
-                        if (index > cards.size) {
-                            index = cards.size
-                        }
-                        val card = Card(
-                            dashboard.path, index, payload.stack,
-                            if (payload.title.isNullOrBlank()) stack.name else payload.title
-                        )
-                        cards.add(index, card)
-                        updateIndexes(cards)
-                        cardService.create(card)
-                        cardService.update(
-                            cards.filter { it.index != index }
-                        )
-                        return ok(UpdateDashboardStatus(
-                            UpdateDashboardInfo(dashboard.userName,
-                                dashboard.id,
-                                dashboard.title,
-                                dashboard.private,
-                                cards.map {
-                                    CardInfo(it.stackPath,
-                                        it.index,
-                                        it.title,
-                                        if (index == it.index && attachments == true) {
-                                            val head = stack.head?.let { frameService.get(stack.path, it.id) }
-                                            head?.let { h ->
-                                                val attachs = attachmentService.findByFrame(h.path)
-                                                FrameInfo(
-                                                    h.id, h.timestampMillis,
-                                                    attachs.map { a ->
-                                                        AttachmentInfo(
-                                                            a.description,
-                                                            a.legacyType,
-                                                            a.application,
-                                                            a.contentType,
-                                                            a.params,
-                                                            a.settings,
-                                                            a.length
-                                                        )
-                                                    }, h.message
-                                                )
-                                            }
-                                        } else null)
-
-                                }
+                    val cards = cardService.getByDashboardPath(dashboard.path).toMutableList()
+                    payload.cards!!.forEachIndexed { cardPayloadIndex, cardPayload ->
+                        val (u, s) = cardPayload.stack!!.parseStackPath()
+                        val stack = stackService.get(u, s)
+                        if (stack == null) {
+                            stackNotFound()
+                        } else {
+                            stackHeads[stack.path] = stack.head
+                            var index = payload.index!! + cardPayloadIndex
+                            if (index > cards.size + cardPayloadIndex) {
+                                index = cards.size + cardPayloadIndex
+                            }
+                            val card = Card(
+                                    dashboard.path, index, cardPayload.stack,
+                                    if (cardPayload.title.isNullOrBlank()) stack.name else cardPayload.title
                             )
-                        ))
+                            cards.add(index, card)
+                            cardService.create(card)
+                        }
                     }
+                    cardService.update(
+                            cards.mapIndexed { index, card ->
+                                    index to card
+                            }.filter{ (index, card) ->
+                                index != card.index
+                            }.map { (index, card) ->
+                                card.copy(index = index).also {
+                                    cards.set(index, it)
+                                }
+                            }
+                    )
+                    return ok(UpdateDashboardStatus(
+                            UpdateDashboardInfo(dashboard.userName,
+                                    dashboard.id,
+                                    dashboard.title,
+                                    dashboard.private,
+                                    cards.map { card ->
+                                        val head = stackHeads[card.stackPath]?.let { frameService.get(card.stackPath, it.id) }
+                                        CardInfo(card.stackPath,
+                                                card.index,
+                                                card.title,
+                                                head?.let { h ->
+                                                    val attachs = attachmentService.findByFrame(h.path)
+                                                    FrameInfo(
+                                                            h.id, h.timestampMillis,
+                                                            attachs.map { a ->
+                                                                AttachmentInfo(
+                                                                        a.description,
+                                                                        a.legacyType,
+                                                                        a.application,
+                                                                        a.contentType,
+                                                                        a.params,
+                                                                        a.settings,
+                                                                        a.length
+                                                                )
+                                                            }, h.message
+                                                    )
+                                                })
+                                    }
+                            )
+                    ))
                 }
             }
         }
@@ -450,7 +459,7 @@ class DashboardResources {
             val session = headers.bearer?.let { sessionService.get(it) }
             val user = session?.userName?.let { userService.get(it) }
             return if (session == null || !session.valid || user == null
-                || user.name != payload!!.user
+                    || user.name != payload!!.user
             ) {
                 badCredentials()
             } else if (!user.verified) {
@@ -468,7 +477,7 @@ class DashboardResources {
                         if (payload.index != null) {
                             var index = payload.index
                             val cards =
-                                cardService.getByDashboardPath(dashboard.path).sortedBy { it.index }.toMutableList()
+                                    cardService.getByDashboardPath(dashboard.path).sortedBy { it.index }.toMutableList()
                             if (index > cards.size) {
                                 index = cards.size
                             }
@@ -481,29 +490,29 @@ class DashboardResources {
                             } else {
                                 cards.remove(card)
                                 cards.add(
-                                    index,
-                                    if (payload.title != null)
-                                        card.copy(title = payload.title)
-                                    else
-                                        card
+                                        index,
+                                        if (payload.title != null)
+                                            card.copy(title = payload.title)
+                                        else
+                                            card
                                 )
                                 updateIndexes(cards)
                                 cardService.update(cards)
                                 ok(
-                                    UpdateDashboardInfo(
-                                        dashboard.userName,
-                                        dashboard.id,
-                                        dashboard.title,
-                                        dashboard.private,
-                                        cards.map {
-                                            CardInfo(
-                                                it.stackPath,
-                                                it.index,
-                                                it.title,
-                                                null
-                                            )
-                                        }
-                                    )
+                                        UpdateDashboardInfo(
+                                                dashboard.userName,
+                                                dashboard.id,
+                                                dashboard.title,
+                                                dashboard.private,
+                                                cards.map {
+                                                    CardInfo(
+                                                            it.stackPath,
+                                                            it.index,
+                                                            it.title,
+                                                            null
+                                                    )
+                                                }
+                                        )
                                 )
                             }
                         } else {
@@ -512,27 +521,27 @@ class DashboardResources {
                                 cardNotFound()
                             } else {
                                 cardService.update(
-                                    listOf(
-                                        card.copy(title = payload.title!!)
-                                    )
+                                        listOf(
+                                                card.copy(title = payload.title!!)
+                                        )
                                 )
                                 val cards =
-                                    cardService.getByDashboardPath(dashboard.path).sortedBy { it.index }.toMutableList()
+                                        cardService.getByDashboardPath(dashboard.path).sortedBy { it.index }.toMutableList()
                                 ok(
-                                    UpdateDashboardInfo(
-                                        dashboard.userName,
-                                        dashboard.id,
-                                        dashboard.title,
-                                        dashboard.private,
-                                        cards.map {
-                                            CardInfo(
-                                                it.stackPath,
-                                                it.index,
-                                                it.title,
-                                                null
-                                            )
-                                        }
-                                    )
+                                        UpdateDashboardInfo(
+                                                dashboard.userName,
+                                                dashboard.id,
+                                                dashboard.title,
+                                                dashboard.private,
+                                                cards.map {
+                                                    CardInfo(
+                                                            it.stackPath,
+                                                            it.index,
+                                                            it.title,
+                                                            null
+                                                    )
+                                                }
+                                        )
                                 )
                             }
                         }
@@ -554,7 +563,7 @@ class DashboardResources {
             val session = headers.bearer?.let { sessionService.get(it) }
             val user = session?.userName?.let { userService.get(it) }
             return if (session == null || !session.valid || user == null
-                || user.name != payload!!.user
+                    || user.name != payload!!.user
             ) {
                 badCredentials()
             } else if (!user.verified) {
@@ -582,19 +591,19 @@ class DashboardResources {
                             updateIndexes(cards)
                             cardService.update(cards)
                             ok(
-                                UpdateDashboardInfo(dashboard.userName,
-                                    dashboard.id,
-                                    dashboard.title,
-                                    dashboard.private,
-                                    cards.map {
-                                        CardInfo(
-                                            it.stackPath,
-                                            it.index,
-                                            it.title,
-                                            null
-                                        )
-                                    }
-                                )
+                                    UpdateDashboardInfo(dashboard.userName,
+                                            dashboard.id,
+                                            dashboard.title,
+                                            dashboard.private,
+                                            cards.map {
+                                                CardInfo(
+                                                        it.stackPath,
+                                                        it.index,
+                                                        it.title,
+                                                        null
+                                                )
+                                            }
+                                    )
                             )
                         }
                     }
