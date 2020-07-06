@@ -1,5 +1,6 @@
 plugins {
     `maven-publish`
+    signing
 }
 
 dependencies {
@@ -35,12 +36,48 @@ val javadocJar = task<Jar>("javadocJar") {
     classifier = "javadoc"
 }
 
+val publications: PublicationContainer = (extensions.getByName("publishing") as PublishingExtension).publications
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign(publications)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
             artifact(sourceJar)
             artifact(javadocJar)
+
+            pom {
+                name.set("dstack Server Base")
+                description.set("A base version of the dstack server")
+                url.set("https://github.com/dstackai/dstack")
+
+                scm {
+                    connection.set("scm:git:https://github.com/dstackai/dstack/")
+                    developerConnection.set("scm:git:https://github.com/dstackai/")
+                    url.set("https://github.com/dstackai/dstack/")
+                }
+
+                licenses {
+                    license {
+                        name.set("Apache-2.0")
+                        url.set("https://opensource.org/licenses/Apache-2.0")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("peterschmidt85")
+                        name.set("Peter Schmidt")
+                        email.set("team@dstack.ai")
+                    }
+                }
+            }
         }
     }
     repositories {
