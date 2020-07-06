@@ -6,6 +6,6 @@ pluginManagement {
     }
 }
 
-include(Modules.SERVER_BASE.id)
-include(Modules.SERVER_BASE_LOCAL.id)
-include(Modules.SERVER_LOCAL_CLI.id)
+include(":server-base")
+include(":server-base-local")
+include(":server-local-cli")

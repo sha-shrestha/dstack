@@ -5,8 +5,14 @@ plugins {
     kotlin("jvm") version Deps.KOTLIN_VERSION
 }
 
+println()
 println("Printing all environment variables:\n")
 System.getenv().forEach {
+    println("\"${it.key}\" = \"${it.value}\"")
+}
+println()
+println("Printing all project properties:\n")
+project.properties.forEach {
     println("\"${it.key}\" = \"${it.value}\"")
 }
 
@@ -15,7 +21,7 @@ allprojects {
     apply(plugin = "idea")
 
     group = "ai.dstack"
-    version = "0.1-SNAPSHOT"
+    version = project.findProperty("dstack_version")?.toString() ?: "0.1-SNAPSHOT"
 
     repositories {
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }

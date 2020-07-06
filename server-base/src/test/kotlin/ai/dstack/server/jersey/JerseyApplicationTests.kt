@@ -6,9 +6,7 @@ import ai.dstack.server.jersey.jackson.API_MAPPER
 import ai.dstack.server.jersey.jackson.createEmptyJsonObject
 import ai.dstack.server.jersey.resources.payload.*
 import ai.dstack.server.jersey.resources.status.*
-import ai.dstack.server.jersey.services.InMemoryJobService
-import ai.dstack.server.jersey.services.InMemorySessionService
-import ai.dstack.server.jersey.services.InMemoryUserService
+import ai.dstack.server.jersey.services.*
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.truth.Truth
 import org.glassfish.hk2.utilities.binding.AbstractBinder
@@ -16,6 +14,8 @@ import org.glassfish.jersey.test.JerseyTest
 import org.junit.Test
 import org.mockito.Mockito
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.ws.rs.client.Entity
 import javax.ws.rs.core.Application
 import javax.ws.rs.core.HttpHeaders
@@ -25,7 +25,6 @@ import javax.ws.rs.core.Response
 // TODO: Implement more tests – ideally for all APIs
 class JerseyApplicationTests : JerseyTest() {
     private lateinit var appConfig: AppConfig
-    private lateinit var stackService: StackService
     private lateinit var frameService: FrameService
     private lateinit var attachmentService: AttachmentService
     private lateinit var emailService: EmailService
@@ -34,13 +33,15 @@ class JerseyApplicationTests : JerseyTest() {
     private lateinit var commentService: CommentService
     private lateinit var schedulerService: SchedulerService
 
+    private lateinit var stackService: InMemoryStackService
+    private lateinit var dashboardService: InMemoryDashboardService
+    private lateinit var cardService: InMemoryCardService
     private lateinit var jobService: InMemoryJobService
     private lateinit var userService: InMemoryUserService
     private lateinit var sessionService: InMemorySessionService
 
     override fun configure(): Application {
         appConfig = Mockito.mock(AppConfig::class.java)
-        stackService = Mockito.mock(StackService::class.java)
         frameService = Mockito.mock(FrameService::class.java)
         attachmentService = Mockito.mock(AttachmentService::class.java)
         emailService = Mockito.mock(EmailService::class.java)
@@ -49,6 +50,9 @@ class JerseyApplicationTests : JerseyTest() {
         commentService = Mockito.mock(CommentService::class.java)
         schedulerService = Mockito.mock(SchedulerService::class.java)
 
+        stackService = InMemoryStackService()
+        dashboardService = InMemoryDashboardService()
+        cardService = InMemoryCardService()
         userService = InMemoryUserService()
         jobService = InMemoryJobService()
         sessionService = InMemorySessionService()
@@ -58,6 +62,8 @@ class JerseyApplicationTests : JerseyTest() {
                 override fun configure() {
                     bind(appConfig).to(AppConfig::class.java)
                     bind(stackService).to(StackService::class.java)
+                    bind(cardService).to(CardService::class.java)
+                    bind(dashboardService).to(DashboardService::class.java)
                     bind(sessionService).to(SessionService::class.java)
                     bind(frameService).to(FrameService::class.java)
                     bind(attachmentService).to(AttachmentService::class.java)
@@ -78,7 +84,6 @@ class JerseyApplicationTests : JerseyTest() {
         super.setUp()
         Mockito.reset(
             appConfig,
-            stackService,
             frameService,
             attachmentService,
             emailService,
@@ -87,6 +92,9 @@ class JerseyApplicationTests : JerseyTest() {
             commentService
         )
 
+        dashboardService.reset()
+        cardService.reset()
+        stackService.reset()
         userService.reset()
         jobService.reset()
         sessionService.reset()
@@ -328,6 +336,90 @@ class JerseyApplicationTests : JerseyTest() {
         Truth.assertThat(emptyResponse2.status).isEqualTo(Response.Status.OK.statusCode)
         Truth.assertThat(emptyResponse2.entity<GetJobsStatus>())
             .isEqualTo(GetJobsStatus(emptyList()))
+    }
+
+    @Test
+    fun testDashboards() {
+        val testUser = User(
+                "test_user", "test@gmail.com", "test",
+                "test_token", "test_code", true, UserPlan.Free,
+                LocalDate.now(), Settings(General(AccessLevel.Public), Notifications(true, true)), "test_user"
+        )
+        userService.create(testUser)
+        val testSession = Session(
+                "test_session", "test_user", LocalDateTime.now(ZoneOffset.UTC).plusMinutes(60).toEpochSecond(ZoneOffset.UTC)
+        )
+        sessionService.create(testSession)
+        // TODO: Submit stacks via push
+        val testStack1 = Stack(
+                "test_user", "test_stack_1", false, null
+        )
+        stackService.create(testStack1)
+        val testStack2 = Stack(
+                "test_user", "test_stack_2", false, null
+        )
+        stackService.create(testStack2)
+        val testStack3 = Stack(
+                "test_user", "test_stack_3", false, null
+        )
+        stackService.create(testStack3)
+        val testStack4 = Stack(
+                "test_user", "test_stack_4", false, null
+        )
+        stackService.create(testStack4)
+
+        val createDashboardResponse: Response = target("/dashboards/create").request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
+                .post(
+                        Entity.json(
+                                CreateDashboardPayload("test_user", null, false)
+                        )
+                )
+        Truth.assertThat(createDashboardResponse.status).isEqualTo(Response.Status.OK.statusCode)
+        val createDashboardStatus = createDashboardResponse.entity<GetDashboardStatus>()
+        Truth.assertThat(createDashboardStatus.dashboard.id).isNotNull()
+        Truth.assertThat(createDashboardStatus.dashboard.title).isEqualTo("")
+        Truth.assertThat(createDashboardStatus.dashboard.private).isEqualTo(false)
+
+        val insertCardsResponse: Response = target("/dashboards/cards/insert").request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
+                .post(
+                        Entity.json(
+                                InsertCardsPayload("test_user", createDashboardStatus.dashboard.id,
+                                0, listOf(
+                                        InsertCardsPayloadCard("test_user/test_stack_1", null),
+                                        InsertCardsPayloadCard("test_user/test_stack_2", null)
+                                ))
+                        )
+                )
+        Truth.assertThat(insertCardsResponse.status).isEqualTo(Response.Status.OK.statusCode)
+        val updateDashboardStatus = insertCardsResponse.entity<UpdateDashboardStatus>()
+        Truth.assertThat(updateDashboardStatus.dashboard.id).isEqualTo(createDashboardStatus.dashboard.id)
+        Truth.assertThat(updateDashboardStatus.dashboard.cards).containsExactly(
+                CardBasicInfo("test_user/test_stack_1", 0, "test_stack_1", null),
+                CardBasicInfo("test_user/test_stack_2", 1, "test_stack_2", null)
+        )
+
+        val insertCardsResponse2: Response = target("/dashboards/cards/insert").request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
+                .post(
+                        Entity.json(
+                                InsertCardsPayload("test_user", createDashboardStatus.dashboard.id,
+                                        0, listOf(
+                                        InsertCardsPayloadCard("test_user/test_stack_3", null),
+                                        InsertCardsPayloadCard("test_user/test_stack_4", null)
+                                ))
+                        )
+                )
+        Truth.assertThat(insertCardsResponse2.status).isEqualTo(Response.Status.OK.statusCode)
+        val updateDashboardStatus2 = insertCardsResponse2.entity<UpdateDashboardStatus>()
+        Truth.assertThat(updateDashboardStatus2.dashboard.id).isEqualTo(createDashboardStatus.dashboard.id)
+        Truth.assertThat(updateDashboardStatus2.dashboard.cards).containsExactly(
+                CardBasicInfo("test_user/test_stack_3", 0, "test_stack_3", null),
+                CardBasicInfo("test_user/test_stack_4", 1, "test_stack_4", null),
+                CardBasicInfo("test_user/test_stack_1", 2, "test_stack_1", null),
+                CardBasicInfo("test_user/test_stack_2", 3, "test_stack_2", null)
+        )
     }
 
     private fun message(value: String) = API_MAPPER.readValue("{ \"message\": \"$value\" }", JsonNode::class.java)
