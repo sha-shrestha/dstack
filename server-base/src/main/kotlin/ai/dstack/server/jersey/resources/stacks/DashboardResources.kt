@@ -413,7 +413,7 @@ class DashboardResources {
                                     dashboard.private,
                                     cards.map { card ->
                                         val head = stackHeads[card.stackPath]?.let { frameService.get(card.stackPath, it.id) }
-                                        BasicCardInfo(card.stackPath,
+                                        CardBasicInfo(card.stackPath,
                                                 card.index,
                                                 card.title,
                                                 head?.let { h ->
@@ -495,7 +495,7 @@ class DashboardResources {
                                                 dashboard.title,
                                                 dashboard.private,
                                                 cards.map {
-                                                    BasicCardInfo(
+                                                    CardBasicInfo(
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
@@ -524,7 +524,7 @@ class DashboardResources {
                                                 dashboard.title,
                                                 dashboard.private,
                                                 cards.map {
-                                                    BasicCardInfo(
+                                                    CardBasicInfo(
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
@@ -586,7 +586,7 @@ class DashboardResources {
                                             dashboard.title,
                                             dashboard.private,
                                             cards.map {
-                                                BasicCardInfo(
+                                                CardBasicInfo(
                                                         it.stackPath,
                                                         it.index,
                                                         it.title,

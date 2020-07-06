@@ -9,5 +9,5 @@ data class UpdateDashboardInfo(
     val id: String,
     val title: String,
     val private: Boolean,
-    val cards: List<BasicCardInfo>
+    val cards: List<CardBasicInfo>
 )
