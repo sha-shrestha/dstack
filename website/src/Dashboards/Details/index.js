@@ -154,13 +154,11 @@ const Details = ({
     };
 
     const addStacksToDashboard = stacks => {
-        stacks.forEach((stack, index) => {
-            insertCard({
-                user: params.user,
-                dashboard: params.id,
-                stack,
-                index: cards.length + index,
-            });
+        insertCard({
+            user: params.user,
+            dashboard: params.id,
+            cards: stacks.map(stack => ({stack})),
+            index: cards.length,
         });
     };
 
