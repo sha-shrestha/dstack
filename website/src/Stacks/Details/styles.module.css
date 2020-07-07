@@ -71,7 +71,6 @@
     }
 }
 .dropdown {
-    margin-left: auto;
     &-button {
         outline: none;
         height: 26px !important;
@@ -91,6 +90,8 @@
     }
 }
 .description {
+    flex-grow: 1;
+    min-width: 0;
     font-size: 14px;
     line-height: 20px;
     color: var(--color-dark-gray);
@@ -121,7 +122,6 @@
 .label {
     display: inline-block;
     position: relative;
-    margin-left: 6px;
     padding-left: 8px;
     padding-right: 8px;
     border-radius: 20px;
@@ -159,28 +159,23 @@
     }
 }
 .actions {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
-    flex-grow: 1;
     min-width: fit-content;
-    flex-basis: 0;
     margin-left: 20px;
-    text-align: right;
     font-size: 13px;
     line-height: 20px;
     color: var(--color-dark-gray);
-    &:nth-child(n+2) {
-        margin-left: 20px;
+    & > * {
+        margin-left: 2px;
+        margin-right: 2px;
     }
     & a {
         transition: color .2s;
     }
     & .size {
         color: var(--color-light-gray);
-    }
-    & > * {
-        margin-left: 2px;
-        margin-right: 2px;
     }
 }
 .revisions {

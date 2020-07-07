@@ -317,11 +317,9 @@ const Details = ({
 
                 {attachment && (
                     <div className={css['attachment-head']}>
-                        {attachment.description && (
-                            <div className={css.description}>
-                                <MarkdownRender source={attachment.description} />
-                            </div>
-                        )}
+                        <div className={css.description}>
+                            {attachment.description && (<MarkdownRender source={attachment.description} />)}
+                        </div>
 
                         {attachment.type === 'text/csv' && (
                             <div className={css.actions}>
