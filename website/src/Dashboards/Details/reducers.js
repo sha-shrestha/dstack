@@ -104,7 +104,11 @@ export default (state = initial, action) => {
                 ...state,
                 data: {
                     ...data,
-                    cards: action.payload,
+
+                    cards: [
+                        ...data.cards,
+                        ...action.payload,
+                    ],
                 },
             };
 

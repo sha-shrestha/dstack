@@ -95,7 +95,7 @@ export const insertCard = (params, onSuccess: Function) => async (dispatch: Func
 
     try {
         const response = await api.post(config.DASHBOARD_CARDS_INSERT + '?attachments=true', params);
-        const {cards} = response.data.dashboard;
+        const cards = response.data.dashboard.cards.filter(card => params.cards.find(i => i.stack === card.stack));
 
         dispatch({
             type: actionsTypes.CARDS_INSERT_SUCCESS,
