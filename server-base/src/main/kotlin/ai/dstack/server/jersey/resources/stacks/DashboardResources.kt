@@ -372,6 +372,7 @@ class DashboardResources {
                     dashboardNotFound()
                 } else {
                     val cards = cardService.getByDashboardPath(dashboard.path).toMutableList()
+                    val insertedCards = mutableListOf<Card>()
                     payload.cards!!.forEachIndexed { cardPayloadIndex, cardPayload ->
                         val (u, s) = cardPayload.stack!!.parseStackPath()
                         val stack = stackService.get(u, s)
@@ -393,12 +394,8 @@ class DashboardResources {
                     }
                     cardService.update(
                             cards.mapIndexed { index, card ->
-                                stackHeads.computeIfAbsent(card.stackPath) {
-                                    val (u, s) = card.stackPath.parseStackPath()
-                                    stackService.get(u, s)?.head
-                                }
                                 index to card
-                            }.filter { (index, card) ->
+                            }.filter{ (index, card) ->
                                 index != card.index
                             }.map { (index, card) ->
                                 card.copy(index = index).also {
@@ -413,11 +410,25 @@ class DashboardResources {
                                     dashboard.private,
                                     cards.map { card ->
                                         val head = stackHeads[card.stackPath]?.let { frameService.get(card.stackPath, it.id) }
-                                        CardBasicInfo(card.stackPath,
+                                        CardInfo(card.stackPath,
                                                 card.index,
                                                 card.title,
                                                 head?.let { h ->
-                                                    BasicFrameInfo(h.id, h.timestampMillis, h.message)
+                                                    val attachs = attachmentService.findByFrame(h.path)
+                                                    FrameInfo(
+                                                            h.id, h.timestampMillis,
+                                                            attachs.map { a ->
+                                                                AttachmentInfo(
+                                                                        a.description,
+                                                                        a.legacyType,
+                                                                        a.application,
+                                                                        a.contentType,
+                                                                        a.params,
+                                                                        a.settings,
+                                                                        a.length
+                                                                )
+                                                            }, h.message
+                                                    )
                                                 })
                                     }
                             )
@@ -495,7 +506,7 @@ class DashboardResources {
                                                 dashboard.title,
                                                 dashboard.private,
                                                 cards.map {
-                                                    CardBasicInfo(
+                                                    CardInfo(
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
@@ -524,7 +535,7 @@ class DashboardResources {
                                                 dashboard.title,
                                                 dashboard.private,
                                                 cards.map {
-                                                    CardBasicInfo(
+                                                    CardInfo(
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
@@ -586,7 +597,7 @@ class DashboardResources {
                                             dashboard.title,
                                             dashboard.private,
                                             cards.map {
-                                                CardBasicInfo(
+                                                CardInfo(
                                                         it.stackPath,
                                                         it.index,
                                                         it.title,
