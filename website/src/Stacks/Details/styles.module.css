@@ -159,6 +159,8 @@
     }
 }
 .actions {
+    display: flex;
+    align-items: center;
     flex-grow: 1;
     min-width: fit-content;
     flex-basis: 0;
@@ -167,11 +169,18 @@
     font-size: 13px;
     line-height: 20px;
     color: var(--color-dark-gray);
+    &:nth-child(n+2) {
+        margin-left: 20px;
+    }
     & a {
         transition: color .2s;
     }
     & .size {
         color: var(--color-light-gray);
+    }
+    & > * {
+        margin-left: 2px;
+        margin-right: 2px;
     }
 }
 .revisions {

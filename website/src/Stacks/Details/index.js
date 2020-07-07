@@ -25,7 +25,7 @@ import Upload from 'Stacks/components/Upload';
 import css from './styles.module.css';
 
 type Props = {
-    attachment: {description?: string},
+    frameAttachments: Array<{}>,
     attachmentRequestStatus: ?number,
     deleteStack: Function,
     fetchDetails: Function,
@@ -42,7 +42,7 @@ type Props = {
 }
 
 const Details = ({
-    attachment,
+    frameAttachments,
     attachmentRequestStatus,
     fetchDetails,
     fetchFrame,
@@ -70,6 +70,8 @@ const Details = ({
     const [attachmentIndex, setAttachmentIndex] = useState(parsedAttachmentIndex);
     const [selectedFrame, setSelectedFrame] = useState(searchParams.f);
     const [headId, setHeadId] = useState(null);
+
+    const attachment = get(frameAttachments, attachmentIndex || 0, {});
 
     const {t} = useTranslation();
     const didMountRef = useRef(false);
@@ -323,12 +325,19 @@ const Details = ({
 
                         {attachment.type === 'text/csv' && (
                             <div className={css.actions}>
+                                {attachment.preview && (
+                                    <div className={css.label}>
+                                        {t('preview')}
+
+                                        <div className={css['label-tooltip']}>
+                                            {t('theTableBelowShowsOnlyAPreview')}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                {' '}
-                                {t('or')}
-                                {' '}
+                                <span>{t('or')}</span>
                                 <a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>
-                                {' '}
                                 {attachment.length && (
                                     <span className={css.size}>({formatBytes(attachment.length)})</span>
                                 )}
@@ -383,7 +392,7 @@ const Details = ({
 export default connect(
     (state, props) => {
         const frame = state.stacks.details.frame;
-        const attachment = get(state.stacks.attachments.data, frame?.id, {});
+        const frameAttachments = get(state.stacks.attachments.data, frame?.id, {});
         const stack = props.location.pathname.replace(/^\//, '');
 
         return {
@@ -394,7 +403,7 @@ export default connect(
             frameRequestStatus: state.stacks.details.frameRequestStatus,
             loadingFrame: state.stacks.details.loadingFrame,
             attachmentRequestStatus: state.stacks.details.attachmentRequestStatus,
-            attachment,
+            frameAttachments,
             loading: state.stacks.details.loading,
             currentUser: state.app.userData?.user,
         };
