@@ -77,7 +77,7 @@ export const downloadAttachment = (stack, frameId, id) => async () => {
 
 export const update = ({stack, noUpdateStore, ...params}, onSuccess?: Function) =>
     async (dispatch: Function, getState: Function) => {
-        const oldData = getState().stacks.details.data;
+        const oldData = getState().stacks.details.data[stack];
 
         dispatch({
             type: actionsTypes.UPDATE,
@@ -100,7 +100,7 @@ export const update = ({stack, noUpdateStore, ...params}, onSuccess?: Function) 
                 onSuccess();
         } catch (e) {
             dispatch({
-                type: actionsTypes.FETCH_FAIL,
+                type: actionsTypes.UPDATE_FAIL,
                 payload: {...getDataFailedRequest(e), data: oldData},
                 meta: {stack},
             });

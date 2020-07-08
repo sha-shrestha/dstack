@@ -44,7 +44,10 @@ export default (state = initial, action) => {
 
                 data: {
                     ...state.data,
-                    [`${action.meta.stack}`]: action.payload,
+                    [`${action.meta.stack}`]: {
+                        ...state.data[`${action.meta.stack}`],
+                        ...action.payload,
+                    },
                 },
             };
 
