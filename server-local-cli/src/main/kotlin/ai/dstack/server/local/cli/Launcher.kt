@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
         cmd = parser.parse(options, args)
     } catch (e: ParseException) {
         println(e.message)
-        formatter.printHelp("java jar server-local-cli.jar", options)
+        formatter.printHelp("java -jar server-local-cli.jar", options)
         exitProcess(1)
     }
     if (cmd.hasOption("port")) {
