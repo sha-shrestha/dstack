@@ -122,6 +122,12 @@ If you're using R, use the following R command to configure your dstack profile:
 
 Note, in your case instead of `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` you'll see your personal code.
 
+The server by default uses the `8080` port. Optionally, you can specify a custom port by using the command line option `--port`:
+
+```bash
+dstack server --start --port 8081
+```
+
 ### Configure a user profile
 
 In order to send requests to the locally running server, one must run the command suggested in the output:
