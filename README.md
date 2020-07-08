@@ -205,13 +205,10 @@ library(ggplot2)
 library(dstack)
 
 line_plot <- function(a) {
-  
     x <- c(0:20)
-  
     y <- sapply(x, function(x) { return(a * x) })
   
     df <- data.frame(x = x, y = y)
-  
     plot <- ggplot(data = df, aes(x = x, y = y)) + 
         geom_line() + xlim(0, 20) + ylim(0, 20)
     return(plot)
@@ -222,7 +219,6 @@ coeff <- c(0.5, 1.0, 1.5, 2.0)
 frame <- create_frame(stack = "line_plot")
 
 for(c in coeff) {
-  
     frame <- commit(frame, line_plot(c), 
         paste0("Line plot with the coefficient of ", c), 
         Coefficient = c)
@@ -267,17 +263,16 @@ Here's an example of the code that pulls a dataset from the server:
 import pandas as pd
 from dstack import pull
 
-df = pd.read_csv(pull("/<username>/<stackname"))
-head(df)
+df = pull("/<username>/<stackname>")
+df.head()
 ```
 
 **R**
 ```R
-library(ggplot2)
 library(dstack)
 
-data("midwest", package = "ggplot2")
-push_frame("simple", midwest, "My first dataset")
+df <- read.csv(pull("/<username>/<stackname>"))
+head(df)
 ```
 
 Currently, the `dstack` packages are compatible with `pandas.core.frame.DataFrame`, `data.frame`, `data.table`, and `tibble`.
