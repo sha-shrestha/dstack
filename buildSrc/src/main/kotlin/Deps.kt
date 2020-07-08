@@ -41,6 +41,9 @@ object Deps {
     var spring_data_jpa = "org.springframework.boot:spring-boot-starter-data-jpa:2.2.6.RELEASE"
     var sqlite_dialect = "com.github.gwenn:sqlite-dialect:0.1.0"
 
+    // Command line
+    var commons_cli = "commons-cli:commons-cli:1.4"
+
     // Testing
     val junit_jupiter_api = "org.junit.jupiter:junit-jupiter-api:$JUNIT_VERSION"
     val junit_jupiter_engine = "org.junit.jupiter:junit-jupiter-engine:$JUNIT_VERSION"

@@ -17,7 +17,7 @@ class LocalCliAppConfig : AppConfig {
 
     override val internalPort: Int
         get() {
-            return System.getenv("dstack_internal_port")?.toInt() ?: 8080
+            return System.getenv("dstack_internal_port")?.toInt() ?: defaultInternalPort.toInt()
         }
 
     override val ssl: Boolean
@@ -75,4 +75,8 @@ class LocalCliAppConfig : AppConfig {
         get() {
             return System.getenv("dstack_smtp_from")
         }
+
+    companion object {
+        var defaultInternalPort: String = "8080"
+    }
 }
