@@ -6,6 +6,7 @@ dependencies {
     compile(Deps.spring_data_jpa)
     compile(Deps.sqlite_dialect)
     compile(Deps.sqlite_jdbc)
+    compile(Deps.commons_cli)
     compile(project(":server-base-local"))
 }
 
@@ -16,7 +17,7 @@ plugins {
 }
 
 springBoot {
-    mainClassName = "ai.dstack.server.local.LauncherKt"
+    mainClassName = "ai.dstack.server.local.cli.LauncherKt"
 }
 
 buildscript {
