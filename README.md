@@ -128,6 +128,14 @@ The server by default uses the `8080` port. Optionally, you can specify a custom
 dstack server --start --port 8081
 ```
 
+Note, by default, the server stores all the data in the local folder `./.dstack/data`. In case you'd like to store the data on the global level, use the following command:
+
+```bash
+dstack server --start --global
+```
+
+In this case, the server will store all the data in `<user home>/.dstack/data`. 
+
 ### Configure a user profile
 
 In order to send requests to the locally running server, one must run the command suggested in the output:
