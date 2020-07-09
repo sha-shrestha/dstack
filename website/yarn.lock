@@ -5478,10 +5478,10 @@ draw-svg-path@^1.0.0:
     abs-svg-path "~0.1.1"
     normalize-svg-path "~0.1.0"
 
-dstack-react@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/dstack-react/-/dstack-react-1.0.2.tgz#4bb88ee23f4f7de04551620506b5dab2ff02f31a"
-  integrity sha512-ZF/TBSYNgDFzUjMIZuf6q+TQRhYGzpZtTVqmGCtCqLP04cIthK2xFrzncrnqFNB4xPjm7b/YhojiRDT/qJdTow==
+dstack-react@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/dstack-react/-/dstack-react-1.0.3.tgz#18264d3ac9af44a8c9528fe32d9c09efa5aa0af9"
+  integrity sha512-E3VSHGvV1l2GgLI/NZjFahdeTGCLH6USCPn79xDjMV1p6zh3DkFYzcXaTPYGzA14aFJ/qQDXdmgfZAPYzRCvdA==
   dependencies:
     "@mdi/font" "^5.3.45"
     classnames "^2.2.6"
