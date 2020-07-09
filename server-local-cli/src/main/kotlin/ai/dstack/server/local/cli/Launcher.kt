@@ -14,6 +14,9 @@ fun main(args: Array<String>) {
     val port = Option("p", "port", true, "server port number")
     options.addOption(port)
 
+    val global = Option("g", "global", false, "store data globally")
+    options.addOption(global)
+
     val parser: CommandLineParser = DefaultParser()
     val formatter = HelpFormatter()
     val cmd: CommandLine
@@ -26,6 +29,10 @@ fun main(args: Array<String>) {
     }
     if (cmd.hasOption("port")) {
         LocalCliAppConfig.defaultInternalPort = cmd.getOptionValue("port")
+    }
+
+    if (cmd.hasOption("global")) {
+        LocalCliAppConfig.global = true
     }
 
     val application = SpringApplication(Application::class.java)
