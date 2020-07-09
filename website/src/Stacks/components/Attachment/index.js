@@ -96,7 +96,7 @@ const Attachment = ({
         if (!isList && attachment
             && !isEqual(prevAttachment, attachment)
             && attachment.preview
-            && isImageType(attachment.type)
+            && isImageType(attachment['content_type'])
         ) {
             fetchFullAttachment();
         }
@@ -120,7 +120,7 @@ const Attachment = ({
     }, {}, [id, frameId, attachment]);
 
     useEffect(() => {
-        if (attachment && attachment.type === 'bokeh' && Bokeh) {
+        if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
             const json = base64ToJSON(attachment.data);
 
             if (json && document.querySelector(`#bokeh-${frameId}`))
@@ -149,7 +149,10 @@ const Attachment = ({
     const renderImage = () => {
         if (!attachment.preview)
             return (
-                <img src={`${base64ImagePrefixes[attachment.type]}base64,${attachment.data}`} alt=""/>
+                <img
+                    src={`${base64ImagePrefixes[attachment['content_type']]}base64,${attachment.data}`}
+                    alt=""
+                />
             );
         else if (fullAttachment) {
             if (fullAttachment['download_url']) {
@@ -158,7 +161,10 @@ const Attachment = ({
                 );
             } else
                 return (
-                    <img src={`${base64ImagePrefixes[attachment.type]}base64,${attachment.data}`} alt=""/>
+                    <img
+                        src={`${base64ImagePrefixes[attachment['content_type']]}base64,${attachment.data}`}
+                        alt=""
+                    />
                 );
         }
 
@@ -219,22 +225,22 @@ const Attachment = ({
         if (requestStatus === 404 && !isList)
             return <div className={css.text}>{t('noPreview')}</div>;
 
-        if (attachment.preview && isList && isImageType(attachment.type))
+        if (attachment.preview && isList && isImageType(attachment['content_type']))
             return <div className={css.message}>{t('noPreview')}</div>;
 
-        switch (attachment.type) {
-            case 'image/svg+xml':
-            case 'image/png':
-            case 'image/jpeg':
+        switch (true) {
+            case (attachment['content_type'] === 'image/svg+xml'):
+            case (attachment['content_type'] === 'image/png'):
+            case (attachment['content_type'] === 'image/jpeg'):
                 return renderImage();
 
-            case 'text/csv':
+            case (attachment['content_type'] === 'text/csv'):
                 return renderCSV();
 
-            case 'plotly':
+            case (attachment['application'] === 'plotly' && attachment['content_type'] === 'text/json'):
                 return renderPlotly();
 
-            case 'bokeh':
+            case (attachment['application'] === 'bokeh' && attachment['content_type'] === 'text/json'):
                 return renderBokeh();
 
             case undefined:
@@ -256,12 +262,12 @@ const Attachment = ({
             <div
                 ref={viewRef}
                 className={cx(css.view, {
-                    'table': (attachment && attachment.data && attachment.type === 'text/csv'),
-                    'bokeh': (attachment && attachment.data && attachment.type === 'bokeh'),
+                    'table': (attachment && attachment.data && attachment['content_type'] === 'text/csv'),
+                    'bokeh': (attachment && attachment.data && attachment['application'] === 'bokeh'),
                 })}
 
                 style={
-                    (attachment && attachment.type === 'text/csv')
+                    (attachment && attachment['content_type'] === 'text/csv')
                         ? {transform: `scale(${tableScale})`}
                         : {}
                 }
