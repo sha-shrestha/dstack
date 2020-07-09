@@ -1,0 +1,12 @@
+@import "styles/variables.css";
+.bar {
+    position: relative;
+    pointer-events: none;
+    height: 5px;
+}
+.progress {
+    height: inherit;
+    overflow: hidden;
+    background-image: linear-gradient(90deg, #B9AEFB 17.04%, #97C9F8 49.1%, #F896E8 81.17%);
+    background-repeat: repeat-x;
+}

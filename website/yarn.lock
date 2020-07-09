@@ -5478,28 +5478,9 @@ draw-svg-path@^1.0.0:
     abs-svg-path "~0.1.1"
     normalize-svg-path "~0.1.0"
 
-dstack-react@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/dstack-react/-/dstack-react-1.0.3.tgz#18264d3ac9af44a8c9528fe32d9c09efa5aa0af9"
-  integrity sha512-E3VSHGvV1l2GgLI/NZjFahdeTGCLH6USCPn79xDjMV1p6zh3DkFYzcXaTPYGzA14aFJ/qQDXdmgfZAPYzRCvdA==
-  dependencies:
-    "@mdi/font" "^5.3.45"
-    classnames "^2.2.6"
-    copy-to-clipboard "^3.3.1"
-    postcss-css-variables "^0.17.0"
-    postcss-custom-media "^7.0.8"
-    postcss-flexbugs-fixes "^4.2.1"
-    postcss-import "^12.0.1"
-    postcss-nested "^4.2.1"
-    postcss-preset-env "^6.7.0"
-    rc-select "^11.0.5"
-    rc-slider "^9.3.1"
-    rc-tooltip "^4.2.1"
-    react-highlight.js "^1.0.7"
-    react-markdown "^4.3.1"
-    react-mathjax "^1.0.1"
-    react-portal "^4.2.1"
-    remark-math "^2.0.1"
+"dstack-react@link:../dstack-react":
+  version "0.0.0"
+  uid ""
 
 dtype@^2.0.0:
   version "2.0.0"

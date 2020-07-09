@@ -1,0 +1,66 @@
+@import "styles/variables.css";
+:root {
+    --normal-size: 28px;
+    --small-size: 24px;
+    --list-size: 18px;
+    --avatar-color-violet: #A89EE5;
+    --avatar-color-turquoise: #85E1C0;
+    --avatar-color-blue: #85D7F1;
+    --avatar-color-lilac: #D78FE2;
+    --avatar-color-pink: #EB92C7;
+    --avatar-color-green: #A8E59E;
+    --avatar-color-green2: #C5D977;
+    --avatar-color-orange: #E9BB75;
+}
+.avatar {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    color: var(--color-white);
+    border-radius: 50%;
+    box-sizing: border-box;
+    &:global(.normal) {
+        width: var(--normal-size);
+        height: var(--normal-size);
+        line-height: var(--normal-size);
+    }
+    &:global(.small) {
+        width: var(--small-size);
+        height: var(--small-size);
+        line-height: var(--small-size);
+    }
+    &:global(.list) {
+        font-size: 7px;
+        width: var(--list-size);
+        height: var(--list-size);
+        line-height: var(--list-size);
+    }
+    &:global(.violet) {
+        background-color: var(--avatar-color-violet);
+    }
+    &:global(.turquoise) {
+        background-color: var(--avatar-color-turquoise);
+    }
+    &:global(.blue) {
+        background-color: var(--avatar-color-blue);
+    }
+    &:global(.lilac) {
+        background-color: var(--avatar-color-lilac);
+    }
+    &:global(.pink) {
+        background-color: var(--avatar-color-pink);
+    }
+    &:global(.green) {
+        background-color: var(--avatar-color-green);
+    }
+    &:global(.green2) {
+        background-color: var(--avatar-color-green2);
+    }
+    &:global(.orange) {
+        background-color: var(--avatar-color-orange);
+    }
+    &:global(.border) {
+        box-shadow: 0 0 0 1px var(--color-white) inset;
+    }
+}
