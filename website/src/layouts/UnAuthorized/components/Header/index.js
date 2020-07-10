@@ -3,7 +3,7 @@ import {Link, withRouter} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
 import routes from 'routes';
-import {Button} from 'dstack-react';
+import {Button} from '@dstackai/dstack-react';
 import logo from 'assets/logo.svg';
 import css from './styles.module.css';
 

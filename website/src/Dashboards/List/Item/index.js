@@ -5,7 +5,7 @@ import {get} from 'lodash-es';
 import {useParams, Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import routes from 'routes';
-import {Dropdown} from 'dstack-react';
+import {Dropdown} from '@dstackai/dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import {deleteDashboard} from 'Dashboards/Details/actions';
 import type {Dashboard} from 'Dashboards/types';

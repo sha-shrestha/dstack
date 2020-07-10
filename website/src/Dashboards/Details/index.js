@@ -9,7 +9,7 @@ import {connect} from 'react-redux';
 import DnDGridContext from 'components/DnDGridContext';
 import DnDItem from 'components/DnDGridContext/components/DnDItem';
 import {Button, Dropdown, ViewSwitcher, AccessForbidden, StretchTitleField,
-    NotFound, Yield, BackButton} from 'dstack-react';
+    NotFound, Yield, BackButton} from '@dstackai/dstack-react';
 import SelectStacks from './components/SelectStacks';
 import Loader from './components/Loader';
 import Card from './components/Card';

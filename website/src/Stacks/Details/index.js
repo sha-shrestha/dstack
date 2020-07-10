@@ -10,7 +10,8 @@ import {useHistory, useLocation, useParams} from 'react-router';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
 import {debounce as _debounce} from 'lodash-es';
-import {Button, AccessForbidden, MarkdownRender, Modal, Dropdown, NotFound, Yield, BackButton} from 'dstack-react';
+import {Button, AccessForbidden, MarkdownRender, Modal,
+    Dropdown, NotFound, Yield, BackButton} from '@dstackai/dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import Loader from './components/Loader';
 import Frames from './Frames';

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import cx from 'classnames';
-import {SelectField, CheckboxField, SliderField} from 'dstack-react';
+import {SelectField, CheckboxField, SliderField} from '@dstackai/dstack-react';
 import css from './styles.module.css';
 
 type Props = {

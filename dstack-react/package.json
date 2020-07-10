@@ -1,5 +1,5 @@
 {
-  "name": "dstack/dstack-react",
+  "name": "@dstackai/dstack-react",
   "version": "1.0.4",
   "description": "Dstack ui components",
   "author": "olgenn",
@@ -9,6 +9,9 @@
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=10"
   },

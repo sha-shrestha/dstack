@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import Auth from 'Auth';
-import {Button, TextField} from 'dstack-react';
+import {Button, TextField} from '@dstackai/dstack-react';
 import {login} from './actions';
 import {fetchUser} from 'App/actions';
 

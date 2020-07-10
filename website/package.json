@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.7.4",
+    "@dstackai/dstack-react": "^1.0.4",
     "@mdi/font": "^4.8.95",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
@@ -24,7 +25,6 @@
     "csv-string": "^3.1.8",
     "dotenv": "^8.2.0",
     "dotenv-expand": "5.1.0",
-    "dstack-react": "^1.0.3",
     "eslint": "^6.6.0",
     "eslint-config-react-app": "^5.1.0",
     "eslint-loader": "3.0.2",

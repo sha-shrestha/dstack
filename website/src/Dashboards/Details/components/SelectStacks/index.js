@@ -4,7 +4,7 @@ import {get} from 'lodash-es';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router';
-import {Button, Modal, SearchField, CheckboxField} from 'dstack-react';
+import {Button, Modal, SearchField, CheckboxField} from '@dstackai/dstack-react';
 import Loader from './Loader';
 import {fetchList} from 'Stacks/List/actions';
 import StackItem from 'Stacks/List/Item';

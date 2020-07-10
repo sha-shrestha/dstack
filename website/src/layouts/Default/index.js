@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import {ProgressBar} from 'dstack-react';
+import {ProgressBar} from '@dstackai/dstack-react';
 
 
 import css from './styles.module.css';

@@ -15,11 +15,10 @@ import Slider from 'rc-slider';
 
 var image = require("./lock~ZBorChcU.svg");
 
-var css = {"forbidden":"_style-module__forbidden__3PN84","message":"_style-module__message__2i8KH"};
+var css = {"forbidden":"_3PN84","message":"_2i8KH"};
 
-const AccessForbidden = ({
-  children
-}) => {
+var AccessForbidden = function AccessForbidden(_ref) {
+  var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
     className: css.forbidden
   }, /*#__PURE__*/React__default.createElement("img", {
@@ -32,63 +31,103 @@ const AccessForbidden = ({
   }, children));
 };
 
-var css$1 = {"avatar":"_styles-module__avatar__3xvkT"};
+var css$1 = {"avatar":"_3xvkT"};
 
-const Avatar = forwardRef(({
-  className,
-  name,
-  color: _color = 'violet',
-  size: _size = 'normal',
-  withBorder,
-  onClick
-}, ref) => {
+var Avatar = forwardRef(function (_ref, ref) {
+  var className = _ref.className,
+      name = _ref.name,
+      _ref$color = _ref.color,
+      color = _ref$color === void 0 ? 'violet' : _ref$color,
+      _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 'normal' : _ref$size,
+      withBorder = _ref.withBorder,
+      onClick = _ref.onClick;
   return /*#__PURE__*/React__default.createElement("div", {
     ref: ref,
-    className: cx(css$1.avatar, className, _color, _size, {
+    className: cx(css$1.avatar, className, color, size, {
       border: withBorder
     }),
     onClick: onClick
   }, name.slice(0, 2));
 });
 
-var css$2 = {"back":"_styles-module__back__1MuhU"};
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
 
-const BackButton = ({
-  Component: _Component = 'button',
-  children,
-  className,
-  ...props
-}) => {
-  return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+function _objectDestructuringEmpty(obj) {
+  if (obj == null) throw new TypeError("Cannot destructure undefined");
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+var css$2 = {"back":"_1MuhU"};
+
+var BackButton = function BackButton(_ref) {
+  var _ref$Component = _ref.Component,
+      Component = _ref$Component === void 0 ? 'button' : _ref$Component,
+      children = _ref.children,
+      className = _ref.className,
+      props = _objectWithoutPropertiesLoose(_ref, ["Component", "children", "className"]);
+
+  return /*#__PURE__*/React__default.createElement(Component, _extends({
     className: cx(css$2.back, className)
   }, props), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-arrow-left"
   }), children);
 };
 
-var css$3 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
+var css$3 = {"button":"_2lKoS","spinner":"_31PPt"};
 
-var css$4 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
+var css$4 = {"spinner":"_3XhrC","spinner-animation":"_2UA3s"};
 
-const COLORS = {
+var COLORS = {
   white: '#fff',
   blue: '#507CD0'
 };
 
-const Spinner = ({
-  size: _size = 22,
-  color: _color = 'white',
-  isShown,
-  className,
-  align
-}) => {
+var Spinner = function Spinner(_ref) {
+  var _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 22 : _ref$size,
+      _ref$color = _ref.color,
+      color = _ref$color === void 0 ? 'white' : _ref$color,
+      isShown = _ref.isShown,
+      className = _ref.className,
+      align = _ref.align;
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$4.spinner, className, align, {
       show: isShown
     })
   }, /*#__PURE__*/React__default.createElement("svg", {
-    width: _size,
-    height: _size,
+    width: size,
+    height: size,
     viewBox: "0 0 22 22",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
@@ -103,29 +142,34 @@ const Spinner = ({
     y2: "13",
     gradientUnits: "userSpaceOnUse"
   }, /*#__PURE__*/React__default.createElement("stop", {
-    stopColor: COLORS[_color]
+    stopColor: COLORS[color]
   }), /*#__PURE__*/React__default.createElement("stop", {
     offset: "1",
-    stopColor: COLORS[_color],
+    stopColor: COLORS[color],
     stopOpacity: "0.2"
   })))));
 };
 
-const Button = forwardRef(({
-  Component: _Component = 'button',
-  children,
-  className,
-  size: _size = 'normal',
-  color: _color = 'default',
-  variant: _variant = 'default',
-  fullWidth: _fullWidth = false,
-  isShowSpinner,
-  ...props
-}, ref) => {
-  return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
+var Button = forwardRef(function (_ref, ref) {
+  var _ref$Component = _ref.Component,
+      Component = _ref$Component === void 0 ? 'button' : _ref$Component,
+      children = _ref.children,
+      className = _ref.className,
+      _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 'normal' : _ref$size,
+      _ref$color = _ref.color,
+      color = _ref$color === void 0 ? 'default' : _ref$color,
+      _ref$variant = _ref.variant,
+      variant = _ref$variant === void 0 ? 'default' : _ref$variant,
+      _ref$fullWidth = _ref.fullWidth,
+      fullWidth = _ref$fullWidth === void 0 ? false : _ref$fullWidth,
+      isShowSpinner = _ref.isShowSpinner,
+      props = _objectWithoutPropertiesLoose(_ref, ["Component", "children", "className", "size", "color", "variant", "fullWidth", "isShowSpinner"]);
+
+  return /*#__PURE__*/React__default.createElement(Component, _extends({
     ref: ref,
-    className: cx(css$3.button, _size, `color-${_color}`, `variant-${_variant}`, className, {
-      'full-width': _fullWidth
+    className: cx(css$3.button, size, "color-" + color, "variant-" + variant, className, {
+      'full-width': fullWidth
     })
   }, props), isShowSpinner && /*#__PURE__*/React__default.createElement(Spinner, {
     className: css$3.spinner,
@@ -134,25 +178,27 @@ const Button = forwardRef(({
   }), children);
 });
 
-var css$5 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
+var css$5 = {"checkbox":"_3lqFk","toggle-label":"_1aLAG","label":"_2PZb-","wrapper":"_2Vufp","mark":"_2Pb2f"};
 
-const CheckboxField = ({
-  className,
-  value,
-  disabled,
-  appearance: _appearance = 'checkbox',
-  align: _align = 'left',
-  label,
-  onLabel,
-  offLabel,
-  children,
-  ...props
-}) => {
+var CheckboxField = function CheckboxField(_ref) {
+  var className = _ref.className,
+      value = _ref.value,
+      disabled = _ref.disabled,
+      _ref$appearance = _ref.appearance,
+      appearance = _ref$appearance === void 0 ? 'checkbox' : _ref$appearance,
+      _ref$align = _ref.align,
+      align = _ref$align === void 0 ? 'left' : _ref$align,
+      label = _ref.label,
+      onLabel = _ref.onLabel,
+      offLabel = _ref.offLabel,
+      children = _ref.children,
+      props = _objectWithoutPropertiesLoose(_ref, ["className", "value", "disabled", "appearance", "align", "label", "onLabel", "offLabel", "children"]);
+
   return /*#__PURE__*/React__default.createElement("label", {
-    className: cx(css$5.checkbox, className, _appearance, _align, {
-      disabled
+    className: cx(css$5.checkbox, className, appearance, align, {
+      disabled: disabled
     })
-  }, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("input", Object.assign({
+  }, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("input", _extends({
     type: "checkbox",
     checked: value
   }, props)), offLabel && /*#__PURE__*/React__default.createElement("span", {
@@ -176,24 +222,28 @@ const CheckboxField = ({
   }, label)), children);
 };
 
-var css$6 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
+var css$6 = {"copy":"_3J5hd","message":"_3RWnQ","button":"_2YqEb","icon":"_25GMO"};
 
-const Copy = ({
-  children,
-  className,
-  copyText,
-  successMessage,
-  buttonTitle
-}) => {
-  const {
-    t
-  } = useTranslation();
-  const [isShowMessage, setIsShowMessage] = useState(false);
+var Copy = function Copy(_ref) {
+  var children = _ref.children,
+      className = _ref.className,
+      copyText = _ref.copyText,
+      successMessage = _ref.successMessage,
+      buttonTitle = _ref.buttonTitle;
 
-  const onCLick = () => {
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = useState(false),
+      isShowMessage = _useState[0],
+      setIsShowMessage = _useState[1];
+
+  var onCLick = function onCLick() {
     copy(copyText);
     setIsShowMessage(true);
-    setTimeout(() => setIsShowMessage(false), 3000);
+    setTimeout(function () {
+      return setIsShowMessage(false);
+    }, 3000);
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
@@ -212,19 +262,19 @@ const Copy = ({
   }, successMessage ? successMessage : t('copied')));
 };
 
-var css$7 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
+var css$7 = {"code":"_3gARj","copy":"_m44gX","icon":"_ZmZbg"};
 
-const CodeViewer = ({
-  className,
-  language,
-  children,
-  fontSize
-}) => {
-  const {
-    t
-  } = useTranslation();
+var CodeViewer = function CodeViewer(_ref) {
+  var className = _ref.className,
+      language = _ref.language,
+      children = _ref.children,
+      fontSize = _ref.fontSize;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$7.code, className, fontSize && `font-size-${fontSize}`)
+    className: cx(css$7.code, className, fontSize && "font-size-" + fontSize)
   }, /*#__PURE__*/React__default.createElement(Highlight, {
     language: language
   }, children), /*#__PURE__*/React__default.createElement(Copy, {
@@ -234,24 +284,29 @@ const CodeViewer = ({
   }));
 };
 
-var css$8 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
+var css$8 = {"dropdown":"_1qRCw","button":"_fzNEm","menu":"_AJ1Y3","item":"_3lbfY"};
 
-const Dropdown = ({
-  className,
-  buttonClassName,
-  children,
-  items
-}) => {
-  const [isShow, setIsShow] = useState(false);
-  const buttonRef = useRef(null);
-  const dropdownRef = useRef(null);
-  useEffect(() => {
+var Dropdown = function Dropdown(_ref) {
+  var className = _ref.className,
+      buttonClassName = _ref.buttonClassName,
+      children = _ref.children,
+      items = _ref.items;
+
+  var _useState = useState(false),
+      isShow = _useState[0],
+      setIsShow = _useState[1];
+
+  var buttonRef = useRef(null);
+  var dropdownRef = useRef(null);
+  useEffect(function () {
     document.body.addEventListener('click', outlineClickHandle);
-    return () => document.body.removeEventListener('click', outlineClickHandle);
+    return function () {
+      return document.body.removeEventListener('click', outlineClickHandle);
+    };
   });
 
-  const outlineClickHandle = event => {
-    let targetElement = event.target;
+  var outlineClickHandle = function outlineClickHandle(event) {
+    var targetElement = event.target;
 
     do {
       if (targetElement === buttonRef.current || targetElement === dropdownRef.current) return;
@@ -261,19 +316,21 @@ const Dropdown = ({
     if (isShow) setIsShow(false);
   };
 
-  const onCLickButton = event => {
+  var onCLickButton = function onCLickButton(event) {
     clickStopPropagation(event);
     setIsShow(!isShow);
   };
 
-  const clickStopPropagation = event => {
+  var clickStopPropagation = function clickStopPropagation(event) {
     event.stopPropagation();
     event.preventDefault();
   };
 
-  const onCLickItem = item => () => {
-    setIsShow(!isShow);
-    if (item.onClick) item.onClick();
+  var onCLickItem = function onCLickItem(item) {
+    return function () {
+      setIsShow(!isShow);
+      if (item.onClick) item.onClick();
+    };
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
@@ -292,11 +349,13 @@ const Dropdown = ({
       className: cx(css$8.menu, 'show'),
       ref: dropdownRef,
       onClick: clickStopPropagation
-    }, items.map((i, index) => /*#__PURE__*/React__default.createElement("div", {
-      key: index,
-      className: css$8.item,
-      onClick: onCLickItem(i)
-    }, i.title)))
+    }, items.map(function (i, index) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        key: index,
+        className: css$8.item,
+        onClick: onCLickItem(i)
+      }, i.title);
+    }))
   }, children ? React__default.cloneElement(children, {
     onClick: onCLickButton,
     ref: buttonRef
@@ -309,77 +368,87 @@ const Dropdown = ({
   }))));
 };
 
-const formatBytes = (bytes, decimals) => {
+var formatBytes = function formatBytes(bytes, decimals) {
   if (bytes === 0) return '0 Bytes';
-  let k = 1024;
-  let dm = decimals <= 0 ? 0 : decimals || 2;
-  let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  let i = Math.floor(Math.log(bytes) / Math.log(k));
+  var k = 1024;
+  var dm = decimals <= 0 ? 0 : decimals || 2;
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  var i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var css$9 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
+var css$9 = {"dnd":"_3uYii","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
 
-const FileDragnDrop = ({
-  formats,
-  className,
-  loading,
-  progressPercent: _progressPercent = null,
-  onChange
-}) => {
-  const {
-    t
-  } = useTranslation();
-  const inputRef = useRef(null);
-  const [active, setActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState();
-  const isDidMount = useRef(true);
-  useEffect(() => {
+var FileDragnDrop = function FileDragnDrop(_ref) {
+  var formats = _ref.formats,
+      className = _ref.className,
+      loading = _ref.loading,
+      _ref$progressPercent = _ref.progressPercent,
+      progressPercent = _ref$progressPercent === void 0 ? null : _ref$progressPercent,
+      onChange = _ref.onChange;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var inputRef = useRef(null);
+
+  var _useState = useState(false),
+      active = _useState[0],
+      setActive = _useState[1];
+
+  var _useState2 = useState(),
+      selectedFile = _useState2[0],
+      setSelectedFile = _useState2[1];
+
+  var isDidMount = useRef(true);
+  useEffect(function () {
     if (!isDidMount.current) {
       if (onChange) onChange(selectedFile);
     } else isDidMount.current = false;
   }, [selectedFile]);
 
-  const onClick = event => {
+  var onClick = function onClick(event) {
     event.preventDefault();
     if (inputRef.current) inputRef.current.click();
   };
 
-  const preventStop = event => {
+  var preventStop = function preventStop(event) {
     event.preventDefault();
     event.stopPropagation();
   };
 
-  const onDrop = event => {
+  var onDrop = function onDrop(event) {
     preventStop(event);
     setActive(false);
-    const [file] = event.dataTransfer.files;
+    var _event$dataTransfer$f = event.dataTransfer.files,
+        file = _event$dataTransfer$f[0];
     if (file && checkAvailableExtension(file)) setSelectedFile(file);
   };
 
-  const onDragEnter = event => {
+  var onDragEnter = function onDragEnter(event) {
     preventStop(event);
     setActive(true);
   };
 
-  const onDragLeave = event => {
+  var onDragLeave = function onDragLeave(event) {
     preventStop(event);
     setActive(false);
   };
 
-  const onChangeInput = event => {
-    const [file] = event.target.files;
+  var onChangeInput = function onChangeInput(event) {
+    var _event$target$files = event.target.files,
+        file = _event$target$files[0];
     if (file && checkAvailableExtension(file)) setSelectedFile(file);
   };
 
-  const removeFile = () => {
+  var removeFile = function removeFile() {
     setSelectedFile(null);
   };
 
-  const checkAvailableExtension = file => {
-    const ext = '.' + file.name.split('.').pop();
-    let isAvailable;
-    if (formats && formats.length) isAvailable = formats.some(format => {
+  var checkAvailableExtension = function checkAvailableExtension(file) {
+    var ext = '.' + file.name.split('.').pop();
+    var isAvailable;
+    if (formats && formats.length) isAvailable = formats.some(function (format) {
       if (format === '.jpg' || format === '.jpeg') return ext === '.jpg' || ext === '.jpeg';else return format === ext;
     });else isAvailable = true;
     return isAvailable;
@@ -387,16 +456,16 @@ const FileDragnDrop = ({
 
   if (loading) return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$9.dnd, className, {
-      active
+      active: active
     })
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$9.loading
-  }, t('Uploading'), "\u2026", typeof _progressPercent === 'number' && `${_progressPercent}%`), typeof _progressPercent === 'number' && /*#__PURE__*/React__default.createElement("div", {
+  }, t('Uploading'), "\u2026", typeof progressPercent === 'number' && progressPercent + "%"), typeof progressPercent === 'number' && /*#__PURE__*/React__default.createElement("div", {
     className: css$9.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$9.progress,
     style: {
-      width: `${_progressPercent}%`
+      width: progressPercent + "%"
     }
   })));
   if (selectedFile) return /*#__PURE__*/React__default.createElement("div", {
@@ -415,7 +484,7 @@ const FileDragnDrop = ({
   }));
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$9.dnd, className, {
-      active
+      active: active
     }),
     onDrop: onDrop,
     onDragEnter: onDragEnter,
@@ -427,15 +496,17 @@ const FileDragnDrop = ({
     type: "file"
   }), /*#__PURE__*/React__default.createElement("div", {
     className: css$9.placeholder
-  }, t('dragHereAFile'), '', Boolean(formats) && `(${formats.join(', ')})`, ' ', t('or'), ' ', /*#__PURE__*/React__default.createElement("a", {
+  }, t('dragHereAFile'), '', Boolean(formats) && "(" + formats.join(', ') + ")", ' ', t('or'), ' ', /*#__PURE__*/React__default.createElement("a", {
     onClick: onClick,
     href: "#"
   }, t('upload')), ' ', t('fromYourComputer'), "."));
 };
 
-var css$a = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
+var css$a = {"loader":"_18_Ho","text":"_3dZu_","stacks-pulse":"_350eA","grid":"_Uki0v","item":"_MvjKB","pic":"_Pc6fT","section":"_2EIKh"};
 
-const Loader = ({}) => {
+var Loader = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$a.loader
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -463,37 +534,43 @@ const Loader = ({}) => {
   }))));
 };
 
-const MarkdownRender = props => {
-  const newProps = { ...props,
+var MarkdownRender = function MarkdownRender(props) {
+  var newProps = _extends({}, props, {
     plugins: [RemarkMathPlugin],
-    renderers: { ...props.renderers,
-      math: props => /*#__PURE__*/React__default.createElement(MathJax.Node, {
-        formula: props.value
-      }),
-      inlineMath: props => /*#__PURE__*/React__default.createElement(MathJax.Node, {
-        inline: true,
-        formula: props.value
-      })
-    }
-  };
+    renderers: _extends({}, props.renderers, {
+      math: function math(props) {
+        return /*#__PURE__*/React__default.createElement(MathJax.Node, {
+          formula: props.value
+        });
+      },
+      inlineMath: function inlineMath(props) {
+        return /*#__PURE__*/React__default.createElement(MathJax.Node, {
+          inline: true,
+          formula: props.value
+        });
+      }
+    })
+  });
+
   return /*#__PURE__*/React__default.createElement(MathJax.Provider, {
     input: "tex"
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, newProps));
 };
 
-var css$b = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
+var css$b = {"modal":"_3FQ59","dialog":"_268e0","close":"_1Y7yz","title":"_knxNI"};
 
-const Modal = ({
-  title,
-  className,
-  dialogClassName,
-  size: _size = 'big',
-  onClose,
-  isShow,
-  children,
-  withCloseButton
-}) => {
-  const onClickByLayer = event => {
+var Modal = function Modal(_ref) {
+  var title = _ref.title,
+      className = _ref.className,
+      dialogClassName = _ref.dialogClassName,
+      _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 'big' : _ref$size,
+      onClose = _ref.onClose,
+      isShow = _ref.isShow,
+      children = _ref.children,
+      withCloseButton = _ref.withCloseButton;
+
+  var onClickByLayer = function onClickByLayer(event) {
     if (event.currentTarget === event.target && onClose) onClose();
   };
 
@@ -503,7 +580,7 @@ const Modal = ({
     }),
     onClick: onClickByLayer
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$b.dialog, _size, dialogClassName)
+    className: cx(css$b.dialog, size, dialogClassName)
   }, withCloseButton && /*#__PURE__*/React__default.createElement("span", {
     className: cx(css$b.close, 'mdi mdi-close'),
     onClick: onClose
@@ -521,16 +598,32 @@ var config = {
   USER_DATA_URL: '/users/remember',
   UPDATE_TOKEN_URL: '/users/update/token',
   UPDATE_SETTINGS_URL: '/users/update/settings',
-  CHECK_USER: userName => `/users/exists/${userName}`,
-  STACKS_LIST: userName => `/stacks/${userName}`,
-  DELETE_STACK: () => '/stacks/delete',
-  STACK_DETAILS: (userName, stack) => `/stacks/${userName}/${stack}`,
-  STACK_FRAME: (userName, stack, frameId) => `/frames/${userName}/${stack}/${frameId}`,
-  STACK_ATTACHMENT: (stack, frameId, id) => `/attachs/${stack}/${frameId}/${id}`,
+  CHECK_USER: function CHECK_USER(userName) {
+    return "/users/exists/" + userName;
+  },
+  STACKS_LIST: function STACKS_LIST(userName) {
+    return "/stacks/" + userName;
+  },
+  DELETE_STACK: function DELETE_STACK() {
+    return '/stacks/delete';
+  },
+  STACK_DETAILS: function STACK_DETAILS(userName, stack) {
+    return "/stacks/" + userName + "/" + stack;
+  },
+  STACK_FRAME: function STACK_FRAME(userName, stack, frameId) {
+    return "/frames/" + userName + "/" + stack + "/" + frameId;
+  },
+  STACK_ATTACHMENT: function STACK_ATTACHMENT(stack, frameId, id) {
+    return "/attachs/" + stack + "/" + frameId + "/" + id;
+  },
   STACK_UPDATE: '/stacks/update',
   STACK_PUSH: '/stacks/push',
-  DASHBOARD_LIST: userName => `/dashboards/${userName}`,
-  DASHBOARD_DETAILS: (userName, id) => `/dashboards/${userName}/${id}`,
+  DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
+    return "/dashboards/" + userName;
+  },
+  DASHBOARD_DETAILS: function DASHBOARD_DETAILS(userName, id) {
+    return "/dashboards/" + userName + "/" + id;
+  },
   DASHBOARD_CREATE: '/dashboards/create',
   DASHBOARD_UPDATE: '/dashboards/update',
   DASHBOARD_DELETE: '/dashboards/delete',
@@ -541,26 +634,42 @@ var config = {
   TWITTER_URL: 'https://twitter.com/dstackai',
   GITHUB_URL: ' https://github.com/dstackai',
   MEDIUM_URL: ' https://medium.com/dstackai',
-  CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
-    const origin = window ? window.location.origin : '';
-    return `dstack config --token ${token} --user ${userName} --server ${origin}/api`;
+  CONFIGURE_PYTHON_COMMAND: function CONFIGURE_PYTHON_COMMAND(token, userName) {
+    if (token === void 0) {
+      token = '<token>';
+    }
+
+    if (userName === void 0) {
+      userName = '<username>';
+    }
+
+    var origin = window ? window.location.origin : '';
+    return "dstack config --token " + token + " --user " + userName + " --server " + origin + "/api";
   },
-  CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => {
-    const origin = window ? window.location.origin : '';
-    return `dstack::configure(user = "${userName}", token = "${token}", persist = "global"` + `, server = "${origin}/api")`;
+  CONFIGURE_R_COMMAND: function CONFIGURE_R_COMMAND(token, userName) {
+    if (token === void 0) {
+      token = '<token>';
+    }
+
+    if (userName === void 0) {
+      userName = '<username>';
+    }
+
+    var origin = window ? window.location.origin : '';
+    return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
   }
 };
 
 var image$1 = require("./404~FXFqzVOe.svg");
 
-var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
+var css$c = {"not-found":"_tAZyq","message":"_3Ok1U","help":"_Aa8x8"};
 
-const NotFound = ({
-  children
-}) => {
-  const {
-    t
-  } = useTranslation();
+var NotFound = function NotFound(_ref) {
+  var children = _ref.children;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$c['not-found']
   }, /*#__PURE__*/React__default.createElement("img", {
@@ -590,29 +699,35 @@ const NotFound = ({
   }), "Discord")));
 };
 
-var usePrevious = (value => {
-  const ref = useRef(value);
-  useEffect(() => {
+var usePrevious = (function (value) {
+  var ref = useRef(value);
+  useEffect(function () {
     ref.current = value;
   }, [value]);
   return ref.current;
 });
 
-var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
+var css$d = {"bar":"_12oWc","progress":"_3JWjz"};
 
-const ProgressBar = ({
-  className,
-  isActive,
-  progress: globalProgress
-}) => {
-  const [progress, setProgress] = useState(0);
-  const [width, setWidth] = useState(1000);
-  const prevIsActive = usePrevious(isActive);
-  const step = useRef(0.01);
-  const currentProgress = useRef(0);
-  const requestFrame = useRef(null);
-  const ref = useRef(null);
-  useEffect(() => {
+var ProgressBar = function ProgressBar(_ref) {
+  var className = _ref.className,
+      isActive = _ref.isActive,
+      globalProgress = _ref.progress;
+
+  var _useState = useState(0),
+      progress = _useState[0],
+      setProgress = _useState[1];
+
+  var _useState2 = useState(1000),
+      width = _useState2[0],
+      setWidth = _useState2[1];
+
+  var prevIsActive = usePrevious(isActive);
+  var step = useRef(0.01);
+  var currentProgress = useRef(0);
+  var requestFrame = useRef(null);
+  var ref = useRef(null);
+  useEffect(function () {
     if (isActive) {
       setProgress(0);
       step.current = 0.01;
@@ -623,7 +738,9 @@ const ProgressBar = ({
     if (prevIsActive === true && isActive === false) {
       if (requestFrame.current) cancelAnimationFrame(requestFrame.current);
       setProgress(100);
-      setTimeout(() => setProgress(0), 800);
+      setTimeout(function () {
+        return setProgress(0);
+      }, 800);
     }
 
     if (isActive === null) {
@@ -631,31 +748,33 @@ const ProgressBar = ({
       setProgress(0);
     }
   }, [isActive]);
-  useEffect(() => {
+  useEffect(function () {
     if (globalProgress !== null) setProgress(globalProgress);else {
       setProgress(0);
     }
   }, [globalProgress]);
-  useEffect(() => {
+  useEffect(function () {
     window.addEventListener('resize', onResize);
     if (ref.current) setWidth(ref.current.offsetWidth);
-    return () => window.removeEventListener('resize', onResize);
+    return function () {
+      return window.removeEventListener('resize', onResize);
+    };
   }, []);
 
-  const startCalculateProgress = () => {
+  var startCalculateProgress = function startCalculateProgress() {
     requestAnimationFrame(calculateProgress);
   };
 
-  const calculateProgress = useCallback(() => {
+  var calculateProgress = useCallback(function () {
     currentProgress.current += step.current;
-    const progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
+    var progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
     setProgress(progress);
     if (progress > 70) step.current = 0.005;
     if (progress >= 100) cancelAnimationFrame(requestFrame.current);
     requestFrame.current = requestAnimationFrame(calculateProgress);
   }, [isActive]);
 
-  const onResize = () => {
+  var onResize = function onResize() {
     if (ref.current) setWidth(ref.current.offsetWidth);
   };
 
@@ -665,55 +784,59 @@ const ProgressBar = ({
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$d.progress,
     style: {
-      width: `${progress}%`,
-      backgroundSize: `${width}px 5px`
+      width: progress + "%",
+      backgroundSize: width + "px 5px"
     }
   }));
 };
 
-var css$e = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
+var css$e = {"field":"_3WCaE","input":"_9Tk5W","label":"_1mHtq","error":"_3jOrk"};
 
-const TextField = ({
-  label,
-  className,
-  size: _size = 'normal',
-  errors: _errors = [],
-  ...props
-}) => {
-  const hasErrors = Boolean(_errors.length);
+var TextField = function TextField(_ref) {
+  var label = _ref.label,
+      className = _ref.className,
+      _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 'normal' : _ref$size,
+      _ref$errors = _ref.errors,
+      errors = _ref$errors === void 0 ? [] : _ref$errors,
+      props = _objectWithoutPropertiesLoose(_ref, ["label", "className", "size", "errors"]);
+
+  var hasErrors = Boolean(errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$e.field, className, _size, {
+    className: cx(css$e.field, className, size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
     className: css$e.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
     className: css$e.input
-  }, /*#__PURE__*/React__default.createElement("input", Object.assign({
+  }, /*#__PURE__*/React__default.createElement("input", _extends({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
     className: css$e.error
-  }, _errors.join(', '))));
+  }, errors.join(', '))));
 };
 
-var css$f = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
+var css$f = {"search":"_3s1gr","field":"_17rsB","clear":"_3oKZ5","button":"_3BfRl"};
 
-const SearchField = ({
-  className,
-  showEverything,
-  isDark,
-  ...props
-}) => {
-  const [isShow, setIsShow] = useState(showEverything || props.value && props.value.length);
+var SearchField = function SearchField(_ref) {
+  var className = _ref.className,
+      showEverything = _ref.showEverything,
+      isDark = _ref.isDark,
+      props = _objectWithoutPropertiesLoose(_ref, ["className", "showEverything", "isDark"]);
 
-  const clear = () => {
+  var _useState = useState(showEverything || props.value && props.value.length),
+      isShow = _useState[0],
+      setIsShow = _useState[1];
+
+  var clear = function clear() {
     if (props.onChange) props.onChange('');
     if (!showEverything) setIsShow(false);
   };
 
-  const onChangeHandle = event => {
+  var onChangeHandle = function onChangeHandle(event) {
     if (props.onChange) props.onChange(event.target.value);
   };
 
@@ -721,7 +844,7 @@ const SearchField = ({
     className: cx(css$f.search, className, {
       'is-dark': isDark
     })
-  }, isShow && /*#__PURE__*/React__default.createElement(TextField, Object.assign({}, props, {
+  }, isShow && /*#__PURE__*/React__default.createElement(TextField, _extends({}, props, {
     onChange: onChangeHandle,
     className: css$f.field
   })), isShow && Boolean(props.value && props.value.length) && /*#__PURE__*/React__default.createElement("div", {
@@ -735,62 +858,73 @@ const SearchField = ({
     className: "mdi mdi-magnify"
   })), !isShow && /*#__PURE__*/React__default.createElement("div", {
     className: css$f.button,
-    onClick: () => setIsShow(true)
+    onClick: function onClick() {
+      return setIsShow(true);
+    }
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-magnify"
   })));
 };
 
-var css$g = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
+var css$g = {"field":"_2jF9E","label":"_iehEi","rcSelectLoadingIcon":"_VtsrG","rcSelectDropdownSlideUpIn":"_27wr-","rcSelectDropdownSlideUpOut":"_1QVN6","rcSelectDropdownSlideDownIn":"_1vYLX","rcSelectDropdownSlideDownOut":"_1-lNh","select-field":"_1mUh_","select-field-selector":"_V9Ufm","select-field-arrow":"_c4k8s","mdi":"_2hNDK","select-field-selection-placeholder":"_2Vdv0","select-field-selection-search":"_3GdNa","select-field-selection-search-input":"_3BOaB","select-field-selection-item":"_2uDu7","select-field-item-option-checkbox":"_2K_G1","select-field-selection-item-remove":"_1k1IW","select-field-show-search":"_3EVnU","select-field-show-arrow":"_1xlmm","select-field-open":"__jEZ1","select-field-multiple":"_2YFSs","select-field-single":"_1n3qF","select-field-clear":"_Mg5xq","select-field-item-option-state":"_2yGkG","select-field-selection__choice-zoom":"_3NUb5","select-field-selection__choice-zoom-appear":"_ZO73y","select-field-selection__choice-zoom-leave":"_2i54q","select-field-dropdown":"_14ngc"};
 
-const allValue = 'all';
+var allValue = 'all';
 
-const SelectField = ({
-  align: _align = 'left',
-  label,
-  disabled,
-  placeholder,
-  value: propValue = [],
-  className,
-  mode,
-  onChange,
-  options: _options = [],
-  showSearch: _showSearch = true,
-  ...props
-}) => {
-  const onChangeHandle = value => {
-    if (value.indexOf(allValue) >= 0) if (value.length > _options.length) value = [];else value = _options.map(o => o.value);
+var SelectField = function SelectField(_ref) {
+  var _ref$align = _ref.align,
+      align = _ref$align === void 0 ? 'left' : _ref$align,
+      label = _ref.label,
+      disabled = _ref.disabled,
+      placeholder = _ref.placeholder,
+      _ref$value = _ref.value,
+      propValue = _ref$value === void 0 ? [] : _ref$value,
+      className = _ref.className,
+      mode = _ref.mode,
+      onChange = _ref.onChange,
+      _ref$options = _ref.options,
+      options = _ref$options === void 0 ? [] : _ref$options,
+      _ref$showSearch = _ref.showSearch,
+      showSearch = _ref$showSearch === void 0 ? true : _ref$showSearch,
+      props = _objectWithoutPropertiesLoose(_ref, ["align", "label", "disabled", "placeholder", "value", "className", "mode", "onChange", "options", "showSearch"]);
+
+  var onChangeHandle = function onChangeHandle(value) {
+    if (value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
+      return o.value;
+    });
     if (onChange) onChange(value);
   };
 
-  const onSelect = () => {};
+  var onSelect = function onSelect() {};
 
-  const onDeselect = () => {};
+  var onDeselect = function onDeselect() {};
 
-  const renderOptions = () => _options.map(({
-    value,
-    label
-  }) => /*#__PURE__*/React__default.createElement(Option, {
-    key: value,
-    value: value
-  }, mode === 'multiple' && /*#__PURE__*/React__default.createElement(CheckboxField, {
-    readOnly: true,
-    className: "select-field-item-option-checkbox",
-    value: propValue.indexOf(value) >= 0
-  }), /*#__PURE__*/React__default.createElement("span", {
-    className: "select-field-item-option-label"
-  }, label)));
+  var renderOptions = function renderOptions() {
+    return options.map(function (_ref2) {
+      var value = _ref2.value,
+          label = _ref2.label;
+      return /*#__PURE__*/React__default.createElement(Option, {
+        key: value,
+        value: value
+      }, mode === 'multiple' && /*#__PURE__*/React__default.createElement(CheckboxField, {
+        readOnly: true,
+        className: "select-field-item-option-checkbox",
+        value: propValue.indexOf(value) >= 0
+      }), /*#__PURE__*/React__default.createElement("span", {
+        className: "select-field-item-option-label"
+      }, label));
+    });
+  };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$g.field, className, _align, {
-      disabled
+    className: cx(css$g.field, className, align, {
+      disabled: disabled
     })
-  }, /*#__PURE__*/React__default.createElement(Select, Object.assign({
+  }, /*#__PURE__*/React__default.createElement(Select, _extends({
     value: propValue,
     prefixCls: "select-field",
     multiple: mode === 'multiple',
     showArrow: true,
-    showSearch: _showSearch,
+    showSearch: showSearch,
     onSelect: onSelect,
     onDeselect: onDeselect,
     placeholder: placeholder,
@@ -798,13 +932,13 @@ const SelectField = ({
     inputIcon: /*#__PURE__*/React__default.createElement("span", {
       className: "mdi mdi-chevron-down"
     })
-  }, props), _options.length && mode === 'multiple' && /*#__PURE__*/React__default.createElement(Option, {
+  }, props), options.length && mode === 'multiple' && /*#__PURE__*/React__default.createElement(Option, {
     key: allValue,
     value: allValue
   }, /*#__PURE__*/React__default.createElement(CheckboxField, {
     readOnly: true,
     className: "select-field-item-option-checkbox",
-    value: propValue.length === _options.length
+    value: propValue.length === options.length
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "select-field-item-option-label"
   }, "Select all")), mode === 'multiple' ? /*#__PURE__*/React__default.createElement(OptGroup, null, renderOptions()) : renderOptions()), label && /*#__PURE__*/React__default.createElement("label", {
@@ -812,10 +946,10 @@ const SelectField = ({
   }, label));
 };
 
-var css$h = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
+var css$h = {"field":"_2_NXc","rcSliderTooltipZoomDownIn":"_2jvao","rcSliderTooltipZoomDownOut":"_2HgMB","slider":"_31Ylv","label":"_Zo_r8","rc-slider":"_1hLjI","rc-slider-rail":"_v9bxI","rc-slider-track":"__3emJ","rc-slider-handle":"_12sQ3","rc-slider-handle-dragging":"_2u63-","rc-slider-handle-click-focused":"_7xSSR","rc-slider-mark":"_1l2Qm","rc-slider-mark-text":"_2zf2c","rc-slider-mark-text-active":"_25tuh","rc-slider-step":"_3wC_L","rc-slider-dot":"_17-SM","rc-slider-dot-active":"_1eLwY","rc-slider-dot-reverse":"_Ewb1d","rc-slider-disabled":"_1YO43","rc-slider-vertical":"_12Juq","rc-slider-tooltip-zoom-down-enter":"_2a95b","rc-slider-tooltip-zoom-down-appear":"_2wvsD","rc-slider-tooltip-zoom-down-leave":"_3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_P9_lk","rc-slider-tooltip":"_1PZK2","rc-slider-tooltip-hidden":"_2CvyB","rc-slider-tooltip-placement-top":"_qzmlA","rc-slider-tooltip-inner":"_27Bp4","rc-slider-tooltip-arrow":"_35-HY"};
 
-const CustomHandle = props => {
-  const style = {
+var CustomHandle = function CustomHandle(props) {
+  var style = {
     left: props.offset + '%',
     transform: 'translateX(-50%)'
   };
@@ -827,147 +961,165 @@ const CustomHandle = props => {
   });
 };
 
-const SliderField = ({
-  className,
-  disabled,
-  label,
-  onChange,
-  name,
-  align: _align = 'left',
-  ...props
-}) => {
-  const onChangeHandle = value => {
+var SliderField = function SliderField(_ref) {
+  var className = _ref.className,
+      disabled = _ref.disabled,
+      label = _ref.label,
+      onChange = _ref.onChange,
+      name = _ref.name,
+      _ref$align = _ref.align,
+      align = _ref$align === void 0 ? 'left' : _ref$align,
+      props = _objectWithoutPropertiesLoose(_ref, ["className", "disabled", "label", "onChange", "name", "align"]);
+
+  var onChangeHandle = function onChangeHandle(value) {
     if (onChange) onChange({
       target: {
-        value,
-        name
+        value: value,
+        name: name
       }
     });
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$h.field, className, _align, {
-      disabled
+    className: cx(css$h.field, className, align, {
+      disabled: disabled
     })
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$h.slider
-  }, /*#__PURE__*/React__default.createElement(Slider, Object.assign({
+  }, /*#__PURE__*/React__default.createElement(Slider, _extends({
     onChange: onChangeHandle,
-    tipFormatter: value => `$${value}`,
+    tipFormatter: function tipFormatter(value) {
+      return "$" + value;
+    },
     handle: CustomHandle
   }, props))), label && /*#__PURE__*/React__default.createElement("span", {
     className: css$h.label
   }, label));
 };
 
-var css$i = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
+var css$i = {"field":"_2DYF1","hidden":"_3z5o2"};
 
-const StretchTitleField = ({
-  value,
-  placeholder: _placeholder = '',
-  className,
-  ...props
-}) => {
+var StretchTitleField = function StretchTitleField(_ref) {
+  var value = _ref.value,
+      _ref$placeholder = _ref.placeholder,
+      placeholder = _ref$placeholder === void 0 ? '' : _ref$placeholder,
+      className = _ref.className,
+      props = _objectWithoutPropertiesLoose(_ref, ["value", "placeholder", "className"]);
+
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$i.field, className)
-  }, /*#__PURE__*/React__default.createElement("input", Object.assign({
+  }, /*#__PURE__*/React__default.createElement("input", _extends({
     type: "text",
-    placeholder: _placeholder,
+    placeholder: placeholder,
     value: value
   }, props)), /*#__PURE__*/React__default.createElement("div", {
     className: css$i.hidden
-  }, value.length ? value : _placeholder));
+  }, value.length ? value : placeholder));
 };
 
-var css$j = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
+var css$j = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
 
-const Tabs = ({
-  className,
-  value,
-  tabs,
-  onChange
-}) => {
-  const {
-    t
-  } = useTranslation();
+var Tabs = function Tabs(_ref) {
+  var className = _ref.className,
+      value = _ref.value,
+      tabs = _ref.tabs,
+      onChange = _ref.onChange;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$j.tabs, className)
-  }, tabs.map((i, index) => /*#__PURE__*/React__default.createElement("div", {
-    key: index,
-    className: cx(css$j.tab, {
-      active: value === i.value
-    }),
-    onClick: () => onChange(i.value)
-  }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
-    className: css$j.soon
-  }, t('soon')))));
+  }, tabs.map(function (i, index) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: index,
+      className: cx(css$j.tab, {
+        active: value === i.value
+      }),
+      onClick: function onClick() {
+        return onChange(i.value);
+      }
+    }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
+      className: css$j.soon
+    }, t('soon')));
+  }));
 };
 
-var css$k = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
+var css$k = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
 
-const TextAreaField = ({
-  label,
-  className,
-  size: _size = 'normal',
-  errors: _errors = [],
-  ...props
-}) => {
-  const hasErrors = Boolean(_errors.length);
+var TextAreaField = function TextAreaField(_ref) {
+  var label = _ref.label,
+      className = _ref.className,
+      _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 'normal' : _ref$size,
+      _ref$errors = _ref.errors,
+      errors = _ref$errors === void 0 ? [] : _ref$errors,
+      props = _objectWithoutPropertiesLoose(_ref, ["label", "className", "size", "errors"]);
+
+  var hasErrors = Boolean(errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$k.field, className, _size, {
+    className: cx(css$k.field, className, size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
     className: css$k.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
     className: css$k.textarea
-  }, /*#__PURE__*/React__default.createElement("textarea", Object.assign({
+  }, /*#__PURE__*/React__default.createElement("textarea", _extends({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
     className: css$k.error
-  }, _errors.join(', '))));
+  }, errors.join(', '))));
 };
 
-var css$l = {"tooltip":"_style-module__tooltip__rE8Jn"};
+var css$l = {"tooltip":"_rE8Jn"};
 
-const Tooltip = ({
-  children,
-  overlayContent,
-  arrowContent: _arrowContent = null,
-  placement: _placement = 'bottomLeft',
-  trigger: _trigger = ['hover'],
-  overlayStyle: _overlayStyle = {
+var Tooltip = function Tooltip(_ref) {
+  var children = _ref.children,
+      overlayContent = _ref.overlayContent,
+      _ref$arrowContent = _ref.arrowContent,
+      arrowContent = _ref$arrowContent === void 0 ? null : _ref$arrowContent,
+      _ref$placement = _ref.placement,
+      placement = _ref$placement === void 0 ? 'bottomLeft' : _ref$placement,
+      _ref$trigger = _ref.trigger,
+      trigger = _ref$trigger === void 0 ? ['hover'] : _ref$trigger,
+      _ref$overlayStyle = _ref.overlayStyle,
+      overlayStyle = _ref$overlayStyle === void 0 ? {
     'pointer-events': 'none'
-  },
-  ...props
-}) => {
-  return /*#__PURE__*/React__default.createElement(RcTooltip, Object.assign({
-    overlayStyle: _overlayStyle,
-    arrowContent: _arrowContent,
-    placement: _placement,
-    trigger: _trigger,
+  } : _ref$overlayStyle,
+      props = _objectWithoutPropertiesLoose(_ref, ["children", "overlayContent", "arrowContent", "placement", "trigger", "overlayStyle"]);
+
+  return /*#__PURE__*/React__default.createElement(RcTooltip, _extends({
+    overlayStyle: overlayStyle,
+    arrowContent: arrowContent,
+    placement: placement,
+    trigger: trigger,
     overlay: /*#__PURE__*/React__default.createElement("div", {
       className: css$l.tooltip
     }, overlayContent)
   }, props), children);
 };
 
-var css$m = {"switcher":"_styles-module__switcher__3NMzC"};
+var css$m = {"switcher":"_3NMzC"};
 
-const ViewSwitcher = ({
-  value: _value = 'grid',
-  onChange,
-  className
-}) => {
-  const [stateValue, setStateValue] = useState(_value);
-  useEffect(() => {
-    if (_value !== stateValue) setStateValue(_value);
-  }, [_value]);
+var ViewSwitcher = function ViewSwitcher(_ref) {
+  var _ref$value = _ref.value,
+      value = _ref$value === void 0 ? 'grid' : _ref$value,
+      onChange = _ref.onChange,
+      className = _ref.className;
 
-  const toggleValue = () => {
-    const newValue = stateValue === 'grid' ? 'list' : 'grid';
+  var _useState = useState(value),
+      stateValue = _useState[0],
+      setStateValue = _useState[1];
+
+  useEffect(function () {
+    if (value !== stateValue) setStateValue(value);
+  }, [value]);
+
+  var toggleValue = function toggleValue() {
+    var newValue = stateValue === 'grid' ? 'list' : 'grid';
     setStateValue(newValue);
     if (onChange) onChange(newValue);
   };
@@ -982,11 +1134,10 @@ const ViewSwitcher = ({
   }));
 };
 
-const Yield = ({
-  name,
-  className,
-  children
-}) => {
+var Yield = function Yield(_ref) {
+  var name = _ref.name,
+      className = _ref.className,
+      children = _ref.children;
   if (!name) return null;
   if (children) return /*#__PURE__*/React__default.createElement(Portal, {
     node: document && document.getElementById(name)

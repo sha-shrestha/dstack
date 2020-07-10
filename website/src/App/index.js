@@ -5,9 +5,9 @@ import {connect} from 'react-redux';
 import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
 import routes from 'routes';
 import '@mdi/font/css/materialdesignicons.min.css';
-import 'dstack-react/dist/index.css';
+import '@dstackai/dstack-react/dist/index.css';
 
-import {NotFound, Loader} from 'dstack-react';
+import {NotFound, Loader} from '@dstackai/dstack-react';
 import DefaultLayout from 'layouts/Default';
 import UnAuthorizedLayout from 'layouts/UnAuthorized';
 

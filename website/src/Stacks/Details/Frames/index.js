@@ -4,7 +4,7 @@ import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
 import {useOnClickOutside} from 'hooks';
-import {Button, Modal, Tooltip} from 'dstack-react';
+import {Button, Modal, Tooltip} from '@dstackai/dstack-react';
 import css from './styles.module.css';
 
 type Props = {

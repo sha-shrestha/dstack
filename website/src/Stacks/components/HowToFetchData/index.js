@@ -3,7 +3,7 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {connect} from 'react-redux';
-import {Tabs, CodeViewer} from 'dstack-react';
+import {Tabs, CodeViewer} from '@dstackai/dstack-react';
 import {get, isString} from 'lodash-es';
 import config from 'config';
 import css from 'Stacks/components/HowTo/styles.module.css';

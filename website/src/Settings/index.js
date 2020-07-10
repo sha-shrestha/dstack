@@ -4,7 +4,7 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {debounce as _debounce, get} from 'lodash-es';
-import {Button, TextField, Copy} from 'dstack-react';
+import {Button, TextField, Copy} from '@dstackai/dstack-react';
 import {updateToken} from 'App/actions';
 import {updateSettings} from './actions';
 import css from './styles.module.css';
