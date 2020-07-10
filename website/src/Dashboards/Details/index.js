@@ -8,7 +8,8 @@ import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import DnDGridContext from 'components/DnDGridContext';
 import DnDItem from 'components/DnDGridContext/components/DnDItem';
-import {Button, Dropdown, ViewSwitcher, AccessForbidden, StretchTitleField, NotFound} from 'dstack-react';
+import {Button, Dropdown, ViewSwitcher, AccessForbidden, StretchTitleField,
+    NotFound, Yield, BackButton} from 'dstack-react';
 import SelectStacks from './components/SelectStacks';
 import Loader from './components/Loader';
 import Card from './components/Card';
@@ -264,6 +265,18 @@ const Details = ({
 
     return (
         <div className={css.details}>
+            <Yield name="header-yield">
+                <BackButton
+                    Component={Link}
+                    to={routes.dashboards(params.user)}
+                >
+                    {(currentUser === params.user)
+                        ? t('backToDashboards')
+                        : t('backToDashboardsOf', {name: params.user})
+                    }
+                </BackButton>
+            </Yield>
+
             <div className={css.header}>
                 <div className={css.title}>
                     <StretchTitleField

@@ -83,6 +83,20 @@
         box-shadow: 0 0 0 1px rgb(255, 255, 255) inset;
     }
 
+._styles-module__back__1MuhU {
+    font-size: 14px;
+    line-height: 22px;
+    color: rgb(180, 184, 199);
+    transition: opacity .2s;
+}
+@media (min-width: 981px) {
+        ._styles-module__back__1MuhU:hover {
+            opacity: .7;
+        }
+    }
+._styles-module__back__1MuhU > span {
+        padding-right: 4px;
+    }
 button._style-module__button__2lKoS {
     box-sizing: border-box;
     border: none;

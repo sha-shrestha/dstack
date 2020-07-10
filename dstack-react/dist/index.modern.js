@@ -51,9 +51,24 @@ const Avatar = forwardRef(({
   }, name.slice(0, 2));
 });
 
-var css$2 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
+var css$2 = {"back":"_styles-module__back__1MuhU"};
 
-var css$3 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
+const BackButton = ({
+  Component: _Component = 'button',
+  children,
+  className,
+  ...props
+}) => {
+  return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
+    className: cx(css$2.back, className)
+  }, props), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-arrow-left"
+  }), children);
+};
+
+var css$3 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
+
+var css$4 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
 
 const COLORS = {
   white: '#fff',
@@ -68,7 +83,7 @@ const Spinner = ({
   align
 }) => {
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$3.spinner, className, align, {
+    className: cx(css$4.spinner, className, align, {
       show: isShown
     })
   }, /*#__PURE__*/React__default.createElement("svg", {
@@ -109,17 +124,17 @@ const Button = forwardRef(({
 }, ref) => {
   return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
     ref: ref,
-    className: cx(css$2.button, _size, `color-${_color}`, `variant-${_variant}`, className, {
+    className: cx(css$3.button, _size, `color-${_color}`, `variant-${_variant}`, className, {
       'full-width': _fullWidth
     })
   }, props), isShowSpinner && /*#__PURE__*/React__default.createElement(Spinner, {
-    className: css$2.spinner,
+    className: css$3.spinner,
     color: "white",
     isShown: true
   }), children);
 });
 
-var css$4 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
+var css$5 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
 
 const CheckboxField = ({
   className,
@@ -134,34 +149,34 @@ const CheckboxField = ({
   ...props
 }) => {
   return /*#__PURE__*/React__default.createElement("label", {
-    className: cx(css$4.checkbox, className, _appearance, _align, {
+    className: cx(css$5.checkbox, className, _appearance, _align, {
       disabled
     })
   }, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("input", Object.assign({
     type: "checkbox",
     checked: value
   }, props)), offLabel && /*#__PURE__*/React__default.createElement("span", {
-    className: cx(css$4['toggle-label'], 'off'),
+    className: cx(css$5['toggle-label'], 'off'),
     dangerouslySetInnerHTML: {
       __html: offLabel
     }
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$4.wrapper
+    className: css$5.wrapper
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$4.mark, 'mdi', 'mdi-check', {
+    className: cx(css$5.mark, 'mdi', 'mdi-check', {
       'toggle-color': !(onLabel && offLabel)
     })
   })), onLabel && /*#__PURE__*/React__default.createElement("span", {
-    className: cx(css$4['toggle-label'], 'on'),
+    className: cx(css$5['toggle-label'], 'on'),
     dangerouslySetInnerHTML: {
       __html: onLabel
     }
   }), label && /*#__PURE__*/React__default.createElement("span", {
-    className: css$4.label
+    className: css$5.label
   }, label)), children);
 };
 
-var css$5 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
+var css$6 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
 
 const Copy = ({
   children,
@@ -182,22 +197,22 @@ const Copy = ({
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$5.copy, className)
+    className: cx(css$6.copy, className)
   }, children ? children({
     onClick: onCLick
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$5.button,
+    className: css$6.button,
     onClick: onCLick
   }, /*#__PURE__*/React__default.createElement("span", {
-    className: cx(css$5.icon, 'mdi mdi-content-copy')
+    className: cx(css$6.icon, 'mdi mdi-content-copy')
   }), buttonTitle ? buttonTitle : t('copy')), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$5.message, {
+    className: cx(css$6.message, {
       'is-show': isShowMessage
     })
   }, successMessage ? successMessage : t('copied')));
 };
 
-var css$6 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
+var css$7 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
 
 const CodeViewer = ({
   className,
@@ -209,17 +224,17 @@ const CodeViewer = ({
     t
   } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$6.code, className, fontSize && `font-size-${fontSize}`)
+    className: cx(css$7.code, className, fontSize && `font-size-${fontSize}`)
   }, /*#__PURE__*/React__default.createElement(Highlight, {
     language: language
   }, children), /*#__PURE__*/React__default.createElement(Copy, {
-    className: css$6.copy,
+    className: css$7.copy,
     copyText: children,
     successMessage: t('snippetIsCopied')
   }));
 };
 
-var css$7 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
+var css$8 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
 
 const Dropdown = ({
   className,
@@ -262,7 +277,7 @@ const Dropdown = ({
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$7.dropdown, className, {
+    className: cx(css$8.dropdown, className, {
       active: isShow
     })
   }, /*#__PURE__*/React__default.createElement(RcTooltip, {
@@ -274,12 +289,12 @@ const Dropdown = ({
       offset: [0, 0]
     },
     overlay: /*#__PURE__*/React__default.createElement("div", {
-      className: cx(css$7.menu, 'show'),
+      className: cx(css$8.menu, 'show'),
       ref: dropdownRef,
       onClick: clickStopPropagation
     }, items.map((i, index) => /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: css$7.item,
+      className: css$8.item,
       onClick: onCLickItem(i)
     }, i.title)))
   }, children ? React__default.cloneElement(children, {
@@ -287,7 +302,7 @@ const Dropdown = ({
     ref: buttonRef
   }) : /*#__PURE__*/React__default.createElement("div", {
     ref: buttonRef,
-    className: cx(css$7.button, buttonClassName),
+    className: cx(css$8.button, buttonClassName),
     onClick: onCLickButton
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-vertical"
@@ -303,7 +318,7 @@ const formatBytes = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var css$8 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
+var css$9 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
 
 const FileDragnDrop = ({
   formats,
@@ -371,35 +386,35 @@ const FileDragnDrop = ({
   };
 
   if (loading) return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$8.dnd, className, {
+    className: cx(css$9.dnd, className, {
       active
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.loading
+    className: css$9.loading
   }, t('Uploading'), "\u2026", typeof _progressPercent === 'number' && `${_progressPercent}%`), typeof _progressPercent === 'number' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.progressBar
+    className: css$9.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.progress,
+    className: css$9.progress,
     style: {
       width: `${_progressPercent}%`
     }
   })));
   if (selectedFile) return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$8.file, className)
+    className: cx(css$9.file, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.fileExtend
+    className: css$9.fileExtend
   }, ".csv"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.fileSection
+    className: css$9.fileSection
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.fileName
+    className: css$9.fileName
   }, selectedFile.name), /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.fileSize
+    className: css$9.fileSize
   }, formatBytes(selectedFile.size))), /*#__PURE__*/React__default.createElement("div", {
     onClick: removeFile,
-    className: cx(css$8.fileRemove, 'mdi mdi-close')
+    className: cx(css$9.fileRemove, 'mdi mdi-close')
   }));
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$8.dnd, className, {
+    className: cx(css$9.dnd, className, {
       active
     }),
     onDrop: onDrop,
@@ -411,40 +426,40 @@ const FileDragnDrop = ({
     onChange: onChangeInput,
     type: "file"
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$8.placeholder
+    className: css$9.placeholder
   }, t('dragHereAFile'), '', Boolean(formats) && `(${formats.join(', ')})`, ' ', t('or'), ' ', /*#__PURE__*/React__default.createElement("a", {
     onClick: onClick,
     href: "#"
   }, t('upload')), ' ', t('fromYourComputer'), "."));
 };
 
-var css$9 = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
+var css$a = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
 
 const Loader = ({}) => {
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.loader
+    className: css$a.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.text
+    className: css$a.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.grid
+    className: css$a.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.item
+    className: css$a.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.pic
+    className: css$a.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.section
+    className: css$a.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.item
+    className: css$a.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.pic
+    className: css$a.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.section
+    className: css$a.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.item
+    className: css$a.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.pic
+    className: css$a.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$9.section
+    className: css$a.section
   }))));
 };
 
@@ -466,7 +481,7 @@ const MarkdownRender = props => {
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, newProps));
 };
 
-var css$a = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
+var css$b = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
 
 const Modal = ({
   title,
@@ -483,17 +498,17 @@ const Modal = ({
   };
 
   return /*#__PURE__*/React__default.createElement(Portal, null, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$a.modal, className, {
+    className: cx(css$b.modal, className, {
       show: isShow
     }),
     onClick: onClickByLayer
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$a.dialog, _size, dialogClassName)
+    className: cx(css$b.dialog, _size, dialogClassName)
   }, withCloseButton && /*#__PURE__*/React__default.createElement("span", {
-    className: cx(css$a.close, 'mdi mdi-close'),
+    className: cx(css$b.close, 'mdi mdi-close'),
     onClick: onClose
   }), title && /*#__PURE__*/React__default.createElement("div", {
-    className: css$a.title
+    className: css$b.title
   }, title), children)));
 };
 
@@ -538,7 +553,7 @@ var config = {
 
 var image$1 = require("./404~FXFqzVOe.svg");
 
-var css$b = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
+var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
 
 const NotFound = ({
   children
@@ -547,16 +562,16 @@ const NotFound = ({
     t
   } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$b['not-found']
+    className: css$c['not-found']
   }, /*#__PURE__*/React__default.createElement("img", {
     src: image$1,
     alt: "",
     width: "224",
     height: "77"
   }), children && /*#__PURE__*/React__default.createElement("div", {
-    className: css$b.message
+    className: css$c.message
   }, children), /*#__PURE__*/React__default.createElement("div", {
-    className: css$b.help
+    className: css$c.help
   }, t('needHelpWWriteToUsOn'), ' ', /*#__PURE__*/React__default.createElement("a", {
     target: "_blank",
     href: config.TWITTER_URL
@@ -583,7 +598,7 @@ var usePrevious = (value => {
   return ref.current;
 });
 
-var css$c = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
+var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
 
 const ProgressBar = ({
   className,
@@ -646,9 +661,9 @@ const ProgressBar = ({
 
   return /*#__PURE__*/React__default.createElement("div", {
     ref: ref,
-    className: cx(css$c.bar, className)
+    className: cx(css$d.bar, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$c.progress,
+    className: css$d.progress,
     style: {
       width: `${progress}%`,
       backgroundSize: `${width}px 5px`
@@ -656,7 +671,7 @@ const ProgressBar = ({
   }));
 };
 
-var css$d = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
+var css$e = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
 
 const TextField = ({
   label,
@@ -667,23 +682,23 @@ const TextField = ({
 }) => {
   const hasErrors = Boolean(_errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$d.field, className, _size, {
+    className: cx(css$e.field, className, _size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
-    className: css$d.label
+    className: css$e.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
-    className: css$d.input
+    className: css$e.input
   }, /*#__PURE__*/React__default.createElement("input", Object.assign({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
-    className: css$d.error
+    className: css$e.error
   }, _errors.join(', '))));
 };
 
-var css$e = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
+var css$f = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
 
 const SearchField = ({
   className,
@@ -703,30 +718,30 @@ const SearchField = ({
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$e.search, className, {
+    className: cx(css$f.search, className, {
       'is-dark': isDark
     })
   }, isShow && /*#__PURE__*/React__default.createElement(TextField, Object.assign({}, props, {
     onChange: onChangeHandle,
-    className: css$e.field
+    className: css$f.field
   })), isShow && Boolean(props.value && props.value.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$e.clear,
+    className: css$f.clear,
     onClick: clear
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-close"
   })), isShow && !Boolean(props.value && props.value.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$e.clear
+    className: css$f.clear
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-magnify"
   })), !isShow && /*#__PURE__*/React__default.createElement("div", {
-    className: css$e.button,
+    className: css$f.button,
     onClick: () => setIsShow(true)
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-magnify"
   })));
 };
 
-var css$f = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
+var css$g = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
 
 const allValue = 'all';
 
@@ -767,7 +782,7 @@ const SelectField = ({
   }, label)));
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$f.field, className, _align, {
+    className: cx(css$g.field, className, _align, {
       disabled
     })
   }, /*#__PURE__*/React__default.createElement(Select, Object.assign({
@@ -793,11 +808,11 @@ const SelectField = ({
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "select-field-item-option-label"
   }, "Select all")), mode === 'multiple' ? /*#__PURE__*/React__default.createElement(OptGroup, null, renderOptions()) : renderOptions()), label && /*#__PURE__*/React__default.createElement("label", {
-    className: css$f.label
+    className: css$g.label
   }, label));
 };
 
-var css$g = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
+var css$h = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
 
 const CustomHandle = props => {
   const style = {
@@ -831,21 +846,21 @@ const SliderField = ({
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$g.field, className, _align, {
+    className: cx(css$h.field, className, _align, {
       disabled
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$g.slider
+    className: css$h.slider
   }, /*#__PURE__*/React__default.createElement(Slider, Object.assign({
     onChange: onChangeHandle,
     tipFormatter: value => `$${value}`,
     handle: CustomHandle
   }, props))), label && /*#__PURE__*/React__default.createElement("span", {
-    className: css$g.label
+    className: css$h.label
   }, label));
 };
 
-var css$h = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
+var css$i = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
 
 const StretchTitleField = ({
   value,
@@ -854,17 +869,17 @@ const StretchTitleField = ({
   ...props
 }) => {
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$h.field, className)
+    className: cx(css$i.field, className)
   }, /*#__PURE__*/React__default.createElement("input", Object.assign({
     type: "text",
     placeholder: _placeholder,
     value: value
   }, props)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$h.hidden
+    className: css$i.hidden
   }, value.length ? value : _placeholder));
 };
 
-var css$i = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
+var css$j = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
 
 const Tabs = ({
   className,
@@ -876,19 +891,19 @@ const Tabs = ({
     t
   } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$i.tabs, className)
+    className: cx(css$j.tabs, className)
   }, tabs.map((i, index) => /*#__PURE__*/React__default.createElement("div", {
     key: index,
-    className: cx(css$i.tab, {
+    className: cx(css$j.tab, {
       active: value === i.value
     }),
     onClick: () => onChange(i.value)
   }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
-    className: css$i.soon
+    className: css$j.soon
   }, t('soon')))));
 };
 
-var css$j = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
+var css$k = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
 
 const TextAreaField = ({
   label,
@@ -899,23 +914,23 @@ const TextAreaField = ({
 }) => {
   const hasErrors = Boolean(_errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$j.field, className, _size, {
+    className: cx(css$k.field, className, _size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
-    className: css$j.label
+    className: css$k.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
-    className: css$j.textarea
+    className: css$k.textarea
   }, /*#__PURE__*/React__default.createElement("textarea", Object.assign({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
-    className: css$j.error
+    className: css$k.error
   }, _errors.join(', '))));
 };
 
-var css$k = {"tooltip":"_style-module__tooltip__rE8Jn"};
+var css$l = {"tooltip":"_style-module__tooltip__rE8Jn"};
 
 const Tooltip = ({
   children,
@@ -934,12 +949,12 @@ const Tooltip = ({
     placement: _placement,
     trigger: _trigger,
     overlay: /*#__PURE__*/React__default.createElement("div", {
-      className: css$k.tooltip
+      className: css$l.tooltip
     }, overlayContent)
   }, props), children);
 };
 
-var css$l = {"switcher":"_styles-module__switcher__3NMzC"};
+var css$m = {"switcher":"_styles-module__switcher__3NMzC"};
 
 const ViewSwitcher = ({
   value: _value = 'grid',
@@ -958,7 +973,7 @@ const ViewSwitcher = ({
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$l.switcher, stateValue, className),
+    className: cx(css$m.switcher, stateValue, className),
     onClick: toggleValue
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-view-grid"
@@ -967,5 +982,20 @@ const ViewSwitcher = ({
   }));
 };
 
-export { AccessForbidden, Avatar, Button, CheckboxField, CodeViewer, Copy, Dropdown, FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SliderField, Spinner, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, ViewSwitcher };
+const Yield = ({
+  name,
+  className,
+  children
+}) => {
+  if (!name) return null;
+  if (children) return /*#__PURE__*/React__default.createElement(Portal, {
+    node: document && document.getElementById(name)
+  }, children);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: className,
+    id: name
+  });
+};
+
+export { AccessForbidden, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, Dropdown, FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SliderField, Spinner, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, ViewSwitcher, Yield };
 //# sourceMappingURL=index.modern.js.map

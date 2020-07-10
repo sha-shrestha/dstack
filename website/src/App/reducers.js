@@ -1,8 +1,6 @@
 import actionsTypes from './actionsTypes';
 
 const initial = {
-    search: '',
-    searchPlaceholder: null,
     progressIsActive: null,
     userData: null,
     userLoading: false,
@@ -10,18 +8,6 @@ const initial = {
 
 export default (state = initial, action) => {
     switch (action.type) {
-        case (actionsTypes.SET_SEARCH_VALUE):
-            return {
-                ...state,
-                search: action.payload,
-            };
-
-        case (actionsTypes.SET_SEARCH_PLACEHOLDER):
-            return {
-                ...state,
-                searchPlaceholder: action.payload,
-            };
-
         case (actionsTypes.FETCH_USER):
             return {
                 ...state,

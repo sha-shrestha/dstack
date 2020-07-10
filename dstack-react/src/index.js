@@ -2,6 +2,7 @@ import React from 'react'
 
 export { default as AccessForbidden} from "./AccessForbidden";
 export { default as Avatar} from "./Avatar";
+export { default as BackButton} from "./BackButton";
 export { default as Button} from "./Button";
 export { default as CheckboxField} from "./CheckboxField";
 export { default as CodeViewer} from "./CodeViewer";
@@ -23,4 +24,5 @@ export { default as TextAreaField} from "./TextAreaField";
 export { default as TextField} from "./TextField";
 export { default as Tooltip} from "./Tooltip";
 export { default as ViewSwitcher} from "./ViewSwitcher";
+export { default as Yield} from "./Yield";
 

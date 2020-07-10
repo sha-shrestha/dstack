@@ -24,6 +24,11 @@
     }
 }
 .search {
+    @media (--mobile) {
+        display: none;
+    }
+}
+.mobileSearch {
     margin-top: 7px;
     width: 100%;
     @media (--mobile) {

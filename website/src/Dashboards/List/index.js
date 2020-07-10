@@ -1,5 +1,5 @@
 // @flow
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import cx from 'classnames';
 import {get} from 'lodash-es';
 import {connect} from 'react-redux';
@@ -10,7 +10,7 @@ import {SearchField, NotFound} from 'dstack-react';
 import Item from './Item';
 import Loader from './components/Loader';
 import {isSignedIn} from 'utils';
-import {setSearch, setSearchPlaceholder} from 'App/actions';
+import Yield from 'dstack-react/src/Yield';
 import {create as createDashboard} from 'Dashboards/Details/actions';
 import {fetchList} from './actions';
 import routes from 'routes';
@@ -22,10 +22,7 @@ type Props = {
     data: ?Array<{}>,
     loading: boolean,
     creatingDashboard: boolean,
-    setSearch: Function,
-    setSearchPlaceholder: Function,
     createDashboard: Function,
-    search: string,
     requestStatus: ?number,
 }
 
@@ -34,14 +31,12 @@ const List = ({
     createDashboard,
     creatingDashboard,
     fetchList,
-    setSearch,
-    setSearchPlaceholder,
     data,
-    search,
     loading,
     requestStatus,
 }: Props) => {
     const {user} = useParams();
+    const [search, setSearch] = useState('');
     const {push} = useHistory();
     const {t} = useTranslation();
 
@@ -50,11 +45,6 @@ const List = ({
     useEffect(() => {
         fetchList(user);
     }, [user]);
-
-    useEffect(() => {
-        setSearchPlaceholder(t('findDashboard'));
-        return () => setSearchPlaceholder(null);
-    }, []);
 
     const getItems = () => {
         let items = [];
@@ -96,6 +86,18 @@ const List = ({
 
     return (
         <div className={css.list}>
+            <Yield name="header-yield">
+                <SearchField
+                    showEverything
+                    isDark
+                    className={css.search}
+                    placeholder={t('findDashboard')}
+                    size="small"
+                    value={search}
+                    onChange={onChangeSearch}
+                />
+            </Yield>
+
             <div className={css.title}>
                 {currentUser === user
                     ? t('myDashboards')
@@ -107,7 +109,7 @@ const List = ({
 
             {data && Boolean(data.length) && <SearchField
                 placeholder={t('search')}
-                className={css.search}
+                className={css.mobileSearch}
                 showEverything
                 size="small"
                 value={search}
@@ -137,7 +139,6 @@ const List = ({
 
 export default connect(
     state => ({
-        search: state.app.search,
         currentUser: get(state.app.userData, 'user'),
         data: state.dashboards.list.data,
         loading: state.dashboards.list.loading,
@@ -145,5 +146,5 @@ export default connect(
         creatingDashboard: state.dashboards.details.creating,
     }),
 
-    {fetchList, setSearch, setSearchPlaceholder, createDashboard}
+    {fetchList, createDashboard}
 )(List);

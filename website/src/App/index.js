@@ -19,7 +19,7 @@ import Stacks from 'Stacks';
 import Settings from 'Settings';
 
 import {isSignedIn} from 'utils';
-import {fetchUser, setSearch} from './actions';
+import {fetchUser} from './actions';
 import css from './styles.module.css';
 import {useTracking} from 'hooks';
 
@@ -59,10 +59,9 @@ type Props = {
     fetchUser: Function,
     userLoading: boolean,
     userData: ?{user: string},
-    setSearch: Function,
 }
 
-const App = ({location, fetchUser, userData, userLoading, history: {push}, setSearch}: Props) => {
+const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
     const [loading, setLoading] = useState(true);
     const isInitialMount = useRef(true);
 
@@ -88,10 +87,6 @@ const App = ({location, fetchUser, userData, userLoading, history: {push}, setSe
             setLoading(userLoading);
         }
     }, [userLoading]);
-
-    useEffect(() => {
-        setSearch('');
-    }, [location.pathname]);
 
     return (
         <div className={css.app}>
@@ -149,5 +144,5 @@ export default connect(
         userLoading: state.app.userLoading,
         userData: state.app.userData,
     }),
-    {fetchUser, setSearch},
+    {fetchUser},
 )(withRouter(App));

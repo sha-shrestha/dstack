@@ -3,20 +3,6 @@ import api from 'api';
 import actionsTypes from './actionsTypes';
 import config from 'config';
 
-export const setSearch = (value: string) => async (dispatch: Function) => {
-    dispatch({
-        type: actionsTypes.SET_SEARCH_VALUE,
-        payload: value,
-    });
-};
-
-export const setSearchPlaceholder = (placeholder: string) => async (dispatch: Function) => {
-    dispatch({
-        type: actionsTypes.SET_SEARCH_PLACEHOLDER,
-        payload: placeholder,
-    });
-};
-
 export const fetchUser = (onSuccess: Function, onFail: Function) => async (dispatch: Function) => {
     dispatch({type: actionsTypes.FETCH_USER});
 

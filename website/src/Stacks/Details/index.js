@@ -10,7 +10,7 @@ import {useHistory, useLocation, useParams} from 'react-router';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
 import {debounce as _debounce} from 'lodash-es';
-import {Button, AccessForbidden, MarkdownRender, Modal, Dropdown, NotFound} from 'dstack-react';
+import {Button, AccessForbidden, MarkdownRender, Modal, Dropdown, NotFound, Yield, BackButton} from 'dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import Loader from './components/Loader';
 import Frames from './Frames';
@@ -275,6 +275,18 @@ const Details = ({
             <Helmet>
                 <title>dstack.ai | {params.user} | {params.stack}</title>
             </Helmet>
+
+            <Yield name="header-yield">
+                <BackButton
+                    Component={Link}
+                    to={routes.stacks(params.user)}
+                >
+                    {(currentUser === params.user)
+                        ? t('backToMyStacks')
+                        : t('backToStacksOF', {name: params.user})
+                    }
+                </BackButton>
+            </Yield>
 
             <section className={css.section}>
                 <div className={css.header}>

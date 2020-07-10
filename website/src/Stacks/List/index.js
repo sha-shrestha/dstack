@@ -3,17 +3,18 @@
 import React, {useState, useEffect, useRef, Fragment} from 'react';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
+import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import HowTo from 'Stacks/components/HowTo';
 import {Button, Loader, Modal, SearchField, NotFound} from 'dstack-react';
+import Yield from 'dstack-react/src/Yield';
 import Item from './Item';
-import css from './styles.module.css';
-import {setSearch, setSearchPlaceholder, startAppProgress, completeAppProgress, resetAppProgress} from 'App/actions';
+import {startAppProgress, completeAppProgress, resetAppProgress} from 'App/actions';
 import {fetchList, deleteStack} from './actions';
 import Upload from 'Stacks/components/Upload';
 import {isSignedIn} from 'utils';
-import {Link} from 'react-router-dom';
 import routes from 'routes';
+import css from './styles.module.css';
 
 type Stack = {
     [key: string]: any,
@@ -41,13 +42,10 @@ type Props = {
 
 const List = ({
     requestStatus,
-    setSearch,
     fetchList,
     data = [],
     loading,
     deleteStack,
-    search,
-    setSearchPlaceholder,
     match: {params: {user}},
     currentUser,
     startAppProgress,
@@ -58,6 +56,7 @@ const List = ({
     const [deletingStack, setDeletingStack] = useState(null);
     const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
     const [isShowHowToModal, setIsShowHowToModal] = useState(false);
+    const [search, setSearch] = useState('');
     const isInitialMount = useRef(true);
 
     const showWelcomeModal = () => setIsShowWelcomeModal(true);
@@ -89,11 +88,6 @@ const List = ({
             resetAppProgress();
         };
     }, [user]);
-
-    useEffect(() => {
-        setSearchPlaceholder(t('findStack'));
-        return () => setSearchPlaceholder(null);
-    }, []);
 
     const showHowToModal = event => {
         event.preventDefault();
@@ -144,6 +138,18 @@ const List = ({
                 <title>dstack.ai | {user}</title>
             </Helmet>
 
+            <Yield name="header-yield">
+                <SearchField
+                    showEverything
+                    isDark
+                    className={css.search}
+                    placeholder={t('findStack')}
+                    size="small"
+                    value={search}
+                    onChange={onChangeSearch}
+                />
+            </Yield>
+
             <div className={css.title}>
                 {currentUser === user
                     ? t('stacks')
@@ -184,7 +190,7 @@ const List = ({
 
             {Boolean(data.length) && <SearchField
                 placeholder={t('search')}
-                className={css.search}
+                className={css.mobileSearch}
                 showEverything
                 size="small"
                 value={search}
@@ -269,7 +275,6 @@ const List = ({
 
 export default connect(
     state => ({
-        search: state.app.search,
         data: state.stacks.list.data,
         requestStatus: state.stacks.list.requestStatus,
         loading: state.stacks.list.loading,
@@ -277,10 +282,8 @@ export default connect(
     }),
 
     {
-        setSearch,
         fetchList,
         deleteStack,
-        setSearchPlaceholder,
         startAppProgress,
         completeAppProgress,
         resetAppProgress,
