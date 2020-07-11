@@ -91,6 +91,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyyaml
+          pip install requests
           pip install dstack
           dstack config --user dstack --token ${{ secrets.DSTACK_TOKEN_STGN }} --server https://api.stgn.dstack.ai
           VERSION=$(./gradlew properties -no-daemon --console=plain -q | grep "^version:" | awk '{printf $2}')
