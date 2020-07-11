@@ -56,22 +56,14 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Prepare Server CLI artifacts
-        run: |
-          VERSION=$(./gradlew properties -no-daemon --console=plain -q | grep "^version:" | awk '{printf $2}')
-          mv server-local-cli/build/libs/server-local-cli-$VERSION.jar server-local-cli/build/libs/server-local-cli.jar
-          echo $VERSION > server-local-cli/build/libs/server-local-cli.version
-          ls -l server-local-cli/build/libs/
-      - name: Upload Server CLI artifacts
-        uses: actions/upload-artifact@v1
-        with:
-          name: server-local-cli
-          path: server-local-cli/build/libs
 
   publish-snapshot:
     needs: build-server
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
       - uses: actions/checkout@v2
@@ -94,6 +86,20 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
+      - name: Publish with dstack
+          run: |
+            python -m pip install --upgrade pip
+            pip install dstack
+            dstack config --user dstack --token ${{ secrets.DSTACK_TOKEN_STGN }} --server https://api.stgn.dstack.ai
+            python -c "print('Hello')"
+            VERSION=$(./gradlew properties -no-daemon --console=plain -q | grep "^version:" | awk '{printf $2}')
+            NUM_VERSION=$(echo $dstack_version | awk '{p=index($1,"-");printf substr($1,0,p-1)}')
+            echo $VERSION
+            echo $NUM_VERSION
 
   create-release:
     runs-on: ubuntu-latest
