@@ -65,6 +65,7 @@ jobs:
       - name: Upload Server CLI artifacts
         uses: actions/upload-artifact@v1
         with:
+          name: server-local-cli
           path: server-local-cli/build/libs/server-local-cli.*
 
   publish-snapshot:
