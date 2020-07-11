@@ -56,6 +56,15 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Build with Gradle
+          run: |
+            ./gradlew build
+            VERSION=$(./gradlew properties -no-daemon --console=plain -q | grep "^version:" | awk '{printf $2}')
+      - name: Upload server-local-cli.jar
+          uses: actions/upload-artifact@v1
+          with:
+            name: server-local-cli.jar
+            path: server-local-cli/build/libs/server-local-cli-$VERSION.jar
 
   publish-snapshot:
     needs: build-server
