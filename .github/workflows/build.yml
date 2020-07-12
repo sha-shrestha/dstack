@@ -13,15 +13,12 @@ on:
 jobs:
   build-website:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12]
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 12
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 12
       - name: Install packages
         working-directory: website
         run: npm install
@@ -83,10 +80,10 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.6
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.6
       - name: Publish with dstack
         run: |
           python -m pip install --upgrade pip
@@ -144,10 +141,10 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.6
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.6
       - name: Publish with dstack
         run: |
           python -m pip install --upgrade pip
