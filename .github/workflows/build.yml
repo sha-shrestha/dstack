@@ -86,7 +86,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: ${{ matrix.python-version }}
       - name: Publish with dstack
         run: |
           python -m pip install --upgrade pip
@@ -144,3 +144,16 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Publish with dstack
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+          pip install requests
+          pip install dstack
+          dstack config --user dstack --token ${{ secrets.DSTACK_TOKEN_PROD }}
+          VERSION=${GITHUB_REF#refs/tags/v}
+          python -c "from dstack import push_frame; from dstack.cli.installer import Installer; from pathlib import Path; print(push_frame(Installer._STACK, Path('server-local-cli/build/libs/server-local-cli-$VERSION.jar'), version='$VERSION', jdk_version='8', jdk_compatible_versions='1.8.0_.*'))"
