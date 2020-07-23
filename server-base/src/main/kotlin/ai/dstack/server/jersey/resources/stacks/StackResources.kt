@@ -134,11 +134,11 @@ class StackResources {
                                                                     a.legacyType,
                                                                     a.application,
                                                                     a.contentType,
-                                                                    a.params,
+                                                                    a.params.orEmpty(),
                                                                     a.settings,
                                                                     a.length
                                                             )
-                                                        }, it.message
+                                                        }, it.params, it.message
                                                 )
                                             },
                                             if (owner) permissionService.findByPath(stack.path)
@@ -155,7 +155,7 @@ class StackResources {
                                                 BasicFrameInfo(
                                                         it.id,
                                                         it.timestampMillis,
-                                                        it.message
+                                                        it.params, it.message
                                                 )
                                             }
                                     )
@@ -254,6 +254,7 @@ class StackResources {
                                 payload.attachments.size
                             else
                                 payload.size,
+                            payload.params.orEmpty().let{ it.mapValues { it.value }.toMap() },
                             payload.message?.let { if (it.isNotEmpty()) it else null }
                     )
                     frameService.create(frame)

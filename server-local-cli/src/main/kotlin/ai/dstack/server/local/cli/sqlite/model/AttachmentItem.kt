@@ -57,6 +57,7 @@ class AttachmentItem(
     @Column
     var length: Long,
 
+    @Deprecated("Is replaced by params")
     @Column
     var description: String?,
 

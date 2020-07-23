@@ -7,6 +7,7 @@ import ai.dstack.server.local.cli.sqlite.model.FrameId
 import ai.dstack.server.local.cli.sqlite.model.FrameItem
 import ai.dstack.server.local.cli.sqlite.repositories.FrameRepository
 import ai.dstack.server.local.cli.sqlite.toNullable
+import com.fasterxml.jackson.core.type.TypeReference
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -34,22 +35,27 @@ class SQLiteFrameService @Autowired constructor(private val repository: FrameRep
         get() = mapId(stackPath, id)
 
     private fun mapId(stackPath: String, frameId: String) =
-        FrameId(stackPath, frameId)
+            FrameId(stackPath, frameId)
 
     private fun FrameItem.toFrame(): Frame {
         return this.let { f ->
-            ai.dstack.server.model.Frame(f.stack, f.id, f.timestamp, f.size, f.message)
+            ai.dstack.server.model.Frame(f.stack, f.id, f.timestamp, f.size,
+                    f.paramsJson?.let { sqliteMapper.readValue(f.paramsJson,
+                            object : TypeReference<Map<String, Any>>() {}) } ?: emptyMap(), f.message)
         }
     }
 
     private fun Frame.toFrameItem(): FrameItem {
         return this.let { f ->
             FrameItem(
-                f.stackPath,
-                f.id,
-                f.timestampMillis,
-                f.size,
-                f.message
+                    f.stackPath,
+                    f.id,
+                    f.timestampMillis,
+                    f.size,
+                    sqliteMapper.writeValueAsString(
+                            f.params
+                    ),
+                    f.message
             )
         }
     }
