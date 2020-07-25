@@ -5,6 +5,8 @@ plugins {
 }
 
 dependencies {
+    compile(Deps.commons_codec)
+
     compile(Deps.javax_servlet_api)
     compile(Deps.jersey_server)
     compile(Deps.spring_context)

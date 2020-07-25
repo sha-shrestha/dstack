@@ -29,7 +29,6 @@ import javax.ws.rs.container.ResourceContext
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.Response
-import javax.xml.bind.DatatypeConverter
 
 @Path("/stacks")
 class StackResources {
@@ -271,7 +270,7 @@ class StackResources {
                             val application = a.application ?: payload.application
                             val contentType = a.contentType ?: payload.contentType
                             val file = frame.path + "/" + index
-                            val data = a.data?.let { DatatypeConverter.parseBase64Binary(a.data) }
+                            val data = a.data?.let { Base64.getDecoder().decode(a.data) }
                             val length = data?.count()?.toLong() ?: a.length!!
                             if (data != null) {
                                 fileService.save(file, data)
