@@ -123,7 +123,7 @@ class UserResources {
                                 token,
                                 verificationCode,
                                 verified,
-                                UserPlan.fromCode(payload.plan!!),
+                                payload.plan?.let { UserPlan.fromCode(it) } ?: UserPlan.Free,
                                 LocalDate.now(ZoneOffset.UTC),
                                 Settings(
                                     General(AccessLevel.Public),
@@ -405,7 +405,7 @@ private val supportedPlans = setOf("free", "team")
 
 val String?.isMalformedPlan: Boolean
     get() {
-        return this == null || !supportedPlans.contains(this)
+        return this != null && !supportedPlans.contains(this)
     }
 
 // TODO: Make it more secure

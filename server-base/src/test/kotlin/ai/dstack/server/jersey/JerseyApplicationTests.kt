@@ -113,8 +113,7 @@ class JerseyApplicationTests : JerseyTest() {
                                 RegisterPayload(
                                         name = "test_user",
                                         email = "test@gmail.com",
-                                        password = "pass",
-                                        plan = "free"
+                                        password = "pass"
                                 )
                         )
                 )
