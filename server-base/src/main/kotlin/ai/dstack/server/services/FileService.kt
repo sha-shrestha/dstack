@@ -7,7 +7,7 @@ interface FileService {
     fun upload(path: String, user:User): URI
     fun save(path: String, data: ByteArray)
     fun get(path: String): ByteArray
-    fun delete(prefix: String)
+    fun delete(stackPath: String)
     fun preview(path: String, length: Long): ByteArray
     fun download(path: String, user: User, filename: String, type: String): URI
 

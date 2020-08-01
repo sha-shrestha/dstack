@@ -34,8 +34,8 @@ class LocalFileService(@Autowired val config: AppConfig) : FileService {
         return File("${config.fileDirectory}/$path").readBytes()
     }
 
-    override fun delete(prefix: String) {
-        File("${config.fileDirectory}/$prefix").deleteRecursively()
+    override fun delete(stackPath: String) {
+        File("${config.fileDirectory}/$stackPath").deleteRecursively()
     }
 
     override fun preview(path: String, length: Long): ByteArray {

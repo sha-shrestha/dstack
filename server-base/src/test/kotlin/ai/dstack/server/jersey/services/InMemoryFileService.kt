@@ -1,6 +1,5 @@
 package ai.dstack.server.jersey.services
 
-import ai.dstack.server.model.Attachment
 import ai.dstack.server.model.User
 import ai.dstack.server.services.FileService
 import java.net.URI
@@ -17,8 +16,8 @@ class InMemoryFileService: FileService {
         return files[path]!!
     }
 
-    override fun delete(prefix: String) {
-        files.keys.filter { it.startsWith(prefix) }.forEach {
+    override fun delete(stackPath: String) {
+        files.keys.filter { it.startsWith(stackPath) }.forEach {
             files.remove(it)
         }
     }
