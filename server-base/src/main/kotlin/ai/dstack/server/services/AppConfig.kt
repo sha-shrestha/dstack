@@ -6,6 +6,7 @@ interface AppConfig {
     val port: Int?
     val internalPort: Int
     val address: String
+    val homeDirectory: String
     val dataDirectory: String
     val fileDirectory: String
     val supportEmail: String
