@@ -237,10 +237,10 @@ const Attachment = ({
             case (attachment['content_type'] === 'text/csv'):
                 return renderCSV();
 
-            case (attachment['application'] === 'plotly' && attachment['content_type'] === 'text/json'):
+            case (attachment['application'] === 'plotly'):
                 return renderPlotly();
 
-            case (attachment['application'] === 'bokeh' && attachment['content_type'] === 'text/json'):
+            case (attachment['application'] === 'bokeh'):
                 return renderBokeh();
 
             case undefined:

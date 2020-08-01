@@ -179,5 +179,5 @@ const HowTo = ({modalMode, userData, data}: Props) => {
 };
 
 export default connect(
-    state => ({userData: state.app.userData}),
+    state => ({userData: state?.app?.userData}),
 )(HowTo);

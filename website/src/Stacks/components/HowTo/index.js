@@ -151,5 +151,5 @@ const HowTo = ({userData}: Props) => {
 };
 
 export default connect(
-    state => ({userData: state.app.userData}),
+    state => ({userData: state?.app?.userData}),
 )(HowTo);
