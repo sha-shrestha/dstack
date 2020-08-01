@@ -31,15 +31,20 @@ class LocalCliAppConfig : AppConfig {
             return ((if (ssl) "https" else "http") + "://") + hostName + ":$p"
         }
 
-    override val dataDirectory: String
+    override val homeDirectory: String
         get() {
             val dir = if (global) System.getProperty("user.home") ?: "." else "."
-            return System.getenv("dstack_data_dir") ?: "$dir/.dstack/data"
+            return System.getenv("dstack_home") ?: "$dir/.dstack"
+        }
+
+    override val dataDirectory: String
+        get() {
+            return "${homeDirectory}/data"
         }
 
     override val fileDirectory: String
         get() {
-            return System.getenv("dstack_file_dir") ?: "${dataDirectory}/files"
+            return "${homeDirectory}/files"
         }
 
     override val supportEmail: String
