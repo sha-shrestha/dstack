@@ -17,7 +17,7 @@
     }
   },
 
-  "plugins": ["react", "flowtype"],
+  "plugins": ["react"],
 
   "rules": {
     "arrow-parens": ["error", "as-needed"],

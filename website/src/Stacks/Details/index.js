@@ -11,14 +11,13 @@ import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
 import {debounce as _debounce} from 'lodash-es';
 import {Button, AccessForbidden, MarkdownRender, Modal,
-    Dropdown, NotFound, Yield, BackButton} from '@dstackai/dstack-react';
+    Dropdown, NotFound, Yield, BackButton, StackFilters} from '@dstackai/dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import Loader from './components/Loader';
 import Frames from './Frames';
 import routes from 'routes';
 import {useForm} from 'hooks';
 import {isSignedIn, parseSearch, formatBytes, parseStackParams} from 'utils';
-import Filters from 'Stacks/components/Filters';
 import {deleteStack} from 'Stacks/List/actions';
 import {fetchDetails, clearDetails, fetchFrame, downloadAttachment, update} from './actions';
 import HowToFetchData from 'Stacks/components/HowToFetchData';
@@ -229,7 +228,7 @@ const Details = ({
         const hasSelectField = Object.keys(fields).some(key => fields[key].type === 'select');
 
         return (
-            <Filters
+            <StackFilters
                 fields={fields}
                 form={form}
                 onChange={onChange}

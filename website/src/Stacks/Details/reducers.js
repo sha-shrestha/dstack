@@ -6,6 +6,7 @@ const initial = {
     error: null,
     frame: null,
     requestStatus: null,
+    attachments: {},
     isPendingAddPermissions: false,
 };
 

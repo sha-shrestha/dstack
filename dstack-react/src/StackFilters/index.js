@@ -1,7 +1,9 @@
 // @flow
 import React from 'react';
 import cx from 'classnames';
-import {SelectField, CheckboxField, SliderField} from '@dstackai/dstack-react';
+import SelectField from '../SelectField'
+import CheckboxField from '../CheckboxField'
+import SliderField from '../SliderField'
 import css from './styles.module.css';
 
 type Props = {
@@ -11,7 +13,7 @@ type Props = {
     className?: string, 
 }
 
-const Filters = ({className, fields, form, onChange}: Props) => {
+const StackFilters = ({className, fields, form, onChange}: Props) => {
     return (
         <div className={cx(css.filters, className)}>
             {Object.keys(fields).map(key => {
@@ -61,4 +63,4 @@ const Filters = ({className, fields, form, onChange}: Props) => {
     );
 };
 
-export default Filters;
+export default StackFilters;

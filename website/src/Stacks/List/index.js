@@ -12,6 +12,7 @@ import {startAppProgress, completeAppProgress, resetAppProgress} from 'App/actio
 import {fetchList, deleteStack} from './actions';
 import Upload from 'Stacks/components/Upload';
 import {isSignedIn} from 'utils';
+import {useParams} from 'react-router';
 import routes from 'routes';
 import css from './styles.module.css';
 
@@ -52,6 +53,7 @@ const List = ({
     resetAppProgress,
 }: Props) => {
     const {t} = useTranslation();
+    const params = useParams();
     const [deletingStack, setDeletingStack] = useState(null);
     const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
     const [isShowHowToModal, setIsShowHowToModal] = useState(false);
@@ -198,10 +200,12 @@ const List = ({
 
             {Boolean(data.length && items.length) && <div className={css.grid}>
                 {items.map((item, index) => <Item
-                    withLink
+                    Component={Link}
                     key={index}
                     data={item}
-                    deleteAction={showDeleteConfirmation}
+                    otherOwner={params.user !== item.user}
+                    to={routes.stackDetails(item.user, item.name)}
+                    deleteAction={currentUser === item.user &&  showDeleteConfirmation}
                 />)}
             </div>}
 

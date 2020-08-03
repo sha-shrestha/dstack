@@ -1,5 +1,7 @@
 export default {
-    API_URL: '/api',
+    // API_URL: '/api',
+    API_URL: 'https://api.stgn.dstack.ai',
+
     GA_ID: '',
     DOCS_URL: 'http://docs.dstack.ai',
 

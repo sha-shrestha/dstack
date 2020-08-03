@@ -304,6 +304,12 @@ module.exports = function(webpackEnv, customEnvVarialles) {
           'react-dom$': 'react-dom/profiling',
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
+
+        ...(isEnvDevelopment && {
+          '@dstackai/dstack-react': path.resolve(__dirname, '../../dstack-react'),
+        }),
+
+
         ...(modules.webpackAliases || {}),
       },
       plugins: [
@@ -315,7 +321,7 @@ module.exports = function(webpackEnv, customEnvVarialles) {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+          ...(isEnvProduction ? [new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson])] : [])
       ],
     },
     resolveLoader: {

@@ -1,15 +1,10 @@
 // @flow
 
 import React, {useRef} from 'react';
-import {Link} from 'react-router-dom';
-import {useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
-import {connect} from 'react-redux';
-import {get} from 'lodash-es';
 import {Dropdown} from '@dstackai/dstack-react';
 import Attachment from 'Stacks/components/Attachment';
 import css from './styles.module.css';
-import routes from 'routes';
 
 type Props = {
     userData: {user: string},
@@ -20,27 +15,27 @@ type Props = {
         head: {id: string}
     },
 
+    otherOwner?: boolean,
     deleteAction: Function,
 };
 
 const Item = ({
-    withLink,
+    Component = 'div',
     onClick,
     data,
     deleteAction,
-    userData,
+    otherOwner,
+    ...rest
 }: Props) => {
-    const params = useParams();
     const {t} = useTranslation();
     const ref = useRef(null);
-    const Component = withLink ? Link : 'div';
 
     return (
         <Component
             className={css.item}
             ref={ref}
             onClick={onClick}
-            {...(withLink ? {to: routes.stackDetails(data.user, data.name)} : {})}
+            {...rest}
         >
             <div className={css.previewWrap}>
                 {data.head
@@ -65,21 +60,16 @@ const Item = ({
                         <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                     </div>
 
-                    {params.user !== data.user && (
+                    {otherOwner && (
                         <div className={css.by}>{t('by')} {data.user}</div>
                     )}
                 </div>
 
-                {deleteAction && get(userData, 'user') === data.user && (
+                {deleteAction && (
                     <Dropdown
                         className={css.dropdown}
 
                         items={[
-                            // {
-                            //     title: t('rename'),
-                            //     onClick: () => {},
-                            // },
-
                             {
                                 title: t('delete'),
                                 onClick: () => deleteAction(data.name),
@@ -92,6 +82,4 @@ const Item = ({
     );
 };
 
-export default connect(
-    state => ({userData: state.app.userData})
-)(Item);
+export default Item;

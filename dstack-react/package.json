@@ -1,6 +1,6 @@
 {
   "name": "@dstackai/dstack-react",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Dstack ui components",
   "author": "olgenn",
   "license": "MIT",
@@ -16,8 +16,8 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "microbundle-crl --no-compress --format modern,cjs",
-    "start": "microbundle-crl watch --no-compress --format modern,cjs",
+    "build": "microbundle-crl -i src/*.js --no-compress --format modern,cjs",
+    "start": "microbundle-crl watch -i src/*.js --no-compress --format modern,cjs",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
@@ -30,9 +30,9 @@
   "peerDependencies": {
     "i18next": "^19.1.0",
     "lodash-es": "^4.17.15",
+    "moment": "^2.27.0",
     "react": "^16.0.0",
-    "react-i18next": "^11.7.0",
-    "moment": "^2.27.0"
+    "react-i18next": "^11.7.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
@@ -63,8 +63,10 @@
   ],
   "dependencies": {
     "@mdi/font": "^5.3.45",
+    "axios": "^0.19.2",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.3.1",
+    "csv-string": "^4.0.1",
     "postcss-css-variables": "^0.17.0",
     "postcss-custom-media": "^7.0.8",
     "postcss-flexbugs-fixes": "^4.2.1",
@@ -77,6 +79,7 @@
     "react-highlight.js": "^1.0.7",
     "react-markdown": "^4.3.1",
     "react-mathjax": "^1.0.1",
+    "react-plotly.js": "^2.4.0",
     "react-portal": "^4.2.1",
     "remark-math": "^2.0.1"
   }

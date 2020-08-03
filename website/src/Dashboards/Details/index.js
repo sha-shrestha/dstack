@@ -9,11 +9,10 @@ import {connect} from 'react-redux';
 import DnDGridContext from 'components/DnDGridContext';
 import DnDItem from 'components/DnDGridContext/components/DnDItem';
 import {Button, Dropdown, ViewSwitcher, AccessForbidden, StretchTitleField,
-    NotFound, Yield, BackButton} from '@dstackai/dstack-react';
+    NotFound, Yield, BackButton, StackFilters} from '@dstackai/dstack-react';
 import SelectStacks from './components/SelectStacks';
 import Loader from './components/Loader';
 import Card from './components/Card';
-import Filters from 'Stacks/components/Filters';
 import routes from 'routes';
 import {isSignedIn, parseStackParams} from 'utils';
 import {useForm, usePrevious} from 'hooks';
@@ -220,7 +219,7 @@ const Details = ({
         const hasSelectField = Object.keys(fields).some(key => fields[key].type === 'select');
 
         return (
-            <Filters
+            <StackFilters
                 fields={fields}
                 form={form}
                 onChange={onChange}

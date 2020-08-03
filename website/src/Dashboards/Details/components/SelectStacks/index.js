@@ -140,6 +140,7 @@ const SelectStacks = ({
 
                                 <StackItem
                                     data={item}
+                                    otherOwner={params.user !== item.user}
                                 />
                             </div>
                         ))}

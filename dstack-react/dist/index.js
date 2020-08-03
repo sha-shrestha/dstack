@@ -7,7 +7,7 @@ var Highlight = _interopDefault(require('react-highlight.js'));
 var reactI18next = require('react-i18next');
 var copy = _interopDefault(require('copy-to-clipboard'));
 var RcTooltip = _interopDefault(require('rc-tooltip'));
-require('lodash-es');
+var lodashEs = require('lodash-es');
 require('moment');
 var ReactMarkdown = _interopDefault(require('react-markdown'));
 var MathJax = _interopDefault(require('react-mathjax'));
@@ -16,10 +16,15 @@ var reactPortal = require('react-portal');
 var Select = require('rc-select');
 var Select__default = _interopDefault(Select);
 var Slider = _interopDefault(require('rc-slider'));
+var Plot = _interopDefault(require('react-plotly.js'));
+var CSV = require('csv-string');
+var axios = _interopDefault(require('axios'));
+var hooks = require('hooks');
+var api = _interopDefault(require('api'));
 
 var image = require("./lock~ZBorChcU.svg");
 
-var css = {"forbidden":"_3PN84","message":"_2i8KH"};
+var css = {"forbidden":"_style-module__forbidden__3PN84","message":"_style-module__message__2i8KH"};
 
 var AccessForbidden = function AccessForbidden(_ref) {
   var children = _ref.children;
@@ -35,7 +40,7 @@ var AccessForbidden = function AccessForbidden(_ref) {
   }, children));
 };
 
-var css$1 = {"avatar":"_3xvkT"};
+var css$1 = {"avatar":"_styles-module__avatar__3xvkT"};
 
 var Avatar = React.forwardRef(function (_ref, ref) {
   var className = _ref.className,
@@ -92,7 +97,7 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-var css$2 = {"back":"_1MuhU"};
+var css$2 = {"back":"_styles-module__back__1MuhU"};
 
 var BackButton = function BackButton(_ref) {
   var _ref$Component = _ref.Component,
@@ -108,9 +113,9 @@ var BackButton = function BackButton(_ref) {
   }), children);
 };
 
-var css$3 = {"button":"_2lKoS","spinner":"_31PPt"};
+var css$3 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
 
-var css$4 = {"spinner":"_3XhrC","spinner-animation":"_2UA3s"};
+var css$4 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
 
 var COLORS = {
   white: '#fff',
@@ -182,7 +187,7 @@ var Button = React.forwardRef(function (_ref, ref) {
   }), children);
 });
 
-var css$5 = {"checkbox":"_3lqFk","toggle-label":"_1aLAG","label":"_2PZb-","wrapper":"_2Vufp","mark":"_2Pb2f"};
+var css$5 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
 
 var CheckboxField = function CheckboxField(_ref) {
   var className = _ref.className,
@@ -226,7 +231,7 @@ var CheckboxField = function CheckboxField(_ref) {
   }, label)), children);
 };
 
-var css$6 = {"copy":"_3J5hd","message":"_3RWnQ","button":"_2YqEb","icon":"_25GMO"};
+var css$6 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
 
 var Copy = function Copy(_ref) {
   var children = _ref.children,
@@ -266,7 +271,7 @@ var Copy = function Copy(_ref) {
   }, successMessage ? successMessage : t('copied')));
 };
 
-var css$7 = {"code":"_3gARj","copy":"_m44gX","icon":"_ZmZbg"};
+var css$7 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
 
 var CodeViewer = function CodeViewer(_ref) {
   var className = _ref.className,
@@ -288,7 +293,7 @@ var CodeViewer = function CodeViewer(_ref) {
   }));
 };
 
-var css$8 = {"dropdown":"_1qRCw","button":"_fzNEm","menu":"_AJ1Y3","item":"_3lbfY"};
+var css$8 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
 
 var Dropdown = function Dropdown(_ref) {
   var className = _ref.className,
@@ -372,6 +377,17 @@ var Dropdown = function Dropdown(_ref) {
   }))));
 };
 
+var unicodeBase64Decode = function unicodeBase64Decode(text) {
+  try {
+    var decodeData = window.atob(text);
+    return decodeURIComponent(Array.prototype.map.call(decodeData, function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  } catch (e) {
+    return null;
+  }
+};
+
 var formatBytes = function formatBytes(bytes, decimals) {
   if (bytes === 0) return '0 Bytes';
   var k = 1024;
@@ -381,7 +397,7 @@ var formatBytes = function formatBytes(bytes, decimals) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var css$9 = {"dnd":"_3uYii","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
+var css$9 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
 
 var FileDragnDrop = function FileDragnDrop(_ref) {
   var formats = _ref.formats,
@@ -506,7 +522,7 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
   }, t('upload')), ' ', t('fromYourComputer'), "."));
 };
 
-var css$a = {"loader":"_18_Ho","text":"_3dZu_","stacks-pulse":"_350eA","grid":"_Uki0v","item":"_MvjKB","pic":"_Pc6fT","section":"_2EIKh"};
+var css$a = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
 
 var Loader = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
@@ -561,7 +577,7 @@ var MarkdownRender = function MarkdownRender(props) {
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, newProps));
 };
 
-var css$b = {"modal":"_3FQ59","dialog":"_268e0","close":"_1Y7yz","title":"_knxNI"};
+var css$b = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
 
 var Modal = function Modal(_ref) {
   var title = _ref.title,
@@ -594,7 +610,7 @@ var Modal = function Modal(_ref) {
 };
 
 var config = {
-  API_URL: '/api',
+  API_URL: 'https://api.stgn.dstack.ai',
   GA_ID: '',
   DOCS_URL: 'http://docs.dstack.ai',
   LOGIN_URL: '/users/login',
@@ -666,7 +682,7 @@ var config = {
 
 var image$1 = require("./404~FXFqzVOe.svg");
 
-var css$c = {"not-found":"_tAZyq","message":"_3Ok1U","help":"_Aa8x8"};
+var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
 
 var NotFound = function NotFound(_ref) {
   var children = _ref.children;
@@ -711,7 +727,7 @@ var usePrevious = (function (value) {
   return ref.current;
 });
 
-var css$d = {"bar":"_12oWc","progress":"_3JWjz"};
+var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
 
 var ProgressBar = function ProgressBar(_ref) {
   var className = _ref.className,
@@ -794,7 +810,7 @@ var ProgressBar = function ProgressBar(_ref) {
   }));
 };
 
-var css$e = {"field":"_3WCaE","input":"_9Tk5W","label":"_1mHtq","error":"_3jOrk"};
+var css$e = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
 
 var TextField = function TextField(_ref) {
   var label = _ref.label,
@@ -823,7 +839,7 @@ var TextField = function TextField(_ref) {
   }, errors.join(', '))));
 };
 
-var css$f = {"search":"_3s1gr","field":"_17rsB","clear":"_3oKZ5","button":"_3BfRl"};
+var css$f = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
 
 var SearchField = function SearchField(_ref) {
   var className = _ref.className,
@@ -870,7 +886,7 @@ var SearchField = function SearchField(_ref) {
   })));
 };
 
-var css$g = {"field":"_2jF9E","label":"_iehEi","rcSelectLoadingIcon":"_VtsrG","rcSelectDropdownSlideUpIn":"_27wr-","rcSelectDropdownSlideUpOut":"_1QVN6","rcSelectDropdownSlideDownIn":"_1vYLX","rcSelectDropdownSlideDownOut":"_1-lNh","select-field":"_1mUh_","select-field-selector":"_V9Ufm","select-field-arrow":"_c4k8s","mdi":"_2hNDK","select-field-selection-placeholder":"_2Vdv0","select-field-selection-search":"_3GdNa","select-field-selection-search-input":"_3BOaB","select-field-selection-item":"_2uDu7","select-field-item-option-checkbox":"_2K_G1","select-field-selection-item-remove":"_1k1IW","select-field-show-search":"_3EVnU","select-field-show-arrow":"_1xlmm","select-field-open":"__jEZ1","select-field-multiple":"_2YFSs","select-field-single":"_1n3qF","select-field-clear":"_Mg5xq","select-field-item-option-state":"_2yGkG","select-field-selection__choice-zoom":"_3NUb5","select-field-selection__choice-zoom-appear":"_ZO73y","select-field-selection__choice-zoom-leave":"_2i54q","select-field-dropdown":"_14ngc"};
+var css$g = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
 
 var allValue = 'all';
 
@@ -950,7 +966,7 @@ var SelectField = function SelectField(_ref) {
   }, label));
 };
 
-var css$h = {"field":"_2_NXc","rcSliderTooltipZoomDownIn":"_2jvao","rcSliderTooltipZoomDownOut":"_2HgMB","slider":"_31Ylv","label":"_Zo_r8","rc-slider":"_1hLjI","rc-slider-rail":"_v9bxI","rc-slider-track":"__3emJ","rc-slider-handle":"_12sQ3","rc-slider-handle-dragging":"_2u63-","rc-slider-handle-click-focused":"_7xSSR","rc-slider-mark":"_1l2Qm","rc-slider-mark-text":"_2zf2c","rc-slider-mark-text-active":"_25tuh","rc-slider-step":"_3wC_L","rc-slider-dot":"_17-SM","rc-slider-dot-active":"_1eLwY","rc-slider-dot-reverse":"_Ewb1d","rc-slider-disabled":"_1YO43","rc-slider-vertical":"_12Juq","rc-slider-tooltip-zoom-down-enter":"_2a95b","rc-slider-tooltip-zoom-down-appear":"_2wvsD","rc-slider-tooltip-zoom-down-leave":"_3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_P9_lk","rc-slider-tooltip":"_1PZK2","rc-slider-tooltip-hidden":"_2CvyB","rc-slider-tooltip-placement-top":"_qzmlA","rc-slider-tooltip-inner":"_27Bp4","rc-slider-tooltip-arrow":"_35-HY"};
+var css$h = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
 
 var CustomHandle = function CustomHandle(props) {
   var style = {
@@ -1001,7 +1017,63 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"field":"_2DYF1","hidden":"_3z5o2"};
+var css$i = {"filters":"_styles-module__filters__kiZkv","select":"_styles-module__select__4Up3c","field":"_styles-module__field__3_9Ku"};
+
+var StackFilters = function StackFilters(_ref) {
+  var className = _ref.className,
+      fields = _ref.fields,
+      form = _ref.form,
+      _onChange = _ref.onChange;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$i.filters, className)
+  }, Object.keys(fields).map(function (key) {
+    switch (fields[key].type) {
+      case 'select':
+        return /*#__PURE__*/React__default.createElement(SelectField, {
+          key: "select-" + key,
+          align: "bottom",
+          className: cx(css$i.field, css$i.select),
+          onChange: function onChange(value) {
+            return _onChange(key, value);
+          },
+          label: key,
+          name: key,
+          options: fields[key].options,
+          value: Array.isArray(form[key]) ? form[key] : [form[key]]
+        });
+
+      case 'checkbox':
+        return /*#__PURE__*/React__default.createElement(CheckboxField, {
+          key: "checkbox-" + key,
+          className: css$i.field,
+          onChange: _onChange,
+          label: key,
+          name: key,
+          value: form[key]
+        });
+
+      case 'slider':
+        return /*#__PURE__*/React__default.createElement(SliderField, {
+          key: "slider-" + key,
+          className: css$i.field,
+          onChange: _onChange,
+          align: "right",
+          label: key,
+          name: key,
+          value: form[key],
+          step: null,
+          min: fields[key].min,
+          max: fields[key].max,
+          marks: fields[key].options
+        });
+
+      default:
+        return null;
+    }
+  }));
+};
+
+var css$j = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
 
 var StretchTitleField = function StretchTitleField(_ref) {
   var value = _ref.value,
@@ -1011,17 +1083,17 @@ var StretchTitleField = function StretchTitleField(_ref) {
       props = _objectWithoutPropertiesLoose(_ref, ["value", "placeholder", "className"]);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$i.field, className)
+    className: cx(css$j.field, className)
   }, /*#__PURE__*/React__default.createElement("input", _extends({
     type: "text",
     placeholder: placeholder,
     value: value
   }, props)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$i.hidden
+    className: css$j.hidden
   }, value.length ? value : placeholder));
 };
 
-var css$j = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
+var css$k = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
 
 var Tabs = function Tabs(_ref) {
   var className = _ref.className,
@@ -1033,23 +1105,23 @@ var Tabs = function Tabs(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$j.tabs, className)
+    className: cx(css$k.tabs, className)
   }, tabs.map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: cx(css$j.tab, {
+      className: cx(css$k.tab, {
         active: value === i.value
       }),
       onClick: function onClick() {
         return onChange(i.value);
       }
     }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
-      className: css$j.soon
+      className: css$k.soon
     }, t('soon')));
   }));
 };
 
-var css$k = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
+var css$l = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
 
 var TextAreaField = function TextAreaField(_ref) {
   var label = _ref.label,
@@ -1062,23 +1134,23 @@ var TextAreaField = function TextAreaField(_ref) {
 
   var hasErrors = Boolean(errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$k.field, className, size, {
+    className: cx(css$l.field, className, size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
-    className: css$k.label
+    className: css$l.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
-    className: css$k.textarea
+    className: css$l.textarea
   }, /*#__PURE__*/React__default.createElement("textarea", _extends({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
-    className: css$k.error
+    className: css$l.error
   }, errors.join(', '))));
 };
 
-var css$l = {"tooltip":"_rE8Jn"};
+var css$m = {"tooltip":"_style-module__tooltip__rE8Jn"};
 
 var Tooltip = function Tooltip(_ref) {
   var children = _ref.children,
@@ -1101,12 +1173,12 @@ var Tooltip = function Tooltip(_ref) {
     placement: placement,
     trigger: trigger,
     overlay: /*#__PURE__*/React__default.createElement("div", {
-      className: css$l.tooltip
+      className: css$m.tooltip
     }, overlayContent)
   }, props), children);
 };
 
-var css$m = {"switcher":"_3NMzC"};
+var css$n = {"switcher":"_styles-module__switcher__3NMzC"};
 
 var ViewSwitcher = function ViewSwitcher(_ref) {
   var _ref$value = _ref.value,
@@ -1129,7 +1201,7 @@ var ViewSwitcher = function ViewSwitcher(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$m.switcher, stateValue, className),
+    className: cx(css$n.switcher, stateValue, className),
     onClick: toggleValue
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-view-grid"
@@ -1152,6 +1224,432 @@ var Yield = function Yield(_ref) {
   });
 };
 
+// A type of promise-like that resolves synchronously and supports only one observer
+
+const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
+
+const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
+
+// Asynchronously call a function and send errors to recovery continuation
+function _catch(body, recover) {
+	try {
+		var result = body();
+	} catch(e) {
+		return recover(e);
+	}
+	if (result && result.then) {
+		return result.then(void 0, recover);
+	}
+	return result;
+}
+
+var css$o = {"table":"_styles-module__table__3tMWP"};
+
+var Table = function Table(_ref) {
+  var data = _ref.data;
+  var captions = data[0],
+      rows = data.slice(1);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$o.table
+  }, /*#__PURE__*/React__default.createElement("table", null, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, captions.map(function (caption) {
+    return /*#__PURE__*/React__default.createElement("th", {
+      key: caption
+    }, caption);
+  }))), /*#__PURE__*/React__default.createElement("tbody", null, rows.map(function (row, index) {
+    return /*#__PURE__*/React__default.createElement("tr", {
+      key: index
+    }, row.map(function (cell, i) {
+      return /*#__PURE__*/React__default.createElement("td", {
+        key: i
+      }, cell);
+    }));
+  }))));
+};
+
+var instance = axios.create({
+  baseURL: config.API_URL,
+  crossDomain: true
+});
+instance.interceptors.request.use(function (config) {
+  var token = localStorage.getItem('token');
+  config.headers.Authorization = token ? "Bearer " + token : '';
+  return config;
+});
+instance.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  if (lodashEs.get(error, 'response.status', null) === 401) {
+    return Promise.reject(error.response);
+  } else if (lodashEs.get(error, 'response.status', null) === 400) {
+    return Promise.reject(error.response);
+  } else {
+    return Promise.reject(error);
+  }
+});
+
+var actionsTypes = {
+  FETCH: 'stacks/attachments/FETCH',
+  FETCH_SUCCESS: 'stacks/attachments/FETCH_SUCCESS',
+  FETCH_FAIL: 'stacks/attachments/FETCH_FAIL'
+};
+
+var initialState = {
+  data: {},
+  errors: {},
+  requestStatus: null
+};
+var reducer = function reducer(state, action) {
+  var _extends2, _extends3, _extends4, _extends5, _extends6, _extends7;
+
+  if (state === void 0) {
+    state = initialState;
+  }
+
+  switch (action.type) {
+    case actionsTypes.FETCH:
+      return _extends({}, state, {
+        data: _extends({}, state.data, (_extends3 = {}, _extends3[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends2 = {}, _extends2[action.meta.id] = _extends({}, state.data[action.meta.frameId] ? state.data[action.meta.frameId][action.meta.id] : {}, {
+          loading: true,
+          requestStatus: null,
+          error: null
+        }), _extends2)), _extends3))
+      });
+
+    case actionsTypes.FETCH_SUCCESS:
+      return _extends({}, state, {
+        data: _extends({}, state.data, (_extends5 = {}, _extends5[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends4 = {}, _extends4[action.meta.id] = _extends({}, action.payload, {
+          loading: false
+        }), _extends4)), _extends5))
+      });
+
+    case actionsTypes.FETCH_FAIL:
+      return _extends({}, state, {
+        data: _extends({}, state.data, (_extends7 = {}, _extends7[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends6 = {}, _extends6[action.meta.id] = {
+          error: action.payload.error,
+          requestStatus: action.payload.requestStatus,
+          loading: false
+        }, _extends6)), _extends7))
+      });
+
+    default:
+      return state;
+  }
+};
+var StateContext = React.createContext();
+var StateProvider = function StateProvider(_ref) {
+  var children = _ref.children;
+  return /*#__PURE__*/React__default.createElement(StateContext.Provider, {
+    value: React.useReducer(reducer, initialState)
+  }, children);
+};
+var useStateValue = function useStateValue() {
+  return React.useContext(StateContext);
+};
+
+var actions = (function () {
+  var _useStateValue = useStateValue(),
+      dispatch = _useStateValue[1];
+
+  var fetchAttachment = function fetchAttachment(stack, frameId, id, onSuccess) {
+    try {
+      dispatch({
+        type: actionsTypes.FETCH,
+        meta: {
+          frameId: frameId,
+          id: id
+        }
+      });
+
+      var _temp2 = _catch(function () {
+        return Promise.resolve(api.get(config.STACK_ATTACHMENT(stack, frameId, id))).then(function (request) {
+          dispatch({
+            type: actionsTypes.FETCH_SUCCESS,
+            meta: {
+              frameId: frameId,
+              id: id
+            },
+            payload: request.data.attachment
+          });
+          if (onSuccess) onSuccess();
+        });
+      }, function (e) {
+        var error = 'Unknown error';
+
+        try {
+          error = JSON.parse(lodashEs.get(e, 'request.response')).message;
+        } catch (e) {
+          console.log(error);
+        }
+
+        dispatch({
+          type: actionsTypes.FETCH_FAIL,
+          meta: {
+            frameId: frameId,
+            id: id
+          },
+          payload: {
+            error: error
+          }
+        });
+      });
+
+      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  return {
+    fetchAttachment: fetchAttachment
+  };
+});
+
+var css$p = {"attachment":"_styles-module__attachment__3NILI","loading-pulse":"_styles-module__loading-pulse__IhCO3","view":"_styles-module__view__3UWqG","text":"_styles-module__text__MOcaD","message":"_styles-module__message__1IDQc"};
+
+var base64ToJSON = function base64ToJSON(base64) {
+  var parsedJSON;
+
+  try {
+    parsedJSON = JSON.parse(atob(base64));
+  } catch (e) {
+    console.log(e);
+  }
+
+  return parsedJSON;
+};
+
+var base64ImagePrefixes = {
+  'image/svg+xml': 'data:image/svg+xml;charset=utf-8;',
+  'image/png': 'data:image/png;charset=utf-8;',
+  'image/jpeg': 'data:image/jpeg;charset=utf-8;'
+};
+
+var isImageType = function isImageType(type) {
+  return /^image/.test(type);
+};
+
+var Attachment = function Attachment(_ref) {
+  var id = _ref.id,
+      className = _ref.className,
+      frameId = _ref.frameId,
+      isList = _ref.isList,
+      withLoader = _ref.withLoader,
+      stack = _ref.stack;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _actions = actions(),
+      fetchAttachment = _actions.fetchAttachment;
+
+  var _useStateValue = useStateValue(),
+      data = _useStateValue[0].data;
+
+  var _get = lodashEs.get(data, frameId + "." + id, {}),
+      loading = _get.loading,
+      error = _get.error,
+      requestStatus = _get.requestStatus,
+      attachment = _objectWithoutPropertiesLoose(_get, ["loading", "error", "requestStatus"]);
+
+  var _useState = React.useState(1),
+      tableScale = _useState[0],
+      setTableScale = _useState[1];
+
+  var _useState2 = React.useState(false),
+      loadingFullAttachment = _useState2[0],
+      setLoadingFullAttachment = _useState2[1];
+
+  var _useState3 = React.useState(null),
+      fullAttachment = _useState3[0],
+      setFullAttachment = _useState3[1];
+
+  var viewRef = React.useRef(null);
+  var prevAttachment = hooks.usePrevious(attachment);
+  React.useEffect(function () {
+    if (window && isList) window.addEventListener('resize', onResizeCard);
+    return function () {
+      if (window && isList) window.removeEventListener('resize', onResizeCard);
+    };
+  }, []);
+
+  var fetchFullAttachment = function fetchFullAttachment() {
+    try {
+      var _temp3 = function _temp3() {
+        setLoadingFullAttachment(false);
+      };
+
+      setLoadingFullAttachment(true);
+
+      var _temp4 = _catch(function () {
+        var url = config.STACK_ATTACHMENT(stack, frameId, id) + '?download=true';
+        return Promise.resolve(instance.get(url)).then(function (_ref2) {
+          var data = _ref2.data;
+          setFullAttachment(data.attachment);
+        });
+      }, function (e) {
+        console.log(e);
+      });
+
+      return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(_temp3) : _temp3(_temp4));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  React.useEffect(function () {
+    if (!isList && attachment && !lodashEs.isEqual(prevAttachment, attachment) && attachment.preview && isImageType(attachment['content_type'])) {
+      fetchFullAttachment();
+    }
+  }, [data]);
+  React.useEffect(function () {
+    if (!isList && typeof id === 'number' && frameId && (!attachment.data && !error || (attachment === null || attachment === void 0 ? void 0 : attachment.index) !== id)) {
+      fetchAttachment(stack, frameId, id);
+    }
+  }, [id, frameId]);
+
+  var _useIntersectionObser = hooks.useIntersectionObserver(function () {
+    if (isList && !loading && (!attachment.data && !error || attachment.data && attachment.index !== id)) fetchAttachment(stack, frameId, id);
+  }, {}, [id, frameId, data]),
+      ref = _useIntersectionObser[0];
+
+  React.useEffect(function () {
+    if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
+      var json = base64ToJSON(attachment.data);
+      if (json && document.querySelector("#bokeh-" + frameId)) Bokeh.embed.embed_item(json, "bokeh-" + frameId);
+    }
+
+    if (isList) setTimeout(function () {
+      return onResizeCard();
+    }, 10);
+  }, [data]);
+
+  var onResizeCard = function onResizeCard() {
+    if (ref.current && viewRef.current) {
+      var containerWidth = ref.current.offsetWidth;
+      var viewWidth = viewRef.current.offsetWidth / tableScale;
+      var newScale = containerWidth / viewWidth;
+      if (newScale > 1) newScale = 1;
+      setTableScale(newScale);
+    }
+  };
+
+  var renderImage = function renderImage() {
+    if (!attachment.preview) return /*#__PURE__*/React__default.createElement("img", {
+      src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
+      alt: ""
+    });else if (fullAttachment) {
+      if (fullAttachment['download_url']) {
+        return /*#__PURE__*/React__default.createElement("img", {
+          src: fullAttachment['download_url'],
+          alt: ""
+        });
+      } else return /*#__PURE__*/React__default.createElement("img", {
+        src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
+        alt: ""
+      });
+    }
+    return null;
+  };
+
+  var renderCSV = function renderCSV() {
+    var decodeCSV = unicodeBase64Decode(attachment.data);
+
+    if (decodeCSV) {
+      var _data = CSV.parse(decodeCSV);
+
+      if (Array.isArray(_data) && _data.length) return /*#__PURE__*/React__default.createElement(Table, {
+        data: _data
+      });
+    }
+
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.text
+    }, t('notSupportedAttachment'));
+  };
+
+  var renderPlotly = function renderPlotly() {
+    var json = base64ToJSON(attachment.data);
+    if (!json) return null;
+    json.layout.width = '100%';
+    json.layout.margin = 0;
+    json.layout.autosize = true;
+    json.config = {
+      responsive: true
+    };
+    return /*#__PURE__*/React__default.createElement(Plot, _extends({}, json, {
+      style: {
+        width: '100%',
+        height: '100%'
+      },
+      useResizeHandler: true
+    }));
+  };
+
+  var renderBokeh = function renderBokeh() {
+    return /*#__PURE__*/React__default.createElement("div", {
+      id: "bokeh-" + frameId
+    });
+  };
+
+  var renderAttachment = function renderAttachment() {
+    if (loading) return null;
+    if (requestStatus === 404 && isList) return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.message
+    }, t('notFound'));
+    if (requestStatus === 404 && !isList) return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.text
+    }, t('noPreview'));
+    if (attachment.preview && isList && isImageType(attachment['content_type'])) return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.message
+    }, t('noPreview'));
+
+    switch (true) {
+      case attachment['content_type'] === 'image/svg+xml':
+      case attachment['content_type'] === 'image/png':
+      case attachment['content_type'] === 'image/jpeg':
+        return renderImage();
+
+      case attachment['content_type'] === 'text/csv':
+        return renderCSV();
+
+      case attachment['application'] === 'plotly':
+        return renderPlotly();
+
+      case attachment['application'] === 'bokeh':
+        return renderBokeh();
+
+      case undefined:
+        return null;
+
+      default:
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: isList ? css$p.message : css$p.text
+        }, t('notSupportedAttachment'));
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    ref: ref,
+    className: cx(css$p.attachment, className, {
+      'is-list': isList,
+      loading: loading && withLoader || loadingFullAttachment
+    })
+  }, /*#__PURE__*/React__default.createElement("div", {
+    ref: viewRef,
+    className: cx(css$p.view, {
+      'table': attachment && attachment.data && attachment['content_type'] === 'text/csv',
+      'bokeh': attachment && attachment.data && attachment['application'] === 'bokeh'
+    }),
+    style: attachment && attachment['content_type'] === 'text/csv' ? {
+      transform: "scale(" + tableScale + ")"
+    } : {}
+  }, renderAttachment()));
+};
+
+var index = (function (props) {
+  return /*#__PURE__*/React__default.createElement(StateProvider, null, /*#__PURE__*/React__default.createElement(Attachment, props));
+});
+
 exports.AccessForbidden = AccessForbidden;
 exports.Avatar = Avatar;
 exports.BackButton = BackButton;
@@ -1170,6 +1668,8 @@ exports.SearchField = SearchField;
 exports.SelectField = SelectField;
 exports.SliderField = SliderField;
 exports.Spinner = Spinner;
+exports.StackAttachment = index;
+exports.StackFilters = StackFilters;
 exports.StretchTitleField = StretchTitleField;
 exports.Tabs = Tabs;
 exports.TextAreaField = TextAreaField;
