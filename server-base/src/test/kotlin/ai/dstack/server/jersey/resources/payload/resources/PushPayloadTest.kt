@@ -22,6 +22,7 @@ class PushPayloadTest {
                         index = 0,
                         attachments = null,
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -41,6 +42,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -60,6 +62,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -79,6 +82,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -97,6 +101,7 @@ class PushPayloadTest {
                         PushPayloadAttachment("image/png", null, null, "hoho", null, null, emptyMap(), emptyMap())
                 ),
                 size = null,
+                params = null,
                 message = null
         ).migrateAttachmentType().isMalformed).isFalse()
 
@@ -115,6 +120,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -134,6 +140,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -153,6 +160,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -171,6 +179,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isFalse()
@@ -190,6 +199,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isFalse()
@@ -206,6 +216,7 @@ class PushPayloadTest {
                         index = null,
                         attachments = null,
                         size = 1,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isFalse()
@@ -224,6 +235,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isFalse()
@@ -242,6 +254,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, null, 10000L, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isFalse()
@@ -260,6 +273,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -278,6 +292,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -296,6 +311,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()
@@ -314,6 +330,7 @@ class PushPayloadTest {
                                 PushPayloadAttachment(null, null, null, null, null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
+                        params = null,
                         message = null
                 ).migrateAttachmentType().isMalformed
         ).isTrue()

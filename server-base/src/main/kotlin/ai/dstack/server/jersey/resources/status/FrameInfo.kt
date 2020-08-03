@@ -9,6 +9,8 @@ data class FrameInfo(
     @JsonProperty("timestamp")
     val timestampMillis: Long,
     val attachments: List<AttachmentInfo>,
+    val params: Map<String, Any>,
+    @Deprecated("Is replaced by params")
     @JsonProperty("description")
     val message: String?
 )

@@ -7,6 +7,8 @@ object Deps {
     const val JACKSON_VERSION_MIN = "2.9.9"
     const val JUNIT_VERSION = "5.1.0"
 
+    val commons_codec = "commons-codec:commons-codec:1.14"
+
     val kotlin_stdlib_jdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
 
     // Web framework

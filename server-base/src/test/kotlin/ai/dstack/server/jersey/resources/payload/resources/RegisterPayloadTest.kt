@@ -87,14 +87,5 @@ class RegisterPayloadTest {
                 plan = "free"
             ).isMalformed
         ).isTrue()
-
-        // no plan
-        Truth.assertThat(
-            RegisterPayload(
-                name = "cheptsov",
-                email = "andrey.cheptsov@gmail.com",
-                password = "pass"
-            ).isMalformed
-        ).isTrue()
     }
 }

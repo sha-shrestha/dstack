@@ -135,6 +135,7 @@ class DashboardResources {
                                                 BasicFrameInfo(
                                                         h.id,
                                                         h.timestampMillis,
+                                                        emptyMap(),
                                                         null
                                                 )
                                             }
@@ -219,7 +220,8 @@ class DashboardResources {
                                                                                     a.settings,
                                                                                     a.length
                                                                             )
-                                                                        }, h.message
+                                                                        }, h.params,
+                                                                        h.message
                                                                 )
                                                             })
                                                 }.toList(),
@@ -395,7 +397,7 @@ class DashboardResources {
                     cardService.update(
                             cards.mapIndexed { index, card ->
                                 index to card
-                            }.filter{ (index, card) ->
+                            }.filter { (index, card) ->
                                 index != card.index
                             }.map { (index, card) ->
                                 card.copy(index = index).also {
@@ -427,7 +429,7 @@ class DashboardResources {
                                                                         a.settings,
                                                                         a.length
                                                                 )
-                                                            }, h.message
+                                                            }, h.params, h.message
                                                     )
                                                 })
                                     }

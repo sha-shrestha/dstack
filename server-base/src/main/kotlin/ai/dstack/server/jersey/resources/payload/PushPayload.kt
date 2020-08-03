@@ -19,6 +19,8 @@ data class PushPayload(
         val index: Int?,
         val attachments: List<PushPayloadAttachment>?,
         val size: Int?,
+        val params: Map<String, Any>?,
+        @Deprecated("Is replaced by params")
         val message: String?
 )
 
@@ -33,6 +35,7 @@ data class PushPayloadAttachment(
         val contentType: String?,
         val data: String?,
         val length: Long?,
+        @Deprecated("Is replaced by params")
         val description: String?,
         val params: Map<String, Any>?,
         val settings: Map<String, Any>?

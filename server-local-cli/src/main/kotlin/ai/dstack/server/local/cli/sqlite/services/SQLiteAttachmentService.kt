@@ -8,20 +8,9 @@ import ai.dstack.server.local.cli.sqlite.model.AttachId
 import ai.dstack.server.local.cli.sqlite.model.AttachmentItem
 import ai.dstack.server.local.cli.sqlite.repositories.AttachmentRepository
 import ai.dstack.server.local.cli.sqlite.toNullable
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-
-val SQLITE_MAPPER: ObjectMapper = ObjectMapper()
-    .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
-    .registerModule(JavaTimeModule())
-    .registerModule(KotlinModule())
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 @Component
 class SQLiteAttachmentService @Autowired constructor(private val repository: AttachmentRepository) :
@@ -62,9 +51,9 @@ class SQLiteAttachmentService @Autowired constructor(private val repository: Att
                 values.contentType ?: "unknown",
                 a.length,
                 a.index,
-                SQLITE_MAPPER.readValue(a.paramsJson,
+                sqliteMapper.readValue(a.paramsJson,
                     object : TypeReference<Map<String, Any>>() {}),
-                SQLITE_MAPPER.readValue(a.settingsJson,
+                sqliteMapper.readValue(a.settingsJson,
                     object : TypeReference<Map<String, Any>>() {}),
                 a.createdDate
             )
@@ -83,10 +72,10 @@ class SQLiteAttachmentService @Autowired constructor(private val repository: Att
                 values.contentType ?: "unknown",
                 a.length,
                 a.description,
-                SQLITE_MAPPER.writeValueAsString(
+                sqliteMapper.writeValueAsString(
                     a.params
                 ),
-                SQLITE_MAPPER.writeValueAsString(
+                sqliteMapper.writeValueAsString(
                     a.settings
                 ),
                 a.createdDate

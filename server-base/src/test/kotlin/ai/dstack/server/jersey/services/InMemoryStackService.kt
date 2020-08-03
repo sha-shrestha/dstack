@@ -31,7 +31,7 @@ class InMemoryStackService: StackService {
     override fun update(stack: Stack) {
         val index = stacks.indexOfFirst { it.userName == stack.userName && it.name == stack.name }
         if (index >= 0) {
-            stacks.set(index, stack)
+            stacks[index] = stack
         }
         // TODO: Throw exception if not updated
     }

@@ -21,6 +21,8 @@ data class BasicFrameInfo(
     val id: String,
     @JsonProperty("timestamp")
     val timestampMillis: Long,
+    val params: Map<String, Any>,
+    @Deprecated("Is replaced by params")
     @JsonProperty("description")
     val message: String?
 )

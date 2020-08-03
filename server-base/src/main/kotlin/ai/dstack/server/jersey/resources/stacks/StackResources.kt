@@ -29,7 +29,6 @@ import javax.ws.rs.container.ResourceContext
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.Response
-import javax.xml.bind.DatatypeConverter
 
 @Path("/stacks")
 class StackResources {
@@ -134,11 +133,11 @@ class StackResources {
                                                                     a.legacyType,
                                                                     a.application,
                                                                     a.contentType,
-                                                                    a.params,
+                                                                    a.params.orEmpty(),
                                                                     a.settings,
                                                                     a.length
                                                             )
-                                                        }, it.message
+                                                        }, it.params, it.message
                                                 )
                                             },
                                             if (owner) permissionService.findByPath(stack.path)
@@ -155,7 +154,7 @@ class StackResources {
                                                 BasicFrameInfo(
                                                         it.id,
                                                         it.timestampMillis,
-                                                        it.message
+                                                        it.params, it.message
                                                 )
                                             }
                                     )
@@ -254,6 +253,7 @@ class StackResources {
                                 payload.attachments.size
                             else
                                 payload.size,
+                            payload.params.orEmpty().let{ it.mapValues { it.value }.toMap() },
                             payload.message?.let { if (it.isNotEmpty()) it else null }
                     )
                     frameService.create(frame)
@@ -270,7 +270,7 @@ class StackResources {
                             val application = a.application ?: payload.application
                             val contentType = a.contentType ?: payload.contentType
                             val file = frame.path + "/" + index
-                            val data = a.data?.let { DatatypeConverter.parseBase64Binary(a.data) }
+                            val data = a.data?.let { Base64.getDecoder().decode(a.data) }
                             val length = data?.count()?.toLong() ?: a.length!!
                             if (data != null) {
                                 fileService.save(file, data)

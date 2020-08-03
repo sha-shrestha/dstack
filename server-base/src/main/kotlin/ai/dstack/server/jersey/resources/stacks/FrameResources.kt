@@ -67,7 +67,7 @@ class FrameResources {
                                         a.settings,
                                         a.length
                                     )
-                                }, frame.message
+                                }, frame.params, frame.message
                             )
                         )
                     )
