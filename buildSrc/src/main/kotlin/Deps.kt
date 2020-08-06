@@ -19,6 +19,8 @@ object Deps {
 
     // DI libraries
     val jersey_hk2 = "org.glassfish.jersey.inject:jersey-hk2:$JERSEY_VERSION"
+    val jaxb = "javax.xml.bind:jaxb-api:2.3.0"
+    val activation = "javax.activation:activation:1.1.1"
 
     // JSON
     val jackson_databind = "com.fasterxml.jackson.core:jackson-databind:$JACKSON_VERSION"
