@@ -44,7 +44,7 @@ open class Startup {
         println()
         println("If you're using Python, use the following command line command to configure your dstack profile:")
         println("\tpip install dstack")
-        println("\tdstack config --token ${user.token} --user ${user.name} --server http://localhost:${config.internalPort}/api")
+        println("\tdstack config add --token ${user.token} --user ${user.name} --server http://localhost:${config.internalPort}/api")
         println()
         println("If you're using R, use the following R command to configure your dstack profile:")
         println("\tinstall.packages(\"dstack\")")

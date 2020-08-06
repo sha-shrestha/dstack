@@ -9,12 +9,12 @@ import ai.dstack.server.jersey.resources.stackNotFound
 import ai.dstack.server.jersey.resources.status.AttachmentInfo
 import ai.dstack.server.jersey.resources.status.GetAttachStatus
 import mu.KLogging
+import java.util.*
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.container.ResourceContext
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
-import javax.xml.bind.DatatypeConverter
 
 @Path("/attachs")
 class AttachResources {
@@ -23,9 +23,6 @@ class AttachResources {
 
     @Inject
     private lateinit var userService: UserService
-
-    @Inject
-    private lateinit var sessionService: SessionService
 
     @Inject
     private lateinit var stackService: StackService
@@ -67,14 +64,15 @@ class AttachResources {
                         val attachment = attachmentService.get(frame.path, a)
                         if (attachment != null) {
                             val data = if (attachment.length < MAX_DATA_LENGTH)
-                                DatatypeConverter.printBase64Binary(fileService.get(attachment.filePath))
+                                Base64.getEncoder().encodeToString(
+                                        fileService.get(attachment.filePath)
+                                ).toString()
                             else if (d != true)
-                                DatatypeConverter.printBase64Binary(
-                                    fileService.preview(
-                                        attachment.filePath,
+                                Base64.getEncoder().encodeToString(
+                                        fileService.preview(attachment.filePath,
                                         PREVIEW_DATA_LENGTH
                                     )
-                                )
+                                ).toString()
                             else
                                 null
                             val downloadUrl = if (attachment.length >= MAX_DATA_LENGTH && d == true)

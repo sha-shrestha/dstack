@@ -1,4 +1,4 @@
-**dstack is an open-source framework for Python and R for managing data science artifacts, and for building data science applications.**
+**dstack is an open-source framework for building data science applications using Python and R.**
 
 ![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![CRAN status](https://www.r-pkg.org/badges/version/dstack)](https://CRAN.R-project.org/package=dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)  
 
@@ -6,46 +6,11 @@ How is dstack different from other frameworks:
  - It is designed for data scientists and doesn't require development skills to build applications.   
  - It simplifies the process of creating applications by leveraging a) a declarative approach to defining application components; b) a tight integration with data science frameworks and tools.
 
-The key features of dstack:
-- Managing data science artifacts (e.g. tracking revisions of datasets, pushing and pulling datasets)
-- Building data science applications (this currently includes dashboards and reports; the support for ML models is coming soon) 
-
 ## How dstack works
 
 The framework consists of the following parts:
 - Client packages for Python ([dstack-py](https://github.com/dstackai/dstack-py)) an R ([dstack-r](https://github.com/dstackai/dstack-r)). These packages can be used from either notebooks or scripts to push data to dstack.
 - A server application ([dstack-server](https://github.com/dstackai/dstack-server)). It handles the requests from the Client packages, and serve data applications. The application can run locally or in Docker.  
-
-There are two general use-cases for dstack:
-
-### Use case #1: Managing data science artifacts
-
-The results of a data science process normally may include all kind of datasets, visualizations, ML models, text and binary files, etc. 
-
-The `dstack-server` application serves as a storage engine to store these artifacts and track their revisions and meta-data.
-The `dstack-py` and `dstack-r` packages provides the capabilities to push and pull these artifacts to and from the corresponding instance of `dstack-server`.
-
-The dstack framework uses the following abstractions to represent artifacts:
-
-- A *Stack* has a human-readable name (*Stack Name*), the ID of its latest frame (*Frame* or *Stack Head*), and the name of the user it belongs to (*User*) 
-- A *Frame* represents a unique revision of a *Stack*. It has a unique ID (*Frame ID*), a human-readable description (*Frame Description*),and a set of *Attachments*.  
-- An *Attachment* has a data (*Attachment Data*) which can be either plain or binary, a MIME type of the data (*Attachment Content Type*),
-   an application name which can interpret this type of data (*Attachment Application*), 
-   and most importantly a key/value dictionary with the metadata associated with the *Attachment* (*Attachment Params*).
-- A *User* has a human-readable name (*Username*), and a secret token for authorization (*User Token*).
-- A *User Profile* has a human readable name (*Profile Name*), a *Username*, a *User Token*, and the URL of the server API (*Server URL*). 
-    User profiles are configured locally to authorize the requests from the `dstack` packages.
-   
-The workflow in this case is the following:
-
-- Install the `dstack` package (e.g. via `pip` or `conda`)
-- Runs `dstack-server` (e.g. using the `dstack server` dstack CLI command)
-- Configure a dstack profile (e.g. using the `dstack config` dstack CLI command) 
-- Push or pull *Stack Frames* from Jupyter notebooks, Rmarkdown files or any Python or R scripts. Pushing and pulling is done via the `dstack` packages for Python or R.
-
-The information on how to push artifacts to a dstack server, can be found in the [dstack-py](https://github.com/dstackai/dstack-py) an [dstack-r](https://github.com/dstackai/dstack-r) repositories correspondingly. 
-
-### Use case #2: Building data science applications
 
 A data science application is a specific kind of applications that solves domain-specific problems using data and data-science methods.
  These data science methods may include data-wrangling, data visualizations, statistical modeling, machine learning, etc.  
@@ -101,7 +66,7 @@ install.packages("dstack")
 In order to run a server locally, one must run this command line:
 
 ```bash
-dstack server --start
+dstack server start
 ```
 
 You'll see the following output:
@@ -113,7 +78,7 @@ To access the dstack server, open one of these URLs in the browser:
 
 If you're using Python, use the following command line command to configure your dstack profile:
 	pip install dstack
-	dstack config --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --server http://localhost:8080/api
+	dstack config add --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --server http://localhost:8080/api
 
 If you're using R, use the following R command to configure your dstack profile:
 	install.packages("dstack")
@@ -125,23 +90,23 @@ Note, in your case instead of `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` you'll see 
 The server by default uses the `8080` port. Optionally, you can specify a custom port by using the command line option `--port`:
 
 ```bash
-dstack server --start --port 8081
+dstack server start --port 8081
 ```
 
-Note, by default, the server stores all the data in the local folder `./.dstack/data`. In case you'd like to store the data on the global level, use the following command:
+Note, by default, the server stores all the data under `.dstack` in the user home directory. In case you'd like to store the `.dstack` folder in a different place, use the following command:
 
 ```bash
-dstack server --start --global
+dstack server start --home <other_directory>
 ```
 
-In this case, the server will store all the data in `<user home>/.dstack/data`. 
+In this case, the server will store all the data in `<other_directory>/.dstack/`. 
 
 ### Configure a user profile
 
 In order to send requests to the locally running server, one must run the command suggested in the output:
 
 ```bash
-dstack config --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --server http://localhost:8080/api
+dstack config add --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --server http://localhost:8080/api
 ```
 
 ### Push artifacts
@@ -295,6 +260,5 @@ Currently, the `dstack` packages are compatible with `pandas.core.frame.DataFram
 
 Here's a list of things not implemented yet but considered for the nearest time:
 
-- Push and pull for multiple large files (aka Git for data)
 - Stacks that can run user code (aka Callbacks) – using these stacks it will be possible to implement Live Dashboards
-- User interfaces for published Machine Learning models (so users may interace with ML models from the web application)
+- User interfaces for published Machine Learning models (so users may interface with ML models from the web application)

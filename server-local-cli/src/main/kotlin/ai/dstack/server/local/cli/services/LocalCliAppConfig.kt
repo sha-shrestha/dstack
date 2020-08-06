@@ -31,15 +31,20 @@ class LocalCliAppConfig : AppConfig {
             return ((if (ssl) "https" else "http") + "://") + hostName + ":$p"
         }
 
+    override val homeDirectory: String
+        get() {
+            val dir = defaultHomeDirectory ?: "."
+            return System.getenv("dstack_home") ?: "$dir/.dstack"
+        }
+
     override val dataDirectory: String
         get() {
-            val dir = if (global) System.getProperty("user.home") ?: "." else "."
-            return System.getenv("dstack_data_dir") ?: "$dir/.dstack/data"
+            return "${homeDirectory}/data"
         }
 
     override val fileDirectory: String
         get() {
-            return System.getenv("dstack_file_dir") ?: "${dataDirectory}/files"
+            return "${homeDirectory}/files"
         }
 
     override val supportEmail: String
@@ -79,6 +84,6 @@ class LocalCliAppConfig : AppConfig {
 
     companion object {
         var defaultInternalPort: String = "8080"
-        var global: Boolean = false
+        var defaultHomeDirectory: String? = System.getProperty("user.home")
     }
 }

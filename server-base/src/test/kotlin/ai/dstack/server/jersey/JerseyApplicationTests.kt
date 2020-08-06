@@ -23,7 +23,6 @@ import javax.ws.rs.core.Application
 import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
-import javax.xml.bind.DatatypeConverter
 
 
 // TODO: Implement more tests – ideally for all APIs
