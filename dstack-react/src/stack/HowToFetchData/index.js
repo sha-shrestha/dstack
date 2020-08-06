@@ -2,11 +2,10 @@
 
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {connect} from 'react-redux';
-import {Tabs, CodeViewer} from '@dstackai/dstack-react';
-import {get, isString} from 'lodash-es';
+import {Tabs, CodeViewer} from '../../';
+import {isString} from 'lodash-es';
 import config from 'config';
-import css from 'Stacks/components/HowTo/styles.module.css';
+import css from '../HowTo/styles.module.css';
 
 export const pullPythonCode = data => {
     let a = [`\'/${data.stack}\'`];
@@ -46,19 +45,17 @@ export const pullRCode = data => {
     }
 
     return `library(dstack)
-    
+
 df <- read.csv(pull(${a.join(', ')}))`;
 };
 
 type Props = {
-    userData?: ?{
-        user: string,
-        token: string
-    },
+    user?: string,
+    token?: string,
     modalMode?: boolean,
 }
 
-const HowTo = ({modalMode, userData, data}: Props) => {
+const HowTo = ({modalMode, user, token, data}: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
@@ -128,7 +125,7 @@ const HowTo = ({modalMode, userData, data}: Props) => {
                     className={css.code}
                     language="bash"
                 >
-                    {config.CONFIGURE_PYTHON_COMMAND(get(userData, 'token'), get(userData, 'user'))}
+                    {config.CONFIGURE_PYTHON_COMMAND(token, user)}
                 </CodeViewer>
 
                 <div className={css.description}>{t('pullDatasetIntro')}</div>
@@ -157,7 +154,7 @@ const HowTo = ({modalMode, userData, data}: Props) => {
                     className={css.code}
                     language="r"
                 >
-                    {config.CONFIGURE_R_COMMAND(get(userData, 'token'), get(userData, 'user'))}
+                    {config.CONFIGURE_R_COMMAND(token, user)}
                 </CodeViewer>
 
                 <div className={css.description}>{t('pullDatasetIntro')}</div>
@@ -178,6 +175,4 @@ const HowTo = ({modalMode, userData, data}: Props) => {
     );
 };
 
-export default connect(
-    state => ({userData: state?.app?.userData}),
-)(HowTo);
+export default HowTo;

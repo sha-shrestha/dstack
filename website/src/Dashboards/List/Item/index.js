@@ -5,8 +5,7 @@ import {get} from 'lodash-es';
 import {useParams, Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import routes from 'routes';
-import {Dropdown} from '@dstackai/dstack-react';
-import Attachment from 'Stacks/components/Attachment';
+import {Dropdown, StackAttachment} from '@dstackai/dstack-react';
 import {deleteDashboard} from 'Dashboards/Details/actions';
 import type {Dashboard} from 'Dashboards/types';
 import css from './styles.module.css';
@@ -50,7 +49,7 @@ const Item = ({dashboard, userData, deleteDashboard}: Props) => {
 
             <div className={css.previewWrap}>
                 {hasStacks
-                    ? <Attachment
+                    ? <StackAttachment
                         className={css.attachment}
                         isList
                         withLoader

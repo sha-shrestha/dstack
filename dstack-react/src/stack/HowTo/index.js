@@ -2,9 +2,7 @@
 
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {connect} from 'react-redux';
-import {CodeViewer, Tabs} from '@dstackai/dstack-react';
-import {get} from 'lodash-es';
+import {CodeViewer, Tabs} from '../../';
 import css from './styles.module.css';
 import config from 'config';
 
@@ -27,14 +25,12 @@ image <- ggplot(data = df, aes(x = x, y = y)) + geom_line()
 push_frame("simple", image, "My first plot")`;
 
 type Props = {
-    userData?: ?{
-        user: string,
-        token: string
-    },
+    user?: string,
+    token?: string,
     modalMode?: boolean,
 }
 
-const HowTo = ({userData}: Props) => {
+const HowTo = ({user, token}: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
@@ -100,7 +96,7 @@ const HowTo = ({userData}: Props) => {
                     className={css.code}
                     language="bash"
                 >
-                    {config.CONFIGURE_PYTHON_COMMAND(get(userData, 'token'), get(userData, 'user'))}
+                    {config.CONFIGURE_PYTHON_COMMAND(token, user)}
                 </CodeViewer>
 
                 <div className={css.description}>{t('reportPlotIntro')}</div>
@@ -129,7 +125,7 @@ const HowTo = ({userData}: Props) => {
                     className={css.code}
                     language="r"
                 >
-                    {config.CONFIGURE_R_COMMAND(get(userData, 'token'), get(userData, 'user'))}
+                    {config.CONFIGURE_R_COMMAND(token, user)}
                 </CodeViewer>
 
                 <div className={css.description}>{t('reportPlotIntro')}</div>
@@ -150,6 +146,4 @@ const HowTo = ({userData}: Props) => {
     );
 };
 
-export default connect(
-    state => ({userData: state?.app?.userData}),
-)(HowTo);
+export default HowTo;

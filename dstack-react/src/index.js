@@ -28,4 +28,11 @@ export {default as ViewSwitcher} from './ViewSwitcher';
 export {default as Yield} from './Yield';
 
 export {default as StackAttachment} from './stack/Attachment';
+export {StateProvider as StackAttachmentProvider} from './stack/Attachment/store';
+export {default as StackList} from './stack/List';
+export {default as StackListItem} from './stack/ListItem';
+export {default as StackHowTo} from './stack/HowTo';
+export {default as StackHowToFetchData} from './stack/HowToFetchData';
+export {default as StackFrames} from './stack/Frames';
+export {default as StackDetails} from './stack/Details';
 

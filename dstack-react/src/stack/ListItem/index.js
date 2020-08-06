@@ -1,9 +1,7 @@
-// @flow
-
 import React, {useRef} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Dropdown} from '@dstackai/dstack-react';
-import Attachment from 'Stacks/components/Attachment';
+import Dropdown from '../../Dropdown';
+import Attachment from '../Attachment';
 import css from './styles.module.css';
 
 type Props = {

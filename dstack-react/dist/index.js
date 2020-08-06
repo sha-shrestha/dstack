@@ -8,7 +8,7 @@ var reactI18next = require('react-i18next');
 var copy = _interopDefault(require('copy-to-clipboard'));
 var RcTooltip = _interopDefault(require('rc-tooltip'));
 var lodashEs = require('lodash-es');
-require('moment');
+var moment = _interopDefault(require('moment'));
 var ReactMarkdown = _interopDefault(require('react-markdown'));
 var MathJax = _interopDefault(require('react-mathjax'));
 var RemarkMathPlugin = _interopDefault(require('remark-math'));
@@ -19,12 +19,14 @@ var Slider = _interopDefault(require('rc-slider'));
 var Plot = _interopDefault(require('react-plotly.js'));
 var CSV = require('csv-string');
 var axios = _interopDefault(require('axios'));
-var hooks = require('hooks');
 var api = _interopDefault(require('api'));
+var reactRouterDom = require('react-router-dom');
+var config$1 = _interopDefault(require('config'));
+var hooks = require('hooks');
 
 var image = require("./lock~ZBorChcU.svg");
 
-var css = {"forbidden":"_style-module__forbidden__3PN84","message":"_style-module__message__2i8KH"};
+var css = {"forbidden":"_3PN84","message":"_2i8KH"};
 
 var AccessForbidden = function AccessForbidden(_ref) {
   var children = _ref.children;
@@ -40,7 +42,7 @@ var AccessForbidden = function AccessForbidden(_ref) {
   }, children));
 };
 
-var css$1 = {"avatar":"_styles-module__avatar__3xvkT"};
+var css$1 = {"avatar":"_3xvkT"};
 
 var Avatar = React.forwardRef(function (_ref, ref) {
   var className = _ref.className,
@@ -97,7 +99,7 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-var css$2 = {"back":"_styles-module__back__1MuhU"};
+var css$2 = {"back":"_1MuhU"};
 
 var BackButton = function BackButton(_ref) {
   var _ref$Component = _ref.Component,
@@ -113,9 +115,9 @@ var BackButton = function BackButton(_ref) {
   }), children);
 };
 
-var css$3 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
+var css$3 = {"button":"_2lKoS","spinner":"_31PPt"};
 
-var css$4 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
+var css$4 = {"spinner":"_3XhrC","spinner-animation":"_2UA3s"};
 
 var COLORS = {
   white: '#fff',
@@ -187,7 +189,7 @@ var Button = React.forwardRef(function (_ref, ref) {
   }), children);
 });
 
-var css$5 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
+var css$5 = {"checkbox":"_3lqFk","toggle-label":"_1aLAG","label":"_2PZb-","wrapper":"_2Vufp","mark":"_2Pb2f"};
 
 var CheckboxField = function CheckboxField(_ref) {
   var className = _ref.className,
@@ -231,7 +233,7 @@ var CheckboxField = function CheckboxField(_ref) {
   }, label)), children);
 };
 
-var css$6 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
+var css$6 = {"copy":"_3J5hd","message":"_3RWnQ","button":"_2YqEb","icon":"_25GMO"};
 
 var Copy = function Copy(_ref) {
   var children = _ref.children,
@@ -271,7 +273,7 @@ var Copy = function Copy(_ref) {
   }, successMessage ? successMessage : t('copied')));
 };
 
-var css$7 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
+var css$7 = {"code":"_3gARj","copy":"_m44gX","icon":"_ZmZbg"};
 
 var CodeViewer = function CodeViewer(_ref) {
   var className = _ref.className,
@@ -293,7 +295,7 @@ var CodeViewer = function CodeViewer(_ref) {
   }));
 };
 
-var css$8 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
+var css$8 = {"dropdown":"_1qRCw","button":"_fzNEm","menu":"_AJ1Y3","item":"_3lbfY"};
 
 var Dropdown = function Dropdown(_ref) {
   var className = _ref.className,
@@ -397,7 +399,50 @@ var formatBytes = function formatBytes(bytes, decimals) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var css$9 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
+var parseStackParams = (function (attachments) {
+  var fields = {};
+  if (!attachments || !attachments.length) return;
+  attachments.forEach(function (i) {
+    Object.keys(i.params).forEach(function (key) {
+      if (fields[key]) fields[key].options.push(i.params[key]);else fields[key] = {
+        options: [i.params[key]]
+      };
+    });
+  });
+  Object.keys(fields).forEach(function (key) {
+    if (typeof fields[key].options[0] === 'string') {
+      fields[key].type = 'select';
+      fields[key].options = fields[key].options.filter(function (a, b) {
+        return fields[key].options.indexOf(a) === b;
+      }).map(function (i) {
+        return {
+          label: i,
+          value: i
+        };
+      });
+    }
+
+    if (typeof fields[key].options[0] === 'boolean') {
+      fields[key].type = 'checkbox';
+    }
+
+    if (typeof fields[key].options[0] === 'number') {
+      var options = fields[key].options;
+      fields[key].type = 'slider';
+      fields[key].min = Math.min.apply(null, options);
+      fields[key].max = Math.max.apply(null, options);
+      fields[key].options = {};
+      options.filter(function (a, b) {
+        return options.indexOf(a) === b;
+      }).forEach(function (i) {
+        return fields[key].options[i] = i;
+      });
+    }
+  });
+  return fields;
+});
+
+var css$9 = {"dnd":"_3uYii","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
 
 var FileDragnDrop = function FileDragnDrop(_ref) {
   var formats = _ref.formats,
@@ -522,7 +567,7 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
   }, t('upload')), ' ', t('fromYourComputer'), "."));
 };
 
-var css$a = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
+var css$a = {"loader":"_18_Ho","text":"_3dZu_","stacks-pulse":"_350eA","grid":"_Uki0v","item":"_MvjKB","pic":"_Pc6fT","section":"_2EIKh"};
 
 var Loader = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
@@ -577,7 +622,7 @@ var MarkdownRender = function MarkdownRender(props) {
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, newProps));
 };
 
-var css$b = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
+var css$b = {"modal":"_3FQ59","dialog":"_268e0","close":"_1Y7yz","title":"_knxNI"};
 
 var Modal = function Modal(_ref) {
   var title = _ref.title,
@@ -682,7 +727,7 @@ var config = {
 
 var image$1 = require("./404~FXFqzVOe.svg");
 
-var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
+var css$c = {"not-found":"_tAZyq","message":"_3Ok1U","help":"_Aa8x8"};
 
 var NotFound = function NotFound(_ref) {
   var children = _ref.children;
@@ -727,7 +772,159 @@ var usePrevious = (function (value) {
   return ref.current;
 });
 
-var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
+var useOnClickOutside = (function (ref, handler) {
+  React.useEffect(function () {
+    var listener = function listener(event) {
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+
+      handler(event);
+    };
+
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return function () {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, handler]);
+});
+
+var isEmail = function isEmail(value) {
+  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
+};
+var isRequired = function isRequired(value) {
+  return !(value === null || value === undefined || value === '');
+};
+var noSpaces = function noSpaces(value) {
+  return /^[\S]*$/.test(value);
+};
+var isValidStackName = function isValidStackName(value) {
+  return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
+};
+
+var validationMap = {
+  required: isRequired,
+  email: isEmail,
+  'no-spaces-stack': noSpaces,
+  'stack-name': isValidStackName
+};
+
+var getValidationFunction = function getValidationFunction(validator) {
+  if (typeof validator === 'string' && validationMap[validator]) return validationMap[validator];
+  if (typeof validator === 'function') return validator;
+  return function () {
+    return true;
+  };
+};
+
+var useForm = (function (initialFormState, fieldsValidators) {
+  if (fieldsValidators === void 0) {
+    fieldsValidators = {};
+  }
+
+  var _useState = React.useState(initialFormState),
+      form = _useState[0],
+      setForm = _useState[1];
+
+  var _useState2 = React.useState({}),
+      formErrors = _useState2[0],
+      setFormErrors = _useState2[1];
+
+  var onChange = function onChange(eventOrName, value) {
+    var _extends2, _extends3;
+
+    var name;
+    var fieldValue;
+
+    if (eventOrName.target) {
+      var event = eventOrName;
+      fieldValue = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+      name = event.target.name;
+    } else {
+      name = eventOrName;
+      fieldValue = value;
+    }
+
+    setForm(_extends({}, form, (_extends2 = {}, _extends2[name] = fieldValue, _extends2)));
+    setFormErrors(_extends({}, formErrors, (_extends3 = {}, _extends3[name] = [], _extends3)));
+  };
+
+  var resetForm = function resetForm() {
+    setForm(initialFormState);
+    setFormErrors({});
+  };
+
+  var getFieldErrors = function getFieldErrors(fieldName) {
+    var errors = [];
+    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(function (validator) {
+      var isValid = getValidationFunction(validator);
+      if (!isValid(form[fieldName])) errors.push(validator);
+    });
+
+    if (typeof fieldsValidators[fieldName] === 'string') {
+      var isValid = getValidationFunction(fieldsValidators[fieldName]);
+      if (!isValid(form[fieldName])) errors.push(fieldsValidators[fieldName]);
+    }
+
+    return errors;
+  };
+
+  var checkValidForm = function checkValidForm() {
+    var isValid = true;
+    var newFormErrors = {};
+    Object.keys(fieldsValidators).forEach(function (fieldName) {
+      var errors = getFieldErrors(fieldName);
+      newFormErrors[fieldName] = errors;
+      isValid = isValid && !errors.length;
+    });
+    setFormErrors(newFormErrors);
+    return isValid;
+  };
+
+  return {
+    form: form,
+    setForm: setForm,
+    formErrors: formErrors,
+    setFormErrors: setFormErrors,
+    resetForm: resetForm,
+    onChange: onChange,
+    checkValidForm: checkValidForm
+  };
+});
+
+var useIntersectionObserver = (function (callBack, _ref, deps) {
+  var _ref$rootMargin = _ref.rootMargin,
+      rootMargin = _ref$rootMargin === void 0 ? '0px' : _ref$rootMargin,
+      _ref$threshold = _ref.threshold,
+      threshold = _ref$threshold === void 0 ? 0.01 : _ref$threshold,
+      _ref$root = _ref.root,
+      root = _ref$root === void 0 ? null : _ref$root;
+  var ref = React.useRef(null);
+  var intersectionCallback = React.useCallback(function (_ref2) {
+    var target = _ref2[0];
+
+    if (target.isIntersecting) {
+      callBack();
+    }
+  }, deps);
+  React.useEffect(function () {
+    var options = {
+      root: root,
+      rootMargin: rootMargin,
+      threshold: threshold
+    };
+    var observer = new IntersectionObserver(intersectionCallback, options);
+    if (ref && ref.current) observer.observe(ref.current);
+    return function () {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, [ref, intersectionCallback]);
+  return [ref];
+});
+
+var css$d = {"bar":"_12oWc","progress":"_3JWjz"};
 
 var ProgressBar = function ProgressBar(_ref) {
   var className = _ref.className,
@@ -810,7 +1007,7 @@ var ProgressBar = function ProgressBar(_ref) {
   }));
 };
 
-var css$e = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
+var css$e = {"field":"_3WCaE","input":"_9Tk5W","label":"_1mHtq","error":"_3jOrk"};
 
 var TextField = function TextField(_ref) {
   var label = _ref.label,
@@ -839,7 +1036,7 @@ var TextField = function TextField(_ref) {
   }, errors.join(', '))));
 };
 
-var css$f = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
+var css$f = {"search":"_3s1gr","field":"_17rsB","clear":"_3oKZ5","button":"_3BfRl"};
 
 var SearchField = function SearchField(_ref) {
   var className = _ref.className,
@@ -886,7 +1083,7 @@ var SearchField = function SearchField(_ref) {
   })));
 };
 
-var css$g = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
+var css$g = {"field":"_2jF9E","label":"_iehEi","rcSelectLoadingIcon":"_VtsrG","rcSelectDropdownSlideUpIn":"_27wr-","rcSelectDropdownSlideUpOut":"_1QVN6","rcSelectDropdownSlideDownIn":"_1vYLX","rcSelectDropdownSlideDownOut":"_1-lNh","select-field":"_1mUh_","select-field-selector":"_V9Ufm","select-field-arrow":"_c4k8s","mdi":"_2hNDK","select-field-selection-placeholder":"_2Vdv0","select-field-selection-search":"_3GdNa","select-field-selection-search-input":"_3BOaB","select-field-selection-item":"_2uDu7","select-field-item-option-checkbox":"_2K_G1","select-field-selection-item-remove":"_1k1IW","select-field-show-search":"_3EVnU","select-field-show-arrow":"_1xlmm","select-field-open":"__jEZ1","select-field-multiple":"_2YFSs","select-field-single":"_1n3qF","select-field-clear":"_Mg5xq","select-field-item-option-state":"_2yGkG","select-field-selection__choice-zoom":"_3NUb5","select-field-selection__choice-zoom-appear":"_ZO73y","select-field-selection__choice-zoom-leave":"_2i54q","select-field-dropdown":"_14ngc"};
 
 var allValue = 'all';
 
@@ -966,7 +1163,7 @@ var SelectField = function SelectField(_ref) {
   }, label));
 };
 
-var css$h = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
+var css$h = {"field":"_2_NXc","rcSliderTooltipZoomDownIn":"_2jvao","rcSliderTooltipZoomDownOut":"_2HgMB","slider":"_31Ylv","label":"_Zo_r8","rc-slider":"_1hLjI","rc-slider-rail":"_v9bxI","rc-slider-track":"__3emJ","rc-slider-handle":"_12sQ3","rc-slider-handle-dragging":"_2u63-","rc-slider-handle-click-focused":"_7xSSR","rc-slider-mark":"_1l2Qm","rc-slider-mark-text":"_2zf2c","rc-slider-mark-text-active":"_25tuh","rc-slider-step":"_3wC_L","rc-slider-dot":"_17-SM","rc-slider-dot-active":"_1eLwY","rc-slider-dot-reverse":"_Ewb1d","rc-slider-disabled":"_1YO43","rc-slider-vertical":"_12Juq","rc-slider-tooltip-zoom-down-enter":"_2a95b","rc-slider-tooltip-zoom-down-appear":"_2wvsD","rc-slider-tooltip-zoom-down-leave":"_3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_P9_lk","rc-slider-tooltip":"_1PZK2","rc-slider-tooltip-hidden":"_2CvyB","rc-slider-tooltip-placement-top":"_qzmlA","rc-slider-tooltip-inner":"_27Bp4","rc-slider-tooltip-arrow":"_35-HY"};
 
 var CustomHandle = function CustomHandle(props) {
   var style = {
@@ -1017,7 +1214,7 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"filters":"_styles-module__filters__kiZkv","select":"_styles-module__select__4Up3c","field":"_styles-module__field__3_9Ku"};
+var css$i = {"filters":"_kiZkv","select":"_4Up3c","field":"_3_9Ku"};
 
 var StackFilters = function StackFilters(_ref) {
   var className = _ref.className,
@@ -1073,7 +1270,7 @@ var StackFilters = function StackFilters(_ref) {
   }));
 };
 
-var css$j = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
+var css$j = {"field":"_2DYF1","hidden":"_3z5o2"};
 
 var StretchTitleField = function StretchTitleField(_ref) {
   var value = _ref.value,
@@ -1093,7 +1290,7 @@ var StretchTitleField = function StretchTitleField(_ref) {
   }, value.length ? value : placeholder));
 };
 
-var css$k = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
+var css$k = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
 
 var Tabs = function Tabs(_ref) {
   var className = _ref.className,
@@ -1121,7 +1318,7 @@ var Tabs = function Tabs(_ref) {
   }));
 };
 
-var css$l = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
+var css$l = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
 
 var TextAreaField = function TextAreaField(_ref) {
   var label = _ref.label,
@@ -1150,7 +1347,7 @@ var TextAreaField = function TextAreaField(_ref) {
   }, errors.join(', '))));
 };
 
-var css$m = {"tooltip":"_style-module__tooltip__rE8Jn"};
+var css$m = {"tooltip":"_rE8Jn"};
 
 var Tooltip = function Tooltip(_ref) {
   var children = _ref.children,
@@ -1178,7 +1375,7 @@ var Tooltip = function Tooltip(_ref) {
   }, props), children);
 };
 
-var css$n = {"switcher":"_styles-module__switcher__3NMzC"};
+var css$n = {"switcher":"_3NMzC"};
 
 var ViewSwitcher = function ViewSwitcher(_ref) {
   var _ref$value = _ref.value,
@@ -1243,7 +1440,7 @@ function _catch(body, recover) {
 	return result;
 }
 
-var css$o = {"table":"_styles-module__table__3tMWP"};
+var css$o = {"table":"_3tMWP"};
 
 var Table = function Table(_ref) {
   var data = _ref.data;
@@ -1404,7 +1601,7 @@ var actions = (function () {
   };
 });
 
-var css$p = {"attachment":"_styles-module__attachment__3NILI","loading-pulse":"_styles-module__loading-pulse__IhCO3","view":"_styles-module__view__3UWqG","text":"_styles-module__text__MOcaD","message":"_styles-module__message__1IDQc"};
+var css$p = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD","message":"_1IDQc"};
 
 var base64ToJSON = function base64ToJSON(base64) {
   var parsedJSON;
@@ -1464,7 +1661,7 @@ var Attachment = function Attachment(_ref) {
       setFullAttachment = _useState3[1];
 
   var viewRef = React.useRef(null);
-  var prevAttachment = hooks.usePrevious(attachment);
+  var prevAttachment = usePrevious(attachment);
   React.useEffect(function () {
     if (window && isList) window.addEventListener('resize', onResizeCard);
     return function () {
@@ -1507,7 +1704,7 @@ var Attachment = function Attachment(_ref) {
     }
   }, [id, frameId]);
 
-  var _useIntersectionObser = hooks.useIntersectionObserver(function () {
+  var _useIntersectionObser = useIntersectionObserver(function () {
     if (isList && !loading && (!attachment.data && !error || attachment.data && attachment.index !== id)) fetchAttachment(stack, frameId, id);
   }, {}, [id, frameId, data]),
       ref = _useIntersectionObser[0];
@@ -1646,9 +1843,790 @@ var Attachment = function Attachment(_ref) {
   }, renderAttachment()));
 };
 
-var index = (function (props) {
-  return /*#__PURE__*/React__default.createElement(StateProvider, null, /*#__PURE__*/React__default.createElement(Attachment, props));
-});
+var css$q = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+
+var List = function List(_ref) {
+  var _ref$data = _ref.data,
+      data = _ref$data === void 0 ? [] : _ref$data,
+      loading = _ref.loading,
+      deleteStack = _ref.deleteStack,
+      currentUser = _ref.currentUser,
+      user = _ref.user,
+      currentUserToken = _ref.currentUserToken,
+      renderSideTitle = _ref.renderSideTitle;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(null),
+      deletingStack = _useState[0],
+      setDeletingStack = _useState[1];
+
+  var _useState2 = React.useState(false),
+      isShowWelcomeModal = _useState2[0],
+      setIsShowWelcomeModal = _useState2[1];
+
+  var _useState3 = React.useState(false),
+      isShowHowToModal = _useState3[0],
+      setIsShowHowToModal = _useState3[1];
+
+  var _useState4 = React.useState(''),
+      search = _useState4[0],
+      setSearch = _useState4[1];
+
+  var isInitialMount = React.useRef(true);
+
+  var showWelcomeModal = function showWelcomeModal() {
+    return setIsShowWelcomeModal(true);
+  };
+
+  var onChangeSearch = function onChangeSearch(value) {
+    return setSearch(value);
+  };
+
+  var hideWelcomeModal = function hideWelcomeModal() {
+    localStorage.setItem('welcome-modal-is-showing', true);
+    setIsShowWelcomeModal(false);
+  };
+
+  React.useEffect(function () {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      if (!localStorage.getItem('welcome-modal-is-showing') && !loading && !data.length) showWelcomeModal();
+    }
+  }, [data]);
+
+  var showHowToModal = function showHowToModal(event) {
+    event.preventDefault();
+    setIsShowHowToModal(true);
+  };
+
+  var hideHowToModal = function hideHowToModal() {
+    return setIsShowHowToModal(false);
+  };
+
+  var deleteItem = function deleteItem() {
+    deleteStack(deletingStack);
+    hideDeleteConfirmation();
+  };
+
+  var showDeleteConfirmation = function showDeleteConfirmation(name) {
+    return setDeletingStack(name);
+  };
+
+  var hideDeleteConfirmation = function hideDeleteConfirmation() {
+    return setDeletingStack(null);
+  };
+
+  var getItems = function getItems() {
+    var items = [];
+
+    if (data && data.length) {
+      if (search.length) items = data.filter(function (i) {
+        return i.name.indexOf(search) >= 0;
+      });else items = data;
+    }
+
+    return items;
+  };
+
+  var items = getItems();
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.list
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(SearchField, {
+    showEverything: true,
+    isDark: true,
+    className: css$q.search,
+    placeholder: t('findStack'),
+    size: "small",
+    value: search,
+    onChange: onChangeSearch
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.title
+  }, currentUser === user ? t('stacks') : t('stacksOf', {
+    name: user
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.side
+  }, renderSideTitle && renderSideTitle())), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement(Loader, null), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.message
+  }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
+    name: user
+  })), !loading && !Boolean(data.length) && currentUser === user && /*#__PURE__*/React__default.createElement(HowTo, {
+    user: currentUser,
+    token: currentUserToken
+  }), Boolean(data.length && items.length) && currentUser === user && /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.text
+  }, t('youHaveStacks', {
+    count: data.length
+  }), ' ', /*#__PURE__*/React__default.createElement("a", {
+    href: "#",
+    onClick: showHowToModal
+  }, t('seeHowToGuide')), "."), Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+    placeholder: t('search'),
+    className: css$q.mobileSearch,
+    showEverything: true,
+    size: "small",
+    value: search,
+    onChange: onChangeSearch
+  }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.grid
+  }, items.map(function (item, index) {
+    return /*#__PURE__*/React__default.createElement(Item, {
+      Component: reactRouterDom.Link,
+      key: index,
+      data: item,
+      otherOwner: user !== item.user,
+      to: "/" + item.user + "/" + item.name,
+      deleteAction: currentUser === item.user && showDeleteConfirmation
+    });
+  })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.text
+  }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: Boolean(deletingStack),
+    onClose: hideDeleteConfirmation,
+    size: "confirmation",
+    title: t('deleteStack'),
+    className: css$q.modal
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.description
+  }, t('areYouSureYouWantToDelete', {
+    name: deletingStack
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    variant: "contained",
+    color: "primary",
+    onClick: hideDeleteConfirmation,
+    className: css$q.button
+  }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
+    color: "secondary",
+    variant: "contained",
+    onClick: deleteItem,
+    className: css$q.button
+  }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: isShowWelcomeModal,
+    onClose: hideWelcomeModal,
+    size: "small",
+    title: t('welcomeToDStack') + "\uD83D\uDC4B",
+    className: css$q.modal
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.description
+  }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    variant: "contained",
+    color: "primary",
+    onClick: hideWelcomeModal,
+    className: css$q.button
+  }, t('getStarted')))), /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: isShowHowToModal,
+    withCloseButton: true,
+    onClose: hideHowToModal,
+    size: "big",
+    title: t('howToConnectYourDataWithDStack'),
+    className: css$q.modal
+  }, /*#__PURE__*/React__default.createElement(HowTo, {
+    user: currentUser,
+    token: currentUserToken,
+    modalMode: true
+  })));
+};
+
+var css$r = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
+
+var Item = function Item(_ref) {
+  var _ref$Component = _ref.Component,
+      Component = _ref$Component === void 0 ? 'div' : _ref$Component,
+      onClick = _ref.onClick,
+      data = _ref.data,
+      deleteAction = _ref.deleteAction,
+      otherOwner = _ref.otherOwner,
+      rest = _objectWithoutPropertiesLoose(_ref, ["Component", "onClick", "data", "deleteAction", "otherOwner"]);
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var ref = React.useRef(null);
+  return /*#__PURE__*/React__default.createElement(Component, _extends({
+    className: css$r.item,
+    ref: ref,
+    onClick: onClick
+  }, rest), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.previewWrap
+  }, data.head ? /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$r.attachment,
+    isList: true,
+    withLoader: true,
+    stack: data.user + "/" + data.name,
+    frameId: data.head,
+    id: 0
+  }) : /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.emptyMessage
+  }, t('emptyStack'))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.section
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.content
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.name
+  }, data.name, ' ', /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+  })), otherOwner && /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.by
+  }, t('by'), " ", data.user)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$r.dropdown,
+    items: [{
+      title: t('delete'),
+      onClick: function onClick() {
+        return deleteAction(data.name);
+      }
+    }]
+  })));
+};
+
+var css$s = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
+
+var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
+var installRPackageCode = 'install.packages("dstack")';
+var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
+
+var HowTo = function HowTo(_ref) {
+  var user = _ref.user,
+      token = _ref.token;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(1),
+      activeCodeTab = _useState[0],
+      setActiveCodeTab = _useState[1];
+
+  var _useState2 = React.useState(1),
+      activePlatformTab = _useState2[0],
+      setActivePlatformTab = _useState2[1];
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.howto
+  }, /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$s.tabs,
+    value: activeCodeTab,
+    onChange: setActiveCodeTab,
+    tabs: [{
+      label: t('python'),
+      value: 1
+    }, {
+      label: t('r'),
+      value: 2
+    }]
+  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$s.tabs,
+    value: activePlatformTab,
+    onChange: setActivePlatformTab,
+    tabs: [{
+      label: t('pip'),
+      value: 1
+    }, {
+      label: t('conda'),
+      value: 2
+    }]
+  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "bash"
+  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "bash"
+  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "bash"
+  }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "python"
+  }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "r"
+  }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "r"
+  }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "r"
+  }, reportPlotRCode)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.footer,
+    dangerouslySetInnerHTML: {
+      __html: t('notClearCheckTheDocks', {
+        href: config$1.DOCS_URL
+      })
+    }
+  }));
+};
+
+var pullPythonCode = function pullPythonCode(data) {
+  var a = ["'/" + data.stack + "'"];
+  var params = Object.keys(data.params);
+
+  if (params.length > 0) {
+    var p = [];
+    params.forEach(function (key) {
+      if (lodashEs.isString(data.params[key])) p.push("'" + key + "': '" + data.params[key] + "'");else p.push("'" + key + "': " + data.params[key]);
+    });
+    a.push('params={' + p.join(', ') + '}');
+  }
+
+  return "import pandas as pd\nfrom dstack import pull\n\ndf = pd.read_csv(pull(" + a.join(', ') + "))";
+};
+var pullRCode = function pullRCode(data) {
+  var a = ["\"/" + data.stack + "\""];
+  var params = Object.keys(data.params);
+
+  if (params.length > 0) {
+    params.forEach(function (key) {
+      if (lodashEs.isString(data.params[key])) a.push("\"" + key + "\" = \"" + data.params[key] + "\"");else a.push("\"" + key + "\" = " + data.params[key]);
+    });
+  }
+
+  return "library(dstack)\n\ndf <- read.csv(pull(" + a.join(', ') + "))";
+};
+
+var HowTo$1 = function HowTo(_ref) {
+  var modalMode = _ref.modalMode,
+      user = _ref.user,
+      token = _ref.token,
+      data = _ref.data;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(1),
+      activeCodeTab = _useState[0],
+      setActiveCodeTab = _useState[1];
+
+  var _useState2 = React.useState(1),
+      activePlatformTab = _useState2[0],
+      setActivePlatformTab = _useState2[1];
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.howto
+  }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.title
+  }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$s.tabs,
+    value: activeCodeTab,
+    onChange: setActiveCodeTab,
+    tabs: [{
+      label: t('python'),
+      value: 1
+    }, {
+      label: t('r'),
+      value: 2
+    }]
+  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$s.tabs,
+    value: activePlatformTab,
+    onChange: setActivePlatformTab,
+    tabs: [{
+      label: t('pip'),
+      value: 1
+    }, {
+      label: t('conda'),
+      value: 2
+    }]
+  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "bash"
+  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "bash"
+  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "bash"
+  }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "python"
+  }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "r"
+  }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "r"
+  }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.description
+  }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$s.code,
+    language: "r"
+  }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.footer,
+    dangerouslySetInnerHTML: {
+      __html: t('notClearCheckTheDocks_2', {
+        href: config$1.DOCS_URL
+      })
+    }
+  }));
+};
+
+var css$t = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+
+var getFrameName = function getFrameName(frame) {
+  return moment(frame.timestamp).format('D MMM YYYY h:mm a');
+};
+
+var Frames = function Frames(_ref) {
+  var frame = _ref.frame,
+      frames = _ref.frames,
+      headId = _ref.headId,
+      onChange = _ref.onChange,
+      onMarkAsHead = _ref.onMarkAsHead,
+      className = _ref.className;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(false),
+      isShowDropdown = _useState[0],
+      setIsShowDropdown = _useState[1];
+
+  var toggleDropdown = function toggleDropdown() {
+    return setIsShowDropdown(!isShowDropdown);
+  };
+
+  var _useState2 = React.useState(null),
+      frameForMarkingAsHead = _useState2[0],
+      setFrameForMarkingAsHead = _useState2[1];
+
+  var dropdownRef = React.useRef(null);
+  useOnClickOutside(dropdownRef, function () {
+    return isShowDropdown && toggleDropdown();
+  });
+  if (!frames.length) return null;
+  var activeFrame = frames.find(function (f) {
+    return f.id === frame;
+  });
+
+  var onClickItem = function onClickItem(frameId) {
+    return function () {
+      toggleDropdown();
+      if (frame !== frameId && onChange) onChange(frameId);
+    };
+  };
+
+  var onClickMarkAsHead = function onClickMarkAsHead(frameId) {
+    return function (event) {
+      event.stopPropagation();
+      setFrameForMarkingAsHead(frameId);
+      toggleDropdown();
+    };
+  };
+
+  var hideConfirmation = function hideConfirmation() {
+    return setFrameForMarkingAsHead(null);
+  };
+
+  var confirmMarkFrameAsHead = function confirmMarkFrameAsHead() {
+    if (onMarkAsHead) onMarkAsHead(frameForMarkingAsHead.id);
+    setFrameForMarkingAsHead(null);
+  };
+
+  if (!activeFrame) {
+    return null;
+  }
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$t.frames, className),
+    ref: dropdownRef
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$t['frames-dropdown']),
+    ref: dropdownRef
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$t.button,
+    onClick: toggleDropdown
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: css$t.name
+  }, getFrameName(activeFrame)), headId === activeFrame.id && /*#__PURE__*/React__default.createElement("span", {
+    className: css$t.label
+  }, t('head')), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$t.dropdown, {
+      show: isShowDropdown
+    })
+  }, frames.map(function (f) {
+    return /*#__PURE__*/React__default.createElement(Tooltip, {
+      key: f.id,
+      placement: "rightTop",
+      trigger: Boolean(f.description) ? ['hover'] : [],
+      align: {
+        offset: [-20, -20]
+      },
+      onClick: onClickItem(f.id),
+      overlayContent: f.description
+    }, /*#__PURE__*/React__default.createElement("div", {
+      className: css$t.item
+    }, /*#__PURE__*/React__default.createElement("span", {
+      className: css$t.name
+    }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
+      className: css$t.label
+    }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
+      className: css$t.mark,
+      onClick: onClickMarkAsHead(f)
+    }, t('markAsHead'))));
+  }))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
+    overlayContent: activeFrame.description
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$t.info)
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-information-variant"
+  }))), /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: Boolean(frameForMarkingAsHead),
+    onClose: hideConfirmation,
+    size: "confirmation",
+    title: t('changeHeadRevision'),
+    className: css$t.modal
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$t.description
+  }, t('areYouSureYouWantToChangeTheCurrentHeadRevisionToByName', {
+    frame: frameForMarkingAsHead && getFrameName(frameForMarkingAsHead)
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$t.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    variant: "contained",
+    color: "primary",
+    onClick: confirmMarkFrameAsHead,
+    className: css$t.button
+  }, t('yesChangeHead')), /*#__PURE__*/React__default.createElement(Button, {
+    color: "secondary",
+    variant: "contained",
+    onClick: hideConfirmation,
+    className: css$t.button
+  }, t('cancel')))));
+};
+
+var css$u = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+
+var Loader$1 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$u.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$u.title
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$u.label
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$u.description
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$u.diagram
+  }));
+};
+
+var css$v = {"details":"_3iAZb","section":"__r9FQ","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","copy":"_2ikHm","link":"_21w9U","dropdown":"_3axDI","attachment-head":"_282UU","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","filters":"_1-hdZ","attachment":"_3IGZo","sidebar":"_U0_wY","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+
+var Details = function Details(_ref) {
+  var currentFrameId = _ref.currentFrameId,
+      headId = _ref.headId,
+      onChangeHeadFrame = _ref.onChangeHeadFrame,
+      attachmentIndex = _ref.attachmentIndex,
+      onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
+      downloadAttachment = _ref.downloadAttachment,
+      onChangeFrame = _ref.onChangeFrame,
+      data = _ref.data,
+      frame = _ref.frame,
+      loading = _ref.loading,
+      currentUser = _ref.currentUser,
+      currentUserToken = _ref.currentUserToken,
+      toggleUpload = _ref.toggleUpload,
+      backUrl = _ref.backUrl,
+      user = _ref.user,
+      stack = _ref.stack;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var didMountRef = React.useRef(false);
+
+  var _useForm = useForm({}),
+      form = _useForm.form,
+      setForm = _useForm.setForm,
+      onChange = _useForm.onChange;
+
+  var _useState = React.useState({}),
+      fields = _useState[0],
+      setFields = _useState[1];
+
+  var prevFrame = hooks.usePrevious(frame);
+
+  var _useState2 = React.useState(false),
+      isShowHowToModal = _useState2[0],
+      setIsShowHowToModal = _useState2[1];
+
+  var showHowToModal = function showHowToModal(event) {
+    event.preventDefault();
+    setIsShowHowToModal(true);
+  };
+
+  var hideHowToModal = function hideHowToModal() {
+    return setIsShowHowToModal(false);
+  };
+
+  React.useEffect(function () {
+    if ((!lodashEs.isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseParams();
+  }, [frame]);
+
+  var findAttach = function findAttach(form, attachmentIndex) {
+    var attachments = lodashEs.get(frame, 'attachments');
+    var fields = Object.keys(form);
+    if (!attachments) return;
+
+    if (fields.length) {
+      attachments.some(function (attach, index) {
+        var valid = true;
+        fields.forEach(function (key) {
+          if (!attach.params || !lodashEs.isEqual(attach.params[key], form[key])) valid = false;
+        });
+        if (valid && !(attachmentIndex === undefined && index === 0)) onChangeAttachmentIndex(index);
+        return valid;
+      });
+    }
+  };
+
+  var findAttachDebounce = React.useCallback(lodashEs.debounce(findAttach, 300), [data, frame]);
+  React.useEffect(function () {
+    if (didMountRef.current) findAttachDebounce(form, attachmentIndex);else didMountRef.current = true;
+  }, [form]);
+
+  var parseParams = function parseParams() {
+    var attachments = lodashEs.get(frame, 'attachments');
+    if (!attachments || !attachments.length) return;
+    var fields = parseStackParams(attachments);
+    setFields(fields);
+
+    if (attachmentIndex !== undefined) {
+      if (attachments[attachmentIndex]) setForm(attachments[attachmentIndex].params);
+    } else setForm(attachments[0].params);
+  };
+
+  var renderFields = function renderFields() {
+    if (!Object.keys(fields).length) return null;
+    var hasSelectField = Object.keys(fields).some(function (key) {
+      return fields[key].type === 'select';
+    });
+    return /*#__PURE__*/React__default.createElement(StackFilters, {
+      fields: fields,
+      form: form,
+      onChange: onChange,
+      className: cx(css$v.filters, {
+        'with-select': hasSelectField
+      })
+    });
+  };
+
+  var onClickDownloadAttachment = function onClickDownloadAttachment(event) {
+    event.preventDefault();
+    downloadAttachment();
+  };
+
+  var attachment = lodashEs.get(frame, "attachments[" + attachmentIndex + "]");
+  if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.details
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(BackButton, {
+    Component: reactRouterDom.Link,
+    to: backUrl
+  }, currentUser === user ? t('backToMyStacks') : t('backToStacksOF', {
+    name: user
+  }))), /*#__PURE__*/React__default.createElement("section", {
+    className: css$v.section
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.header
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.title
+  }, data.name, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+  })), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$v.dropdown,
+    items: [{
+      title: t('upload'),
+      onClick: toggleUpload
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$v['dropdown-button'],
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-dots-horizontal"
+  })))), /*#__PURE__*/React__default.createElement(Frames, {
+    frames: lodashEs.get(data, 'frames', []),
+    frame: currentFrameId,
+    headId: headId,
+    onMarkAsHead: onChangeHeadFrame,
+    onChange: onChangeFrame,
+    className: css$v.revisions
+  }), renderFields(), attachment && /*#__PURE__*/React__default.createElement("div", {
+    className: css$v['attachment-head']
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.description
+  }, attachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
+    source: attachment.description
+  })), attachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.actions
+  }, attachment.preview && /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.label
+  }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
+    className: css$v['label-tooltip']
+  }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
+    href: "#",
+    onClick: showHowToModal
+  }, t('useThisStackViaAPI')), /*#__PURE__*/React__default.createElement("span", null, t('or')), /*#__PURE__*/React__default.createElement("a", {
+    href: "#",
+    onClick: onClickDownloadAttachment
+  }, t('download')), attachment.length && /*#__PURE__*/React__default.createElement("span", {
+    className: css$v.size
+  }, "(", formatBytes(attachment.length), ")"))), frame && /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$v.attachment,
+    withLoader: true,
+    stack: user + "/" + stack,
+    frameId: frame.id,
+    id: attachmentIndex || 0
+  })), /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: isShowHowToModal,
+    withCloseButton: true,
+    onClose: hideHowToModal,
+    size: "big",
+    title: t('howToFetchDataUsingTheAPI'),
+    className: css$v.modal
+  }, /*#__PURE__*/React__default.createElement(HowTo$1, {
+    user: currentUser,
+    token: currentUserToken,
+    data: {
+      stack: user + "/" + stack,
+      params: form
+    },
+    modalMode: true
+  })));
+};
 
 exports.AccessForbidden = AccessForbidden;
 exports.Avatar = Avatar;
@@ -1668,8 +2646,15 @@ exports.SearchField = SearchField;
 exports.SelectField = SelectField;
 exports.SliderField = SliderField;
 exports.Spinner = Spinner;
-exports.StackAttachment = index;
+exports.StackAttachment = Attachment;
+exports.StackAttachmentProvider = StateProvider;
+exports.StackDetails = Details;
 exports.StackFilters = StackFilters;
+exports.StackFrames = Frames;
+exports.StackHowTo = HowTo;
+exports.StackHowToFetchData = HowTo$1;
+exports.StackList = List;
+exports.StackListItem = Item;
 exports.StretchTitleField = StretchTitleField;
 exports.Tabs = Tabs;
 exports.TextAreaField = TextAreaField;

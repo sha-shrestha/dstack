@@ -7,8 +7,7 @@ import * as CSV from 'csv-string';
 import Table from './Table';
 import config from '../../config';
 import api from '../../api';
-import {StateProvider} from './store';
-import {useIntersectionObserver, usePrevious} from 'hooks';
+import {useIntersectionObserver, usePrevious} from '../../hooks';
 import actions from './actions';
 import {useStateValue} from './store';
 import {unicodeBase64Decode} from '../../utils';
@@ -271,6 +270,4 @@ const Attachment = ({
     );
 };
 
-export default props => (<StateProvider>
-    <Attachment {...props} />
-</StateProvider>);
+export default Attachment;

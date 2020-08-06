@@ -3,8 +3,8 @@ import React, {useState, useRef} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
-import {useOnClickOutside} from 'hooks';
-import {Button, Modal, Tooltip} from '@dstackai/dstack-react';
+import {useOnClickOutside} from '../../hooks';
+import {Button, Modal, Tooltip} from '../../';
 import css from './styles.module.css';
 
 type Props = {

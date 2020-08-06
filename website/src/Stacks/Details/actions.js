@@ -4,7 +4,7 @@ import actionsTypes from './actionsTypes';
 import config from 'config';
 import {getDataFailedRequest, downloadFile} from 'utils';
 
-export const fetchDetails = (userName, stack, attachmentFrame, onSuccess?: Function) => async (dispatch: Function) => {
+export const fetchDetails = (userName, stack, onSuccess?: Function) => async (dispatch: Function) => {
     dispatch({type: actionsTypes.FETCH});
 
     try {
@@ -16,11 +16,10 @@ export const fetchDetails = (userName, stack, attachmentFrame, onSuccess?: Funct
             meta: {stack: `${userName}/${stack}`},
         });
 
-        if (!attachmentFrame)
-            dispatch({
-                type: actionsTypes.FETCH_FRAME_SUCCESS,
-                payload: request.data.stack.head,
-            });
+        dispatch({
+            type: actionsTypes.FETCH_FRAME_SUCCESS,
+            payload: request.data.stack.head,
+        });
 
         if (onSuccess)
             onSuccess();

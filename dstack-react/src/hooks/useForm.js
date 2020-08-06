@@ -1,6 +1,6 @@
 // @flow
 import {useState} from 'react';
-import {isRequired, isEmail, noSpaces, isValidStackName} from 'validations';
+import {isRequired, isEmail, noSpaces, isValidStackName} from '../validations';
 
 const validationMap = {
     required: isRequired,

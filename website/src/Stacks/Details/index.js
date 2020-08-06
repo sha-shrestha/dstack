@@ -1,31 +1,20 @@
 // @flow
 
-import React, {useEffect, useState, useRef, useCallback, Fragment} from 'react';
-import cx from 'classnames';
-import {isEqual, get} from 'lodash-es';
-import {usePrevious} from 'hooks';
+import React, {useEffect, useState, useRef, Fragment} from 'react';
+import {get} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import {useHistory, useLocation, useParams} from 'react-router';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
-import {debounce as _debounce} from 'lodash-es';
-import {Button, AccessForbidden, MarkdownRender, Modal,
-    Dropdown, NotFound, Yield, BackButton, StackFilters} from '@dstackai/dstack-react';
-import Attachment from 'Stacks/components/Attachment';
-import Loader from './components/Loader';
-import Frames from './Frames';
+import {AccessForbidden, NotFound, StackDetails} from '@dstackai/dstack-react';
 import routes from 'routes';
-import {useForm} from 'hooks';
-import {isSignedIn, parseSearch, formatBytes, parseStackParams} from 'utils';
+import {isSignedIn, parseSearch} from 'utils';
 import {deleteStack} from 'Stacks/List/actions';
 import {fetchDetails, clearDetails, fetchFrame, downloadAttachment, update} from './actions';
-import HowToFetchData from 'Stacks/components/HowToFetchData';
 import Upload from 'Stacks/components/Upload';
-import css from './styles.module.css';
 
 type Props = {
-    frameAttachments: Array<{}>,
     attachmentRequestStatus: ?number,
     deleteStack: Function,
     fetchDetails: Function,
@@ -39,11 +28,10 @@ type Props = {
     frameRequestStatus: ?number,
     loadingFrame?: boolean,
     currentUser?: string,
+    currentUserToken?: string,
 }
 
 const Details = ({
-    frameAttachments,
-    attachmentRequestStatus,
     fetchDetails,
     fetchFrame,
     downloadAttachment,
@@ -56,6 +44,7 @@ const Details = ({
     loading,
     requestStatus,
     currentUser,
+    currentUserToken,
 }: Props) => {
     let parsedAttachmentIndex;
 
@@ -71,27 +60,12 @@ const Details = ({
     const [selectedFrame, setSelectedFrame] = useState(searchParams.f);
     const [headId, setHeadId] = useState(null);
 
-    const attachment = get(frameAttachments, attachmentIndex || 0, {});
-
     const {t} = useTranslation();
-    const didMountRef = useRef(false);
-    const {form, setForm, onChange} = useForm({});
-    const [fields, setFields] = useState({});
-    const prevFrame = usePrevious(frame);
 
-    const [isShowHowToModal, setIsShowHowToModal] = useState(false);
     const [isShowUploadModal, setIsShowUploadModal] = useState(false);
     const isFirstChangeSearch = useRef(false);
 
-    const showHowToModal = event => {
-        event.preventDefault();
-        setIsShowHowToModal(true);
-    };
-
-    const hideHowToModal = () => setIsShowHowToModal(false);
-
-    const onClickDownloadAttachment = event => {
-        event.preventDefault();
+    const downloadAttachmentHandle = () => {
         downloadAttachment(`${params.user}/${params.stack}`, selectedFrame || headId, attachmentIndex || 0);
     };
 
@@ -140,7 +114,7 @@ const Details = ({
             fetchData();
 
         return () => clearDetails();
-    }, []);
+    }, [params.user, params.stack]);
 
     const setHeadFrame = frameId => {
         update({
@@ -156,11 +130,6 @@ const Details = ({
     }, [selectedFrame]);
 
     useEffect(() => {
-        if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame)
-            parseParams();
-    }, [frame]);
-
-    useEffect(() => {
         if (data && data.head)
             setHeadId(data.head.id);
     }, [data]);
@@ -170,77 +139,9 @@ const Details = ({
         setAttachmentIndex(undefined);
     };
 
-    const findAttach = (form, attachmentIndex) => {
-        const attachments = get(frame, 'attachments');
-        const fields = Object.keys(form);
+    const toggleUploadModal = () => setIsShowUploadModal(!isShowUploadModal);
 
-        if (!attachments)
-            return;
-
-        if (fields.length) {
-            attachments.some((attach, index) => {
-                let valid = true;
-
-                fields.forEach(key => {
-                    if (!attach.params || !isEqual(attach.params[key], form[key]))
-                        valid = false;
-                });
-
-                if (valid && !(attachmentIndex === undefined && index === 0))
-                    setAttachmentIndex(index);
-
-                return valid;
-            });
-        }
-    };
-
-    const findAttachDebounce = useCallback(_debounce(findAttach, 300), [data, frame]);
-
-    useEffect(() => {
-        if (didMountRef.current)
-            findAttachDebounce(form, attachmentIndex);
-        else
-            didMountRef.current = true;
-    }, [form]);
-
-    const parseParams = () => {
-        const attachments = get(frame, 'attachments');
-
-        if (!attachments || !attachments.length)
-            return;
-
-        const fields = parseStackParams(attachments);
-
-        setFields(fields);
-
-        if (attachmentIndex !== undefined) {
-            if (attachments[attachmentIndex])
-                setForm(attachments[attachmentIndex].params);
-        } else
-            setForm(attachments[0].params);
-
-    };
-
-    const renderFields = () => {
-        if (!Object.keys(fields).length)
-            return null;
-
-        const hasSelectField = Object.keys(fields).some(key => fields[key].type === 'select');
-
-        return (
-            <StackFilters
-                fields={fields}
-                form={form}
-                onChange={onChange}
-                className={cx(css.filters, {'with-select': hasSelectField})}
-            />
-        );
-    };
-
-    if (loading)
-        return <Loader />;
-
-    if (requestStatus === 403)
+    if (!loading && requestStatus === 403)
         return <AccessForbidden>
             {t('youDontHaveAnAccessToThisStack')}.
 
@@ -255,7 +156,7 @@ const Details = ({
             )}
         </AccessForbidden>;
 
-    if (requestStatus === 404)
+    if (!loading && (requestStatus === 404 || frameRequestStatus === 404))
         return <NotFound>
             {t('theStackYouAreRookingForCouldNotBeFound')}
             {' '}
@@ -268,108 +169,32 @@ const Details = ({
             )}
         </NotFound>;
 
-    const currentFrame = selectedFrame ? selectedFrame : get(data, 'head.id');
+    const currentFrameId = selectedFrame ? selectedFrame : get(data, 'head.id');
 
     return (
-        <div className={css.details}>
+        <Fragment>
             <Helmet>
                 <title>dstack.ai | {params.user} | {params.stack}</title>
             </Helmet>
 
-            <Yield name="header-yield">
-                <BackButton
-                    Component={Link}
-                    to={routes.stacks(params.user)}
-                >
-                    {(currentUser === params.user)
-                        ? t('backToMyStacks')
-                        : t('backToStacksOF', {name: params.user})
-                    }
-                </BackButton>
-            </Yield>
-
-            <section className={css.section}>
-                <div className={css.header}>
-                    <div className={css.title}>
-                        {data.name}
-                        <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
-                    </div>
-
-                    {data && data.user === currentUser && (
-                        <Dropdown
-                            className={css.dropdown}
-
-                            items={[
-                                {
-                                    title: t('upload'),
-                                    onClick: () => setIsShowUploadModal(true),
-                                },
-                            ]}
-                        >
-                            <Button
-                                className={css['dropdown-button']}
-                                color="secondary"
-                            >
-                                <span className="mdi mdi-dots-horizontal" />
-                            </Button>
-                        </Dropdown>
-                    )}
-                </div>
-
-                <Frames
-                    frames={get(data, 'frames', [])}
-                    frame={currentFrame}
-                    headId={headId}
-                    onMarkAsHead={setHeadFrame}
-                    onChange={onChangeFrame}
-                    className={css.revisions}
-                />
-
-                {!frameRequestStatus && renderFields()}
-
-                {attachment && (
-                    <div className={css['attachment-head']}>
-                        <div className={css.description}>
-                            {attachment.description && (<MarkdownRender source={attachment.description} />)}
-                        </div>
-
-                        {attachment.type === 'text/csv' && (
-                            <div className={css.actions}>
-                                {attachment.preview && (
-                                    <div className={css.label}>
-                                        {t('preview')}
-
-                                        <div className={css['label-tooltip']}>
-                                            {t('theTableBelowShowsOnlyAPreview')}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                <span>{t('or')}</span>
-                                <a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>
-                                {attachment.length && (
-                                    <span className={css.size}>({formatBytes(attachment.length)})</span>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {attachmentRequestStatus === 404 || frameRequestStatus === 404 && (
-                    <div className={css.empty}>{t('noMatch')}</div>
-                )}
-
-                {(frame && !attachmentRequestStatus && !frameRequestStatus) && (
-                    <Attachment
-                        className={css.attachment}
-                        withLoader
-                        stack={`${params.user}/${params.stack}`}
-                        frameId={currentFrame}
-                        id={attachmentIndex || 0}
-                    />
-                )}
-            </section>
+            <StackDetails
+                loading={loading}
+                currentFrameId={currentFrameId}
+                frame={frame}
+                attachmentIndex={attachmentIndex || 0}
+                data={data}
+                frameRequestStatus={frameRequestStatus}
+                currentUser={currentUser}
+                currentUserToken={currentUserToken}
+                toggleUpload={toggleUploadModal}
+                backUrl={routes.stacks(params.user)}
+                user={params.user}
+                stack={params.stack}
+                onChangeFrame={onChangeFrame}
+                onChangeHeadFrame={setHeadFrame}
+                onChangeAttachmentIndex={setAttachmentIndex}
+                downloadAttachment={downloadAttachmentHandle}
+            />
 
             <Upload
                 stack={params.stack}
@@ -377,32 +202,13 @@ const Details = ({
                 onClose={() => setIsShowUploadModal(false)}
                 refresh={fetchData}
             />
-
-            <Modal
-                isShow={isShowHowToModal}
-                withCloseButton
-                onClose={hideHowToModal}
-                size="big"
-                title={t('howToFetchDataUsingTheAPI')}
-                className={css.modal}
-            >
-                <HowToFetchData
-                    data={{
-                        stack: `${params.user}/${params.stack}`,
-                        params: form,
-                    }}
-
-                    modalMode
-                />
-            </Modal>
-        </div>
+        </Fragment>
     );
 };
 
 export default connect(
     (state, props) => {
         const frame = state.stacks.details.frame;
-        const frameAttachments = get(state.stacks.attachments.data, frame?.id, {});
         const stack = props.location.pathname.replace(/^\//, '');
 
         return {
@@ -413,9 +219,9 @@ export default connect(
             frameRequestStatus: state.stacks.details.frameRequestStatus,
             loadingFrame: state.stacks.details.loadingFrame,
             attachmentRequestStatus: state.stacks.details.attachmentRequestStatus,
-            frameAttachments,
             loading: state.stacks.details.loading,
             currentUser: state.app.userData?.user,
+            currentUserToken: state.app.userData?.token,
         };
     },
 

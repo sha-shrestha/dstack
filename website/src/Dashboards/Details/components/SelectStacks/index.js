@@ -4,10 +4,9 @@ import {get} from 'lodash-es';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router';
-import {Button, Modal, SearchField, CheckboxField} from '@dstackai/dstack-react';
+import {Button, Modal, SearchField, CheckboxField, StackListItem} from '@dstackai/dstack-react';
 import Loader from './Loader';
 import {fetchList} from 'Stacks/List/actions';
-import StackItem from 'Stacks/List/Item';
 import css from './style.module.css';
 
 type Props = {
@@ -138,7 +137,7 @@ const SelectStacks = ({
                                     readOnly
                                 />
 
-                                <StackItem
+                                <StackListItem
                                     data={item}
                                     otherOwner={params.user !== item.user}
                                 />

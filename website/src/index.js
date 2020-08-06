@@ -2,6 +2,7 @@ import React from 'react';
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
+import {StackAttachmentProvider} from '@dstackai/dstack-react';
 import {DndProvider} from 'react-dnd';
 import {GridProvider} from 'components/DnDGridContext';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -23,7 +24,9 @@ if (rootElement instanceof Element) {
             <BrowserRouter>
                 <DndProvider backend={HTML5Backend}>
                     <GridProvider>
-                        <App/>
+                        <StackAttachmentProvider>
+                            <App/>
+                        </StackAttachmentProvider>
                     </GridProvider>
                 </DndProvider>
             </BrowserRouter>
