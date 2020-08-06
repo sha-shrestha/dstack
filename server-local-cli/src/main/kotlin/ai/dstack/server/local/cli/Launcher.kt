@@ -14,8 +14,8 @@ fun main(args: Array<String>) {
     val port = Option("p", "port", true, "server port number")
     options.addOption(port)
 
-    val global = Option("g", "global", false, "store data globally")
-    options.addOption(global)
+    val home = Option("h", "home", true, "dstack home directory")
+    options.addOption(home)
 
     val parser: CommandLineParser = DefaultParser()
     val formatter = HelpFormatter()
@@ -31,8 +31,8 @@ fun main(args: Array<String>) {
         LocalCliAppConfig.defaultInternalPort = cmd.getOptionValue("port")
     }
 
-    if (cmd.hasOption("global")) {
-        LocalCliAppConfig.global = true
+    if (cmd.hasOption("home")) {
+        LocalCliAppConfig.defaultHomeDirectory = cmd.getOptionValue("home")
     }
 
     val application = SpringApplication(Application::class.java)

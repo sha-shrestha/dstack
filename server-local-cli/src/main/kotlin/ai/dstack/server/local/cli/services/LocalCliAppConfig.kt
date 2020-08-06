@@ -33,7 +33,7 @@ class LocalCliAppConfig : AppConfig {
 
     override val homeDirectory: String
         get() {
-            val dir = if (global) System.getProperty("user.home") ?: "." else "."
+            val dir = defaultHomeDirectory ?: "."
             return System.getenv("dstack_home") ?: "$dir/.dstack"
         }
 
@@ -84,6 +84,6 @@ class LocalCliAppConfig : AppConfig {
 
     companion object {
         var defaultInternalPort: String = "8080"
-        var global: Boolean = false
+        var defaultHomeDirectory: String? = System.getProperty("user.home")
     }
 }
