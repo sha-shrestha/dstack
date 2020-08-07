@@ -31,7 +31,7 @@ export default {
     CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
         const origin = window ? window.location.origin : '';
 
-        return `dstack config --token ${token} --user ${userName} --server ${origin}/api`;
+        return `dstack config add --token ${token} --user ${userName} --server ${origin}/api`;
     },
 
     CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => {

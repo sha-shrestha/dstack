@@ -15,6 +15,8 @@ dependencies {
     compile(Deps.jackson_datatype_jsr310)
     compile(Deps.jersey_media_json_jackson)
     compile(Deps.jersey_hk2)
+    compile(Deps.jaxb)
+    compile(Deps.activation)
     compile(Deps.jackson_module_kotlin)
 
     runtime(Deps.jcl_over_slf4j)

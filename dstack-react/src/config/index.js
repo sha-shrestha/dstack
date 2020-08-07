@@ -32,13 +32,13 @@ export default {
 
     DISCORD_URL: 'https://discord.gg/8xfhEYa',
     TWITTER_URL: 'https://twitter.com/dstackai',
-    GITHUB_URL: ' https://github.com/dstackai',
-    MEDIUM_URL: ' https://medium.com/dstackai',
+    GITHUB_URL: 'https://github.com/dstackai',
+    MEDIUM_URL: 'https://blog.dstack.ai',
 
     CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
         const origin = window ? window.location.origin : '';
 
-        return `dstack config --token ${token} --user ${userName} --server ${origin}/api`;
+        return `dstack config add --token ${token} --user ${userName} --server ${origin}/api`;
     },
 
     CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => {
