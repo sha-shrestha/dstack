@@ -2,7 +2,8 @@
 
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {CodeViewer, Tabs} from '../../';
+import CodeViewer from '../../CodeViewer';
+import Tabs from '../../Tabs';
 import css from './styles.module.css';
 import config from 'config';
 

@@ -30,23 +30,6 @@
 .permissions {
     margin-left: 10px;
 }
-.share {
-    margin-left: 16px;
-    @media (--desktop) {
-        margin-right: 12px;
-    }
-}
-.pdf {
-    outline: none;
-    margin-left: 6px;
-    height: 26px !important;
-    line-height: 26px !important;
-    padding-left: 6px;
-    padding-right: 6px;
-    & :global(.mdi) {
-        margin-right: 4px;
-    }
-}
 .dropdown {
     &-button {
         outline: none;

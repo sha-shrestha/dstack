@@ -1679,14 +1679,16 @@
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
 
-"@dstackai/dstack-react@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.0.5.tgz#e1acacc939208cb4206f45f6f4db493465144497"
-  integrity sha512-shetwsAjBwBMLmP8Km7VK+J+XZfufB0Qv3AkdIlQ+xWtWk3nr9Rkc8BETletn3rPQXm2hdLGXeQ8hRn16KIrwQ==
+"@dstackai/dstack-react@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.0.6.tgz#85ed68994de2fadf6f0f494151c80e141f82da1a"
+  integrity sha512-n+SE3DfQl/I4DYR7VQPnGwD723lC64u+SdjmBmoxb+xOwvcgRHtnpoca2RCGxQ4NRDwUrOq7yPryiFfOfojxxA==
   dependencies:
     "@mdi/font" "^5.3.45"
+    axios "^0.19.2"
     classnames "^2.2.6"
     copy-to-clipboard "^3.3.1"
+    csv-string "^4.0.1"
     postcss-css-variables "^0.17.0"
     postcss-custom-media "^7.0.8"
     postcss-flexbugs-fixes "^4.2.1"
@@ -1699,6 +1701,7 @@
     react-highlight.js "^1.0.7"
     react-markdown "^4.3.1"
     react-mathjax "^1.0.1"
+    react-plotly.js "^2.4.0"
     react-portal "^4.2.1"
     remark-math "^2.0.1"
 
@@ -4996,6 +4999,11 @@ csv-string@^3.1.8:
   version "3.1.8"
   resolved "https://registry.yarnpkg.com/csv-string/-/csv-string-3.1.8.tgz#732ac993420a505471106aab00ab0183ba194fc2"
   integrity sha512-5Mwdju/gmAhAyJu0WBG+v0GgaQrlSVVg9qrywcgADegyne2NwrdDAOIQ+CpalgwkodrhqcP55juua924psyRpQ==
+
+csv-string@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/csv-string/-/csv-string-4.0.1.tgz#1fb4a88c869badad056d55247f57336e1e748b00"
+  integrity sha512-nCdK+EWDbqLvZ2MmVQhHTmidMEsHbK3ncgTJb4oguNRpkmH5OOr+KkDRB4nqsVrJ7oK0AdO1QEsBp0+z7KBtGQ==
 
 cubic-hermite@^1.0.0:
   version "1.0.0"

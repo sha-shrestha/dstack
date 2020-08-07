@@ -1,16 +1,13 @@
 // @flow
 import React, {useEffect, useState, Fragment} from 'react';
-import {get} from 'lodash-es';
-import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router';
 import {Button, Modal, SearchField, CheckboxField, StackListItem} from '@dstackai/dstack-react';
 import Loader from './Loader';
-import {fetchList} from 'Stacks/List/actions';
 import css from './style.module.css';
 
 type Props = {
-    userData: {user: string},
+    currentUser?: string,
     isShow?: boolean,
     stacks?: Array<{}>,
     loading?: boolean,
@@ -19,14 +16,14 @@ type Props = {
     onClose: Function,
 }
 
-const SelectStacks = ({
+const AddStacksModal = ({
     stacks = [],
-    userData,
     loading,
     isShow,
-    fetchList,
     onClose,
     onAddStacks,
+    currentUser,
+    user,
 }: Props) => {
     const {t} = useTranslation();
     const params = useParams();
@@ -34,9 +31,7 @@ const SelectStacks = ({
     const [selected, setSelected] = useState([]);
 
     useEffect(() => {
-        if (isShow)
-            fetchList(params.user);
-        else {
+        if (!isShow) {
             setSelected([]);
             setSearchQuery('');
         }
@@ -113,7 +108,7 @@ const SelectStacks = ({
 
             {!loading && !stacks.length && (
                 <div className={css.message}>
-                    {params.user === get(userData, 'user')
+                    {user === currentUser
                         ? t('youHaveNoStacksYet')
                         : t('theUserHasNoStacksYetByName', {name: params.user})
                     }
@@ -172,11 +167,4 @@ const SelectStacks = ({
     );
 };
 
-export default connect(
-    state => ({
-        userData: state.app.userData,
-        stacks: state.stacks.list.data,
-        loading: state.stacks.list.loading,
-    }),
-    {fetchList}
-)(SelectStacks);
+export default AddStacksModal;

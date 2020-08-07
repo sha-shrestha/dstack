@@ -1,27 +1,20 @@
 // @flow
 import React, {useRef} from 'react';
-import {connect} from 'react-redux';
 import {get} from 'lodash-es';
-import {useParams, Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import routes from 'routes';
-import {Dropdown, StackAttachment} from '@dstackai/dstack-react';
-import {deleteDashboard} from 'Dashboards/Details/actions';
-import type {Dashboard} from 'Dashboards/types';
+import Dropdown from '../../Dropdown';
+import StackAttachment from '../../stack/Attachment';
+import type {Dashboard} from '../types';
 import css from './styles.module.css';
 
 type Props = {
     dashboard: Dashboard,
-    userData: ?{user: string},
-    deleteDashboard: Function,
-
-    attachment: {
-        error: any
-    },
+    deleteDashboard?: Function,
 }
 
-const Item = ({dashboard, userData, deleteDashboard}: Props) => {
-    const params = useParams();
+const Item = ({dashboard, deleteDashboard, user}: Props) => {
     const {t} = useTranslation();
     const ref = useRef(null);
 
@@ -30,14 +23,16 @@ const Item = ({dashboard, userData, deleteDashboard}: Props) => {
 
     const onClickDelete = () => {
         deleteDashboard({
-            user: params.user,
+            user: user,
             id: dashboard.id,
         });
     };
 
+    const isShowDropdown = Boolean(deleteDashboard);
+
     return (
         <Link
-            to={routes.dashboardsDetails(params.user, dashboard.id)}
+            to={routes.dashboardsDetails(user, dashboard.id)}
             className={css.item}
             ref={ref}
         >
@@ -70,12 +65,12 @@ const Item = ({dashboard, userData, deleteDashboard}: Props) => {
                         <span className={`mdi mdi-lock${dashboard.private ? '' : '-open'}`} />
                     </div>
 
-                    {params.user !== dashboard.user && (
+                    {user !== dashboard.user && (
                         <div className={css.by}>{t('by')} {dashboard.user}</div>
                     )}
                 </div>
 
-                {get(userData, 'user') === dashboard.user && <Dropdown
+                {isShowDropdown && <Dropdown
                     className={css.dropdown}
 
                     items={[
@@ -91,7 +86,4 @@ const Item = ({dashboard, userData, deleteDashboard}: Props) => {
     );
 };
 
-export default connect(
-    state => ({userData: state.app.userData}),
-    {deleteDashboard}
-)(Item);
+export default Item;

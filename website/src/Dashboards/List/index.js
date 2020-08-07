@@ -1,19 +1,15 @@
 // @flow
-import React, {Fragment, useState, useEffect} from 'react';
-import cx from 'classnames';
+import React, {Fragment, useEffect} from 'react';
 import {get} from 'lodash-es';
 import {connect} from 'react-redux';
 import {useParams, useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import {SearchField, NotFound, Yield} from '@dstackai/dstack-react';
-import Item from './Item';
-import Loader from './components/Loader';
+import {NotFound, DashboardList} from '@dstackai/dstack-react';
 import {isSignedIn} from 'utils';
-import {create as createDashboard} from 'Dashboards/Details/actions';
+import {create as createDashboard, deleteDashboard} from 'Dashboards/Details/actions';
 import {fetchList} from './actions';
 import routes from 'routes';
-import css from './styles.module.css';
 
 type Props = {
     currentUser?: string,
@@ -22,6 +18,7 @@ type Props = {
     loading: boolean,
     creatingDashboard: boolean,
     createDashboard: Function,
+    deleteDashboard: Function,
     requestStatus: ?number,
 }
 
@@ -35,28 +32,13 @@ const List = ({
     requestStatus,
 }: Props) => {
     const {user} = useParams();
-    const [search, setSearch] = useState('');
     const {push} = useHistory();
     const {t} = useTranslation();
 
-    const onChangeSearch = value => setSearch(value);
 
     useEffect(() => {
         fetchList(user);
     }, [user]);
-
-    const getItems = () => {
-        let items = [];
-
-        if (data && data.length) {
-            if (search.length)
-                items = data.filter(i => i.title.indexOf(search) >= 0);
-            else
-                items = data;
-        }
-
-        return items;
-    };
 
     const onClickAdd = () => {
         createDashboard(
@@ -65,12 +47,7 @@ const List = ({
         );
     };
 
-    const items = getItems();
-
-    if (loading)
-        return <Loader />;
-
-    if (requestStatus === 404)
+    if (!loading && requestStatus === 404)
         return <NotFound>
             {t('theDashboardYouAreRookingForCouldNotBeFound')}
             {' '}
@@ -84,55 +61,15 @@ const List = ({
         </NotFound>;
 
     return (
-        <div className={css.list}>
-            <Yield name="header-yield">
-                <SearchField
-                    showEverything
-                    isDark
-                    className={css.search}
-                    placeholder={t('findDashboard')}
-                    size="small"
-                    value={search}
-                    onChange={onChangeSearch}
-                />
-            </Yield>
-
-            <div className={css.title}>
-                {currentUser === user
-                    ? t('myDashboards')
-                    : t('dashboardsOf', {name: user})
-                }
-
-                {data && Boolean(data.length) && <span>{data.length}</span>}
-            </div>
-
-            {data && Boolean(data.length) && <SearchField
-                placeholder={t('search')}
-                className={css.mobileSearch}
-                showEverything
-                size="small"
-                value={search}
-                onChange={onChangeSearch}
-            />}
-
-            <div className={css.grid}>
-                {currentUser === user && (
-                    <div
-                        onClick={onClickAdd}
-                        className={cx(css.add, {disabled: creatingDashboard})}
-                    >
-                        <div className={css.caption}>
-                            <span className="mdi mdi-plus" />
-                            {t('newDashboard')}
-                        </div>
-                    </div>
-                )}
-
-                {items.map((item, index) => (
-                    <Item key={index} dashboard={item} />
-                ))}
-            </div>
-        </div>
+        <DashboardList
+            addDashboard={onClickAdd}
+            addDashboardDisable={creatingDashboard}
+            currentUser={currentUser}
+            data={data}
+            deleteDashboard={deleteDashboard}
+            loading={loading}
+            user={user}
+        />
     );
 };
 
@@ -145,5 +82,5 @@ export default connect(
         creatingDashboard: state.dashboards.details.creating,
     }),
 
-    {fetchList, createDashboard}
+    {fetchList, createDashboard, deleteDashboard}
 )(List);

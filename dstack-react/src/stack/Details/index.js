@@ -7,8 +7,16 @@ import {usePrevious} from 'hooks';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import {debounce as _debounce} from 'lodash-es';
-import {Button, MarkdownRender, Modal, Dropdown, Yield, BackButton, StackFilters,
-    StackHowToFetchData, StackAttachment, StackFrames} from '../../';
+import Button from '../../Button';
+import MarkdownRender from '../../MarkdownRender';
+import Modal from '../../Modal';
+import Dropdown from '../../Dropdown';
+import Yield from '../../Yield';
+import BackButton from '../../BackButton';
+import StackFilters from '../../StackFilters';
+import StackHowToFetchData from '../HowToFetchData';
+import StackAttachment from '../Attachment';
+import StackFrames from '../Frames';
 import Loader from './components/Loader';
 import {useForm} from '../../hooks';
 import {formatBytes, parseStackParams} from '../../utils';

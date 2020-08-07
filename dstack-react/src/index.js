@@ -36,3 +36,7 @@ export {default as StackHowToFetchData} from './stack/HowToFetchData';
 export {default as StackFrames} from './stack/Frames';
 export {default as StackDetails} from './stack/Details';
 
+export {default as DashboardListItem} from './dashboard/ListItem';
+export {default as DashboardList} from './dashboard/List';
+export {default as DashboardAddStacksModal} from './dashboard/AddStacksModal';
+

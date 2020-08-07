@@ -1,4 +1,4 @@
-import React__default, { forwardRef, useState, useRef, useEffect, useCallback, createContext, useReducer, useContext } from 'react';
+import React__default, { forwardRef, useState, useRef, useEffect, useCallback, createContext, useReducer, useContext, Fragment } from 'react';
 import cx from 'classnames';
 import Highlight from 'react-highlight.js';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,9 @@ import api from 'api';
 import { Link } from 'react-router-dom';
 import config$1 from 'config';
 import { usePrevious as usePrevious$1 } from 'hooks';
+import routes from 'routes';
+import { useParams } from 'react-router';
+import { Modal as Modal$1, SearchField as SearchField$1, CheckboxField as CheckboxField$1, StackListItem, Button as Button$1 } from '@dstackai/dstack-react';
 
 var image = require("./lock~ZBorChcU.svg");
 
@@ -1839,7 +1842,146 @@ var Attachment = function Attachment(_ref) {
   }, renderAttachment()));
 };
 
-var css$q = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$q = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
+
+var Item = function Item(_ref) {
+  var _ref$Component = _ref.Component,
+      Component = _ref$Component === void 0 ? 'div' : _ref$Component,
+      onClick = _ref.onClick,
+      data = _ref.data,
+      deleteAction = _ref.deleteAction,
+      otherOwner = _ref.otherOwner,
+      rest = _objectWithoutPropertiesLoose(_ref, ["Component", "onClick", "data", "deleteAction", "otherOwner"]);
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var ref = useRef(null);
+  return /*#__PURE__*/React__default.createElement(Component, _extends({
+    className: css$q.item,
+    ref: ref,
+    onClick: onClick
+  }, rest), /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.previewWrap
+  }, data.head ? /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$q.attachment,
+    isList: true,
+    withLoader: true,
+    stack: data.user + "/" + data.name,
+    frameId: data.head,
+    id: 0
+  }) : /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.emptyMessage
+  }, t('emptyStack'))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.section
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.content
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.name
+  }, data.name, ' ', /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+  })), otherOwner && /*#__PURE__*/React__default.createElement("div", {
+    className: css$q.by
+  }, t('by'), " ", data.user)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$q.dropdown,
+    items: [{
+      title: t('delete'),
+      onClick: function onClick() {
+        return deleteAction(data.name);
+      }
+    }]
+  })));
+};
+
+var css$r = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
+
+var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
+var installRPackageCode = 'install.packages("dstack")';
+var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
+
+var HowTo = function HowTo(_ref) {
+  var user = _ref.user,
+      token = _ref.token;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = useState(1),
+      activeCodeTab = _useState[0],
+      setActiveCodeTab = _useState[1];
+
+  var _useState2 = useState(1),
+      activePlatformTab = _useState2[0],
+      setActivePlatformTab = _useState2[1];
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.howto
+  }, /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$r.tabs,
+    value: activeCodeTab,
+    onChange: setActiveCodeTab,
+    tabs: [{
+      label: t('python'),
+      value: 1
+    }, {
+      label: t('r'),
+      value: 2
+    }]
+  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.description
+  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$r.tabs,
+    value: activePlatformTab,
+    onChange: setActivePlatformTab,
+    tabs: [{
+      label: t('pip'),
+      value: 1
+    }, {
+      label: t('conda'),
+      value: 2
+    }]
+  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "bash"
+  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "bash"
+  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "bash"
+  }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.description
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "python"
+  }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.description
+  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "r"
+  }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "r"
+  }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.description
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$r.code,
+    language: "r"
+  }, reportPlotRCode)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$r.footer,
+    dangerouslySetInnerHTML: {
+      __html: t('notClearCheckTheDocks', {
+        href: config$1.DOCS_URL
+      })
+    }
+  }));
+};
+
+var css$s = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -1929,32 +2071,32 @@ var List = function List(_ref) {
 
   var items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.list
+    className: css$s.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$q.search,
+    className: css$s.search,
     placeholder: t('findStack'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.title
+    className: css$s.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.side
+    className: css$s.side
   }, renderSideTitle && renderSideTitle())), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement(Loader, null), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.message
+    className: css$s.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
   })), !loading && !Boolean(data.length) && currentUser === user && /*#__PURE__*/React__default.createElement(HowTo, {
     user: currentUser,
     token: currentUserToken
   }), Boolean(data.length && items.length) && currentUser === user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.text
+    className: css$s.text
   }, t('youHaveStacks', {
     count: data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
@@ -1962,13 +2104,13 @@ var List = function List(_ref) {
     onClick: showHowToModal
   }, t('seeHowToGuide')), "."), Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$q.mobileSearch,
+    className: css$s.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.grid
+    className: css$s.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
       Component: Link,
@@ -1979,195 +2121,56 @@ var List = function List(_ref) {
       deleteAction: currentUser === item.user && showDeleteConfirmation
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.text
+    className: css$s.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
     title: t('deleteStack'),
-    className: css$q.modal
+    className: css$s.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.description
+    className: css$s.description
   }, t('areYouSureYouWantToDelete', {
     name: deletingStack
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.buttons
+    className: css$s.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideDeleteConfirmation,
-    className: css$q.button
+    className: css$s.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: deleteItem,
-    className: css$q.button
+    className: css$s.button
   }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
     title: t('welcomeToDStack') + "\uD83D\uDC4B",
-    className: css$q.modal
+    className: css$s.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.description
+    className: css$s.description
   }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.buttons
+    className: css$s.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideWelcomeModal,
-    className: css$q.button
+    className: css$s.button
   }, t('getStarted')))), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowHowToModal,
     withCloseButton: true,
     onClose: hideHowToModal,
     size: "big",
     title: t('howToConnectYourDataWithDStack'),
-    className: css$q.modal
+    className: css$s.modal
   }, /*#__PURE__*/React__default.createElement(HowTo, {
     user: currentUser,
     token: currentUserToken,
     modalMode: true
   })));
-};
-
-var css$r = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
-
-var Item = function Item(_ref) {
-  var _ref$Component = _ref.Component,
-      Component = _ref$Component === void 0 ? 'div' : _ref$Component,
-      onClick = _ref.onClick,
-      data = _ref.data,
-      deleteAction = _ref.deleteAction,
-      otherOwner = _ref.otherOwner,
-      rest = _objectWithoutPropertiesLoose(_ref, ["Component", "onClick", "data", "deleteAction", "otherOwner"]);
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var ref = useRef(null);
-  return /*#__PURE__*/React__default.createElement(Component, _extends({
-    className: css$r.item,
-    ref: ref,
-    onClick: onClick
-  }, rest), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.previewWrap
-  }, data.head ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$r.attachment,
-    isList: true,
-    withLoader: true,
-    stack: data.user + "/" + data.name,
-    frameId: data.head,
-    id: 0
-  }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.emptyMessage
-  }, t('emptyStack'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.section
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.content
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.name
-  }, data.name, ' ', /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), otherOwner && /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.by
-  }, t('by'), " ", data.user)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$r.dropdown,
-    items: [{
-      title: t('delete'),
-      onClick: function onClick() {
-        return deleteAction(data.name);
-      }
-    }]
-  })));
-};
-
-var css$s = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
-
-var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
-var installRPackageCode = 'install.packages("dstack")';
-var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
-
-var HowTo = function HowTo(_ref) {
-  var user = _ref.user,
-      token = _ref.token;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var _useState = useState(1),
-      activeCodeTab = _useState[0],
-      setActiveCodeTab = _useState[1];
-
-  var _useState2 = useState(1),
-      activePlatformTab = _useState2[0],
-      setActivePlatformTab = _useState2[1];
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.howto
-  }, /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
-    value: activeCodeTab,
-    onChange: setActiveCodeTab,
-    tabs: [{
-      label: t('python'),
-      value: 1
-    }, {
-      label: t('r'),
-      value: 2
-    }]
-  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
-    value: activePlatformTab,
-    onChange: setActivePlatformTab,
-    tabs: [{
-      label: t('pip'),
-      value: 1
-    }, {
-      label: t('conda'),
-      value: 2
-    }]
-  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "bash"
-  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "bash"
-  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "bash"
-  }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "python"
-  }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "r"
-  }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "r"
-  }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "r"
-  }, reportPlotRCode)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.footer,
-    dangerouslySetInnerHTML: {
-      __html: t('notClearCheckTheDocks', {
-        href: config$1.DOCS_URL
-      })
-    }
-  }));
 };
 
 var pullPythonCode = function pullPythonCode(data) {
@@ -2215,11 +2218,11 @@ var HowTo$1 = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.howto
+    className: css$r.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.title
+    className: css$r.title
   }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
+    className: css$r.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
@@ -2230,9 +2233,9 @@ var HowTo$1 = function HowTo(_ref) {
       value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$r.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
+    className: css$r.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -2243,38 +2246,38 @@ var HowTo$1 = function HowTo(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$r.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "bash"
   }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$r.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "python"
   }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$r.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "r"
   }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$r.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "r"
   }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$r.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$r.code,
     language: "r"
   }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.footer,
+    className: css$r.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
         href: config$1.DOCS_URL
@@ -2624,5 +2627,337 @@ var Details = function Details(_ref) {
   })));
 };
 
-export { AccessForbidden, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, Dropdown, FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowTo, HowTo$1 as StackHowToFetchData, List as StackList, Item as StackListItem, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, ViewSwitcher, Yield };
+var css$w = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
+
+var Item$1 = function Item(_ref) {
+  var dashboard = _ref.dashboard,
+      deleteDashboard = _ref.deleteDashboard,
+      user = _ref.user;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var ref = useRef(null);
+  var hasStacks = dashboard.cards && Boolean(dashboard.cards.length);
+  var card = dashboard.cards.find(function (c) {
+    return get(c, 'head.id');
+  });
+
+  var onClickDelete = function onClickDelete() {
+    deleteDashboard({
+      user: user,
+      id: dashboard.id
+    });
+  };
+
+  var isShowDropdown = Boolean(deleteDashboard);
+  return /*#__PURE__*/React__default.createElement(Link, {
+    to: routes.dashboardsDetails(user, dashboard.id),
+    className: css$w.item,
+    ref: ref
+  }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.label
+  }, t('stacksWithCount', {
+    count: dashboard.cards.length
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.previewWrap
+  }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$w.attachment,
+    isList: true,
+    withLoader: true,
+    frameId: card.head.id,
+    stack: card.stack,
+    id: 0
+  }) : /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.emptyMessage
+  }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.section
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.content
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.name
+  }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
+  })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.by
+  }, t('by'), " ", dashboard.user)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$w.dropdown,
+    items: [{
+      title: t('delete'),
+      onClick: onClickDelete
+    }]
+  })));
+};
+
+var css$x = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
+
+var Loader$2 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.text
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.grid
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.item
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.pic
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.section
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.item
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.pic
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.section
+  }))));
+};
+
+var css$y = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
+
+var List$1 = function List(_ref) {
+  var addDashboard = _ref.addDashboard,
+      addDashboardDisable = _ref.addDashboardDisable,
+      currentUser = _ref.currentUser,
+      data = _ref.data,
+      deleteDashboard = _ref.deleteDashboard,
+      loading = _ref.loading,
+      user = _ref.user;
+
+  var _useState = useState(''),
+      search = _useState[0],
+      setSearch = _useState[1];
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var onChangeSearch = function onChangeSearch(value) {
+    return setSearch(value);
+  };
+
+  var getItems = function getItems() {
+    var items = [];
+
+    if (data && data.length) {
+      if (search.length) items = data.filter(function (i) {
+        return i.title.indexOf(search) >= 0;
+      });else items = data;
+    }
+
+    return items;
+  };
+
+  var items = getItems();
+  if (loading) return /*#__PURE__*/React__default.createElement(Loader$2, null);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.list
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(SearchField, {
+    showEverything: true,
+    isDark: true,
+    className: css$y.search,
+    placeholder: t('findDashboard'),
+    size: "small",
+    value: search,
+    onChange: onChangeSearch
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.title
+  }, currentUser === user ? t('myDashboards') : t('dashboardsOf', {
+    name: user
+  }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+    placeholder: t('search'),
+    className: css$y.mobileSearch,
+    showEverything: true,
+    size: "small",
+    value: search,
+    onChange: onChangeSearch
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.grid
+  }, currentUser === user && /*#__PURE__*/React__default.createElement("div", {
+    onClick: addDashboard,
+    className: cx(css$y.add, {
+      disabled: addDashboardDisable
+    })
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.caption
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-plus"
+  }), t('newDashboard'))), items.map(function (item, index) {
+    return /*#__PURE__*/React__default.createElement(Item$1, {
+      key: index,
+      user: user,
+      dashboard: item,
+      deleteDashboard: currentUser === item.user && deleteDashboard
+    });
+  })));
+};
+
+var css$z = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
+
+var Loader$3 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.text
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.grid
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.item
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.pic
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.section
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.item
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.pic
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.section
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.item
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.pic
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.section
+  }))));
+};
+
+var css$A = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
+
+var AddStacksModal = function AddStacksModal(_ref) {
+  var _ref$stacks = _ref.stacks,
+      stacks = _ref$stacks === void 0 ? [] : _ref$stacks,
+      loading = _ref.loading,
+      isShow = _ref.isShow,
+      onClose = _ref.onClose,
+      onAddStacks = _ref.onAddStacks,
+      currentUser = _ref.currentUser,
+      user = _ref.user;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var params = useParams();
+
+  var _useState = useState(''),
+      searchQuery = _useState[0],
+      setSearchQuery = _useState[1];
+
+  var _useState2 = useState([]),
+      selected = _useState2[0],
+      setSelected = _useState2[1];
+
+  useEffect(function () {
+    if (!isShow) {
+      setSelected([]);
+      setSearchQuery('');
+    }
+  }, [isShow]);
+
+  var getItems = function getItems() {
+    var items = [];
+
+    if (stacks && stacks.length) {
+      if (searchQuery.length) items = stacks.filter(function (i) {
+        return i.name.indexOf(searchQuery) >= 0;
+      });else items = stacks;
+    }
+
+    return items;
+  };
+
+  var items = getItems();
+
+  var onChangeSearch = function onChangeSearch(value) {
+    return setSearchQuery(value);
+  };
+
+  var getFullStackName = function getFullStackName(stack) {
+    return stack.user + "/" + stack.name;
+  };
+
+  var isChecked = function isChecked(stack) {
+    var stackName = getFullStackName(stack);
+    return selected.findIndex(function (i) {
+      return i === stackName;
+    }) >= 0;
+  };
+
+  var getOnClickStack = function getOnClickStack(stack) {
+    return function () {
+      var stackName = getFullStackName(stack);
+
+      if (isChecked(stack)) {
+        var filtered = selected.filter(function (i) {
+          return i !== stackName;
+        });
+        setSelected(filtered);
+      } else {
+        setSelected([].concat(selected, [stackName]));
+      }
+    };
+  };
+
+  var submit = function submit() {
+    if (onAddStacks) onAddStacks(selected);
+    onClose();
+  };
+
+  return /*#__PURE__*/React__default.createElement(Modal$1, {
+    dialogClassName: css$A.stacks,
+    isShow: isShow,
+    title: t('selectStacks'),
+    onClose: onClose,
+    withCloseButton: true
+  }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField$1, {
+    className: css$A.search,
+    isDark: true,
+    size: "middle",
+    showEverything: true,
+    placeholder: t('findStack'),
+    value: searchQuery,
+    onChange: onChangeSearch
+  }), loading && /*#__PURE__*/React__default.createElement(Loader$3, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
+    className: css$A.message
+  }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
+    name: params.user
+  })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$A.text
+  }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$A.grid
+  }, items.map(function (item, index) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: css$A.item,
+      key: index,
+      onClick: getOnClickStack(item)
+    }, /*#__PURE__*/React__default.createElement(CheckboxField$1, {
+      className: css$A.checkbox,
+      value: isChecked(item),
+      readOnly: true
+    }), /*#__PURE__*/React__default.createElement(StackListItem, {
+      data: item,
+      otherOwner: params.user !== item.user
+    }));
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$A.buttons
+  }, /*#__PURE__*/React__default.createElement(Button$1, {
+    className: css$A.button,
+    color: "primary",
+    variant: "contained",
+    disabled: !selected.length,
+    onClick: submit
+  }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button$1, {
+    className: css$A.button,
+    color: "secondary",
+    variant: "contained",
+    onClick: onClose
+  }, t('cancel')))));
+};
+
+export { AccessForbidden, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, AddStacksModal as DashboardAddStacksModal, List$1 as DashboardList, Item$1 as DashboardListItem, Dropdown, FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowTo, HowTo$1 as StackHowToFetchData, List as StackList, Item as StackListItem, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, ViewSwitcher, Yield };
 //# sourceMappingURL=index.modern.js.map

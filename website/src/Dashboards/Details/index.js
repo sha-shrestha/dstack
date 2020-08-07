@@ -9,14 +9,14 @@ import {connect} from 'react-redux';
 import DnDGridContext from 'components/DnDGridContext';
 import DnDItem from 'components/DnDGridContext/components/DnDItem';
 import {Button, Dropdown, ViewSwitcher, AccessForbidden, StretchTitleField,
-    NotFound, Yield, BackButton, StackFilters} from '@dstackai/dstack-react';
-import SelectStacks from './components/SelectStacks';
+    NotFound, Yield, BackButton, StackFilters, DashboardAddStacksModal} from '@dstackai/dstack-react';
 import Loader from './components/Loader';
 import Card from './components/Card';
 import routes from 'routes';
 import {isSignedIn, parseStackParams} from 'utils';
 import {useForm, usePrevious} from 'hooks';
 import type {Dashboard} from 'Dashboards/types';
+import {fetchList as fetchStackList} from 'Stacks/List/actions';
 import {deleteDashboard, fetch, update, insertCard, deleteCard, updateCard} from './actions';
 import css from './styles.module.css';
 
@@ -26,8 +26,11 @@ type Props = {
     update: Function,
     deleteDashboard: Function,
     insertCard: Function,
+    fetchStackList: Function,
     currentUser?: string,
     loading: boolean,
+    stacks?: Array<{}>,
+    stacksLoading?: boolean,
 }
 
 const Details = ({
@@ -40,7 +43,10 @@ const Details = ({
     deleteCard,
     updateCard,
     requestStatus,
+    fetchStackList,
     loading,
+    stacks,
+    stacksLoading,
 }: Props) => {
     const {items, moveItem, setItems} = useContext(DnDGridContext);
 
@@ -58,6 +64,11 @@ const Details = ({
     const cards = data?.cards;
 
     const setGridItems = cardsItems => setItems(cardsItems.map(card => ({id: card.index, card})));
+
+    useEffect(() => {
+        if (isShowStacksModal)
+            fetchStackList(params.user);
+    }, [isShowStacksModal]);
 
     useEffect(() => {
         if (!data || data.id !== params.id)
@@ -289,14 +300,6 @@ const Details = ({
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {/*<Button*/}
-                {/*    className={css.pdf}*/}
-                {/*    color="secondary"*/}
-                {/*>*/}
-                {/*    <span className="mdi mdi-download" />*/}
-                {/*    PDF*/}
-                {/*</Button>*/}
-
                 {currentUser === data.user && <Dropdown
                     className={css.dropdown}
 
@@ -390,10 +393,14 @@ const Details = ({
                 </div>
             )}
 
-            {isShowStacksModal && <SelectStacks
+            {isShowStacksModal && <DashboardAddStacksModal
                 isShow={isShowStacksModal}
+                currentUser={currentUser}
                 onClose={closeModal}
                 onAddStacks={addStacksToDashboard}
+                user={params.user}
+                stacks={stacks}
+                loading={stacksLoading}
             />}
         </div>
     );
@@ -401,10 +408,12 @@ const Details = ({
 
 export default connect(
     state => ({
-        currentUser: get(state.app.userData, 'user'),
+        currentUser: state.app.userData?.user,
         data: state.dashboards.details.data,
         loading: state.dashboards.details.loading,
         requestStatus: state.dashboards.details.requestStatus,
+        stacks: state.stacks.list.data,
+        stacksLoading: state.stacks.list.loading,
     }),
-    {fetch, update, deleteDashboard, insertCard, deleteCard, updateCard}
+    {fetch, update, deleteDashboard, insertCard, deleteCard, updateCard, fetchStackList}
 )(Details);

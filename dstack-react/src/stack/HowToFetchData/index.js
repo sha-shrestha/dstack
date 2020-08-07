@@ -2,7 +2,8 @@
 
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Tabs, CodeViewer} from '../../';
+import Tabs from '../../Tabs';
+import CodeViewer from '../../CodeViewer';
 import {isString} from 'lodash-es';
 import config from 'config';
 import css from '../HowTo/styles.module.css';

@@ -3,7 +3,13 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import {Button, Loader, Modal, SearchField, Yield, StackListItem, StackHowTo} from '../../';
+import Button from '../../Button';
+import Loader from '../../Loader';
+import Modal from '../../Modal';
+import SearchField from '../../SearchField';
+import Yield from '../../Yield';
+import StackListItem from '../ListItem';
+import StackHowTo from '../HowTo';
 import css from './styles.module.css';
 
 type Stack = {
