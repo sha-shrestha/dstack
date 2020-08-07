@@ -25,10 +25,11 @@ import { Modal as Modal$1, SearchField as SearchField$1, CheckboxField as Checkb
 
 var image = require("./lock~ZBorChcU.svg");
 
-var css = {"forbidden":"_3PN84","message":"_2i8KH"};
+var css = {"forbidden":"_style-module__forbidden__3PN84","message":"_style-module__message__2i8KH"};
 
-var AccessForbidden = function AccessForbidden(_ref) {
-  var children = _ref.children;
+const AccessForbidden = ({
+  children
+}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: css.forbidden
   }, /*#__PURE__*/React__default.createElement("img", {
@@ -41,103 +42,63 @@ var AccessForbidden = function AccessForbidden(_ref) {
   }, children));
 };
 
-var css$1 = {"avatar":"_3xvkT"};
+var css$1 = {"avatar":"_styles-module__avatar__3xvkT"};
 
-var Avatar = forwardRef(function (_ref, ref) {
-  var className = _ref.className,
-      name = _ref.name,
-      _ref$color = _ref.color,
-      color = _ref$color === void 0 ? 'violet' : _ref$color,
-      _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 'normal' : _ref$size,
-      withBorder = _ref.withBorder,
-      onClick = _ref.onClick;
+const Avatar = forwardRef(({
+  className,
+  name,
+  color: _color = 'violet',
+  size: _size = 'normal',
+  withBorder,
+  onClick
+}, ref) => {
   return /*#__PURE__*/React__default.createElement("div", {
     ref: ref,
-    className: cx(css$1.avatar, className, color, size, {
+    className: cx(css$1.avatar, className, _color, _size, {
       border: withBorder
     }),
     onClick: onClick
   }, name.slice(0, 2));
 });
 
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
+var css$2 = {"back":"_styles-module__back__1MuhU"};
 
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-function _objectDestructuringEmpty(obj) {
-  if (obj == null) throw new TypeError("Cannot destructure undefined");
-}
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-
-var css$2 = {"back":"_1MuhU"};
-
-var BackButton = function BackButton(_ref) {
-  var _ref$Component = _ref.Component,
-      Component = _ref$Component === void 0 ? 'button' : _ref$Component,
-      children = _ref.children,
-      className = _ref.className,
-      props = _objectWithoutPropertiesLoose(_ref, ["Component", "children", "className"]);
-
-  return /*#__PURE__*/React__default.createElement(Component, _extends({
+const BackButton = ({
+  Component: _Component = 'button',
+  children,
+  className,
+  ...props
+}) => {
+  return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
     className: cx(css$2.back, className)
   }, props), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-arrow-left"
   }), children);
 };
 
-var css$3 = {"button":"_2lKoS","spinner":"_31PPt"};
+var css$3 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
 
-var css$4 = {"spinner":"_3XhrC","spinner-animation":"_2UA3s"};
+var css$4 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
 
-var COLORS = {
+const COLORS = {
   white: '#fff',
   blue: '#507CD0'
 };
 
-var Spinner = function Spinner(_ref) {
-  var _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 22 : _ref$size,
-      _ref$color = _ref.color,
-      color = _ref$color === void 0 ? 'white' : _ref$color,
-      isShown = _ref.isShown,
-      className = _ref.className,
-      align = _ref.align;
+const Spinner = ({
+  size: _size = 22,
+  color: _color = 'white',
+  isShown,
+  className,
+  align
+}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$4.spinner, className, align, {
       show: isShown
     })
   }, /*#__PURE__*/React__default.createElement("svg", {
-    width: size,
-    height: size,
+    width: _size,
+    height: _size,
     viewBox: "0 0 22 22",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
@@ -152,34 +113,29 @@ var Spinner = function Spinner(_ref) {
     y2: "13",
     gradientUnits: "userSpaceOnUse"
   }, /*#__PURE__*/React__default.createElement("stop", {
-    stopColor: COLORS[color]
+    stopColor: COLORS[_color]
   }), /*#__PURE__*/React__default.createElement("stop", {
     offset: "1",
-    stopColor: COLORS[color],
+    stopColor: COLORS[_color],
     stopOpacity: "0.2"
   })))));
 };
 
-var Button = forwardRef(function (_ref, ref) {
-  var _ref$Component = _ref.Component,
-      Component = _ref$Component === void 0 ? 'button' : _ref$Component,
-      children = _ref.children,
-      className = _ref.className,
-      _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 'normal' : _ref$size,
-      _ref$color = _ref.color,
-      color = _ref$color === void 0 ? 'default' : _ref$color,
-      _ref$variant = _ref.variant,
-      variant = _ref$variant === void 0 ? 'default' : _ref$variant,
-      _ref$fullWidth = _ref.fullWidth,
-      fullWidth = _ref$fullWidth === void 0 ? false : _ref$fullWidth,
-      isShowSpinner = _ref.isShowSpinner,
-      props = _objectWithoutPropertiesLoose(_ref, ["Component", "children", "className", "size", "color", "variant", "fullWidth", "isShowSpinner"]);
-
-  return /*#__PURE__*/React__default.createElement(Component, _extends({
+const Button = forwardRef(({
+  Component: _Component = 'button',
+  children,
+  className,
+  size: _size = 'normal',
+  color: _color = 'default',
+  variant: _variant = 'default',
+  fullWidth: _fullWidth = false,
+  isShowSpinner,
+  ...props
+}, ref) => {
+  return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
     ref: ref,
-    className: cx(css$3.button, size, "color-" + color, "variant-" + variant, className, {
-      'full-width': fullWidth
+    className: cx(css$3.button, _size, `color-${_color}`, `variant-${_variant}`, className, {
+      'full-width': _fullWidth
     })
   }, props), isShowSpinner && /*#__PURE__*/React__default.createElement(Spinner, {
     className: css$3.spinner,
@@ -188,27 +144,25 @@ var Button = forwardRef(function (_ref, ref) {
   }), children);
 });
 
-var css$5 = {"checkbox":"_3lqFk","toggle-label":"_1aLAG","label":"_2PZb-","wrapper":"_2Vufp","mark":"_2Pb2f"};
+var css$5 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
 
-var CheckboxField = function CheckboxField(_ref) {
-  var className = _ref.className,
-      value = _ref.value,
-      disabled = _ref.disabled,
-      _ref$appearance = _ref.appearance,
-      appearance = _ref$appearance === void 0 ? 'checkbox' : _ref$appearance,
-      _ref$align = _ref.align,
-      align = _ref$align === void 0 ? 'left' : _ref$align,
-      label = _ref.label,
-      onLabel = _ref.onLabel,
-      offLabel = _ref.offLabel,
-      children = _ref.children,
-      props = _objectWithoutPropertiesLoose(_ref, ["className", "value", "disabled", "appearance", "align", "label", "onLabel", "offLabel", "children"]);
-
+const CheckboxField = ({
+  className,
+  value,
+  disabled,
+  appearance: _appearance = 'checkbox',
+  align: _align = 'left',
+  label,
+  onLabel,
+  offLabel,
+  children,
+  ...props
+}) => {
   return /*#__PURE__*/React__default.createElement("label", {
-    className: cx(css$5.checkbox, className, appearance, align, {
-      disabled: disabled
+    className: cx(css$5.checkbox, className, _appearance, _align, {
+      disabled
     })
-  }, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("input", _extends({
+  }, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("input", Object.assign({
     type: "checkbox",
     checked: value
   }, props)), offLabel && /*#__PURE__*/React__default.createElement("span", {
@@ -232,28 +186,24 @@ var CheckboxField = function CheckboxField(_ref) {
   }, label)), children);
 };
 
-var css$6 = {"copy":"_3J5hd","message":"_3RWnQ","button":"_2YqEb","icon":"_25GMO"};
+var css$6 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
 
-var Copy = function Copy(_ref) {
-  var children = _ref.children,
-      className = _ref.className,
-      copyText = _ref.copyText,
-      successMessage = _ref.successMessage,
-      buttonTitle = _ref.buttonTitle;
+const Copy = ({
+  children,
+  className,
+  copyText,
+  successMessage,
+  buttonTitle
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const [isShowMessage, setIsShowMessage] = useState(false);
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var _useState = useState(false),
-      isShowMessage = _useState[0],
-      setIsShowMessage = _useState[1];
-
-  var onCLick = function onCLick() {
+  const onCLick = () => {
     copy(copyText);
     setIsShowMessage(true);
-    setTimeout(function () {
-      return setIsShowMessage(false);
-    }, 3000);
+    setTimeout(() => setIsShowMessage(false), 3000);
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
@@ -272,19 +222,19 @@ var Copy = function Copy(_ref) {
   }, successMessage ? successMessage : t('copied')));
 };
 
-var css$7 = {"code":"_3gARj","copy":"_m44gX","icon":"_ZmZbg"};
+var css$7 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
 
-var CodeViewer = function CodeViewer(_ref) {
-  var className = _ref.className,
-      language = _ref.language,
-      children = _ref.children,
-      fontSize = _ref.fontSize;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
+const CodeViewer = ({
+  className,
+  language,
+  children,
+  fontSize
+}) => {
+  const {
+    t
+  } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$7.code, className, fontSize && "font-size-" + fontSize)
+    className: cx(css$7.code, className, fontSize && `font-size-${fontSize}`)
   }, /*#__PURE__*/React__default.createElement(Highlight, {
     language: language
   }, children), /*#__PURE__*/React__default.createElement(Copy, {
@@ -294,29 +244,24 @@ var CodeViewer = function CodeViewer(_ref) {
   }));
 };
 
-var css$8 = {"dropdown":"_1qRCw","button":"_fzNEm","menu":"_AJ1Y3","item":"_3lbfY"};
+var css$8 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
 
-var Dropdown = function Dropdown(_ref) {
-  var className = _ref.className,
-      buttonClassName = _ref.buttonClassName,
-      children = _ref.children,
-      items = _ref.items;
-
-  var _useState = useState(false),
-      isShow = _useState[0],
-      setIsShow = _useState[1];
-
-  var buttonRef = useRef(null);
-  var dropdownRef = useRef(null);
-  useEffect(function () {
+const Dropdown = ({
+  className,
+  buttonClassName,
+  children,
+  items
+}) => {
+  const [isShow, setIsShow] = useState(false);
+  const buttonRef = useRef(null);
+  const dropdownRef = useRef(null);
+  useEffect(() => {
     document.body.addEventListener('click', outlineClickHandle);
-    return function () {
-      return document.body.removeEventListener('click', outlineClickHandle);
-    };
+    return () => document.body.removeEventListener('click', outlineClickHandle);
   });
 
-  var outlineClickHandle = function outlineClickHandle(event) {
-    var targetElement = event.target;
+  const outlineClickHandle = event => {
+    let targetElement = event.target;
 
     do {
       if (targetElement === buttonRef.current || targetElement === dropdownRef.current) return;
@@ -326,21 +271,19 @@ var Dropdown = function Dropdown(_ref) {
     if (isShow) setIsShow(false);
   };
 
-  var onCLickButton = function onCLickButton(event) {
+  const onCLickButton = event => {
     clickStopPropagation(event);
     setIsShow(!isShow);
   };
 
-  var clickStopPropagation = function clickStopPropagation(event) {
+  const clickStopPropagation = event => {
     event.stopPropagation();
     event.preventDefault();
   };
 
-  var onCLickItem = function onCLickItem(item) {
-    return function () {
-      setIsShow(!isShow);
-      if (item.onClick) item.onClick();
-    };
+  const onCLickItem = item => () => {
+    setIsShow(!isShow);
+    if (item.onClick) item.onClick();
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
@@ -359,13 +302,11 @@ var Dropdown = function Dropdown(_ref) {
       className: cx(css$8.menu, 'show'),
       ref: dropdownRef,
       onClick: clickStopPropagation
-    }, items.map(function (i, index) {
-      return /*#__PURE__*/React__default.createElement("div", {
-        key: index,
-        className: css$8.item,
-        onClick: onCLickItem(i)
-      }, i.title);
-    }))
+    }, items.map((i, index) => /*#__PURE__*/React__default.createElement("div", {
+      key: index,
+      className: css$8.item,
+      onClick: onCLickItem(i)
+    }, i.title)))
   }, children ? React__default.cloneElement(children, {
     onClick: onCLickButton,
     ref: buttonRef
@@ -378,10 +319,10 @@ var Dropdown = function Dropdown(_ref) {
   }))));
 };
 
-var unicodeBase64Decode = function unicodeBase64Decode(text) {
+const unicodeBase64Decode = text => {
   try {
-    var decodeData = window.atob(text);
-    return decodeURIComponent(Array.prototype.map.call(decodeData, function (c) {
+    const decodeData = window.atob(text);
+    return decodeURIComponent(Array.prototype.map.call(decodeData, c => {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
   } catch (e) {
@@ -389,36 +330,32 @@ var unicodeBase64Decode = function unicodeBase64Decode(text) {
   }
 };
 
-var formatBytes = function formatBytes(bytes, decimals) {
+const formatBytes = (bytes, decimals) => {
   if (bytes === 0) return '0 Bytes';
-  var k = 1024;
-  var dm = decimals <= 0 ? 0 : decimals || 2;
-  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  var i = Math.floor(Math.log(bytes) / Math.log(k));
+  let k = 1024;
+  let dm = decimals <= 0 ? 0 : decimals || 2;
+  let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  let i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var parseStackParams = (function (attachments) {
-  var fields = {};
+var parseStackParams = (attachments => {
+  const fields = {};
   if (!attachments || !attachments.length) return;
-  attachments.forEach(function (i) {
-    Object.keys(i.params).forEach(function (key) {
+  attachments.forEach(i => {
+    Object.keys(i.params).forEach(key => {
       if (fields[key]) fields[key].options.push(i.params[key]);else fields[key] = {
         options: [i.params[key]]
       };
     });
   });
-  Object.keys(fields).forEach(function (key) {
+  Object.keys(fields).forEach(key => {
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
-      fields[key].options = fields[key].options.filter(function (a, b) {
-        return fields[key].options.indexOf(a) === b;
-      }).map(function (i) {
-        return {
-          label: i,
-          value: i
-        };
-      });
+      fields[key].options = fields[key].options.filter((a, b) => fields[key].options.indexOf(a) === b).map(i => ({
+        label: i,
+        value: i
+      }));
     }
 
     if (typeof fields[key].options[0] === 'boolean') {
@@ -426,93 +363,79 @@ var parseStackParams = (function (attachments) {
     }
 
     if (typeof fields[key].options[0] === 'number') {
-      var options = fields[key].options;
+      const options = fields[key].options;
       fields[key].type = 'slider';
       fields[key].min = Math.min.apply(null, options);
       fields[key].max = Math.max.apply(null, options);
       fields[key].options = {};
-      options.filter(function (a, b) {
-        return options.indexOf(a) === b;
-      }).forEach(function (i) {
-        return fields[key].options[i] = i;
-      });
+      options.filter((a, b) => options.indexOf(a) === b).forEach(i => fields[key].options[i] = i);
     }
   });
   return fields;
 });
 
-var css$9 = {"dnd":"_3uYii","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
+var css$9 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
 
-var FileDragnDrop = function FileDragnDrop(_ref) {
-  var formats = _ref.formats,
-      className = _ref.className,
-      loading = _ref.loading,
-      _ref$progressPercent = _ref.progressPercent,
-      progressPercent = _ref$progressPercent === void 0 ? null : _ref$progressPercent,
-      onChange = _ref.onChange;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var inputRef = useRef(null);
-
-  var _useState = useState(false),
-      active = _useState[0],
-      setActive = _useState[1];
-
-  var _useState2 = useState(),
-      selectedFile = _useState2[0],
-      setSelectedFile = _useState2[1];
-
-  var isDidMount = useRef(true);
-  useEffect(function () {
+const FileDragnDrop = ({
+  formats,
+  className,
+  loading,
+  progressPercent: _progressPercent = null,
+  onChange
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const inputRef = useRef(null);
+  const [active, setActive] = useState(false);
+  const [selectedFile, setSelectedFile] = useState();
+  const isDidMount = useRef(true);
+  useEffect(() => {
     if (!isDidMount.current) {
       if (onChange) onChange(selectedFile);
     } else isDidMount.current = false;
   }, [selectedFile]);
 
-  var onClick = function onClick(event) {
+  const onClick = event => {
     event.preventDefault();
     if (inputRef.current) inputRef.current.click();
   };
 
-  var preventStop = function preventStop(event) {
+  const preventStop = event => {
     event.preventDefault();
     event.stopPropagation();
   };
 
-  var onDrop = function onDrop(event) {
+  const onDrop = event => {
     preventStop(event);
     setActive(false);
-    var _event$dataTransfer$f = event.dataTransfer.files,
-        file = _event$dataTransfer$f[0];
+    const [file] = event.dataTransfer.files;
     if (file && checkAvailableExtension(file)) setSelectedFile(file);
   };
 
-  var onDragEnter = function onDragEnter(event) {
+  const onDragEnter = event => {
     preventStop(event);
     setActive(true);
   };
 
-  var onDragLeave = function onDragLeave(event) {
+  const onDragLeave = event => {
     preventStop(event);
     setActive(false);
   };
 
-  var onChangeInput = function onChangeInput(event) {
-    var _event$target$files = event.target.files,
-        file = _event$target$files[0];
+  const onChangeInput = event => {
+    const [file] = event.target.files;
     if (file && checkAvailableExtension(file)) setSelectedFile(file);
   };
 
-  var removeFile = function removeFile() {
+  const removeFile = () => {
     setSelectedFile(null);
   };
 
-  var checkAvailableExtension = function checkAvailableExtension(file) {
-    var ext = '.' + file.name.split('.').pop();
-    var isAvailable;
-    if (formats && formats.length) isAvailable = formats.some(function (format) {
+  const checkAvailableExtension = file => {
+    const ext = '.' + file.name.split('.').pop();
+    let isAvailable;
+    if (formats && formats.length) isAvailable = formats.some(format => {
       if (format === '.jpg' || format === '.jpeg') return ext === '.jpg' || ext === '.jpeg';else return format === ext;
     });else isAvailable = true;
     return isAvailable;
@@ -520,16 +443,16 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
 
   if (loading) return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$9.dnd, className, {
-      active: active
+      active
     })
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$9.loading
-  }, t('Uploading'), "\u2026", typeof progressPercent === 'number' && progressPercent + "%"), typeof progressPercent === 'number' && /*#__PURE__*/React__default.createElement("div", {
+  }, t('Uploading'), "\u2026", typeof _progressPercent === 'number' && `${_progressPercent}%`), typeof _progressPercent === 'number' && /*#__PURE__*/React__default.createElement("div", {
     className: css$9.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$9.progress,
     style: {
-      width: progressPercent + "%"
+      width: `${_progressPercent}%`
     }
   })));
   if (selectedFile) return /*#__PURE__*/React__default.createElement("div", {
@@ -548,7 +471,7 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
   }));
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$9.dnd, className, {
-      active: active
+      active
     }),
     onDrop: onDrop,
     onDragEnter: onDragEnter,
@@ -560,17 +483,15 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
     type: "file"
   }), /*#__PURE__*/React__default.createElement("div", {
     className: css$9.placeholder
-  }, t('dragHereAFile'), '', Boolean(formats) && "(" + formats.join(', ') + ")", ' ', t('or'), ' ', /*#__PURE__*/React__default.createElement("a", {
+  }, t('dragHereAFile'), '', Boolean(formats) && `(${formats.join(', ')})`, ' ', t('or'), ' ', /*#__PURE__*/React__default.createElement("a", {
     onClick: onClick,
     href: "#"
   }, t('upload')), ' ', t('fromYourComputer'), "."));
 };
 
-var css$a = {"loader":"_18_Ho","text":"_3dZu_","stacks-pulse":"_350eA","grid":"_Uki0v","item":"_MvjKB","pic":"_Pc6fT","section":"_2EIKh"};
+var css$a = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
 
-var Loader = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
+const Loader = ({}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$a.loader
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -598,43 +519,37 @@ var Loader = function Loader(_ref) {
   }))));
 };
 
-var MarkdownRender = function MarkdownRender(props) {
-  var newProps = _extends({}, props, {
+const MarkdownRender = props => {
+  const newProps = { ...props,
     plugins: [RemarkMathPlugin],
-    renderers: _extends({}, props.renderers, {
-      math: function math(props) {
-        return /*#__PURE__*/React__default.createElement(MathJax.Node, {
-          formula: props.value
-        });
-      },
-      inlineMath: function inlineMath(props) {
-        return /*#__PURE__*/React__default.createElement(MathJax.Node, {
-          inline: true,
-          formula: props.value
-        });
-      }
-    })
-  });
-
+    renderers: { ...props.renderers,
+      math: props => /*#__PURE__*/React__default.createElement(MathJax.Node, {
+        formula: props.value
+      }),
+      inlineMath: props => /*#__PURE__*/React__default.createElement(MathJax.Node, {
+        inline: true,
+        formula: props.value
+      })
+    }
+  };
   return /*#__PURE__*/React__default.createElement(MathJax.Provider, {
     input: "tex"
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, newProps));
 };
 
-var css$b = {"modal":"_3FQ59","dialog":"_268e0","close":"_1Y7yz","title":"_knxNI"};
+var css$b = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
 
-var Modal = function Modal(_ref) {
-  var title = _ref.title,
-      className = _ref.className,
-      dialogClassName = _ref.dialogClassName,
-      _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 'big' : _ref$size,
-      onClose = _ref.onClose,
-      isShow = _ref.isShow,
-      children = _ref.children,
-      withCloseButton = _ref.withCloseButton;
-
-  var onClickByLayer = function onClickByLayer(event) {
+const Modal = ({
+  title,
+  className,
+  dialogClassName,
+  size: _size = 'big',
+  onClose,
+  isShow,
+  children,
+  withCloseButton
+}) => {
+  const onClickByLayer = event => {
     if (event.currentTarget === event.target && onClose) onClose();
   };
 
@@ -644,7 +559,7 @@ var Modal = function Modal(_ref) {
     }),
     onClick: onClickByLayer
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$b.dialog, size, dialogClassName)
+    className: cx(css$b.dialog, _size, dialogClassName)
   }, withCloseButton && /*#__PURE__*/React__default.createElement("span", {
     className: cx(css$b.close, 'mdi mdi-close'),
     onClick: onClose
@@ -662,32 +577,16 @@ var config = {
   USER_DATA_URL: '/users/remember',
   UPDATE_TOKEN_URL: '/users/update/token',
   UPDATE_SETTINGS_URL: '/users/update/settings',
-  CHECK_USER: function CHECK_USER(userName) {
-    return "/users/exists/" + userName;
-  },
-  STACKS_LIST: function STACKS_LIST(userName) {
-    return "/stacks/" + userName;
-  },
-  DELETE_STACK: function DELETE_STACK() {
-    return '/stacks/delete';
-  },
-  STACK_DETAILS: function STACK_DETAILS(userName, stack) {
-    return "/stacks/" + userName + "/" + stack;
-  },
-  STACK_FRAME: function STACK_FRAME(userName, stack, frameId) {
-    return "/frames/" + userName + "/" + stack + "/" + frameId;
-  },
-  STACK_ATTACHMENT: function STACK_ATTACHMENT(stack, frameId, id) {
-    return "/attachs/" + stack + "/" + frameId + "/" + id;
-  },
+  CHECK_USER: userName => `/users/exists/${userName}`,
+  STACKS_LIST: userName => `/stacks/${userName}`,
+  DELETE_STACK: () => '/stacks/delete',
+  STACK_DETAILS: (userName, stack) => `/stacks/${userName}/${stack}`,
+  STACK_FRAME: (userName, stack, frameId) => `/frames/${userName}/${stack}/${frameId}`,
+  STACK_ATTACHMENT: (stack, frameId, id) => `/attachs/${stack}/${frameId}/${id}`,
   STACK_UPDATE: '/stacks/update',
   STACK_PUSH: '/stacks/push',
-  DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
-    return "/dashboards/" + userName;
-  },
-  DASHBOARD_DETAILS: function DASHBOARD_DETAILS(userName, id) {
-    return "/dashboards/" + userName + "/" + id;
-  },
+  DASHBOARD_LIST: userName => `/dashboards/${userName}`,
+  DASHBOARD_DETAILS: (userName, id) => `/dashboards/${userName}/${id}`,
   DASHBOARD_CREATE: '/dashboards/create',
   DASHBOARD_UPDATE: '/dashboards/update',
   DASHBOARD_DELETE: '/dashboards/delete',
@@ -698,42 +597,26 @@ var config = {
   TWITTER_URL: 'https://twitter.com/dstackai',
   GITHUB_URL: ' https://github.com/dstackai',
   MEDIUM_URL: ' https://medium.com/dstackai',
-  CONFIGURE_PYTHON_COMMAND: function CONFIGURE_PYTHON_COMMAND(token, userName) {
-    if (token === void 0) {
-      token = '<token>';
-    }
-
-    if (userName === void 0) {
-      userName = '<username>';
-    }
-
-    var origin = window ? window.location.origin : '';
-    return "dstack config --token " + token + " --user " + userName + " --server " + origin + "/api";
+  CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
+    const origin = window ? window.location.origin : '';
+    return `dstack config --token ${token} --user ${userName} --server ${origin}/api`;
   },
-  CONFIGURE_R_COMMAND: function CONFIGURE_R_COMMAND(token, userName) {
-    if (token === void 0) {
-      token = '<token>';
-    }
-
-    if (userName === void 0) {
-      userName = '<username>';
-    }
-
-    var origin = window ? window.location.origin : '';
-    return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
+  CONFIGURE_R_COMMAND: (token = '<token>', userName = '<username>') => {
+    const origin = window ? window.location.origin : '';
+    return `dstack::configure(user = "${userName}", token = "${token}", persist = "global"` + `, server = "${origin}/api")`;
   }
 };
 
 var image$1 = require("./404~FXFqzVOe.svg");
 
-var css$c = {"not-found":"_tAZyq","message":"_3Ok1U","help":"_Aa8x8"};
+var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
 
-var NotFound = function NotFound(_ref) {
-  var children = _ref.children;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
+const NotFound = ({
+  children
+}) => {
+  const {
+    t
+  } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$c['not-found']
   }, /*#__PURE__*/React__default.createElement("img", {
@@ -763,17 +646,17 @@ var NotFound = function NotFound(_ref) {
   }), "Discord")));
 };
 
-var usePrevious = (function (value) {
-  var ref = useRef(value);
-  useEffect(function () {
+var usePrevious = (value => {
+  const ref = useRef(value);
+  useEffect(() => {
     ref.current = value;
   }, [value]);
   return ref.current;
 });
 
-var useOnClickOutside = (function (ref, handler) {
-  useEffect(function () {
-    var listener = function listener(event) {
+var useOnClickOutside = ((ref, handler) => {
+  useEffect(() => {
+    const listener = event => {
       if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
@@ -783,62 +666,49 @@ var useOnClickOutside = (function (ref, handler) {
 
     document.addEventListener('mousedown', listener);
     document.addEventListener('touchstart', listener);
-    return function () {
+    return () => {
       document.removeEventListener('mousedown', listener);
       document.removeEventListener('touchstart', listener);
     };
   }, [ref, handler]);
 });
 
-var isEmail = function isEmail(value) {
+const isEmail = value => {
   return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
 };
-var isRequired = function isRequired(value) {
+const isRequired = value => {
   return !(value === null || value === undefined || value === '');
 };
-var noSpaces = function noSpaces(value) {
+const noSpaces = value => {
   return /^[\S]*$/.test(value);
 };
-var isValidStackName = function isValidStackName(value) {
+const isValidStackName = value => {
   return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
 };
 
-var validationMap = {
+const validationMap = {
   required: isRequired,
   email: isEmail,
   'no-spaces-stack': noSpaces,
   'stack-name': isValidStackName
 };
 
-var getValidationFunction = function getValidationFunction(validator) {
+const getValidationFunction = validator => {
   if (typeof validator === 'string' && validationMap[validator]) return validationMap[validator];
   if (typeof validator === 'function') return validator;
-  return function () {
-    return true;
-  };
+  return () => true;
 };
 
-var useForm = (function (initialFormState, fieldsValidators) {
-  if (fieldsValidators === void 0) {
-    fieldsValidators = {};
-  }
+var useForm = ((initialFormState, fieldsValidators = {}) => {
+  const [form, setForm] = useState(initialFormState);
+  const [formErrors, setFormErrors] = useState({});
 
-  var _useState = useState(initialFormState),
-      form = _useState[0],
-      setForm = _useState[1];
-
-  var _useState2 = useState({}),
-      formErrors = _useState2[0],
-      setFormErrors = _useState2[1];
-
-  var onChange = function onChange(eventOrName, value) {
-    var _extends2, _extends3;
-
-    var name;
-    var fieldValue;
+  const onChange = (eventOrName, value) => {
+    let name;
+    let fieldValue;
 
     if (eventOrName.target) {
-      var event = eventOrName;
+      const event = eventOrName;
       fieldValue = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
       name = event.target.name;
     } else {
@@ -846,35 +716,39 @@ var useForm = (function (initialFormState, fieldsValidators) {
       fieldValue = value;
     }
 
-    setForm(_extends({}, form, (_extends2 = {}, _extends2[name] = fieldValue, _extends2)));
-    setFormErrors(_extends({}, formErrors, (_extends3 = {}, _extends3[name] = [], _extends3)));
+    setForm({ ...form,
+      [name]: fieldValue
+    });
+    setFormErrors({ ...formErrors,
+      [name]: []
+    });
   };
 
-  var resetForm = function resetForm() {
+  const resetForm = () => {
     setForm(initialFormState);
     setFormErrors({});
   };
 
-  var getFieldErrors = function getFieldErrors(fieldName) {
-    var errors = [];
-    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(function (validator) {
-      var isValid = getValidationFunction(validator);
+  const getFieldErrors = fieldName => {
+    const errors = [];
+    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(validator => {
+      const isValid = getValidationFunction(validator);
       if (!isValid(form[fieldName])) errors.push(validator);
     });
 
     if (typeof fieldsValidators[fieldName] === 'string') {
-      var isValid = getValidationFunction(fieldsValidators[fieldName]);
+      const isValid = getValidationFunction(fieldsValidators[fieldName]);
       if (!isValid(form[fieldName])) errors.push(fieldsValidators[fieldName]);
     }
 
     return errors;
   };
 
-  var checkValidForm = function checkValidForm() {
-    var isValid = true;
-    var newFormErrors = {};
-    Object.keys(fieldsValidators).forEach(function (fieldName) {
-      var errors = getFieldErrors(fieldName);
+  const checkValidForm = () => {
+    let isValid = true;
+    const newFormErrors = {};
+    Object.keys(fieldsValidators).forEach(fieldName => {
+      const errors = getFieldErrors(fieldName);
       newFormErrors[fieldName] = errors;
       isValid = isValid && !errors.length;
     });
@@ -883,67 +757,57 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 
   return {
-    form: form,
-    setForm: setForm,
-    formErrors: formErrors,
-    setFormErrors: setFormErrors,
-    resetForm: resetForm,
-    onChange: onChange,
-    checkValidForm: checkValidForm
+    form,
+    setForm,
+    formErrors,
+    setFormErrors,
+    resetForm,
+    onChange,
+    checkValidForm
   };
 });
 
-var useIntersectionObserver = (function (callBack, _ref, deps) {
-  var _ref$rootMargin = _ref.rootMargin,
-      rootMargin = _ref$rootMargin === void 0 ? '0px' : _ref$rootMargin,
-      _ref$threshold = _ref.threshold,
-      threshold = _ref$threshold === void 0 ? 0.01 : _ref$threshold,
-      _ref$root = _ref.root,
-      root = _ref$root === void 0 ? null : _ref$root;
-  var ref = useRef(null);
-  var intersectionCallback = useCallback(function (_ref2) {
-    var target = _ref2[0];
-
+var useIntersectionObserver = ((callBack, {
+  rootMargin: _rootMargin = '0px',
+  threshold: _threshold = 0.01,
+  root: _root = null
+}, deps) => {
+  const ref = useRef(null);
+  const intersectionCallback = useCallback(([target]) => {
     if (target.isIntersecting) {
       callBack();
     }
   }, deps);
-  useEffect(function () {
-    var options = {
-      root: root,
-      rootMargin: rootMargin,
-      threshold: threshold
+  useEffect(() => {
+    const options = {
+      root: _root,
+      rootMargin: _rootMargin,
+      threshold: _threshold
     };
-    var observer = new IntersectionObserver(intersectionCallback, options);
+    const observer = new IntersectionObserver(intersectionCallback, options);
     if (ref && ref.current) observer.observe(ref.current);
-    return function () {
+    return () => {
       if (ref.current) observer.unobserve(ref.current);
     };
   }, [ref, intersectionCallback]);
   return [ref];
 });
 
-var css$d = {"bar":"_12oWc","progress":"_3JWjz"};
+var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
 
-var ProgressBar = function ProgressBar(_ref) {
-  var className = _ref.className,
-      isActive = _ref.isActive,
-      globalProgress = _ref.progress;
-
-  var _useState = useState(0),
-      progress = _useState[0],
-      setProgress = _useState[1];
-
-  var _useState2 = useState(1000),
-      width = _useState2[0],
-      setWidth = _useState2[1];
-
-  var prevIsActive = usePrevious(isActive);
-  var step = useRef(0.01);
-  var currentProgress = useRef(0);
-  var requestFrame = useRef(null);
-  var ref = useRef(null);
-  useEffect(function () {
+const ProgressBar = ({
+  className,
+  isActive,
+  progress: globalProgress
+}) => {
+  const [progress, setProgress] = useState(0);
+  const [width, setWidth] = useState(1000);
+  const prevIsActive = usePrevious(isActive);
+  const step = useRef(0.01);
+  const currentProgress = useRef(0);
+  const requestFrame = useRef(null);
+  const ref = useRef(null);
+  useEffect(() => {
     if (isActive) {
       setProgress(0);
       step.current = 0.01;
@@ -954,9 +818,7 @@ var ProgressBar = function ProgressBar(_ref) {
     if (prevIsActive === true && isActive === false) {
       if (requestFrame.current) cancelAnimationFrame(requestFrame.current);
       setProgress(100);
-      setTimeout(function () {
-        return setProgress(0);
-      }, 800);
+      setTimeout(() => setProgress(0), 800);
     }
 
     if (isActive === null) {
@@ -964,33 +826,31 @@ var ProgressBar = function ProgressBar(_ref) {
       setProgress(0);
     }
   }, [isActive]);
-  useEffect(function () {
+  useEffect(() => {
     if (globalProgress !== null) setProgress(globalProgress);else {
       setProgress(0);
     }
   }, [globalProgress]);
-  useEffect(function () {
+  useEffect(() => {
     window.addEventListener('resize', onResize);
     if (ref.current) setWidth(ref.current.offsetWidth);
-    return function () {
-      return window.removeEventListener('resize', onResize);
-    };
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  var startCalculateProgress = function startCalculateProgress() {
+  const startCalculateProgress = () => {
     requestAnimationFrame(calculateProgress);
   };
 
-  var calculateProgress = useCallback(function () {
+  const calculateProgress = useCallback(() => {
     currentProgress.current += step.current;
-    var progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
+    const progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
     setProgress(progress);
     if (progress > 70) step.current = 0.005;
     if (progress >= 100) cancelAnimationFrame(requestFrame.current);
     requestFrame.current = requestAnimationFrame(calculateProgress);
   }, [isActive]);
 
-  var onResize = function onResize() {
+  const onResize = () => {
     if (ref.current) setWidth(ref.current.offsetWidth);
   };
 
@@ -1000,59 +860,55 @@ var ProgressBar = function ProgressBar(_ref) {
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$d.progress,
     style: {
-      width: progress + "%",
-      backgroundSize: width + "px 5px"
+      width: `${progress}%`,
+      backgroundSize: `${width}px 5px`
     }
   }));
 };
 
-var css$e = {"field":"_3WCaE","input":"_9Tk5W","label":"_1mHtq","error":"_3jOrk"};
+var css$e = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
 
-var TextField = function TextField(_ref) {
-  var label = _ref.label,
-      className = _ref.className,
-      _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 'normal' : _ref$size,
-      _ref$errors = _ref.errors,
-      errors = _ref$errors === void 0 ? [] : _ref$errors,
-      props = _objectWithoutPropertiesLoose(_ref, ["label", "className", "size", "errors"]);
-
-  var hasErrors = Boolean(errors.length);
+const TextField = ({
+  label,
+  className,
+  size: _size = 'normal',
+  errors: _errors = [],
+  ...props
+}) => {
+  const hasErrors = Boolean(_errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$e.field, className, size, {
+    className: cx(css$e.field, className, _size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
     className: css$e.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
     className: css$e.input
-  }, /*#__PURE__*/React__default.createElement("input", _extends({
+  }, /*#__PURE__*/React__default.createElement("input", Object.assign({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
     className: css$e.error
-  }, errors.join(', '))));
+  }, _errors.join(', '))));
 };
 
-var css$f = {"search":"_3s1gr","field":"_17rsB","clear":"_3oKZ5","button":"_3BfRl"};
+var css$f = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
 
-var SearchField = function SearchField(_ref) {
-  var className = _ref.className,
-      showEverything = _ref.showEverything,
-      isDark = _ref.isDark,
-      props = _objectWithoutPropertiesLoose(_ref, ["className", "showEverything", "isDark"]);
+const SearchField = ({
+  className,
+  showEverything,
+  isDark,
+  ...props
+}) => {
+  const [isShow, setIsShow] = useState(showEverything || props.value && props.value.length);
 
-  var _useState = useState(showEverything || props.value && props.value.length),
-      isShow = _useState[0],
-      setIsShow = _useState[1];
-
-  var clear = function clear() {
+  const clear = () => {
     if (props.onChange) props.onChange('');
     if (!showEverything) setIsShow(false);
   };
 
-  var onChangeHandle = function onChangeHandle(event) {
+  const onChangeHandle = event => {
     if (props.onChange) props.onChange(event.target.value);
   };
 
@@ -1060,7 +916,7 @@ var SearchField = function SearchField(_ref) {
     className: cx(css$f.search, className, {
       'is-dark': isDark
     })
-  }, isShow && /*#__PURE__*/React__default.createElement(TextField, _extends({}, props, {
+  }, isShow && /*#__PURE__*/React__default.createElement(TextField, Object.assign({}, props, {
     onChange: onChangeHandle,
     className: css$f.field
   })), isShow && Boolean(props.value && props.value.length) && /*#__PURE__*/React__default.createElement("div", {
@@ -1074,73 +930,62 @@ var SearchField = function SearchField(_ref) {
     className: "mdi mdi-magnify"
   })), !isShow && /*#__PURE__*/React__default.createElement("div", {
     className: css$f.button,
-    onClick: function onClick() {
-      return setIsShow(true);
-    }
+    onClick: () => setIsShow(true)
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-magnify"
   })));
 };
 
-var css$g = {"field":"_2jF9E","label":"_iehEi","rcSelectLoadingIcon":"_VtsrG","rcSelectDropdownSlideUpIn":"_27wr-","rcSelectDropdownSlideUpOut":"_1QVN6","rcSelectDropdownSlideDownIn":"_1vYLX","rcSelectDropdownSlideDownOut":"_1-lNh","select-field":"_1mUh_","select-field-selector":"_V9Ufm","select-field-arrow":"_c4k8s","mdi":"_2hNDK","select-field-selection-placeholder":"_2Vdv0","select-field-selection-search":"_3GdNa","select-field-selection-search-input":"_3BOaB","select-field-selection-item":"_2uDu7","select-field-item-option-checkbox":"_2K_G1","select-field-selection-item-remove":"_1k1IW","select-field-show-search":"_3EVnU","select-field-show-arrow":"_1xlmm","select-field-open":"__jEZ1","select-field-multiple":"_2YFSs","select-field-single":"_1n3qF","select-field-clear":"_Mg5xq","select-field-item-option-state":"_2yGkG","select-field-selection__choice-zoom":"_3NUb5","select-field-selection__choice-zoom-appear":"_ZO73y","select-field-selection__choice-zoom-leave":"_2i54q","select-field-dropdown":"_14ngc"};
+var css$g = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
 
-var allValue = 'all';
+const allValue = 'all';
 
-var SelectField = function SelectField(_ref) {
-  var _ref$align = _ref.align,
-      align = _ref$align === void 0 ? 'left' : _ref$align,
-      label = _ref.label,
-      disabled = _ref.disabled,
-      placeholder = _ref.placeholder,
-      _ref$value = _ref.value,
-      propValue = _ref$value === void 0 ? [] : _ref$value,
-      className = _ref.className,
-      mode = _ref.mode,
-      onChange = _ref.onChange,
-      _ref$options = _ref.options,
-      options = _ref$options === void 0 ? [] : _ref$options,
-      _ref$showSearch = _ref.showSearch,
-      showSearch = _ref$showSearch === void 0 ? true : _ref$showSearch,
-      props = _objectWithoutPropertiesLoose(_ref, ["align", "label", "disabled", "placeholder", "value", "className", "mode", "onChange", "options", "showSearch"]);
-
-  var onChangeHandle = function onChangeHandle(value) {
-    if (value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
-      return o.value;
-    });
+const SelectField = ({
+  align: _align = 'left',
+  label,
+  disabled,
+  placeholder,
+  value: propValue = [],
+  className,
+  mode,
+  onChange,
+  options: _options = [],
+  showSearch: _showSearch = true,
+  ...props
+}) => {
+  const onChangeHandle = value => {
+    if (value.indexOf(allValue) >= 0) if (value.length > _options.length) value = [];else value = _options.map(o => o.value);
     if (onChange) onChange(value);
   };
 
-  var onSelect = function onSelect() {};
+  const onSelect = () => {};
 
-  var onDeselect = function onDeselect() {};
+  const onDeselect = () => {};
 
-  var renderOptions = function renderOptions() {
-    return options.map(function (_ref2) {
-      var value = _ref2.value,
-          label = _ref2.label;
-      return /*#__PURE__*/React__default.createElement(Option, {
-        key: value,
-        value: value
-      }, mode === 'multiple' && /*#__PURE__*/React__default.createElement(CheckboxField, {
-        readOnly: true,
-        className: "select-field-item-option-checkbox",
-        value: propValue.indexOf(value) >= 0
-      }), /*#__PURE__*/React__default.createElement("span", {
-        className: "select-field-item-option-label"
-      }, label));
-    });
-  };
+  const renderOptions = () => _options.map(({
+    value,
+    label
+  }) => /*#__PURE__*/React__default.createElement(Option, {
+    key: value,
+    value: value
+  }, mode === 'multiple' && /*#__PURE__*/React__default.createElement(CheckboxField, {
+    readOnly: true,
+    className: "select-field-item-option-checkbox",
+    value: propValue.indexOf(value) >= 0
+  }), /*#__PURE__*/React__default.createElement("span", {
+    className: "select-field-item-option-label"
+  }, label)));
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$g.field, className, align, {
-      disabled: disabled
+    className: cx(css$g.field, className, _align, {
+      disabled
     })
-  }, /*#__PURE__*/React__default.createElement(Select, _extends({
+  }, /*#__PURE__*/React__default.createElement(Select, Object.assign({
     value: propValue,
     prefixCls: "select-field",
     multiple: mode === 'multiple',
     showArrow: true,
-    showSearch: showSearch,
+    showSearch: _showSearch,
     onSelect: onSelect,
     onDeselect: onDeselect,
     placeholder: placeholder,
@@ -1148,13 +993,13 @@ var SelectField = function SelectField(_ref) {
     inputIcon: /*#__PURE__*/React__default.createElement("span", {
       className: "mdi mdi-chevron-down"
     })
-  }, props), options.length && mode === 'multiple' && /*#__PURE__*/React__default.createElement(Option, {
+  }, props), _options.length && mode === 'multiple' && /*#__PURE__*/React__default.createElement(Option, {
     key: allValue,
     value: allValue
   }, /*#__PURE__*/React__default.createElement(CheckboxField, {
     readOnly: true,
     className: "select-field-item-option-checkbox",
-    value: propValue.length === options.length
+    value: propValue.length === _options.length
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "select-field-item-option-label"
   }, "Select all")), mode === 'multiple' ? /*#__PURE__*/React__default.createElement(OptGroup, null, renderOptions()) : renderOptions()), label && /*#__PURE__*/React__default.createElement("label", {
@@ -1162,10 +1007,10 @@ var SelectField = function SelectField(_ref) {
   }, label));
 };
 
-var css$h = {"field":"_2_NXc","rcSliderTooltipZoomDownIn":"_2jvao","rcSliderTooltipZoomDownOut":"_2HgMB","slider":"_31Ylv","label":"_Zo_r8","rc-slider":"_1hLjI","rc-slider-rail":"_v9bxI","rc-slider-track":"__3emJ","rc-slider-handle":"_12sQ3","rc-slider-handle-dragging":"_2u63-","rc-slider-handle-click-focused":"_7xSSR","rc-slider-mark":"_1l2Qm","rc-slider-mark-text":"_2zf2c","rc-slider-mark-text-active":"_25tuh","rc-slider-step":"_3wC_L","rc-slider-dot":"_17-SM","rc-slider-dot-active":"_1eLwY","rc-slider-dot-reverse":"_Ewb1d","rc-slider-disabled":"_1YO43","rc-slider-vertical":"_12Juq","rc-slider-tooltip-zoom-down-enter":"_2a95b","rc-slider-tooltip-zoom-down-appear":"_2wvsD","rc-slider-tooltip-zoom-down-leave":"_3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_P9_lk","rc-slider-tooltip":"_1PZK2","rc-slider-tooltip-hidden":"_2CvyB","rc-slider-tooltip-placement-top":"_qzmlA","rc-slider-tooltip-inner":"_27Bp4","rc-slider-tooltip-arrow":"_35-HY"};
+var css$h = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
 
-var CustomHandle = function CustomHandle(props) {
-  var style = {
+const CustomHandle = props => {
+  const style = {
     left: props.offset + '%',
     transform: 'translateX(-50%)'
   };
@@ -1177,61 +1022,57 @@ var CustomHandle = function CustomHandle(props) {
   });
 };
 
-var SliderField = function SliderField(_ref) {
-  var className = _ref.className,
-      disabled = _ref.disabled,
-      label = _ref.label,
-      onChange = _ref.onChange,
-      name = _ref.name,
-      _ref$align = _ref.align,
-      align = _ref$align === void 0 ? 'left' : _ref$align,
-      props = _objectWithoutPropertiesLoose(_ref, ["className", "disabled", "label", "onChange", "name", "align"]);
-
-  var onChangeHandle = function onChangeHandle(value) {
+const SliderField = ({
+  className,
+  disabled,
+  label,
+  onChange,
+  name,
+  align: _align = 'left',
+  ...props
+}) => {
+  const onChangeHandle = value => {
     if (onChange) onChange({
       target: {
-        value: value,
-        name: name
+        value,
+        name
       }
     });
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$h.field, className, align, {
-      disabled: disabled
+    className: cx(css$h.field, className, _align, {
+      disabled
     })
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$h.slider
-  }, /*#__PURE__*/React__default.createElement(Slider, _extends({
+  }, /*#__PURE__*/React__default.createElement(Slider, Object.assign({
     onChange: onChangeHandle,
-    tipFormatter: function tipFormatter(value) {
-      return "$" + value;
-    },
+    tipFormatter: value => `$${value}`,
     handle: CustomHandle
   }, props))), label && /*#__PURE__*/React__default.createElement("span", {
     className: css$h.label
   }, label));
 };
 
-var css$i = {"filters":"_kiZkv","select":"_4Up3c","field":"_3_9Ku"};
+var css$i = {"filters":"_styles-module__filters__kiZkv","select":"_styles-module__select__4Up3c","field":"_styles-module__field__3_9Ku"};
 
-var StackFilters = function StackFilters(_ref) {
-  var className = _ref.className,
-      fields = _ref.fields,
-      form = _ref.form,
-      _onChange = _ref.onChange;
+const StackFilters = ({
+  className,
+  fields,
+  form,
+  onChange
+}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$i.filters, className)
-  }, Object.keys(fields).map(function (key) {
+  }, Object.keys(fields).map(key => {
     switch (fields[key].type) {
       case 'select':
         return /*#__PURE__*/React__default.createElement(SelectField, {
-          key: "select-" + key,
+          key: `select-${key}`,
           align: "bottom",
           className: cx(css$i.field, css$i.select),
-          onChange: function onChange(value) {
-            return _onChange(key, value);
-          },
+          onChange: value => onChange(key, value),
           label: key,
           name: key,
           options: fields[key].options,
@@ -1240,9 +1081,9 @@ var StackFilters = function StackFilters(_ref) {
 
       case 'checkbox':
         return /*#__PURE__*/React__default.createElement(CheckboxField, {
-          key: "checkbox-" + key,
+          key: `checkbox-${key}`,
           className: css$i.field,
-          onChange: _onChange,
+          onChange: onChange,
           label: key,
           name: key,
           value: form[key]
@@ -1250,9 +1091,9 @@ var StackFilters = function StackFilters(_ref) {
 
       case 'slider':
         return /*#__PURE__*/React__default.createElement(SliderField, {
-          key: "slider-" + key,
+          key: `slider-${key}`,
           className: css$i.field,
-          onChange: _onChange,
+          onChange: onChange,
           align: "right",
           label: key,
           name: key,
@@ -1269,129 +1110,114 @@ var StackFilters = function StackFilters(_ref) {
   }));
 };
 
-var css$j = {"field":"_2DYF1","hidden":"_3z5o2"};
+var css$j = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
 
-var StretchTitleField = function StretchTitleField(_ref) {
-  var value = _ref.value,
-      _ref$placeholder = _ref.placeholder,
-      placeholder = _ref$placeholder === void 0 ? '' : _ref$placeholder,
-      className = _ref.className,
-      props = _objectWithoutPropertiesLoose(_ref, ["value", "placeholder", "className"]);
-
+const StretchTitleField = ({
+  value,
+  placeholder: _placeholder = '',
+  className,
+  ...props
+}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$j.field, className)
-  }, /*#__PURE__*/React__default.createElement("input", _extends({
+  }, /*#__PURE__*/React__default.createElement("input", Object.assign({
     type: "text",
-    placeholder: placeholder,
+    placeholder: _placeholder,
     value: value
   }, props)), /*#__PURE__*/React__default.createElement("div", {
     className: css$j.hidden
-  }, value.length ? value : placeholder));
+  }, value.length ? value : _placeholder));
 };
 
-var css$k = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
+var css$k = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
 
-var Tabs = function Tabs(_ref) {
-  var className = _ref.className,
-      value = _ref.value,
-      tabs = _ref.tabs,
-      onChange = _ref.onChange;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
+const Tabs = ({
+  className,
+  value,
+  tabs,
+  onChange
+}) => {
+  const {
+    t
+  } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$k.tabs, className)
-  }, tabs.map(function (i, index) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      key: index,
-      className: cx(css$k.tab, {
-        active: value === i.value
-      }),
-      onClick: function onClick() {
-        return onChange(i.value);
-      }
-    }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
-      className: css$k.soon
-    }, t('soon')));
-  }));
+  }, tabs.map((i, index) => /*#__PURE__*/React__default.createElement("div", {
+    key: index,
+    className: cx(css$k.tab, {
+      active: value === i.value
+    }),
+    onClick: () => onChange(i.value)
+  }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
+    className: css$k.soon
+  }, t('soon')))));
 };
 
-var css$l = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
+var css$l = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
 
-var TextAreaField = function TextAreaField(_ref) {
-  var label = _ref.label,
-      className = _ref.className,
-      _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 'normal' : _ref$size,
-      _ref$errors = _ref.errors,
-      errors = _ref$errors === void 0 ? [] : _ref$errors,
-      props = _objectWithoutPropertiesLoose(_ref, ["label", "className", "size", "errors"]);
-
-  var hasErrors = Boolean(errors.length);
+const TextAreaField = ({
+  label,
+  className,
+  size: _size = 'normal',
+  errors: _errors = [],
+  ...props
+}) => {
+  const hasErrors = Boolean(_errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$l.field, className, size, {
+    className: cx(css$l.field, className, _size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
     className: css$l.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
     className: css$l.textarea
-  }, /*#__PURE__*/React__default.createElement("textarea", _extends({
+  }, /*#__PURE__*/React__default.createElement("textarea", Object.assign({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
     className: css$l.error
-  }, errors.join(', '))));
+  }, _errors.join(', '))));
 };
 
-var css$m = {"tooltip":"_rE8Jn"};
+var css$m = {"tooltip":"_style-module__tooltip__rE8Jn"};
 
-var Tooltip = function Tooltip(_ref) {
-  var children = _ref.children,
-      overlayContent = _ref.overlayContent,
-      _ref$arrowContent = _ref.arrowContent,
-      arrowContent = _ref$arrowContent === void 0 ? null : _ref$arrowContent,
-      _ref$placement = _ref.placement,
-      placement = _ref$placement === void 0 ? 'bottomLeft' : _ref$placement,
-      _ref$trigger = _ref.trigger,
-      trigger = _ref$trigger === void 0 ? ['hover'] : _ref$trigger,
-      _ref$overlayStyle = _ref.overlayStyle,
-      overlayStyle = _ref$overlayStyle === void 0 ? {
+const Tooltip = ({
+  children,
+  overlayContent,
+  arrowContent: _arrowContent = null,
+  placement: _placement = 'bottomLeft',
+  trigger: _trigger = ['hover'],
+  overlayStyle: _overlayStyle = {
     'pointer-events': 'none'
-  } : _ref$overlayStyle,
-      props = _objectWithoutPropertiesLoose(_ref, ["children", "overlayContent", "arrowContent", "placement", "trigger", "overlayStyle"]);
-
-  return /*#__PURE__*/React__default.createElement(RcTooltip, _extends({
-    overlayStyle: overlayStyle,
-    arrowContent: arrowContent,
-    placement: placement,
-    trigger: trigger,
+  },
+  ...props
+}) => {
+  return /*#__PURE__*/React__default.createElement(RcTooltip, Object.assign({
+    overlayStyle: _overlayStyle,
+    arrowContent: _arrowContent,
+    placement: _placement,
+    trigger: _trigger,
     overlay: /*#__PURE__*/React__default.createElement("div", {
       className: css$m.tooltip
     }, overlayContent)
   }, props), children);
 };
 
-var css$n = {"switcher":"_3NMzC"};
+var css$n = {"switcher":"_styles-module__switcher__3NMzC"};
 
-var ViewSwitcher = function ViewSwitcher(_ref) {
-  var _ref$value = _ref.value,
-      value = _ref$value === void 0 ? 'grid' : _ref$value,
-      onChange = _ref.onChange,
-      className = _ref.className;
+const ViewSwitcher = ({
+  value: _value = 'grid',
+  onChange,
+  className
+}) => {
+  const [stateValue, setStateValue] = useState(_value);
+  useEffect(() => {
+    if (_value !== stateValue) setStateValue(_value);
+  }, [_value]);
 
-  var _useState = useState(value),
-      stateValue = _useState[0],
-      setStateValue = _useState[1];
-
-  useEffect(function () {
-    if (value !== stateValue) setStateValue(value);
-  }, [value]);
-
-  var toggleValue = function toggleValue() {
-    var newValue = stateValue === 'grid' ? 'list' : 'grid';
+  const toggleValue = () => {
+    const newValue = stateValue === 'grid' ? 'list' : 'grid';
     setStateValue(newValue);
     if (onChange) onChange(newValue);
   };
@@ -1406,10 +1232,11 @@ var ViewSwitcher = function ViewSwitcher(_ref) {
   }));
 };
 
-var Yield = function Yield(_ref) {
-  var name = _ref.name,
-      className = _ref.className,
-      children = _ref.children;
+const Yield = ({
+  name,
+  className,
+  children
+}) => {
   if (!name) return null;
   if (children) return /*#__PURE__*/React__default.createElement(Portal, {
     node: document && document.getElementById(name)
@@ -1420,60 +1247,35 @@ var Yield = function Yield(_ref) {
   });
 };
 
-// A type of promise-like that resolves synchronously and supports only one observer
+var css$o = {"table":"_styles-module__table__3tMWP"};
 
-const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
-
-const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
-
-// Asynchronously call a function and send errors to recovery continuation
-function _catch(body, recover) {
-	try {
-		var result = body();
-	} catch(e) {
-		return recover(e);
-	}
-	if (result && result.then) {
-		return result.then(void 0, recover);
-	}
-	return result;
-}
-
-var css$o = {"table":"_3tMWP"};
-
-var Table = function Table(_ref) {
-  var data = _ref.data;
-  var captions = data[0],
-      rows = data.slice(1);
+const Table = ({
+  data
+}) => {
+  const [captions, ...rows] = data;
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$o.table
-  }, /*#__PURE__*/React__default.createElement("table", null, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, captions.map(function (caption) {
-    return /*#__PURE__*/React__default.createElement("th", {
-      key: caption
-    }, caption);
-  }))), /*#__PURE__*/React__default.createElement("tbody", null, rows.map(function (row, index) {
-    return /*#__PURE__*/React__default.createElement("tr", {
-      key: index
-    }, row.map(function (cell, i) {
-      return /*#__PURE__*/React__default.createElement("td", {
-        key: i
-      }, cell);
-    }));
-  }))));
+  }, /*#__PURE__*/React__default.createElement("table", null, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, captions.map(caption => /*#__PURE__*/React__default.createElement("th", {
+    key: caption
+  }, caption)))), /*#__PURE__*/React__default.createElement("tbody", null, rows.map((row, index) => /*#__PURE__*/React__default.createElement("tr", {
+    key: index
+  }, row.map((cell, i) => /*#__PURE__*/React__default.createElement("td", {
+    key: i
+  }, cell)))))));
 };
 
-var instance = axios.create({
+const instance = axios.create({
   baseURL: config.API_URL,
   crossDomain: true
 });
-instance.interceptors.request.use(function (config) {
-  var token = localStorage.getItem('token');
-  config.headers.Authorization = token ? "Bearer " + token : '';
+instance.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  config.headers.Authorization = token ? `Bearer ${token}` : '';
   return config;
 });
-instance.interceptors.response.use(function (response) {
+instance.interceptors.response.use(response => {
   return response;
-}, function (error) {
+}, error => {
   if (get(error, 'response.status', null) === 401) {
     return Promise.reject(error.response);
   } else if (get(error, 'response.status', null) === 400) {
@@ -1489,121 +1291,116 @@ var actionsTypes = {
   FETCH_FAIL: 'stacks/attachments/FETCH_FAIL'
 };
 
-var initialState = {
+const initialState = {
   data: {},
   errors: {},
   requestStatus: null
 };
-var reducer = function reducer(state, action) {
-  var _extends2, _extends3, _extends4, _extends5, _extends6, _extends7;
-
-  if (state === void 0) {
-    state = initialState;
-  }
-
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionsTypes.FETCH:
-      return _extends({}, state, {
-        data: _extends({}, state.data, (_extends3 = {}, _extends3[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends2 = {}, _extends2[action.meta.id] = _extends({}, state.data[action.meta.frameId] ? state.data[action.meta.frameId][action.meta.id] : {}, {
-          loading: true,
-          requestStatus: null,
-          error: null
-        }), _extends2)), _extends3))
-      });
+      return { ...state,
+        data: { ...state.data,
+          [action.meta.frameId]: { ...state.data[action.meta.frameId],
+            [action.meta.id]: { ...(state.data[action.meta.frameId] ? state.data[action.meta.frameId][action.meta.id] : {}),
+              loading: true,
+              requestStatus: null,
+              error: null
+            }
+          }
+        }
+      };
 
     case actionsTypes.FETCH_SUCCESS:
-      return _extends({}, state, {
-        data: _extends({}, state.data, (_extends5 = {}, _extends5[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends4 = {}, _extends4[action.meta.id] = _extends({}, action.payload, {
-          loading: false
-        }), _extends4)), _extends5))
-      });
+      return { ...state,
+        data: { ...state.data,
+          [action.meta.frameId]: { ...state.data[action.meta.frameId],
+            [action.meta.id]: { ...action.payload,
+              loading: false
+            }
+          }
+        }
+      };
 
     case actionsTypes.FETCH_FAIL:
-      return _extends({}, state, {
-        data: _extends({}, state.data, (_extends7 = {}, _extends7[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends6 = {}, _extends6[action.meta.id] = {
-          error: action.payload.error,
-          requestStatus: action.payload.requestStatus,
-          loading: false
-        }, _extends6)), _extends7))
-      });
+      return { ...state,
+        data: { ...state.data,
+          [action.meta.frameId]: { ...state.data[action.meta.frameId],
+            [action.meta.id]: {
+              error: action.payload.error,
+              requestStatus: action.payload.requestStatus,
+              loading: false
+            }
+          }
+        }
+      };
 
     default:
       return state;
   }
 };
-var StateContext = createContext();
-var StateProvider = function StateProvider(_ref) {
-  var children = _ref.children;
-  return /*#__PURE__*/React__default.createElement(StateContext.Provider, {
-    value: useReducer(reducer, initialState)
-  }, children);
-};
-var useStateValue = function useStateValue() {
-  return useContext(StateContext);
-};
+const StateContext = createContext();
+const StateProvider = ({
+  children
+}) => /*#__PURE__*/React__default.createElement(StateContext.Provider, {
+  value: useReducer(reducer, initialState)
+}, children);
+const useStateValue = () => useContext(StateContext);
 
-var actions = (function () {
-  var _useStateValue = useStateValue(),
-      dispatch = _useStateValue[1];
+var actions = (() => {
+  const [, dispatch] = useStateValue();
 
-  var fetchAttachment = function fetchAttachment(stack, frameId, id, onSuccess) {
+  const fetchAttachment = async (stack, frameId, id, onSuccess) => {
+    dispatch({
+      type: actionsTypes.FETCH,
+      meta: {
+        frameId,
+        id
+      }
+    });
+
     try {
+      const request = await api.get(config.STACK_ATTACHMENT(stack, frameId, id));
       dispatch({
-        type: actionsTypes.FETCH,
+        type: actionsTypes.FETCH_SUCCESS,
         meta: {
-          frameId: frameId,
-          id: id
-        }
+          frameId,
+          id
+        },
+        payload: request.data.attachment
       });
-
-      var _temp2 = _catch(function () {
-        return Promise.resolve(api.get(config.STACK_ATTACHMENT(stack, frameId, id))).then(function (request) {
-          dispatch({
-            type: actionsTypes.FETCH_SUCCESS,
-            meta: {
-              frameId: frameId,
-              id: id
-            },
-            payload: request.data.attachment
-          });
-          if (onSuccess) onSuccess();
-        });
-      }, function (e) {
-        var error = 'Unknown error';
-
-        try {
-          error = JSON.parse(get(e, 'request.response')).message;
-        } catch (e) {
-          console.log(error);
-        }
-
-        dispatch({
-          type: actionsTypes.FETCH_FAIL,
-          meta: {
-            frameId: frameId,
-            id: id
-          },
-          payload: {
-            error: error
-          }
-        });
-      });
-
-      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+      if (onSuccess) onSuccess();
     } catch (e) {
-      return Promise.reject(e);
+      let error = 'Unknown error';
+
+      try {
+        error = JSON.parse(get(e, 'request.response')).message;
+      } catch (e) {
+        console.log(error);
+      }
+
+      dispatch({
+        type: actionsTypes.FETCH_FAIL,
+        meta: {
+          frameId,
+          id
+        },
+        payload: {
+          error
+        }
+      });
     }
   };
 
   return {
-    fetchAttachment: fetchAttachment
+    fetchAttachment
   };
 });
 
-var css$p = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD","message":"_1IDQc"};
+var css$p = {"attachment":"_styles-module__attachment__3NILI","loading-pulse":"_styles-module__loading-pulse__IhCO3","view":"_styles-module__view__3UWqG","text":"_styles-module__text__MOcaD","message":"_styles-module__message__1IDQc"};
 
-var base64ToJSON = function base64ToJSON(base64) {
-  var parsedJSON;
+const base64ToJSON = base64 => {
+  let parsedJSON;
 
   try {
     parsedJSON = JSON.parse(atob(base64));
@@ -1614,124 +1411,100 @@ var base64ToJSON = function base64ToJSON(base64) {
   return parsedJSON;
 };
 
-var base64ImagePrefixes = {
+const base64ImagePrefixes = {
   'image/svg+xml': 'data:image/svg+xml;charset=utf-8;',
   'image/png': 'data:image/png;charset=utf-8;',
   'image/jpeg': 'data:image/jpeg;charset=utf-8;'
 };
 
-var isImageType = function isImageType(type) {
-  return /^image/.test(type);
-};
+const isImageType = type => /^image/.test(type);
 
-var Attachment = function Attachment(_ref) {
-  var id = _ref.id,
-      className = _ref.className,
-      frameId = _ref.frameId,
-      isList = _ref.isList,
-      withLoader = _ref.withLoader,
-      stack = _ref.stack;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var _actions = actions(),
-      fetchAttachment = _actions.fetchAttachment;
-
-  var _useStateValue = useStateValue(),
-      data = _useStateValue[0].data;
-
-  var _get = get(data, frameId + "." + id, {}),
-      loading = _get.loading,
-      error = _get.error,
-      requestStatus = _get.requestStatus,
-      attachment = _objectWithoutPropertiesLoose(_get, ["loading", "error", "requestStatus"]);
-
-  var _useState = useState(1),
-      tableScale = _useState[0],
-      setTableScale = _useState[1];
-
-  var _useState2 = useState(false),
-      loadingFullAttachment = _useState2[0],
-      setLoadingFullAttachment = _useState2[1];
-
-  var _useState3 = useState(null),
-      fullAttachment = _useState3[0],
-      setFullAttachment = _useState3[1];
-
-  var viewRef = useRef(null);
-  var prevAttachment = usePrevious(attachment);
-  useEffect(function () {
+const Attachment = ({
+  id,
+  className,
+  frameId,
+  isList,
+  withLoader,
+  stack
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const {
+    fetchAttachment
+  } = actions();
+  const [{
+    data
+  }] = useStateValue();
+  const {
+    loading,
+    error,
+    requestStatus,
+    ...attachment
+  } = get(data, `${frameId}.${id}`, {});
+  const [tableScale, setTableScale] = useState(1);
+  const [loadingFullAttachment, setLoadingFullAttachment] = useState(false);
+  const [fullAttachment, setFullAttachment] = useState(null);
+  const viewRef = useRef(null);
+  const prevAttachment = usePrevious(attachment);
+  useEffect(() => {
     if (window && isList) window.addEventListener('resize', onResizeCard);
-    return function () {
+    return () => {
       if (window && isList) window.removeEventListener('resize', onResizeCard);
     };
   }, []);
 
-  var fetchFullAttachment = function fetchFullAttachment() {
+  const fetchFullAttachment = async () => {
+    setLoadingFullAttachment(true);
+
     try {
-      var _temp3 = function _temp3() {
-        setLoadingFullAttachment(false);
-      };
-
-      setLoadingFullAttachment(true);
-
-      var _temp4 = _catch(function () {
-        var url = config.STACK_ATTACHMENT(stack, frameId, id) + '?download=true';
-        return Promise.resolve(instance.get(url)).then(function (_ref2) {
-          var data = _ref2.data;
-          setFullAttachment(data.attachment);
-        });
-      }, function (e) {
-        console.log(e);
-      });
-
-      return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(_temp3) : _temp3(_temp4));
+      const url = config.STACK_ATTACHMENT(stack, frameId, id) + '?download=true';
+      const {
+        data
+      } = await instance.get(url);
+      setFullAttachment(data.attachment);
     } catch (e) {
-      return Promise.reject(e);
+      console.log(e);
     }
+
+    setLoadingFullAttachment(false);
   };
 
-  useEffect(function () {
+  useEffect(() => {
     if (!isList && attachment && !isEqual(prevAttachment, attachment) && attachment.preview && isImageType(attachment['content_type'])) {
       fetchFullAttachment();
     }
   }, [data]);
-  useEffect(function () {
+  useEffect(() => {
     if (!isList && typeof id === 'number' && frameId && (!attachment.data && !error || (attachment === null || attachment === void 0 ? void 0 : attachment.index) !== id)) {
       fetchAttachment(stack, frameId, id);
     }
   }, [id, frameId]);
-
-  var _useIntersectionObser = useIntersectionObserver(function () {
+  const [ref] = useIntersectionObserver(() => {
     if (isList && !loading && (!attachment.data && !error || attachment.data && attachment.index !== id)) fetchAttachment(stack, frameId, id);
-  }, {}, [id, frameId, data]),
-      ref = _useIntersectionObser[0];
-
-  useEffect(function () {
+  }, {}, [id, frameId, data]);
+  useEffect(() => {
     if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
-      var json = base64ToJSON(attachment.data);
-      if (json && document.querySelector("#bokeh-" + frameId)) Bokeh.embed.embed_item(json, "bokeh-" + frameId);
+      const json = base64ToJSON(attachment.data);
+      if (json && document.querySelector(`#bokeh-${frameId}`)) Bokeh.embed.embed_item(json, `bokeh-${frameId}`);
     }
 
-    if (isList) setTimeout(function () {
-      return onResizeCard();
-    }, 10);
+    if (isList) setTimeout(() => onResizeCard(), 10);
   }, [data]);
 
-  var onResizeCard = function onResizeCard() {
+  const onResizeCard = () => {
     if (ref.current && viewRef.current) {
-      var containerWidth = ref.current.offsetWidth;
-      var viewWidth = viewRef.current.offsetWidth / tableScale;
-      var newScale = containerWidth / viewWidth;
+      const containerWidth = ref.current.offsetWidth;
+      const viewWidth = viewRef.current.offsetWidth / tableScale;
+      let newScale = containerWidth / viewWidth;
       if (newScale > 1) newScale = 1;
       setTableScale(newScale);
     }
   };
 
-  var renderImage = function renderImage() {
+  const renderImage = () => {
     if (!attachment.preview) return /*#__PURE__*/React__default.createElement("img", {
-      src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
+      src: `${base64ImagePrefixes[attachment['content_type']]}base64,${attachment.data}`,
       alt: ""
     });else if (fullAttachment) {
       if (fullAttachment['download_url']) {
@@ -1740,21 +1513,20 @@ var Attachment = function Attachment(_ref) {
           alt: ""
         });
       } else return /*#__PURE__*/React__default.createElement("img", {
-        src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
+        src: `${base64ImagePrefixes[attachment['content_type']]}base64,${attachment.data}`,
         alt: ""
       });
     }
     return null;
   };
 
-  var renderCSV = function renderCSV() {
-    var decodeCSV = unicodeBase64Decode(attachment.data);
+  const renderCSV = () => {
+    const decodeCSV = unicodeBase64Decode(attachment.data);
 
     if (decodeCSV) {
-      var _data = parse(decodeCSV);
-
-      if (Array.isArray(_data) && _data.length) return /*#__PURE__*/React__default.createElement(Table, {
-        data: _data
+      const data = parse(decodeCSV);
+      if (Array.isArray(data) && data.length) return /*#__PURE__*/React__default.createElement(Table, {
+        data: data
       });
     }
 
@@ -1763,8 +1535,8 @@ var Attachment = function Attachment(_ref) {
     }, t('notSupportedAttachment'));
   };
 
-  var renderPlotly = function renderPlotly() {
-    var json = base64ToJSON(attachment.data);
+  const renderPlotly = () => {
+    const json = base64ToJSON(attachment.data);
     if (!json) return null;
     json.layout.width = '100%';
     json.layout.margin = 0;
@@ -1772,7 +1544,7 @@ var Attachment = function Attachment(_ref) {
     json.config = {
       responsive: true
     };
-    return /*#__PURE__*/React__default.createElement(Plot, _extends({}, json, {
+    return /*#__PURE__*/React__default.createElement(Plot, Object.assign({}, json, {
       style: {
         width: '100%',
         height: '100%'
@@ -1781,13 +1553,11 @@ var Attachment = function Attachment(_ref) {
     }));
   };
 
-  var renderBokeh = function renderBokeh() {
-    return /*#__PURE__*/React__default.createElement("div", {
-      id: "bokeh-" + frameId
-    });
-  };
+  const renderBokeh = () => /*#__PURE__*/React__default.createElement("div", {
+    id: `bokeh-${frameId}`
+  });
 
-  var renderAttachment = function renderAttachment() {
+  const renderAttachment = () => {
     if (loading) return null;
     if (requestStatus === 404 && isList) return /*#__PURE__*/React__default.createElement("div", {
       className: css$p.message
@@ -1837,27 +1607,26 @@ var Attachment = function Attachment(_ref) {
       'bokeh': attachment && attachment.data && attachment['application'] === 'bokeh'
     }),
     style: attachment && attachment['content_type'] === 'text/csv' ? {
-      transform: "scale(" + tableScale + ")"
+      transform: `scale(${tableScale})`
     } : {}
   }, renderAttachment()));
 };
 
-var css$q = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
+var css$q = {"item":"_styles-module__item__fLtf5","preview":"_styles-module__preview__2dbXz","previewWrap":"_styles-module__previewWrap__2tToy","emptyMessage":"_styles-module__emptyMessage__3HPC2","attachment":"_styles-module__attachment__2ggOS","section":"_styles-module__section__1ugjv","content":"_styles-module__content__2S1Sc","name":"_styles-module__name__147V3","by":"_styles-module__by__3t2iA","permissions":"_styles-module__permissions__2SUP0","dropdown":"_styles-module__dropdown__35FwM","preview-stack-pulse":"_styles-module__preview-stack-pulse__YESUl"};
 
-var Item = function Item(_ref) {
-  var _ref$Component = _ref.Component,
-      Component = _ref$Component === void 0 ? 'div' : _ref$Component,
-      onClick = _ref.onClick,
-      data = _ref.data,
-      deleteAction = _ref.deleteAction,
-      otherOwner = _ref.otherOwner,
-      rest = _objectWithoutPropertiesLoose(_ref, ["Component", "onClick", "data", "deleteAction", "otherOwner"]);
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var ref = useRef(null);
-  return /*#__PURE__*/React__default.createElement(Component, _extends({
+const Item = ({
+  Component: _Component = 'div',
+  onClick,
+  data,
+  deleteAction,
+  otherOwner,
+  ...rest
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const ref = useRef(null);
+  return /*#__PURE__*/React__default.createElement(_Component, Object.assign({
     className: css$q.item,
     ref: ref,
     onClick: onClick
@@ -1867,7 +1636,7 @@ var Item = function Item(_ref) {
     className: css$q.attachment,
     isList: true,
     withLoader: true,
-    stack: data.user + "/" + data.name,
+    stack: `${data.user}/${data.name}`,
     frameId: data.head,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
@@ -1879,41 +1648,45 @@ var Item = function Item(_ref) {
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$q.name
   }, data.name, ' ', /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+    className: `mdi mdi-lock${data.private ? '' : '-open'}`
   })), otherOwner && /*#__PURE__*/React__default.createElement("div", {
     className: css$q.by
   }, t('by'), " ", data.user)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$q.dropdown,
     items: [{
       title: t('delete'),
-      onClick: function onClick() {
-        return deleteAction(data.name);
-      }
+      onClick: () => deleteAction(data.name)
     }]
   })));
 };
 
-var css$r = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
+var css$r = {"howto":"_styles-module__howto__2kGrG","tabs":"_styles-module__tabs__RLKw7","description":"_styles-module__description__3Ul2-","code":"_styles-module__code__11v2r","footer":"_styles-module__footer__nTy2P"};
 
-var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
-var installRPackageCode = 'install.packages("dstack")';
-var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
+const reportPlotPythonCode = `import matplotlib.pyplot as plt
+from dstack import push_frame
 
-var HowTo = function HowTo(_ref) {
-  var user = _ref.user,
-      token = _ref.token;
+fig = plt.figure()
+plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
+push_frame("simple", fig, "My first plot")`;
+const installRPackageCode = 'install.packages("dstack")';
+const reportPlotRCode = `library(ggplot2)
+library(dstack)
 
-  var _useState = useState(1),
-      activeCodeTab = _useState[0],
-      setActiveCodeTab = _useState[1];
+df <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))
+image <- ggplot(data = df, aes(x = x, y = y)) + geom_line()
 
-  var _useState2 = useState(1),
-      activePlatformTab = _useState2[0],
-      setActivePlatformTab = _useState2[1];
+push_frame("simple", image, "My first plot")`;
 
+const HowTo = ({
+  user,
+  token
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const [activeCodeTab, setActiveCodeTab] = useState(1);
+  const [activePlatformTab, setActivePlatformTab] = useState(1);
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$r.howto
   }, /*#__PURE__*/React__default.createElement(Tabs, {
@@ -1981,95 +1754,70 @@ var HowTo = function HowTo(_ref) {
   }));
 };
 
-var css$s = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$s = {"list":"_styles-module__list__3CcWo","title":"_styles-module__title__2HbVV","side":"_styles-module__side__I1N48","message":"_styles-module__message__3XJKG","text":"_styles-module__text__1_wO5","grid":"_styles-module__grid__1BjLa","search":"_styles-module__search__3VlZv","mobileSearch":"_styles-module__mobileSearch__IxVfV","modal":"_styles-module__modal__1BJIQ","description":"_styles-module__description__1U-iN","buttons":"_styles-module__buttons__19NkE","button":"_styles-module__button__3jLaw"};
 
-var List = function List(_ref) {
-  var _ref$data = _ref.data,
-      data = _ref$data === void 0 ? [] : _ref$data,
-      loading = _ref.loading,
-      deleteStack = _ref.deleteStack,
-      currentUser = _ref.currentUser,
-      user = _ref.user,
-      currentUserToken = _ref.currentUserToken,
-      renderSideTitle = _ref.renderSideTitle;
+const List = ({
+  data: _data = [],
+  loading,
+  deleteStack,
+  currentUser,
+  user,
+  currentUserToken,
+  renderSideTitle
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const [deletingStack, setDeletingStack] = useState(null);
+  const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
+  const [isShowHowToModal, setIsShowHowToModal] = useState(false);
+  const [search, setSearch] = useState('');
+  const isInitialMount = useRef(true);
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
+  const showWelcomeModal = () => setIsShowWelcomeModal(true);
 
-  var _useState = useState(null),
-      deletingStack = _useState[0],
-      setDeletingStack = _useState[1];
+  const onChangeSearch = value => setSearch(value);
 
-  var _useState2 = useState(false),
-      isShowWelcomeModal = _useState2[0],
-      setIsShowWelcomeModal = _useState2[1];
-
-  var _useState3 = useState(false),
-      isShowHowToModal = _useState3[0],
-      setIsShowHowToModal = _useState3[1];
-
-  var _useState4 = useState(''),
-      search = _useState4[0],
-      setSearch = _useState4[1];
-
-  var isInitialMount = useRef(true);
-
-  var showWelcomeModal = function showWelcomeModal() {
-    return setIsShowWelcomeModal(true);
-  };
-
-  var onChangeSearch = function onChangeSearch(value) {
-    return setSearch(value);
-  };
-
-  var hideWelcomeModal = function hideWelcomeModal() {
+  const hideWelcomeModal = () => {
     localStorage.setItem('welcome-modal-is-showing', true);
     setIsShowWelcomeModal(false);
   };
 
-  useEffect(function () {
+  useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else {
-      if (!localStorage.getItem('welcome-modal-is-showing') && !loading && !data.length) showWelcomeModal();
+      if (!localStorage.getItem('welcome-modal-is-showing') && !loading && !_data.length) showWelcomeModal();
     }
-  }, [data]);
+  }, [_data]);
 
-  var showHowToModal = function showHowToModal(event) {
+  const showHowToModal = event => {
     event.preventDefault();
     setIsShowHowToModal(true);
   };
 
-  var hideHowToModal = function hideHowToModal() {
-    return setIsShowHowToModal(false);
-  };
+  const hideHowToModal = () => setIsShowHowToModal(false);
 
-  var deleteItem = function deleteItem() {
+  const deleteItem = () => {
     deleteStack(deletingStack);
     hideDeleteConfirmation();
   };
 
-  var showDeleteConfirmation = function showDeleteConfirmation(name) {
-    return setDeletingStack(name);
-  };
+  const showDeleteConfirmation = name => setDeletingStack(name);
 
-  var hideDeleteConfirmation = function hideDeleteConfirmation() {
-    return setDeletingStack(null);
-  };
+  const hideDeleteConfirmation = () => setDeletingStack(null);
 
-  var getItems = function getItems() {
-    var items = [];
+  const getItems = () => {
+    let items = [];
 
-    if (data && data.length) {
-      if (search.length) items = data.filter(function (i) {
-        return i.name.indexOf(search) >= 0;
-      });else items = data;
+    if (_data && _data.length) {
+      if (search.length) items = _data.filter(i => i.name.indexOf(search) >= 0);else items = _data;
     }
 
     return items;
   };
 
-  var items = getItems();
+  const items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$s.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
@@ -2088,39 +1836,37 @@ var List = function List(_ref) {
     name: user
   }), /*#__PURE__*/React__default.createElement("div", {
     className: css$s.side
-  }, renderSideTitle && renderSideTitle())), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement(Loader, null), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
+  }, renderSideTitle && renderSideTitle())), loading && !Boolean(_data.length) && /*#__PURE__*/React__default.createElement(Loader, null), !loading && !_data.length && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
-  })), !loading && !Boolean(data.length) && currentUser === user && /*#__PURE__*/React__default.createElement(HowTo, {
+  })), !loading && !Boolean(_data.length) && currentUser === user && /*#__PURE__*/React__default.createElement(HowTo, {
     user: currentUser,
     token: currentUserToken
-  }), Boolean(data.length && items.length) && currentUser === user && /*#__PURE__*/React__default.createElement("div", {
+  }), Boolean(_data.length && items.length) && currentUser === user && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.text
   }, t('youHaveStacks', {
-    count: data.length
+    count: _data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
     href: "#",
     onClick: showHowToModal
-  }, t('seeHowToGuide')), "."), Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+  }, t('seeHowToGuide')), "."), Boolean(_data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
     className: css$s.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
-  }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
+  }), Boolean(_data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.grid
-  }, items.map(function (item, index) {
-    return /*#__PURE__*/React__default.createElement(Item, {
-      Component: Link,
-      key: index,
-      data: item,
-      otherOwner: user !== item.user,
-      to: "/" + item.user + "/" + item.name,
-      deleteAction: currentUser === item.user && showDeleteConfirmation
-    });
-  })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
+  }, items.map((item, index) => /*#__PURE__*/React__default.createElement(Item, {
+    Component: Link,
+    key: index,
+    data: item,
+    otherOwner: user !== item.user,
+    to: `/${item.user}/${item.name}`,
+    deleteAction: currentUser === item.user && showDeleteConfirmation
+  }))), Boolean(_data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
@@ -2148,7 +1894,7 @@ var List = function List(_ref) {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
-    title: t('welcomeToDStack') + "\uD83D\uDC4B",
+    title: `${t('welcomeToDStack')}👋`,
     className: css$s.modal
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$s.description
@@ -2173,50 +1919,49 @@ var List = function List(_ref) {
   })));
 };
 
-var pullPythonCode = function pullPythonCode(data) {
-  var a = ["'/" + data.stack + "'"];
-  var params = Object.keys(data.params);
+const pullPythonCode = data => {
+  let a = [`\'/${data.stack}\'`];
+  let params = Object.keys(data.params);
 
   if (params.length > 0) {
-    var p = [];
-    params.forEach(function (key) {
-      if (isString(data.params[key])) p.push("'" + key + "': '" + data.params[key] + "'");else p.push("'" + key + "': " + data.params[key]);
+    let p = [];
+    params.forEach(key => {
+      if (isString(data.params[key])) p.push(`\'${key}\': \'${data.params[key]}\'`);else p.push(`\'${key}\': ${data.params[key]}`);
     });
     a.push('params={' + p.join(', ') + '}');
   }
 
-  return "import pandas as pd\nfrom dstack import pull\n\ndf = pd.read_csv(pull(" + a.join(', ') + "))";
+  return `import pandas as pd
+from dstack import pull
+
+df = pd.read_csv(pull(${a.join(', ')}))`;
 };
-var pullRCode = function pullRCode(data) {
-  var a = ["\"/" + data.stack + "\""];
-  var params = Object.keys(data.params);
+const pullRCode = data => {
+  let a = [`\"/${data.stack}\"`];
+  let params = Object.keys(data.params);
 
   if (params.length > 0) {
-    params.forEach(function (key) {
-      if (isString(data.params[key])) a.push("\"" + key + "\" = \"" + data.params[key] + "\"");else a.push("\"" + key + "\" = " + data.params[key]);
+    params.forEach(key => {
+      if (isString(data.params[key])) a.push(`\"${key}\" = \"${data.params[key]}\"`);else a.push(`\"${key}\" = ${data.params[key]}`);
     });
   }
 
-  return "library(dstack)\n\ndf <- read.csv(pull(" + a.join(', ') + "))";
+  return `library(dstack)
+
+df <- read.csv(pull(${a.join(', ')}))`;
 };
 
-var HowTo$1 = function HowTo(_ref) {
-  var modalMode = _ref.modalMode,
-      user = _ref.user,
-      token = _ref.token,
-      data = _ref.data;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var _useState = useState(1),
-      activeCodeTab = _useState[0],
-      setActiveCodeTab = _useState[1];
-
-  var _useState2 = useState(1),
-      activePlatformTab = _useState2[0],
-      setActivePlatformTab = _useState2[1];
-
+const HowTo$1 = ({
+  modalMode,
+  user,
+  token,
+  data
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const [activeCodeTab, setActiveCodeTab] = useState(1);
+  const [activePlatformTab, setActivePlatformTab] = useState(1);
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$r.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
@@ -2286,64 +2031,45 @@ var HowTo$1 = function HowTo(_ref) {
   }));
 };
 
-var css$t = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+var css$t = {"frames":"_styles-module__frames__3D3R4","frames-dropdown":"_styles-module__frames-dropdown__3hapH","button":"_styles-module__button__Tn4o_","name":"_styles-module__name__YzOn7","label":"_styles-module__label__Hg7hs","dropdown":"_styles-module__dropdown__16pcp","item":"_styles-module__item__1q46l","mark":"_styles-module__mark__1h8Eq","info":"_styles-module__info__2BnTD","modal":"_styles-module__modal__pk61B","description":"_styles-module__description__2GOOp","buttons":"_styles-module__buttons__3Ml-A"};
 
-var getFrameName = function getFrameName(frame) {
-  return moment(frame.timestamp).format('D MMM YYYY h:mm a');
-};
+const getFrameName = frame => moment(frame.timestamp).format('D MMM YYYY h:mm a');
 
-var Frames = function Frames(_ref) {
-  var frame = _ref.frame,
-      frames = _ref.frames,
-      headId = _ref.headId,
-      onChange = _ref.onChange,
-      onMarkAsHead = _ref.onMarkAsHead,
-      className = _ref.className;
+const Frames = ({
+  frame,
+  frames,
+  headId,
+  onChange,
+  onMarkAsHead,
+  className
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const [isShowDropdown, setIsShowDropdown] = useState(false);
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
+  const toggleDropdown = () => setIsShowDropdown(!isShowDropdown);
 
-  var _useState = useState(false),
-      isShowDropdown = _useState[0],
-      setIsShowDropdown = _useState[1];
-
-  var toggleDropdown = function toggleDropdown() {
-    return setIsShowDropdown(!isShowDropdown);
-  };
-
-  var _useState2 = useState(null),
-      frameForMarkingAsHead = _useState2[0],
-      setFrameForMarkingAsHead = _useState2[1];
-
-  var dropdownRef = useRef(null);
-  useOnClickOutside(dropdownRef, function () {
-    return isShowDropdown && toggleDropdown();
-  });
+  const [frameForMarkingAsHead, setFrameForMarkingAsHead] = useState(null);
+  const dropdownRef = useRef(null);
+  useOnClickOutside(dropdownRef, () => isShowDropdown && toggleDropdown());
   if (!frames.length) return null;
-  var activeFrame = frames.find(function (f) {
-    return f.id === frame;
-  });
+  const activeFrame = frames.find(f => f.id === frame);
 
-  var onClickItem = function onClickItem(frameId) {
-    return function () {
-      toggleDropdown();
-      if (frame !== frameId && onChange) onChange(frameId);
-    };
+  const onClickItem = frameId => () => {
+    toggleDropdown();
+    if (frame !== frameId && onChange) onChange(frameId);
   };
 
-  var onClickMarkAsHead = function onClickMarkAsHead(frameId) {
-    return function (event) {
-      event.stopPropagation();
-      setFrameForMarkingAsHead(frameId);
-      toggleDropdown();
-    };
+  const onClickMarkAsHead = frameId => event => {
+    event.stopPropagation();
+    setFrameForMarkingAsHead(frameId);
+    toggleDropdown();
   };
 
-  var hideConfirmation = function hideConfirmation() {
-    return setFrameForMarkingAsHead(null);
-  };
+  const hideConfirmation = () => setFrameForMarkingAsHead(null);
 
-  var confirmMarkFrameAsHead = function confirmMarkFrameAsHead() {
+  const confirmMarkFrameAsHead = () => {
     if (onMarkAsHead) onMarkAsHead(frameForMarkingAsHead.id);
     setFrameForMarkingAsHead(null);
   };
@@ -2371,27 +2097,25 @@ var Frames = function Frames(_ref) {
     className: cx(css$t.dropdown, {
       show: isShowDropdown
     })
-  }, frames.map(function (f) {
-    return /*#__PURE__*/React__default.createElement(Tooltip, {
-      key: f.id,
-      placement: "rightTop",
-      trigger: Boolean(f.description) ? ['hover'] : [],
-      align: {
-        offset: [-20, -20]
-      },
-      onClick: onClickItem(f.id),
-      overlayContent: f.description
-    }, /*#__PURE__*/React__default.createElement("div", {
-      className: css$t.item
-    }, /*#__PURE__*/React__default.createElement("span", {
-      className: css$t.name
-    }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
-      className: css$t.label
-    }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
-      className: css$t.mark,
-      onClick: onClickMarkAsHead(f)
-    }, t('markAsHead'))));
-  }))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
+  }, frames.map(f => /*#__PURE__*/React__default.createElement(Tooltip, {
+    key: f.id,
+    placement: "rightTop",
+    trigger: Boolean(f.description) ? ['hover'] : [],
+    align: {
+      offset: [-20, -20]
+    },
+    onClick: onClickItem(f.id),
+    overlayContent: f.description
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$t.item
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: css$t.name
+  }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
+    className: css$t.label
+  }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
+    className: css$t.mark,
+    onClick: onClickMarkAsHead(f)
+  }, t('markAsHead'))))))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: activeFrame.description
   }, /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$t.info)
@@ -2422,11 +2146,9 @@ var Frames = function Frames(_ref) {
   }, t('cancel')))));
 };
 
-var css$u = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+var css$u = {"loader":"_styles-module__loader__2wNmt","title":"_styles-module__title__1Ms-2","stacks-pulse":"_styles-module__stacks-pulse__FjfKI","label":"_styles-module__label__1rFaq","description":"_styles-module__description__1Rg_O","diagram":"_styles-module__diagram__2Aj7C"};
 
-var Loader$1 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
+const Loader$1 = ({}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$u.loader
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -2440,68 +2162,59 @@ var Loader$1 = function Loader(_ref) {
   }));
 };
 
-var css$v = {"details":"_3iAZb","section":"__r9FQ","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","copy":"_2ikHm","link":"_21w9U","dropdown":"_3axDI","attachment-head":"_282UU","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","filters":"_1-hdZ","attachment":"_3IGZo","sidebar":"_U0_wY","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$v = {"details":"_styles-module__details__3iAZb","section":"_styles-module__section___r9FQ","header":"_styles-module__header__2kekg","title":"_styles-module__title__1zGvd","permissions":"_styles-module__permissions__3ydGO","copy":"_styles-module__copy__2ikHm","link":"_styles-module__link__21w9U","dropdown":"_styles-module__dropdown__3axDI","attachment-head":"_styles-module__attachment-head__282UU","description":"_styles-module__description__Y6gJz","label":"_styles-module__label__2FemD","label-tooltip":"_styles-module__label-tooltip__2Oe5S","actions":"_styles-module__actions__sZkKa","size":"_styles-module__size__Ja107","revisions":"_styles-module__revisions__bLqAO","filters":"_styles-module__filters__1-hdZ","attachment":"_styles-module__attachment__3IGZo","sidebar":"_styles-module__sidebar__U0_wY","modal":"_styles-module__modal__2TdJX","buttons":"_styles-module__buttons__RhHmq","button":"_styles-module__button__26mqa"};
 
-var Details = function Details(_ref) {
-  var currentFrameId = _ref.currentFrameId,
-      headId = _ref.headId,
-      onChangeHeadFrame = _ref.onChangeHeadFrame,
-      attachmentIndex = _ref.attachmentIndex,
-      onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
-      downloadAttachment = _ref.downloadAttachment,
-      onChangeFrame = _ref.onChangeFrame,
-      data = _ref.data,
-      frame = _ref.frame,
-      loading = _ref.loading,
-      currentUser = _ref.currentUser,
-      currentUserToken = _ref.currentUserToken,
-      toggleUpload = _ref.toggleUpload,
-      backUrl = _ref.backUrl,
-      user = _ref.user,
-      stack = _ref.stack;
+const Details = ({
+  currentFrameId,
+  headId,
+  onChangeHeadFrame,
+  attachmentIndex,
+  onChangeAttachmentIndex,
+  downloadAttachment,
+  onChangeFrame,
+  data,
+  frame,
+  loading,
+  currentUser,
+  currentUserToken,
+  toggleUpload,
+  backUrl,
+  user,
+  stack
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const didMountRef = useRef(false);
+  const {
+    form,
+    setForm,
+    onChange
+  } = useForm({});
+  const [fields, setFields] = useState({});
+  const prevFrame = usePrevious$1(frame);
+  const [isShowHowToModal, setIsShowHowToModal] = useState(false);
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var didMountRef = useRef(false);
-
-  var _useForm = useForm({}),
-      form = _useForm.form,
-      setForm = _useForm.setForm,
-      onChange = _useForm.onChange;
-
-  var _useState = useState({}),
-      fields = _useState[0],
-      setFields = _useState[1];
-
-  var prevFrame = usePrevious$1(frame);
-
-  var _useState2 = useState(false),
-      isShowHowToModal = _useState2[0],
-      setIsShowHowToModal = _useState2[1];
-
-  var showHowToModal = function showHowToModal(event) {
+  const showHowToModal = event => {
     event.preventDefault();
     setIsShowHowToModal(true);
   };
 
-  var hideHowToModal = function hideHowToModal() {
-    return setIsShowHowToModal(false);
-  };
+  const hideHowToModal = () => setIsShowHowToModal(false);
 
-  useEffect(function () {
+  useEffect(() => {
     if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseParams();
   }, [frame]);
 
-  var findAttach = function findAttach(form, attachmentIndex) {
-    var attachments = get(frame, 'attachments');
-    var fields = Object.keys(form);
+  const findAttach = (form, attachmentIndex) => {
+    const attachments = get(frame, 'attachments');
+    const fields = Object.keys(form);
     if (!attachments) return;
 
     if (fields.length) {
-      attachments.some(function (attach, index) {
-        var valid = true;
-        fields.forEach(function (key) {
+      attachments.some((attach, index) => {
+        let valid = true;
+        fields.forEach(key => {
           if (!attach.params || !isEqual(attach.params[key], form[key])) valid = false;
         });
         if (valid && !(attachmentIndex === undefined && index === 0)) onChangeAttachmentIndex(index);
@@ -2510,15 +2223,15 @@ var Details = function Details(_ref) {
     }
   };
 
-  var findAttachDebounce = useCallback(debounce(findAttach, 300), [data, frame]);
-  useEffect(function () {
+  const findAttachDebounce = useCallback(debounce(findAttach, 300), [data, frame]);
+  useEffect(() => {
     if (didMountRef.current) findAttachDebounce(form, attachmentIndex);else didMountRef.current = true;
   }, [form]);
 
-  var parseParams = function parseParams() {
-    var attachments = get(frame, 'attachments');
+  const parseParams = () => {
+    const attachments = get(frame, 'attachments');
     if (!attachments || !attachments.length) return;
-    var fields = parseStackParams(attachments);
+    const fields = parseStackParams(attachments);
     setFields(fields);
 
     if (attachmentIndex !== undefined) {
@@ -2526,11 +2239,9 @@ var Details = function Details(_ref) {
     } else setForm(attachments[0].params);
   };
 
-  var renderFields = function renderFields() {
+  const renderFields = () => {
     if (!Object.keys(fields).length) return null;
-    var hasSelectField = Object.keys(fields).some(function (key) {
-      return fields[key].type === 'select';
-    });
+    const hasSelectField = Object.keys(fields).some(key => fields[key].type === 'select');
     return /*#__PURE__*/React__default.createElement(StackFilters, {
       fields: fields,
       form: form,
@@ -2541,12 +2252,12 @@ var Details = function Details(_ref) {
     });
   };
 
-  var onClickDownloadAttachment = function onClickDownloadAttachment(event) {
+  const onClickDownloadAttachment = event => {
     event.preventDefault();
     downloadAttachment();
   };
 
-  var attachment = get(frame, "attachments[" + attachmentIndex + "]");
+  const attachment = get(frame, `attachments[${attachmentIndex}]`);
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$v.details
@@ -2564,7 +2275,7 @@ var Details = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$v.title
   }, data.name, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+    className: `mdi mdi-lock${data.private ? '' : '-open'}`
   })), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$v.dropdown,
     items: [{
@@ -2606,7 +2317,7 @@ var Details = function Details(_ref) {
   }, "(", formatBytes(attachment.length), ")"))), frame && /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$v.attachment,
     withLoader: true,
-    stack: user + "/" + stack,
+    stack: `${user}/${stack}`,
     frameId: frame.id,
     id: attachmentIndex || 0
   })), /*#__PURE__*/React__default.createElement(Modal, {
@@ -2620,37 +2331,35 @@ var Details = function Details(_ref) {
     user: currentUser,
     token: currentUserToken,
     data: {
-      stack: user + "/" + stack,
+      stack: `${user}/${stack}`,
       params: form
     },
     modalMode: true
   })));
 };
 
-var css$w = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
+var css$w = {"item":"_styles-module__item__3urCL","preview":"_styles-module__preview__cxR4e","label":"_styles-module__label__tCzQe","previewWrap":"_styles-module__previewWrap__15fuU","emptyMessage":"_styles-module__emptyMessage__2pDKf","attachment":"_styles-module__attachment__35KB8","section":"_styles-module__section__LeHWu","content":"_styles-module__content__Bgbe4","name":"_styles-module__name__2PrtI","by":"_styles-module__by__1_qsJ","permissions":"_styles-module__permissions__3ZdE1","dropdown":"_styles-module__dropdown__vK4SD","preview-stack-pulse":"_styles-module__preview-stack-pulse__3NFJT"};
 
-var Item$1 = function Item(_ref) {
-  var dashboard = _ref.dashboard,
-      deleteDashboard = _ref.deleteDashboard,
-      user = _ref.user;
+const Item$1 = ({
+  dashboard,
+  deleteDashboard,
+  user
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const ref = useRef(null);
+  const hasStacks = dashboard.cards && Boolean(dashboard.cards.length);
+  const card = dashboard.cards.find(c => get(c, 'head.id'));
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var ref = useRef(null);
-  var hasStacks = dashboard.cards && Boolean(dashboard.cards.length);
-  var card = dashboard.cards.find(function (c) {
-    return get(c, 'head.id');
-  });
-
-  var onClickDelete = function onClickDelete() {
+  const onClickDelete = () => {
     deleteDashboard({
       user: user,
       id: dashboard.id
     });
   };
 
-  var isShowDropdown = Boolean(deleteDashboard);
+  const isShowDropdown = Boolean(deleteDashboard);
   return /*#__PURE__*/React__default.createElement(Link, {
     to: routes.dashboardsDetails(user, dashboard.id),
     className: css$w.item,
@@ -2677,7 +2386,7 @@ var Item$1 = function Item(_ref) {
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$w.name
   }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
+    className: `mdi mdi-lock${dashboard.private ? '' : '-open'}`
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
     className: css$w.by
   }, t('by'), " ", dashboard.user)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
@@ -2689,11 +2398,9 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$x = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
+var css$x = {"loader":"_styles-module__loader__PK0JP","text":"_styles-module__text__1F-rx","dashboards-pulse":"_styles-module__dashboards-pulse__29IbF","grid":"_styles-module__grid__ef-jq","item":"_styles-module__item__1HBd8","pic":"_styles-module__pic__1z0LR","section":"_styles-module__section__14O5G"};
 
-var Loader$2 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
+const Loader$2 = ({}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$x.loader
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -2715,41 +2422,35 @@ var Loader$2 = function Loader(_ref) {
   }))));
 };
 
-var css$y = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
+var css$y = {"list":"_styles-module__list__2tGd9","title":"_styles-module__title__lNufF","search":"_styles-module__search__3Vnt-","mobileSearch":"_styles-module__mobileSearch__28J_R","text":"_styles-module__text__2QiEZ","grid":"_styles-module__grid__31LQw","add":"_styles-module__add__1VMC5","caption":"_styles-module__caption__pTzl3"};
 
-var List$1 = function List(_ref) {
-  var addDashboard = _ref.addDashboard,
-      addDashboardDisable = _ref.addDashboardDisable,
-      currentUser = _ref.currentUser,
-      data = _ref.data,
-      deleteDashboard = _ref.deleteDashboard,
-      loading = _ref.loading,
-      user = _ref.user;
+const List$1 = ({
+  addDashboard,
+  addDashboardDisable,
+  currentUser,
+  data,
+  deleteDashboard,
+  loading,
+  user
+}) => {
+  const [search, setSearch] = useState('');
+  const {
+    t
+  } = useTranslation();
 
-  var _useState = useState(''),
-      search = _useState[0],
-      setSearch = _useState[1];
+  const onChangeSearch = value => setSearch(value);
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var onChangeSearch = function onChangeSearch(value) {
-    return setSearch(value);
-  };
-
-  var getItems = function getItems() {
-    var items = [];
+  const getItems = () => {
+    let items = [];
 
     if (data && data.length) {
-      if (search.length) items = data.filter(function (i) {
-        return i.title.indexOf(search) >= 0;
-      });else items = data;
+      if (search.length) items = data.filter(i => i.title.indexOf(search) >= 0);else items = data;
     }
 
     return items;
   };
 
-  var items = getItems();
+  const items = getItems();
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$2, null);
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$y.list
@@ -2785,21 +2486,17 @@ var List$1 = function List(_ref) {
     className: css$y.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
-  }), t('newDashboard'))), items.map(function (item, index) {
-    return /*#__PURE__*/React__default.createElement(Item$1, {
-      key: index,
-      user: user,
-      dashboard: item,
-      deleteDashboard: currentUser === item.user && deleteDashboard
-    });
-  })));
+  }), t('newDashboard'))), items.map((item, index) => /*#__PURE__*/React__default.createElement(Item$1, {
+    key: index,
+    user: user,
+    dashboard: item,
+    deleteDashboard: currentUser === item.user && deleteDashboard
+  }))));
 };
 
-var css$z = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
+var css$z = {"loader":"_styles-module__loader__FMgKh","text":"_styles-module__text__3kMB4","stacks-pulse":"_styles-module__stacks-pulse__2uZ4b","grid":"_styles-module__grid__1i-Vy","item":"_styles-module__item__3Q6le","pic":"_styles-module__pic__2gd5L","section":"_styles-module__section__BzTYi"};
 
-var Loader$3 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
+const Loader$3 = ({}) => {
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$z.loader
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -2827,83 +2524,63 @@ var Loader$3 = function Loader(_ref) {
   }))));
 };
 
-var css$A = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
+var css$A = {"stacks":"_style-module__stacks__1YlOe","grid":"_style-module__grid__2Xblj","search":"_style-module__search__2JDJR","message":"_style-module__message__30aty","text":"_style-module__text__1qJHA","item":"_style-module__item__1AIvq","checkbox":"_style-module__checkbox__I8MzQ","buttons":"_style-module__buttons__3uEfC","button":"_style-module__button__22J0P"};
 
-var AddStacksModal = function AddStacksModal(_ref) {
-  var _ref$stacks = _ref.stacks,
-      stacks = _ref$stacks === void 0 ? [] : _ref$stacks,
-      loading = _ref.loading,
-      isShow = _ref.isShow,
-      onClose = _ref.onClose,
-      onAddStacks = _ref.onAddStacks,
-      currentUser = _ref.currentUser,
-      user = _ref.user;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var params = useParams();
-
-  var _useState = useState(''),
-      searchQuery = _useState[0],
-      setSearchQuery = _useState[1];
-
-  var _useState2 = useState([]),
-      selected = _useState2[0],
-      setSelected = _useState2[1];
-
-  useEffect(function () {
+const AddStacksModal = ({
+  stacks: _stacks = [],
+  loading,
+  isShow,
+  onClose,
+  onAddStacks,
+  currentUser,
+  user
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const params = useParams();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selected, setSelected] = useState([]);
+  useEffect(() => {
     if (!isShow) {
       setSelected([]);
       setSearchQuery('');
     }
   }, [isShow]);
 
-  var getItems = function getItems() {
-    var items = [];
+  const getItems = () => {
+    let items = [];
 
-    if (stacks && stacks.length) {
-      if (searchQuery.length) items = stacks.filter(function (i) {
-        return i.name.indexOf(searchQuery) >= 0;
-      });else items = stacks;
+    if (_stacks && _stacks.length) {
+      if (searchQuery.length) items = _stacks.filter(i => i.name.indexOf(searchQuery) >= 0);else items = _stacks;
     }
 
     return items;
   };
 
-  var items = getItems();
+  const items = getItems();
 
-  var onChangeSearch = function onChangeSearch(value) {
-    return setSearchQuery(value);
+  const onChangeSearch = value => setSearchQuery(value);
+
+  const getFullStackName = stack => `${stack.user}/${stack.name}`;
+
+  const isChecked = stack => {
+    const stackName = getFullStackName(stack);
+    return selected.findIndex(i => i === stackName) >= 0;
   };
 
-  var getFullStackName = function getFullStackName(stack) {
-    return stack.user + "/" + stack.name;
+  const getOnClickStack = stack => () => {
+    const stackName = getFullStackName(stack);
+
+    if (isChecked(stack)) {
+      const filtered = selected.filter(i => i !== stackName);
+      setSelected(filtered);
+    } else {
+      setSelected([...selected, stackName]);
+    }
   };
 
-  var isChecked = function isChecked(stack) {
-    var stackName = getFullStackName(stack);
-    return selected.findIndex(function (i) {
-      return i === stackName;
-    }) >= 0;
-  };
-
-  var getOnClickStack = function getOnClickStack(stack) {
-    return function () {
-      var stackName = getFullStackName(stack);
-
-      if (isChecked(stack)) {
-        var filtered = selected.filter(function (i) {
-          return i !== stackName;
-        });
-        setSelected(filtered);
-      } else {
-        setSelected([].concat(selected, [stackName]));
-      }
-    };
-  };
-
-  var submit = function submit() {
+  const submit = () => {
     if (onAddStacks) onAddStacks(selected);
     onClose();
   };
@@ -2914,7 +2591,7 @@ var AddStacksModal = function AddStacksModal(_ref) {
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
-  }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField$1, {
+  }, !loading && Boolean(_stacks.length) && /*#__PURE__*/React__default.createElement(SearchField$1, {
     className: css$A.search,
     isDark: true,
     size: "middle",
@@ -2922,28 +2599,26 @@ var AddStacksModal = function AddStacksModal(_ref) {
     placeholder: t('findStack'),
     value: searchQuery,
     onChange: onChangeSearch
-  }), loading && /*#__PURE__*/React__default.createElement(Loader$3, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
+  }), loading && /*#__PURE__*/React__default.createElement(Loader$3, null), !loading && !_stacks.length && /*#__PURE__*/React__default.createElement("div", {
     className: css$A.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
-  })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
+  })), !loading && Boolean(_stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$A.text
-  }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+  }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(_stacks.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
     className: css$A.grid
-  }, items.map(function (item, index) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      className: css$A.item,
-      key: index,
-      onClick: getOnClickStack(item)
-    }, /*#__PURE__*/React__default.createElement(CheckboxField$1, {
-      className: css$A.checkbox,
-      value: isChecked(item),
-      readOnly: true
-    }), /*#__PURE__*/React__default.createElement(StackListItem, {
-      data: item,
-      otherOwner: params.user !== item.user
-    }));
-  })), /*#__PURE__*/React__default.createElement("div", {
+  }, items.map((item, index) => /*#__PURE__*/React__default.createElement("div", {
+    className: css$A.item,
+    key: index,
+    onClick: getOnClickStack(item)
+  }, /*#__PURE__*/React__default.createElement(CheckboxField$1, {
+    className: css$A.checkbox,
+    value: isChecked(item),
+    readOnly: true
+  }), /*#__PURE__*/React__default.createElement(StackListItem, {
+    data: item,
+    otherOwner: params.user !== item.user
+  })))), /*#__PURE__*/React__default.createElement("div", {
     className: css$A.buttons
   }, /*#__PURE__*/React__default.createElement(Button$1, {
     className: css$A.button,
