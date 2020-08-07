@@ -6,7 +6,7 @@ import {useParams, useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {NotFound, DashboardList} from '@dstackai/dstack-react';
-import {isSignedIn} from 'utils';
+import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {create as createDashboard, deleteDashboard} from 'Dashboards/Details/actions';
 import {fetchList} from './actions';
 import routes from 'routes';

@@ -1,5 +1,4 @@
-import React from 'react';
-
+export {default as config} from './config';
 export {default as AccessForbidden} from './AccessForbidden';
 export {default as Avatar} from './Avatar';
 export {default as BackButton} from './BackButton';
@@ -36,7 +35,15 @@ export {default as StackHowToFetchData} from './stack/HowToFetchData';
 export {default as StackFrames} from './stack/Frames';
 export {default as StackDetails} from './stack/Details';
 
+export {default as DashboardDetails} from './dashboard/Details';
 export {default as DashboardListItem} from './dashboard/ListItem';
 export {default as DashboardList} from './dashboard/List';
 export {default as DashboardAddStacksModal} from './dashboard/AddStacksModal';
+
+export {DndProvider as DndProvider} from 'react-dnd';
+export {GridProvider as DnDGridContextProvider} from './dnd/DnDGridContext';
+export {default as DnDGridContext} from './dnd/DnDGridContext';
+export {default as DnDItem} from './dnd/DnDItem';
+
+
 

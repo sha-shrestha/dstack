@@ -3,7 +3,7 @@ import React, {useState, useRef} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
-import {useOnClickOutside} from '../../hooks';
+import useOnClickOutside from '../../hooks/useOnClickOutside';
 import Button from '../../Button';
 import Modal from '../../Modal';
 import Tooltip from '../../Tooltip';

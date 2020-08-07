@@ -7,8 +7,8 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router';
 import cx from 'classnames';
 import {Button, Modal, Tooltip, TextField, FileDragnDrop} from '@dstackai/dstack-react';
+import {fileToBaseTo64} from '@dstackai/dstack-react/dist/utils';
 import {useForm, useDebounce} from 'hooks';
-import {fileToBaseTo64} from 'utils';
 import config from 'config';
 import css from './style.module.css';
 

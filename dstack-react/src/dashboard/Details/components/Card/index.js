@@ -5,9 +5,12 @@ import {get, isEqual} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import cx from 'classnames';
-import {parseStackParams} from 'utils';
-import {useDebounce} from 'hooks';
-import {Button, Dropdown, Tooltip, StackAttachment} from '@dstackai/dstack-react';
+import {parseStackParams} from '../../../../utils';
+import useDebounce from '../../../../hooks/useDebounce';
+import Button from '../../../../Button';
+import Dropdown from '../../../../Dropdown';
+import Tooltip from '../../../../Tooltip';
+import StackAttachment from '../../../../stack/Attachment';
 import css from './styles.module.css';
 
 export type DashboardCard = {
@@ -23,8 +26,9 @@ type Props = {
     attachment: {},
     fetchAttachment: Function,
     deleteCard: Function,
-    updateCard: Function,
+    updateCardTitle: Function,
     filters: {},
+    moveAvailable?: boolean,
 }
 
 const Card = memo(({
@@ -32,9 +36,10 @@ const Card = memo(({
     className,
     type = 'grid',
     deleteCard,
-    updateCard,
+    updateCardTitle,
     filters,
     forwardedRef,
+    moveAvailable,
 }: Props) => {
     const [title, setTitle] = useState(data.title);
     const {t} = useTranslation();
@@ -80,18 +85,18 @@ const Card = memo(({
             setAttachmentIndex(0);
     };
 
-    const onUpdate = updateCard ? useDebounce(updateCard, []) : () => {};
+    const onUpdate = updateCardTitle ? useDebounce(updateCardTitle, []) : () => {};
 
     const onChangeTitle = event => {
         setTitle(event.target.value);
-        onUpdate({title: event.target.value});
+        onUpdate(event.target.value);
     };
 
     return (
         <div className={cx(css.card, `type-${type}`, className)} ref={forwardedRef}>
             <div className={css.inner}>
                 <div className={css.head}>
-                    <div className={cx(css.name, {readonly: !updateCard})}>
+                    <div className={cx(css.name, {readonly: !updateCardTitle})}>
                         <div className={css.nameValue}>{title.length ? title : t('title')}</div>
 
                         <input
@@ -128,15 +133,15 @@ const Card = memo(({
                         <span className="mdi mdi-open-in-new" />
                     </Button>
 
-                    {deleteCard && (
+                    {Boolean(deleteCard) && (
                         <Dropdown
                             className={css.dropdown}
 
                             items={[
-                                {
+                                ...(deleteCard ? [{
                                     title: t('delete'),
                                     onClick: deleteCard,
-                                },
+                                }] : []),
                             ]}
                         >
                             <Button
@@ -148,7 +153,7 @@ const Card = memo(({
                         </Dropdown>
                     )}
 
-                    {updateCard && (
+                    {moveAvailable && (
                         <Button
                             className={cx(css.button, css.move)}
                             color="secondary"

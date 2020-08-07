@@ -1,11 +1,11 @@
-import api from 'api';
+import axios from 'axios';
 import {get as _get} from 'lodash-es';
 import actionsTypes from './actionsTypes';
 import config from '../../config';
 import {useStateValue} from './store';
 
 export default () => {
-    const [, dispatch] = useStateValue();
+    const [{apiUrl}, dispatch] = useStateValue();
 
     const fetchAttachment = async (stack, frameId, id, onSuccess) => {
         dispatch({
@@ -14,7 +14,10 @@ export default () => {
         });
 
         try {
-            const request = await api.get(config.STACK_ATTACHMENT(stack, frameId, id));
+            const request = await axios({
+                baseURL: apiUrl,
+                url: config.STACK_ATTACHMENT(stack, frameId, id),
+            });
 
             dispatch({
                 type: actionsTypes.FETCH_SUCCESS,

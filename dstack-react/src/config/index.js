@@ -1,8 +1,4 @@
 export default {
-    // API_URL: '/api',
-    API_URL: 'https://api.stgn.dstack.ai',
-
-    GA_ID: '',
     DOCS_URL: 'http://docs.dstack.ai',
 
     LOGIN_URL: '/users/login',
@@ -33,7 +29,7 @@ export default {
     DISCORD_URL: 'https://discord.gg/8xfhEYa',
     TWITTER_URL: 'https://twitter.com/dstackai',
     GITHUB_URL: 'https://github.com/dstackai',
-    MEDIUM_URL: 'https://blog.dstack.ai',
+    BLOG_URL: 'https://blog.dstack.ai',
 
     CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
         const origin = window ? window.location.origin : '';

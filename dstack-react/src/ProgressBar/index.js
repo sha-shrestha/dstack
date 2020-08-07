@@ -1,7 +1,7 @@
 // @flow
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import cx from 'classnames';
-import {usePrevious} from '../hooks';
+import usePrevious from '../hooks/usePrevious';
 import css from './styles.module.css';
 
 type Props = {

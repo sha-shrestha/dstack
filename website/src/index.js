@@ -2,10 +2,9 @@ import React from 'react';
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
-import {StackAttachmentProvider} from '@dstackai/dstack-react';
-import {DndProvider} from 'react-dnd';
-import {GridProvider} from 'components/DnDGridContext';
+import {StackAttachmentProvider, DnDGridContextProvider, DndProvider} from '@dstackai/dstack-react';
 import HTML5Backend from 'react-dnd-html5-backend';
+import config from 'config';
 
 import App from 'App';
 import store from './store';
@@ -23,11 +22,11 @@ if (rootElement instanceof Element) {
         <Provider store={store}>
             <BrowserRouter>
                 <DndProvider backend={HTML5Backend}>
-                    <GridProvider>
-                        <StackAttachmentProvider>
+                    <DnDGridContextProvider>
+                        <StackAttachmentProvider apiUrl={config.API_URL}>
                             <App/>
                         </StackAttachmentProvider>
-                    </GridProvider>
+                    </DnDGridContextProvider>
                 </DndProvider>
             </BrowserRouter>
         </Provider>,

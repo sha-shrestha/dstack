@@ -1,8 +1,8 @@
 // @flow
 import api from 'api';
+import {getDataFailedRequest, downloadFile} from '@dstackai/dstack-react/dist/utils';
 import actionsTypes from './actionsTypes';
 import config from 'config';
-import {getDataFailedRequest, downloadFile} from 'utils';
 
 export const fetchDetails = (userName, stack, onSuccess?: Function) => async (dispatch: Function) => {
     dispatch({type: actionsTypes.FETCH});

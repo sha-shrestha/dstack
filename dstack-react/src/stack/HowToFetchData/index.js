@@ -5,7 +5,7 @@ import {useTranslation} from 'react-i18next';
 import Tabs from '../../Tabs';
 import CodeViewer from '../../CodeViewer';
 import {isString} from 'lodash-es';
-import config from 'config';
+import config from '../../config';
 import css from '../HowTo/styles.module.css';
 
 export const pullPythonCode = data => {

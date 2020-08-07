@@ -3,7 +3,7 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import cx from 'classnames';
 import {isEqual, get} from 'lodash-es';
-import {usePrevious} from 'hooks';
+import usePrevious from '../../hooks/usePrevious';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import {debounce as _debounce} from 'lodash-es';
@@ -18,7 +18,7 @@ import StackHowToFetchData from '../HowToFetchData';
 import StackAttachment from '../Attachment';
 import StackFrames from '../Frames';
 import Loader from './components/Loader';
-import {useForm} from '../../hooks';
+import useForm from '../../hooks/useForm';
 import {formatBytes, parseStackParams} from '../../utils';
 import css from './styles.module.css';
 

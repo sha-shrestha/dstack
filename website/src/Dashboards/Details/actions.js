@@ -2,7 +2,7 @@
 import api from 'api';
 import actionsTypes from './actionsTypes';
 import config from 'config';
-import {getDataFailedRequest} from 'utils';
+import {getDataFailedRequest} from '@dstackai/dstack-react/dist/utils';
 
 export const fetch = (userName, id, onSuccess: Function) => async (dispatch: Function) => {
     dispatch({type: actionsTypes.FETCH});

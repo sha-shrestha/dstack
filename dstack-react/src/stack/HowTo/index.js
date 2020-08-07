@@ -5,7 +5,7 @@ import {useTranslation} from 'react-i18next';
 import CodeViewer from '../../CodeViewer';
 import Tabs from '../../Tabs';
 import css from './styles.module.css';
-import config from 'config';
+import config from '../../config';
 
 export const reportPlotPythonCode = `import matplotlib.pyplot as plt
 from dstack import push_frame

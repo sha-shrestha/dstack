@@ -6,10 +6,10 @@ import Helmet from 'react-helmet';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {NotFound, StackList} from '@dstackai/dstack-react';
+import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {startAppProgress, completeAppProgress, resetAppProgress} from 'App/actions';
 import {fetchList, deleteStack} from './actions';
 import Upload from 'Stacks/components/Upload';
-import {isSignedIn} from 'utils';
 import {useParams} from 'react-router';
 import routes from 'routes';
 

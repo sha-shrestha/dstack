@@ -74,8 +74,8 @@ export const reducer = (state = initialState, action) => {
 
 export const StateContext = createContext();
 
-export const StateProvider = ({children}) => (
-    <StateContext.Provider value={useReducer(reducer, initialState)}>
+export const StateProvider = ({children, apiUrl}) => (
+    <StateContext.Provider value={useReducer(reducer, {...initialState, apiUrl})}>
         {children}
     </StateContext.Provider>
 );

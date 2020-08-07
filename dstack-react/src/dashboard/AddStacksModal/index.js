@@ -2,7 +2,11 @@
 import React, {useEffect, useState, Fragment} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router';
-import {Button, Modal, SearchField, CheckboxField, StackListItem} from '@dstackai/dstack-react';
+import Button from '../../Button';
+import Modal from '../../Modal';
+import SearchField from '../../SearchField';
+import CheckboxField from '../../CheckboxField';
+import StackListItem from '../../stack/ListItem';
 import Loader from './Loader';
 import css from './style.module.css';
 

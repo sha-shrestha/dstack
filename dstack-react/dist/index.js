@@ -16,16 +16,81 @@ var reactPortal = require('react-portal');
 var Select = require('rc-select');
 var Select__default = _interopDefault(Select);
 var Slider = _interopDefault(require('rc-slider'));
+var axios = _interopDefault(require('axios'));
 var Plot = _interopDefault(require('react-plotly.js'));
 var CSV = require('csv-string');
-var axios = _interopDefault(require('axios'));
-var api = _interopDefault(require('api'));
 var reactRouterDom = require('react-router-dom');
-var config$1 = _interopDefault(require('config'));
-var hooks = require('hooks');
-var routes = _interopDefault(require('routes'));
+var reactDnd = require('react-dnd');
 var reactRouter = require('react-router');
-var dstackReact = require('@dstackai/dstack-react');
+
+var config = {
+  DOCS_URL: 'http://docs.dstack.ai',
+  LOGIN_URL: '/users/login',
+  VERIFY_EMAIL_URL: '/users/verify',
+  USER_DATA_URL: '/users/remember',
+  UPDATE_TOKEN_URL: '/users/update/token',
+  UPDATE_SETTINGS_URL: '/users/update/settings',
+  CHECK_USER: function CHECK_USER(userName) {
+    return "/users/exists/" + userName;
+  },
+  STACKS_LIST: function STACKS_LIST(userName) {
+    return "/stacks/" + userName;
+  },
+  DELETE_STACK: function DELETE_STACK() {
+    return '/stacks/delete';
+  },
+  STACK_DETAILS: function STACK_DETAILS(userName, stack) {
+    return "/stacks/" + userName + "/" + stack;
+  },
+  STACK_FRAME: function STACK_FRAME(userName, stack, frameId) {
+    return "/frames/" + userName + "/" + stack + "/" + frameId;
+  },
+  STACK_ATTACHMENT: function STACK_ATTACHMENT(stack, frameId, id) {
+    return "/attachs/" + stack + "/" + frameId + "/" + id;
+  },
+  STACK_UPDATE: '/stacks/update',
+  STACK_PUSH: '/stacks/push',
+  DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
+    return "/dashboards/" + userName;
+  },
+  DASHBOARD_DETAILS: function DASHBOARD_DETAILS(userName, id) {
+    return "/dashboards/" + userName + "/" + id;
+  },
+  DASHBOARD_CREATE: '/dashboards/create',
+  DASHBOARD_UPDATE: '/dashboards/update',
+  DASHBOARD_DELETE: '/dashboards/delete',
+  DASHBOARD_CARDS_INSERT: '/dashboards/cards/insert',
+  DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
+  DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
+  DISCORD_URL: 'https://discord.gg/8xfhEYa',
+  TWITTER_URL: 'https://twitter.com/dstackai',
+  GITHUB_URL: 'https://github.com/dstackai',
+  BLOG_URL: 'https://blog.dstack.ai',
+  CONFIGURE_PYTHON_COMMAND: function CONFIGURE_PYTHON_COMMAND(token, userName) {
+    if (token === void 0) {
+      token = '<token>';
+    }
+
+    if (userName === void 0) {
+      userName = '<username>';
+    }
+
+    var origin = window ? window.location.origin : '';
+    return "dstack config add --token " + token + " --user " + userName + " --server " + origin + "/api";
+  },
+  CONFIGURE_R_COMMAND: function CONFIGURE_R_COMMAND(token, userName) {
+    if (token === void 0) {
+      token = '<token>';
+    }
+
+    if (userName === void 0) {
+      userName = '<username>';
+    }
+
+    var origin = window ? window.location.origin : '';
+    return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
+  }
+};
 
 var image = require("./lock~ZBorChcU.svg");
 
@@ -81,6 +146,12 @@ function _extends() {
   };
 
   return _extends.apply(this, arguments);
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
 }
 
 function _objectDestructuringEmpty(obj) {
@@ -657,77 +728,6 @@ var Modal = function Modal(_ref) {
   }, title), children)));
 };
 
-var config = {
-  API_URL: 'https://api.stgn.dstack.ai',
-  GA_ID: '',
-  DOCS_URL: 'http://docs.dstack.ai',
-  LOGIN_URL: '/users/login',
-  VERIFY_EMAIL_URL: '/users/verify',
-  USER_DATA_URL: '/users/remember',
-  UPDATE_TOKEN_URL: '/users/update/token',
-  UPDATE_SETTINGS_URL: '/users/update/settings',
-  CHECK_USER: function CHECK_USER(userName) {
-    return "/users/exists/" + userName;
-  },
-  STACKS_LIST: function STACKS_LIST(userName) {
-    return "/stacks/" + userName;
-  },
-  DELETE_STACK: function DELETE_STACK() {
-    return '/stacks/delete';
-  },
-  STACK_DETAILS: function STACK_DETAILS(userName, stack) {
-    return "/stacks/" + userName + "/" + stack;
-  },
-  STACK_FRAME: function STACK_FRAME(userName, stack, frameId) {
-    return "/frames/" + userName + "/" + stack + "/" + frameId;
-  },
-  STACK_ATTACHMENT: function STACK_ATTACHMENT(stack, frameId, id) {
-    return "/attachs/" + stack + "/" + frameId + "/" + id;
-  },
-  STACK_UPDATE: '/stacks/update',
-  STACK_PUSH: '/stacks/push',
-  DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
-    return "/dashboards/" + userName;
-  },
-  DASHBOARD_DETAILS: function DASHBOARD_DETAILS(userName, id) {
-    return "/dashboards/" + userName + "/" + id;
-  },
-  DASHBOARD_CREATE: '/dashboards/create',
-  DASHBOARD_UPDATE: '/dashboards/update',
-  DASHBOARD_DELETE: '/dashboards/delete',
-  DASHBOARD_CARDS_INSERT: '/dashboards/cards/insert',
-  DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
-  DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
-  DISCORD_URL: 'https://discord.gg/8xfhEYa',
-  TWITTER_URL: 'https://twitter.com/dstackai',
-  GITHUB_URL: ' https://github.com/dstackai',
-  MEDIUM_URL: ' https://medium.com/dstackai',
-  CONFIGURE_PYTHON_COMMAND: function CONFIGURE_PYTHON_COMMAND(token, userName) {
-    if (token === void 0) {
-      token = '<token>';
-    }
-
-    if (userName === void 0) {
-      userName = '<username>';
-    }
-
-    var origin = window ? window.location.origin : '';
-    return "dstack config --token " + token + " --user " + userName + " --server " + origin + "/api";
-  },
-  CONFIGURE_R_COMMAND: function CONFIGURE_R_COMMAND(token, userName) {
-    if (token === void 0) {
-      token = '<token>';
-    }
-
-    if (userName === void 0) {
-      userName = '<username>';
-    }
-
-    var origin = window ? window.location.origin : '';
-    return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
-  }
-};
-
 var image$1 = require("./404~FXFqzVOe.svg");
 
 var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
@@ -773,158 +773,6 @@ var usePrevious = (function (value) {
     ref.current = value;
   }, [value]);
   return ref.current;
-});
-
-var useOnClickOutside = (function (ref, handler) {
-  React.useEffect(function () {
-    var listener = function listener(event) {
-      if (!ref.current || ref.current.contains(event.target)) {
-        return;
-      }
-
-      handler(event);
-    };
-
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
-    return function () {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchstart', listener);
-    };
-  }, [ref, handler]);
-});
-
-var isEmail = function isEmail(value) {
-  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
-};
-var isRequired = function isRequired(value) {
-  return !(value === null || value === undefined || value === '');
-};
-var noSpaces = function noSpaces(value) {
-  return /^[\S]*$/.test(value);
-};
-var isValidStackName = function isValidStackName(value) {
-  return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
-};
-
-var validationMap = {
-  required: isRequired,
-  email: isEmail,
-  'no-spaces-stack': noSpaces,
-  'stack-name': isValidStackName
-};
-
-var getValidationFunction = function getValidationFunction(validator) {
-  if (typeof validator === 'string' && validationMap[validator]) return validationMap[validator];
-  if (typeof validator === 'function') return validator;
-  return function () {
-    return true;
-  };
-};
-
-var useForm = (function (initialFormState, fieldsValidators) {
-  if (fieldsValidators === void 0) {
-    fieldsValidators = {};
-  }
-
-  var _useState = React.useState(initialFormState),
-      form = _useState[0],
-      setForm = _useState[1];
-
-  var _useState2 = React.useState({}),
-      formErrors = _useState2[0],
-      setFormErrors = _useState2[1];
-
-  var onChange = function onChange(eventOrName, value) {
-    var _extends2, _extends3;
-
-    var name;
-    var fieldValue;
-
-    if (eventOrName.target) {
-      var event = eventOrName;
-      fieldValue = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-      name = event.target.name;
-    } else {
-      name = eventOrName;
-      fieldValue = value;
-    }
-
-    setForm(_extends({}, form, (_extends2 = {}, _extends2[name] = fieldValue, _extends2)));
-    setFormErrors(_extends({}, formErrors, (_extends3 = {}, _extends3[name] = [], _extends3)));
-  };
-
-  var resetForm = function resetForm() {
-    setForm(initialFormState);
-    setFormErrors({});
-  };
-
-  var getFieldErrors = function getFieldErrors(fieldName) {
-    var errors = [];
-    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(function (validator) {
-      var isValid = getValidationFunction(validator);
-      if (!isValid(form[fieldName])) errors.push(validator);
-    });
-
-    if (typeof fieldsValidators[fieldName] === 'string') {
-      var isValid = getValidationFunction(fieldsValidators[fieldName]);
-      if (!isValid(form[fieldName])) errors.push(fieldsValidators[fieldName]);
-    }
-
-    return errors;
-  };
-
-  var checkValidForm = function checkValidForm() {
-    var isValid = true;
-    var newFormErrors = {};
-    Object.keys(fieldsValidators).forEach(function (fieldName) {
-      var errors = getFieldErrors(fieldName);
-      newFormErrors[fieldName] = errors;
-      isValid = isValid && !errors.length;
-    });
-    setFormErrors(newFormErrors);
-    return isValid;
-  };
-
-  return {
-    form: form,
-    setForm: setForm,
-    formErrors: formErrors,
-    setFormErrors: setFormErrors,
-    resetForm: resetForm,
-    onChange: onChange,
-    checkValidForm: checkValidForm
-  };
-});
-
-var useIntersectionObserver = (function (callBack, _ref, deps) {
-  var _ref$rootMargin = _ref.rootMargin,
-      rootMargin = _ref$rootMargin === void 0 ? '0px' : _ref$rootMargin,
-      _ref$threshold = _ref.threshold,
-      threshold = _ref$threshold === void 0 ? 0.01 : _ref$threshold,
-      _ref$root = _ref.root,
-      root = _ref$root === void 0 ? null : _ref$root;
-  var ref = React.useRef(null);
-  var intersectionCallback = React.useCallback(function (_ref2) {
-    var target = _ref2[0];
-
-    if (target.isIntersecting) {
-      callBack();
-    }
-  }, deps);
-  React.useEffect(function () {
-    var options = {
-      root: root,
-      rootMargin: rootMargin,
-      threshold: threshold
-    };
-    var observer = new IntersectionObserver(intersectionCallback, options);
-    if (ref && ref.current) observer.observe(ref.current);
-    return function () {
-      if (ref.current) observer.unobserve(ref.current);
-    };
-  }, [ref, intersectionCallback]);
-  return [ref];
 });
 
 var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
@@ -1276,18 +1124,32 @@ var StackFilters = function StackFilters(_ref) {
 var css$j = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
 
 var StretchTitleField = function StretchTitleField(_ref) {
-  var value = _ref.value,
+  var propValue = _ref.value,
       _ref$placeholder = _ref.placeholder,
       placeholder = _ref$placeholder === void 0 ? '' : _ref$placeholder,
       className = _ref.className,
-      props = _objectWithoutPropertiesLoose(_ref, ["value", "placeholder", "className"]);
+      onChangeProp = _ref.onChange,
+      props = _objectWithoutPropertiesLoose(_ref, ["value", "placeholder", "className", "onChange"]);
 
+  var _useState = React.useState(propValue),
+      value = _useState[0],
+      set = _useState[1];
+
+  var onChange = function onChange(event) {
+    if (onChangeProp) onChangeProp(event.target.value);
+    set(event.target.value);
+  };
+
+  React.useEffect(function () {
+    set(propValue);
+  }, [propValue]);
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$j.field, className)
   }, /*#__PURE__*/React__default.createElement("input", _extends({
     type: "text",
     placeholder: placeholder,
-    value: value
+    value: value,
+    onChange: onChange
   }, props)), /*#__PURE__*/React__default.createElement("div", {
     className: css$j.hidden
   }, value.length ? value : placeholder));
@@ -1466,25 +1328,34 @@ var Table = function Table(_ref) {
   }))));
 };
 
-var instance = axios.create({
-  baseURL: config.API_URL,
-  crossDomain: true
-});
-instance.interceptors.request.use(function (config) {
-  var token = localStorage.getItem('token');
-  config.headers.Authorization = token ? "Bearer " + token : '';
-  return config;
-});
-instance.interceptors.response.use(function (response) {
-  return response;
-}, function (error) {
-  if (lodashEs.get(error, 'response.status', null) === 401) {
-    return Promise.reject(error.response);
-  } else if (lodashEs.get(error, 'response.status', null) === 400) {
-    return Promise.reject(error.response);
-  } else {
-    return Promise.reject(error);
-  }
+var useIntersectionObserver = (function (callBack, _ref, deps) {
+  var _ref$rootMargin = _ref.rootMargin,
+      rootMargin = _ref$rootMargin === void 0 ? '0px' : _ref$rootMargin,
+      _ref$threshold = _ref.threshold,
+      threshold = _ref$threshold === void 0 ? 0.01 : _ref$threshold,
+      _ref$root = _ref.root,
+      root = _ref$root === void 0 ? null : _ref$root;
+  var ref = React.useRef(null);
+  var intersectionCallback = React.useCallback(function (_ref2) {
+    var target = _ref2[0];
+
+    if (target.isIntersecting) {
+      callBack();
+    }
+  }, deps);
+  React.useEffect(function () {
+    var options = {
+      root: root,
+      rootMargin: rootMargin,
+      threshold: threshold
+    };
+    var observer = new IntersectionObserver(intersectionCallback, options);
+    if (ref && ref.current) observer.observe(ref.current);
+    return function () {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, [ref, intersectionCallback]);
+  return [ref];
 });
 
 var actionsTypes = {
@@ -1537,9 +1408,12 @@ var reducer = function reducer(state, action) {
 };
 var StateContext = React.createContext();
 var StateProvider = function StateProvider(_ref) {
-  var children = _ref.children;
+  var children = _ref.children,
+      apiUrl = _ref.apiUrl;
   return /*#__PURE__*/React__default.createElement(StateContext.Provider, {
-    value: React.useReducer(reducer, initialState)
+    value: React.useReducer(reducer, _extends({}, initialState, {
+      apiUrl: apiUrl
+    }))
   }, children);
 };
 var useStateValue = function useStateValue() {
@@ -1548,6 +1422,7 @@ var useStateValue = function useStateValue() {
 
 var actions = (function () {
   var _useStateValue = useStateValue(),
+      apiUrl = _useStateValue[0].apiUrl,
       dispatch = _useStateValue[1];
 
   var fetchAttachment = function fetchAttachment(stack, frameId, id, onSuccess) {
@@ -1561,7 +1436,10 @@ var actions = (function () {
       });
 
       var _temp2 = _catch(function () {
-        return Promise.resolve(api.get(config.STACK_ATTACHMENT(stack, frameId, id))).then(function (request) {
+        return Promise.resolve(axios({
+          baseURL: apiUrl,
+          url: config.STACK_ATTACHMENT(stack, frameId, id)
+        })).then(function (request) {
           dispatch({
             type: actionsTypes.FETCH_SUCCESS,
             meta: {
@@ -1643,7 +1521,9 @@ var Attachment = function Attachment(_ref) {
       fetchAttachment = _actions.fetchAttachment;
 
   var _useStateValue = useStateValue(),
-      data = _useStateValue[0].data;
+      _useStateValue$ = _useStateValue[0],
+      data = _useStateValue$.data,
+      apiUrl = _useStateValue$.apiUrl;
 
   var _get = lodashEs.get(data, frameId + "." + id, {}),
       loading = _get.loading,
@@ -1682,7 +1562,10 @@ var Attachment = function Attachment(_ref) {
 
       var _temp4 = _catch(function () {
         var url = config.STACK_ATTACHMENT(stack, frameId, id) + '?download=true';
-        return Promise.resolve(instance.get(url)).then(function (_ref2) {
+        return Promise.resolve(axios({
+          baseUrl: apiUrl,
+          url: url
+        })).then(function (_ref2) {
           var data = _ref2.data;
           setFullAttachment(data.attachment);
         });
@@ -1955,7 +1838,7 @@ var HowTo = function HowTo(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
     language: "bash"
-  }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
     className: css$r.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
@@ -1970,7 +1853,7 @@ var HowTo = function HowTo(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
     language: "r"
-  }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
     className: css$r.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
@@ -1979,7 +1862,7 @@ var HowTo = function HowTo(_ref) {
     className: css$r.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks', {
-        href: config$1.DOCS_URL
+        href: config.DOCS_URL
       })
     }
   }));
@@ -2260,7 +2143,7 @@ var HowTo$1 = function HowTo(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
     language: "bash"
-  }, config$1.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
     className: css$r.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
@@ -2275,7 +2158,7 @@ var HowTo$1 = function HowTo(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
     language: "r"
-  }, config$1.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
     className: css$r.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$r.code,
@@ -2284,11 +2167,30 @@ var HowTo$1 = function HowTo(_ref) {
     className: css$r.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
-        href: config$1.DOCS_URL
+        href: config.DOCS_URL
       })
     }
   }));
 };
+
+var useOnClickOutside = (function (ref, handler) {
+  React.useEffect(function () {
+    var listener = function listener(event) {
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+
+      handler(event);
+    };
+
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return function () {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, handler]);
+});
 
 var css$t = {"frames":"_styles-module__frames__3D3R4","frames-dropdown":"_styles-module__frames-dropdown__3hapH","button":"_styles-module__button__Tn4o_","name":"_styles-module__name__YzOn7","label":"_styles-module__label__Hg7hs","dropdown":"_styles-module__dropdown__16pcp","item":"_styles-module__item__1q46l","mark":"_styles-module__mark__1h8Eq","info":"_styles-module__info__2BnTD","modal":"_styles-module__modal__pk61B","description":"_styles-module__description__2GOOp","buttons":"_styles-module__buttons__3Ml-A"};
 
@@ -2444,6 +2346,109 @@ var Loader$1 = function Loader(_ref) {
   }));
 };
 
+var isEmail = function isEmail(value) {
+  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
+};
+var isRequired = function isRequired(value) {
+  return !(value === null || value === undefined || value === '');
+};
+var noSpaces = function noSpaces(value) {
+  return /^[\S]*$/.test(value);
+};
+var isValidStackName = function isValidStackName(value) {
+  return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
+};
+
+var validationMap = {
+  required: isRequired,
+  email: isEmail,
+  'no-spaces-stack': noSpaces,
+  'stack-name': isValidStackName
+};
+
+var getValidationFunction = function getValidationFunction(validator) {
+  if (typeof validator === 'string' && validationMap[validator]) return validationMap[validator];
+  if (typeof validator === 'function') return validator;
+  return function () {
+    return true;
+  };
+};
+
+var useForm = (function (initialFormState, fieldsValidators) {
+  if (fieldsValidators === void 0) {
+    fieldsValidators = {};
+  }
+
+  var _useState = React.useState(initialFormState),
+      form = _useState[0],
+      setForm = _useState[1];
+
+  var _useState2 = React.useState({}),
+      formErrors = _useState2[0],
+      setFormErrors = _useState2[1];
+
+  var onChange = function onChange(eventOrName, value) {
+    var _extends2, _extends3;
+
+    var name;
+    var fieldValue;
+
+    if (eventOrName.target) {
+      var event = eventOrName;
+      fieldValue = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+      name = event.target.name;
+    } else {
+      name = eventOrName;
+      fieldValue = value;
+    }
+
+    setForm(_extends({}, form, (_extends2 = {}, _extends2[name] = fieldValue, _extends2)));
+    setFormErrors(_extends({}, formErrors, (_extends3 = {}, _extends3[name] = [], _extends3)));
+  };
+
+  var resetForm = function resetForm() {
+    setForm(initialFormState);
+    setFormErrors({});
+  };
+
+  var getFieldErrors = function getFieldErrors(fieldName) {
+    var errors = [];
+    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(function (validator) {
+      var isValid = getValidationFunction(validator);
+      if (!isValid(form[fieldName])) errors.push(validator);
+    });
+
+    if (typeof fieldsValidators[fieldName] === 'string') {
+      var isValid = getValidationFunction(fieldsValidators[fieldName]);
+      if (!isValid(form[fieldName])) errors.push(fieldsValidators[fieldName]);
+    }
+
+    return errors;
+  };
+
+  var checkValidForm = function checkValidForm() {
+    var isValid = true;
+    var newFormErrors = {};
+    Object.keys(fieldsValidators).forEach(function (fieldName) {
+      var errors = getFieldErrors(fieldName);
+      newFormErrors[fieldName] = errors;
+      isValid = isValid && !errors.length;
+    });
+    setFormErrors(newFormErrors);
+    return isValid;
+  };
+
+  return {
+    form: form,
+    setForm: setForm,
+    formErrors: formErrors,
+    setFormErrors: setFormErrors,
+    resetForm: resetForm,
+    onChange: onChange,
+    checkValidForm: checkValidForm
+  };
+});
+
 var css$v = {"details":"_styles-module__details__3iAZb","section":"_styles-module__section___r9FQ","header":"_styles-module__header__2kekg","title":"_styles-module__title__1zGvd","permissions":"_styles-module__permissions__3ydGO","copy":"_styles-module__copy__2ikHm","link":"_styles-module__link__21w9U","dropdown":"_styles-module__dropdown__3axDI","attachment-head":"_styles-module__attachment-head__282UU","description":"_styles-module__description__Y6gJz","label":"_styles-module__label__2FemD","label-tooltip":"_styles-module__label-tooltip__2Oe5S","actions":"_styles-module__actions__sZkKa","size":"_styles-module__size__Ja107","revisions":"_styles-module__revisions__bLqAO","filters":"_styles-module__filters__1-hdZ","attachment":"_styles-module__attachment__3IGZo","sidebar":"_styles-module__sidebar__U0_wY","modal":"_styles-module__modal__2TdJX","buttons":"_styles-module__buttons__RhHmq","button":"_styles-module__button__26mqa"};
 
 var Details = function Details(_ref) {
@@ -2478,7 +2483,7 @@ var Details = function Details(_ref) {
       fields = _useState[0],
       setFields = _useState[1];
 
-  var prevFrame = hooks.usePrevious(frame);
+  var prevFrame = usePrevious(frame);
 
   var _useState2 = React.useState(false),
       isShowHowToModal = _useState2[0],
@@ -2631,7 +2636,496 @@ var Details = function Details(_ref) {
   })));
 };
 
-var css$w = {"item":"_styles-module__item__3urCL","preview":"_styles-module__preview__cxR4e","label":"_styles-module__label__tCzQe","previewWrap":"_styles-module__previewWrap__15fuU","emptyMessage":"_styles-module__emptyMessage__2pDKf","attachment":"_styles-module__attachment__35KB8","section":"_styles-module__section__LeHWu","content":"_styles-module__content__Bgbe4","name":"_styles-module__name__2PrtI","by":"_styles-module__by__1_qsJ","permissions":"_styles-module__permissions__3ZdE1","dropdown":"_styles-module__dropdown__vK4SD","preview-stack-pulse":"_styles-module__preview-stack-pulse__3NFJT"};
+function move(array, oldIndex, newIndex) {
+  if (newIndex >= array.length) {
+    newIndex = array.length - 1;
+  }
+
+  array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+  return array;
+}
+
+function moveElement(array, index, offset) {
+  var newIndex = index + offset;
+  return move(array, index, newIndex);
+}
+
+var GridContext = React.createContext({
+  items: []
+});
+var GridProvider = /*#__PURE__*/function (_Component) {
+  _inheritsLoose(GridProvider, _Component);
+
+  function GridProvider(props) {
+    var _this;
+
+    _this = _Component.call(this, props) || this;
+
+    _this.setItems = function (items) {
+      return _this.setState({
+        items: items
+      });
+    };
+
+    _this.moveItem = function (sourceId, destinationId) {
+      var sourceIndex = _this.state.items.findIndex(function (item) {
+        return item.id === sourceId;
+      });
+
+      var destinationIndex = _this.state.items.findIndex(function (item) {
+        return item.id === destinationId;
+      });
+
+      if (sourceId === -1 || destinationId === -1) {
+        return;
+      }
+
+      var offset = destinationIndex - sourceIndex;
+
+      _this.setState(function (state) {
+        return {
+          items: moveElement(state.items, sourceIndex, offset)
+        };
+      });
+    };
+
+    _this.state = {
+      items: [],
+      moveItem: _this.moveItem,
+      setItems: _this.setItems
+    };
+    return _this;
+  }
+
+  var _proto = GridProvider.prototype;
+
+  _proto.render = function render() {
+    return /*#__PURE__*/React__default.createElement(GridContext.Provider, {
+      value: this.state
+    }, this.props.children);
+  };
+
+  return GridProvider;
+}(React.Component);
+
+var DnDItem = React.memo(function (_ref) {
+  var id = _ref.id,
+      onMoveItem = _ref.onMoveItem,
+      children = _ref.children;
+  var ref = React.useRef(null);
+
+  var _useDrag = reactDnd.useDrag({
+    item: {
+      id: id,
+      type: 'IMG'
+    },
+    collect: function collect(monitor) {
+      return {
+        isDragging: monitor.isDragging()
+      };
+    }
+  }),
+      connectDrag = _useDrag[1];
+
+  var _useDrop = reactDnd.useDrop({
+    accept: 'IMG',
+    drop: function drop(hoveredOverItem) {
+      if (hoveredOverItem.id !== id) {
+        onMoveItem(hoveredOverItem.id, id);
+      }
+    }
+  }),
+      connectDrop = _useDrop[1];
+
+  connectDrag(ref);
+  connectDrop(ref);
+  return React__default.Children.map(children, function (child) {
+    return React__default.cloneElement(child, {
+      forwardedRef: ref
+    });
+  });
+});
+
+var css$w = {"loader":"_styles-module__loader__2RpBO","text":"_styles-module__text__3gk1Z","dashboards-details-pulse":"_styles-module__dashboards-details-pulse__3HZ82","filters":"_styles-module__filters__3ZZJL","grid":"_styles-module__grid__ZafPr","item":"_styles-module__item__LIYeR"};
+
+var Loader$2 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.text
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.filters
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.grid
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.item
+  })));
+};
+
+var useDebounce = (function (callback, depsOrDelay, deps) {
+  var delay = 300;
+  if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
+  return React.useCallback(lodashEs.debounce(callback, delay), deps);
+});
+
+var css$x = {"card":"_styles-module__card__17jo7","inner":"_styles-module__inner__YLuSm","head":"_styles-module__head__2dKop","name":"_styles-module__name__1blF_","nameEdit":"_styles-module__nameEdit__3omHN","nameValue":"_styles-module__nameValue__wx2sM","info":"_styles-module__info__1Tbhc","dropdown":"_styles-module__dropdown__1NvWp","button":"_styles-module__button__d6fLT","move":"_styles-module__move__312qk","link":"_styles-module__link__NfDp4","infoTime":"_styles-module__infoTime__2QMrW","emptyMessage":"_styles-module__emptyMessage__7aBhX","attachment":"_styles-module__attachment__2ajkc"};
+
+var Card = React.memo(function (_ref) {
+  var data = _ref.data,
+      className = _ref.className,
+      _ref$type = _ref.type,
+      type = _ref$type === void 0 ? 'grid' : _ref$type,
+      deleteCard = _ref.deleteCard,
+      updateCardTitle = _ref.updateCardTitle,
+      filters = _ref.filters,
+      forwardedRef = _ref.forwardedRef,
+      moveAvailable = _ref.moveAvailable;
+
+  var _useState = React.useState(data.title),
+      title = _useState[0],
+      setTitle = _useState[1];
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var headId = lodashEs.get(data, 'head.id');
+  var stackOwner = data.stack.split('/')[0];
+
+  var _useState2 = React.useState(0),
+      attachmentIndex = _useState2[0],
+      setAttachmentIndex = _useState2[1];
+
+  var _useState3 = React.useState([]),
+      cardParams = _useState3[0],
+      setCardParams = _useState3[1];
+
+  React.useEffect(function () {
+    var params = parseStackParams(lodashEs.get(data, 'head.attachments', []));
+    if (params) setCardParams(Object.keys(params));
+  }, [data]);
+  React.useEffect(function () {
+    findAttach();
+  }, [filters]);
+
+  var findAttach = function findAttach() {
+    var attachments = lodashEs.get(data, 'head.attachments');
+    var fields = Object.keys(filters).filter(function (f) {
+      return cardParams.indexOf(f) >= 0;
+    });
+    if (!attachments) return;
+
+    if (fields.length) {
+      attachments.some(function (attach, index) {
+        var valid = true;
+        fields.forEach(function (key) {
+          if (!attach.params || !lodashEs.isEqual(attach.params[key], filters[key])) valid = false;
+        });
+        if (valid) setAttachmentIndex(index);
+        return valid;
+      });
+    } else setAttachmentIndex(0);
+  };
+
+  var onUpdate = updateCardTitle ? useDebounce(updateCardTitle, []) : function () {};
+
+  var onChangeTitle = function onChangeTitle(event) {
+    setTitle(event.target.value);
+    onUpdate(event.target.value);
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$x.card, "type-" + type, className),
+    ref: forwardedRef
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.inner
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.head
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$x.name, {
+      readonly: !updateCardTitle
+    })
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.nameValue
+  }, title.length ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
+    value: title,
+    type: "text",
+    placeholder: t('title'),
+    onChange: onChangeTitle,
+    className: cx(css$x.nameEdit, {
+      active: !title.length
+    })
+  })), /*#__PURE__*/React__default.createElement(Tooltip, {
+    overlayContent: /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
+      name: stackOwner
+    })), data.head && /*#__PURE__*/React__default.createElement("div", {
+      className: css$x.infoTime
+    }, moment(data.head.timestamp).format('D MMM YYYY')))
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.info
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-information-outline"
+  }))), /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$x.button, css$x.link),
+    color: "secondary",
+    Component: reactRouterDom.Link,
+    to: "/" + data.stack
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-open-in-new"
+  })), Boolean(deleteCard) && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$x.dropdown,
+    items: [].concat(deleteCard ? [{
+      title: t('delete'),
+      onClick: deleteCard
+    }] : [])
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$x.button,
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-dots-horizontal"
+  }))), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$x.button, css$x.move),
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-cursor-move"
+  }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$x.attachment,
+    isList: true,
+    withLoader: true,
+    stack: data.stack,
+    frameId: headId,
+    id: attachmentIndex
+  }) : /*#__PURE__*/React__default.createElement("div", {
+    className: css$x.emptyMessage
+  }, t('emptyDashboard'))));
+});
+
+var css$y = {"details":"_styles-module__details__2U9YD","header":"_styles-module__header__2Lioj","title":"_styles-module__title__353_b","edit":"_styles-module__edit__14H-Y","permissions":"_styles-module__permissions__1up3B","dropdown":"_styles-module__dropdown__1OYBD","section":"_styles-module__section__3ZM3A","cards":"_styles-module__cards__2idlU","fields":"_styles-module__fields__3zxn3","filters":"_styles-module__filters__QjWiF","controls":"_styles-module__controls__9DqNJ","addButton":"_styles-module__addButton__ezy69","viewSwitcher":"_styles-module__viewSwitcher__2LheQ","empty":"_styles-module__empty__j9SPi"};
+
+var Details$1 = function Details(_ref) {
+  var addCards = _ref.addCards,
+      backUrl = _ref.backUrl,
+      cards = _ref.cards,
+      currentUser = _ref.currentUser,
+      data = _ref.data,
+      deleteCard = _ref.deleteCard,
+      deleteDashboard = _ref.deleteDashboard,
+      loading = _ref.loading,
+      onChangeTitle = _ref.onChangeTitle,
+      updateCard = _ref.updateCard,
+      user = _ref.user,
+      withSorting = _ref.withSorting;
+
+  var _useContext = React.useContext(GridContext),
+      items = _useContext.items,
+      moveItem = _useContext.moveItem,
+      setItems = _useContext.setItems;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState('grid'),
+      view = _useState[0],
+      setView = _useState[1];
+
+  var _useForm = useForm({}),
+      form = _useForm.form,
+      setForm = _useForm.setForm,
+      onChange = _useForm.onChange;
+
+  var _useState2 = React.useState({}),
+      fields = _useState2[0],
+      setFields = _useState2[1];
+
+  var prevData = usePrevious(data);
+  var isDidMount = React.useRef(true);
+  var onChangeTitleDebounce = React.useCallback(lodashEs.debounce(onChangeTitle, 300), []);
+
+  var setGridItems = function setGridItems(cardsItems) {
+    return setItems(cardsItems.map(function (card) {
+      return {
+        id: card.index,
+        card: card
+      };
+    }));
+  };
+
+  React.useEffect(function () {
+    if (window) window.dispatchEvent(new Event('resize'));
+  }, [view]);
+  React.useEffect(function () {
+    if (cards) setGridItems(cards);
+    return function () {
+      return setGridItems([]);
+    };
+  }, [cards]);
+  React.useEffect(function () {
+    if ((!lodashEs.isEqual(prevData, data) || isDidMount.current) && data) parseParams();
+    if (isDidMount.current) isDidMount.current = false;
+  }, [data]);
+
+  var moveCard = function moveCard(indexFrom, indexTo) {
+    if (indexTo < 0 || indexFrom < 0) return;
+    var stack = items[indexFrom].card.stack;
+    updateCard({
+      stack: stack,
+      index: indexTo
+    });
+    moveItem(indexFrom, indexTo);
+  };
+
+  var getDeleteCardAction = function getDeleteCardAction(stack) {
+    if (deleteCard) {
+      return function () {
+        deleteCard(stack);
+      };
+    }
+  };
+
+  var getUpdateCardTitleAction = function getUpdateCardTitleAction(stack) {
+    if (updateCard) return function (title) {
+      updateCard({
+        stack: stack,
+        title: title
+      });
+    };
+  };
+
+  var parseParams = function parseParams() {
+    if (!cards) return;
+    var fields = cards.reduce(function (result, card) {
+      var cardFields = parseStackParams(lodashEs.get(card, 'head.attachments', [])) || {};
+      Object.keys(cardFields).forEach(function (fieldName) {
+        if (result[fieldName]) {
+          if (cardFields[fieldName].type === 'select') {
+            result[fieldName].options = lodashEs.unionBy(result[fieldName].options, cardFields[fieldName].options, 'value');
+          }
+
+          if (cardFields[fieldName].type === 'slider') {
+            result[fieldName].options = _extends({}, result[fieldName].options, cardFields[fieldName].options);
+            result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
+            result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
+          }
+        } else {
+          result[fieldName] = cardFields[fieldName];
+        }
+      });
+      return result;
+    }, {});
+    var defaultFilterValues = Object.keys(fields).reduce(function (result, fieldName) {
+      if (fields[fieldName].type === 'select') result[fieldName] = fields[fieldName].options[0].value;
+      if (fields[fieldName].type === 'slider') result[fieldName] = fields[fieldName].options[0];
+      if (fields[fieldName].type === 'checkbox') result[fieldName] = false;
+      return result;
+    }, {});
+    setForm(defaultFilterValues);
+    setFields(fields);
+  };
+
+  var renderFilters = function renderFilters() {
+    if (!Object.keys(fields).length) return null;
+    var hasSelectField = Object.keys(fields).some(function (key) {
+      return fields[key].type === 'select';
+    });
+    return /*#__PURE__*/React__default.createElement(StackFilters, {
+      fields: fields,
+      form: form,
+      onChange: onChange,
+      className: cx(css$y.filters, {
+        'with-select': hasSelectField
+      })
+    });
+  };
+
+  var getAddClickAction = function getAddClickAction() {
+    if (addCards) return function (event) {
+      event.preventDefault();
+      addCards();
+    };
+  };
+
+  if (loading) return /*#__PURE__*/React__default.createElement(Loader$2, null);
+  if (!data) return null;
+  var CardWrapComponent = withSorting ? DnDItem : React.Fragment;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.details
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(BackButton, {
+    Component: reactRouterDom.Link,
+    to: backUrl
+  }, currentUser === user ? t('backToDashboards') : t('backToDashboardsOf', {
+    name: user
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.header
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.title
+  }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
+    className: css$y.edit,
+    value: data === null || data === void 0 ? void 0 : data.title,
+    onChange: onChangeTitleDebounce,
+    readOnly: currentUser !== data.user,
+    placeholder: t('newDashboard')
+  }), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+  })), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$y.dropdown,
+    items: [].concat(Boolean(deleteDashboard) ? [{
+      title: t('delete'),
+      onClick: deleteDashboard
+    }] : [])
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$y['dropdown-button'],
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-dots-horizontal"
+  })))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.section
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.fields
+  }, renderFilters()), /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.controls
+  }, getAddClickAction() && /*#__PURE__*/React__default.createElement("a", {
+    className: css$y.addButton,
+    onClick: getAddClickAction(),
+    href: "#"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-plus"
+  }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
+    value: view,
+    className: css$y.viewSwitcher,
+    onChange: function onChange(view) {
+      return setView(view);
+    }
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$y.cards, view)
+  }, items.map(function (item) {
+    return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
+      key: item.card.stack
+    }, withSorting ? {
+      id: item.id,
+      onMoveItem: moveCard
+    } : {}), /*#__PURE__*/React__default.createElement(Card, {
+      filters: form,
+      deleteCard: getDeleteCardAction(item.card.stack),
+      data: item.card,
+      type: view,
+      updateCardTitle: getUpdateCardTitleAction(item.card.stack),
+      moveAvailable: withSorting
+    }));
+  }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.empty
+  }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), getAddClickAction() && /*#__PURE__*/React__default.createElement(React.Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
+    className: css$y.addButton,
+    onClick: getAddClickAction(),
+    href: "#"
+  }, t('addStack')), ".")));
+};
+
+var css$z = {"item":"_styles-module__item__3urCL","preview":"_styles-module__preview__cxR4e","label":"_styles-module__label__tCzQe","previewWrap":"_styles-module__previewWrap__15fuU","emptyMessage":"_styles-module__emptyMessage__2pDKf","attachment":"_styles-module__attachment__35KB8","section":"_styles-module__section__LeHWu","content":"_styles-module__content__Bgbe4","name":"_styles-module__name__2PrtI","by":"_styles-module__by__1_qsJ","permissions":"_styles-module__permissions__3ZdE1","dropdown":"_styles-module__dropdown__vK4SD","preview-stack-pulse":"_styles-module__preview-stack-pulse__3NFJT"};
 
 var Item$1 = function Item(_ref) {
   var dashboard = _ref.dashboard,
@@ -2656,36 +3150,36 @@ var Item$1 = function Item(_ref) {
 
   var isShowDropdown = Boolean(deleteDashboard);
   return /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
-    to: routes.dashboardsDetails(user, dashboard.id),
-    className: css$w.item,
+    to: "/" + user + "/d/" + dashboard.id,
+    className: css$z.item,
     ref: ref
   }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.label
+    className: css$z.label
   }, t('stacksWithCount', {
     count: dashboard.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.previewWrap
+    className: css$z.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$w.attachment,
+    className: css$z.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.emptyMessage
+    className: css$z.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.section
+    className: css$z.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.content
+    className: css$z.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.name
+    className: css$z.name
   }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.by
+    className: css$z.by
   }, t('by'), " ", dashboard.user)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$w.dropdown,
+    className: css$z.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
@@ -2693,33 +3187,33 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$x = {"loader":"_styles-module__loader__PK0JP","text":"_styles-module__text__1F-rx","dashboards-pulse":"_styles-module__dashboards-pulse__29IbF","grid":"_styles-module__grid__ef-jq","item":"_styles-module__item__1HBd8","pic":"_styles-module__pic__1z0LR","section":"_styles-module__section__14O5G"};
+var css$A = {"loader":"_styles-module__loader__PK0JP","text":"_styles-module__text__1F-rx","dashboards-pulse":"_styles-module__dashboards-pulse__29IbF","grid":"_styles-module__grid__ef-jq","item":"_styles-module__item__1HBd8","pic":"_styles-module__pic__1z0LR","section":"_styles-module__section__14O5G"};
 
-var Loader$2 = function Loader(_ref) {
+var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.loader
+    className: css$A.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.text
+    className: css$A.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.grid
+    className: css$A.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.item
+    className: css$A.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.pic
+    className: css$A.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.section
+    className: css$A.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.item
+    className: css$A.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.pic
+    className: css$A.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.section
+    className: css$A.section
   }))));
 };
 
-var css$y = {"list":"_styles-module__list__2tGd9","title":"_styles-module__title__lNufF","search":"_styles-module__search__3Vnt-","mobileSearch":"_styles-module__mobileSearch__28J_R","text":"_styles-module__text__2QiEZ","grid":"_styles-module__grid__31LQw","add":"_styles-module__add__1VMC5","caption":"_styles-module__caption__pTzl3"};
+var css$B = {"list":"_styles-module__list__2tGd9","title":"_styles-module__title__lNufF","search":"_styles-module__search__3Vnt-","mobileSearch":"_styles-module__mobileSearch__28J_R","text":"_styles-module__text__2QiEZ","grid":"_styles-module__grid__31LQw","add":"_styles-module__add__1VMC5","caption":"_styles-module__caption__pTzl3"};
 
 var List$1 = function List(_ref) {
   var addDashboard = _ref.addDashboard,
@@ -2754,39 +3248,39 @@ var List$1 = function List(_ref) {
   };
 
   var items = getItems();
-  if (loading) return /*#__PURE__*/React__default.createElement(Loader$2, null);
+  if (loading) return /*#__PURE__*/React__default.createElement(Loader$3, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.list
+    className: css$B.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$y.search,
+    className: css$B.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.title
+    className: css$B.title
   }, currentUser === user ? t('myDashboards') : t('dashboardsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$y.mobileSearch,
+    className: css$B.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.grid
+    className: css$B.grid
   }, currentUser === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: addDashboard,
-    className: cx(css$y.add, {
+    className: cx(css$B.add, {
       disabled: addDashboardDisable
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.caption
+    className: css$B.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newDashboard'))), items.map(function (item, index) {
@@ -2799,39 +3293,39 @@ var List$1 = function List(_ref) {
   })));
 };
 
-var css$z = {"loader":"_styles-module__loader__FMgKh","text":"_styles-module__text__3kMB4","stacks-pulse":"_styles-module__stacks-pulse__2uZ4b","grid":"_styles-module__grid__1i-Vy","item":"_styles-module__item__3Q6le","pic":"_styles-module__pic__2gd5L","section":"_styles-module__section__BzTYi"};
+var css$C = {"loader":"_styles-module__loader__FMgKh","text":"_styles-module__text__3kMB4","stacks-pulse":"_styles-module__stacks-pulse__2uZ4b","grid":"_styles-module__grid__1i-Vy","item":"_styles-module__item__3Q6le","pic":"_styles-module__pic__2gd5L","section":"_styles-module__section__BzTYi"};
 
-var Loader$3 = function Loader(_ref) {
+var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.loader
+    className: css$C.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.text
+    className: css$C.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.grid
+    className: css$C.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.item
+    className: css$C.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.pic
+    className: css$C.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.section
+    className: css$C.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.item
+    className: css$C.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.pic
+    className: css$C.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.section
+    className: css$C.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.item
+    className: css$C.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.pic
+    className: css$C.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.section
+    className: css$C.section
   }))));
 };
 
-var css$A = {"stacks":"_style-module__stacks__1YlOe","grid":"_style-module__grid__2Xblj","search":"_style-module__search__2JDJR","message":"_style-module__message__30aty","text":"_style-module__text__1qJHA","item":"_style-module__item__1AIvq","checkbox":"_style-module__checkbox__I8MzQ","buttons":"_style-module__buttons__3uEfC","button":"_style-module__button__22J0P"};
+var css$D = {"stacks":"_style-module__stacks__1YlOe","grid":"_style-module__grid__2Xblj","search":"_style-module__search__2JDJR","message":"_style-module__message__30aty","text":"_style-module__text__1qJHA","item":"_style-module__item__1AIvq","checkbox":"_style-module__checkbox__I8MzQ","buttons":"_style-module__buttons__3uEfC","button":"_style-module__button__22J0P"};
 
 var AddStacksModal = function AddStacksModal(_ref) {
   var _ref$stacks = _ref.stacks,
@@ -2912,57 +3406,63 @@ var AddStacksModal = function AddStacksModal(_ref) {
     onClose();
   };
 
-  return /*#__PURE__*/React__default.createElement(dstackReact.Modal, {
-    dialogClassName: css$A.stacks,
+  return /*#__PURE__*/React__default.createElement(Modal, {
+    dialogClassName: css$D.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
-  }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(dstackReact.SearchField, {
-    className: css$A.search,
+  }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+    className: css$D.search,
     isDark: true,
     size: "middle",
     showEverything: true,
     placeholder: t('findStack'),
     value: searchQuery,
     onChange: onChangeSearch
-  }), loading && /*#__PURE__*/React__default.createElement(Loader$3, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.message
+  }), loading && /*#__PURE__*/React__default.createElement(Loader$4, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.text
+    className: css$D.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.grid
+    className: css$D.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$A.item,
+      className: css$D.item,
       key: index,
       onClick: getOnClickStack(item)
-    }, /*#__PURE__*/React__default.createElement(dstackReact.CheckboxField, {
-      className: css$A.checkbox,
+    }, /*#__PURE__*/React__default.createElement(CheckboxField, {
+      className: css$D.checkbox,
       value: isChecked(item),
       readOnly: true
-    }), /*#__PURE__*/React__default.createElement(dstackReact.StackListItem, {
+    }), /*#__PURE__*/React__default.createElement(Item, {
       data: item,
       otherOwner: params.user !== item.user
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.buttons
-  }, /*#__PURE__*/React__default.createElement(dstackReact.Button, {
-    className: css$A.button,
+    className: css$D.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$D.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
-  }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(dstackReact.Button, {
-    className: css$A.button,
+  }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
+    className: css$D.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
   }, t('cancel')))));
 };
 
+Object.defineProperty(exports, 'DndProvider', {
+    enumerable: true,
+    get: function () {
+        return reactDnd.DndProvider;
+    }
+});
 exports.AccessForbidden = AccessForbidden;
 exports.Avatar = Avatar;
 exports.BackButton = BackButton;
@@ -2971,8 +3471,12 @@ exports.CheckboxField = CheckboxField;
 exports.CodeViewer = CodeViewer;
 exports.Copy = Copy;
 exports.DashboardAddStacksModal = AddStacksModal;
+exports.DashboardDetails = Details$1;
 exports.DashboardList = List$1;
 exports.DashboardListItem = Item$1;
+exports.DnDGridContext = GridContext;
+exports.DnDGridContextProvider = GridProvider;
+exports.DnDItem = DnDItem;
 exports.Dropdown = Dropdown;
 exports.FileDragnDrop = FileDragnDrop;
 exports.Loader = Loader;
@@ -3000,4 +3504,5 @@ exports.TextField = TextField;
 exports.Tooltip = Tooltip;
 exports.ViewSwitcher = ViewSwitcher;
 exports.Yield = Yield;
+exports.config = config;
 //# sourceMappingURL=index.js.map

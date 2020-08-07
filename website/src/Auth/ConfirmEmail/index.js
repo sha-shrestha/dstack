@@ -7,7 +7,7 @@ import routes from 'routes';
 import {Loader} from '@dstackai/dstack-react';
 import {verifyUser} from './actions';
 import {fetchUser} from 'App/actions';
-import {parseSearch} from 'utils';
+import {parseSearch} from '@dstackai/dstack-react/dist/utils';
 import css from './styles.module.css';
 
 type Props = {

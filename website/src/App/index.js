@@ -18,7 +18,7 @@ import Dashboards from 'Dashboards';
 import Stacks from 'Stacks';
 import Settings from 'Settings';
 
-import {isSignedIn} from 'utils';
+import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {fetchUser} from './actions';
 import css from './styles.module.css';
 import {useTracking} from 'hooks';

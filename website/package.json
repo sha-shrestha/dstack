@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.7.4",
-    "@dstackai/dstack-react": "^1.0.7",
+    "@dstackai/dstack-react": "^1.0.9",
     "@mdi/font": "^4.8.95",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
@@ -67,7 +67,6 @@
     "react": "^16.12.0",
     "react-app-polyfill": "^1.0.5",
     "react-dev-utils": "^10.0.0",
-    "react-dnd": "^10.0.2",
     "react-dnd-html5-backend": "^10.0.2",
     "react-dom": "^16.12.0",
     "react-ga": "^2.7.0",

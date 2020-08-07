@@ -3,7 +3,6 @@ import React, {useRef} from 'react';
 import {get} from 'lodash-es';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import routes from 'routes';
 import Dropdown from '../../Dropdown';
 import StackAttachment from '../../stack/Attachment';
 import type {Dashboard} from '../types';
@@ -32,7 +31,7 @@ const Item = ({dashboard, deleteDashboard, user}: Props) => {
 
     return (
         <Link
-            to={routes.dashboardsDetails(user, dashboard.id)}
+            to={`/${user}/d/${dashboard.id}`}
             className={css.item}
             ref={ref}
         >

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import css from './styles.module.css';
 
@@ -10,17 +10,32 @@ type Props = {
 }
 
 const StretchTitleField = ({
-    value,
+    value: propValue,
     placeholder = '',
     className,
+    onChange: onChangeProp,
     ...props
 }: Props) => {
+    const [value, set] = useState(propValue);
+
+    const onChange = event => {
+        if (onChangeProp)
+            onChangeProp(event.target.value);
+
+        set(event.target.value);
+    };
+
+    useEffect(() => {
+        set(propValue);
+    }, [propValue]);
+
     return (
         <div className={cx(css.field, className)}>
             <input
                 type="text"
                 placeholder={placeholder}
                 value={value}
+                onChange={onChange}
                 {...props}
             />
 

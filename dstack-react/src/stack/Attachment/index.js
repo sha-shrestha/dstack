@@ -1,13 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import cx from 'classnames';
+import axios from 'axios';
 import {get, isEqual} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
 import Plot from 'react-plotly.js';
 import * as CSV from 'csv-string';
 import Table from './Table';
 import config from '../../config';
-import api from '../../api';
-import {useIntersectionObserver, usePrevious} from '../../hooks';
+import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import usePrevious from '../../hooks/usePrevious';
 import actions from './actions';
 import {useStateValue} from './store';
 import {unicodeBase64Decode} from '../../utils';
@@ -51,7 +52,7 @@ const Attachment = ({
 }: Props) => {
     const {t} = useTranslation();
     const {fetchAttachment} = actions();
-    const [{data}] = useStateValue();
+    const [{data, apiUrl}] = useStateValue();
     const {loading, error, requestStatus, ...attachment} = get(data, `${frameId}.${id}`, {});
     const [tableScale, setTableScale] = useState(1);
     const [loadingFullAttachment, setLoadingFullAttachment] = useState(false);
@@ -74,7 +75,10 @@ const Attachment = ({
 
         try {
             const url = config.STACK_ATTACHMENT(stack, frameId, id) + '?download=true';
-            const {data} = await api.get(url);
+            const {data} = await axios({
+                baseUrl: apiUrl,
+                url,
+            });
 
             setFullAttachment(data.attachment);
         } catch (e) {

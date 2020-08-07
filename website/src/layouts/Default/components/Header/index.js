@@ -7,7 +7,7 @@ import cx from 'classnames';
 import {logOut} from 'App/actions';
 import css from './styles.module.css';
 import logo from 'assets/logo.svg';
-import {isSignedIn} from 'utils';
+import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 
 type Props = {
     logOut: Function,

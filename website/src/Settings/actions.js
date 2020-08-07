@@ -1,8 +1,8 @@
 // @flow
 import api from 'api';
+import {getDataFailedRequest} from '@dstackai/dstack-react/dist/utils';
 import actionsTypes from './actionsTypes';
 import config from 'config';
-import {getDataFailedRequest} from 'utils';
 
 export const updateSettings = ({user, ...params}) => async (dispatch: Function) => {
     dispatch({type: actionsTypes.UPDATE});
