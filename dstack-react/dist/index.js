@@ -23,8 +23,6 @@ var reactRouterDom = require('react-router-dom');
 var uuid = require('uuid');
 var reactDnd = require('react-dnd');
 var reactRouter = require('react-router');
-var routes = _interopDefault(require('routes'));
-var logo = _interopDefault(require('assets/logo.svg'));
 
 var config = {
   DOCS_URL: 'http://docs.dstack.ai',
@@ -3686,18 +3684,15 @@ var AddStacksModal = function AddStacksModal(_ref) {
   }, t('cancel')))));
 };
 
+var logo = require("./logo~gyFSAwBb.svg");
+
 var css$F = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
-  var className = _ref.className,
-      push = _ref.history.push;
+  var className = _ref.className;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
-
-  var logIn = function logIn() {
-    return push(routes.authLogin());
-  };
 
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$F.header, className)
@@ -3712,13 +3707,12 @@ var Header = function Header(_ref) {
   })), /*#__PURE__*/React__default.createElement("div", {
     className: css$F.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
+    Component: reactRouterDom.Link,
+    to: "/auth/login",
     className: css$F.button,
-    color: "primary",
-    onClick: logIn
+    color: "primary"
   }, t('logIn'))));
 };
-
-var Header$1 = reactRouterDom.withRouter(Header);
 
 var css$G = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
@@ -3726,7 +3720,7 @@ var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$G.layout
-  }, /*#__PURE__*/React__default.createElement(Header$1, {
+  }, /*#__PURE__*/React__default.createElement(Header, {
     className: css$G.header
   }), /*#__PURE__*/React__default.createElement("div", {
     className: css$G.main

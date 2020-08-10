@@ -1,19 +1,17 @@
 import React from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
-import routes from 'routes';
 import Button from '../../../Button';
-import logo from 'assets/logo.svg';
+import logo from '../assets/logo.svg';
 import css from './styles.module.css';
 
 type Props = {
     className?: string,
 }
 
-const Header = ({className, history: {push}}: Props) => {
+const Header = ({className}: Props) => {
     const {t} = useTranslation();
-    const logIn = () => push(routes.authLogin());
 
     return <div className={cx(css.header, className)}>
         <Link to="/" className={css.logo}>
@@ -22,12 +20,13 @@ const Header = ({className, history: {push}}: Props) => {
 
         <div className={css.buttons}>
             <Button
+                Component={Link}
+                to="/auth/login"
                 className={css.button}
                 color="primary"
-                onClick={logIn}
             >{t('logIn')}</Button>
         </div>
     </div>;
 };
 
-export default withRouter(Header);
+export default Header;
