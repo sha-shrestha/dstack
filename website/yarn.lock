@@ -1679,10 +1679,10 @@
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
 
-"@dstackai/dstack-react@^1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.0.10.tgz#b50ff7fcd3bd44162335e3cf8b31c41e21ef112c"
-  integrity sha512-1ywNwjjs98v4T8BU8rIdXjBAIgZUlouY78E3U0WRGxMqKY1BWdx38LU0mqK3rYDDhKVd2U9y+GJcmYZvWYBmfQ==
+"@dstackai/dstack-react@^1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.0.11.tgz#3c2aa8d06a440cb323def883e4fda64f53b5cb9c"
+  integrity sha512-0UFUuljPnItmyRlhFZ3igCYb1965/V5LeWheYcin58dG9wKGBveNtP+ZsjyOMuwfTzaYZ6++pAv/Dm1u7H6UEw==
   dependencies:
     "@mdi/font" "^5.3.45"
     axios "^0.19.2"
@@ -1706,6 +1706,7 @@
     react-plotly.js "^2.4.0"
     react-portal "^4.2.1"
     remark-math "^2.0.1"
+    uuid "^8.3.0"
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -15267,11 +15268,6 @@ utils-regex-from-string@^1.0.0:
     regex-regex "^1.0.0"
     validate.io-string-primitive "^1.0.0"
 
-uuid@8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
-  integrity sha512-CI18flHDznR0lq54xBycOVmphdCYnQLKn8abKn7PXUiKUGdEd+/l9LWNJmugXel4hXq7S+RMNl34ecyC9TntWg==
-
 uuid@^3.0.1:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
@@ -15286,12 +15282,10 @@ uuid@^7.0.3:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
   integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
-uuidv4@^6.0.9:
-  version "6.0.9"
-  resolved "https://registry.yarnpkg.com/uuidv4/-/uuidv4-6.0.9.tgz#cfab0855ef9f58aff8b0bb75c51670cf4242ecac"
-  integrity sha512-a/1nruGzltmS3RQkWD49/9/kj1D/bGwWl0SUcDbJJy1tvJ8/xnh4ADFshUwYDGiVNj1xmr23NsogQXBgvvTy5g==
-  dependencies:
-    uuid "8.1.0"
+uuid@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.0.tgz#ab738085ca22dc9a8c92725e459b1d507df5d6ea"
+  integrity sha512-fX6Z5o4m6XsXBdli9g7DtWgAx+osMsRRZFKma1mIUsLCz6vRvv+pz5VNbyu9UEDzpMWulZfvpgb/cmDXVulYFQ==
 
 v8-compile-cache@^2.0.3:
   version "2.1.0"

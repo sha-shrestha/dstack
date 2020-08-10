@@ -6,7 +6,7 @@ import cx from 'classnames';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import config from 'config';
 import routes from 'routes';
-import {useOnClickOutside} from 'hooks';
+import {useOnClickOutside} from '@dstackai/dstack-react/dist/hooks';
 import {startAppProgress, completeAppProgress} from 'App/actions';
 import logo from 'assets/logo.svg';
 import css from './styles.module.css';

@@ -7,9 +7,8 @@ import routes from 'routes';
 import '@mdi/font/css/materialdesignicons.min.css';
 import '@dstackai/dstack-react/dist/index.css';
 
-import {NotFound, Loader} from '@dstackai/dstack-react';
+import {NotFound, Loader, UnAuthorizedLayout} from '@dstackai/dstack-react';
 import DefaultLayout from 'layouts/Default';
-import UnAuthorizedLayout from 'layouts/UnAuthorized';
 
 import Login from 'Auth/Login';
 import ConfirmEmail from 'Auth/ConfirmEmail';

@@ -7,12 +7,12 @@ import {Link} from 'react-router-dom';
 import {useHistory, useLocation, useParams} from 'react-router';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
-import {AccessForbidden, NotFound, StackDetails} from '@dstackai/dstack-react';
+import {AccessForbidden, NotFound, StackDetails, StackUpload} from '@dstackai/dstack-react';
 import {isSignedIn, parseSearch} from '@dstackai/dstack-react/dist/utils';
-import routes from 'routes';
 import {deleteStack} from 'Stacks/List/actions';
 import {fetchDetails, clearDetails, fetchFrame, downloadAttachment, update} from './actions';
-import Upload from 'Stacks/components/Upload';
+import routes from 'routes';
+import config from 'config';
 
 type Props = {
     attachmentRequestStatus: ?number,
@@ -196,11 +196,13 @@ const Details = ({
                 downloadAttachment={downloadAttachmentHandle}
             />
 
-            <Upload
+            <StackUpload
                 stack={params.stack}
                 isShow={isShowUploadModal}
                 onClose={() => setIsShowUploadModal(false)}
                 refresh={fetchData}
+                apiUrl={config.API_URL}
+                user={params.user}
             />
         </Fragment>
     );
