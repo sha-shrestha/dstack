@@ -49,26 +49,11 @@
         opacity: .3;
     }
 }
-.permissions {
-    margin-left: 10px;
-}
-.copy {
-    flex-shrink: 0;
-    margin-left: 6px;
-    margin-right: 6px;
-}
-.link {
-    width: 22px;
-    height: 22px;
-    font-size: 22px;
-    line-height: 22px;
-    text-align: center;
-    color: var(--color-light-gray);
-    opacity: .3;
-    cursor: pointer;
-    &:hover {
-        opacity: .6;
-    }
+.sideHeader {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    padding-left: 10px;
 }
 .dropdown {
     &-button {

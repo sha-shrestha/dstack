@@ -20,8 +20,11 @@ var axios = _interopDefault(require('axios'));
 var Plot = _interopDefault(require('react-plotly.js'));
 var CSV = require('csv-string');
 var reactRouterDom = require('react-router-dom');
+var uuid = require('uuid');
 var reactDnd = require('react-dnd');
 var reactRouter = require('react-router');
+var routes = _interopDefault(require('routes'));
+var logo = _interopDefault(require('assets/logo.svg'));
 
 var config = {
   DOCS_URL: 'http://docs.dstack.ai',
@@ -94,7 +97,7 @@ var config = {
 
 var image = require("./lock~ZBorChcU.svg");
 
-var css = {"forbidden":"_3PN84","message":"_2i8KH"};
+var css = {"forbidden":"_style-module__forbidden__3PN84","message":"_style-module__message__2i8KH"};
 
 var AccessForbidden = function AccessForbidden(_ref) {
   var children = _ref.children;
@@ -110,7 +113,7 @@ var AccessForbidden = function AccessForbidden(_ref) {
   }, children));
 };
 
-var css$1 = {"avatar":"_3xvkT"};
+var css$1 = {"avatar":"_styles-module__avatar__3xvkT"};
 
 var Avatar = React.forwardRef(function (_ref, ref) {
   var className = _ref.className,
@@ -173,7 +176,7 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-var css$2 = {"back":"_1MuhU"};
+var css$2 = {"back":"_styles-module__back__1MuhU"};
 
 var BackButton = function BackButton(_ref) {
   var _ref$Component = _ref.Component,
@@ -189,9 +192,9 @@ var BackButton = function BackButton(_ref) {
   }), children);
 };
 
-var css$3 = {"button":"_2lKoS","spinner":"_31PPt"};
+var css$3 = {"button":"_style-module__button__2lKoS","spinner":"_style-module__spinner__31PPt"};
 
-var css$4 = {"spinner":"_3XhrC","spinner-animation":"_2UA3s"};
+var css$4 = {"spinner":"_styles-module__spinner__3XhrC","spinner-animation":"_styles-module__spinner-animation__2UA3s"};
 
 var COLORS = {
   white: '#fff',
@@ -263,7 +266,7 @@ var Button = React.forwardRef(function (_ref, ref) {
   }), children);
 });
 
-var css$5 = {"checkbox":"_3lqFk","toggle-label":"_1aLAG","label":"_2PZb-","wrapper":"_2Vufp","mark":"_2Pb2f"};
+var css$5 = {"checkbox":"_styles-module__checkbox__3lqFk","toggle-label":"_styles-module__toggle-label__1aLAG","label":"_styles-module__label__2PZb-","wrapper":"_styles-module__wrapper__2Vufp","mark":"_styles-module__mark__2Pb2f"};
 
 var CheckboxField = function CheckboxField(_ref) {
   var className = _ref.className,
@@ -307,7 +310,7 @@ var CheckboxField = function CheckboxField(_ref) {
   }, label)), children);
 };
 
-var css$6 = {"copy":"_3J5hd","message":"_3RWnQ","button":"_2YqEb","icon":"_25GMO"};
+var css$6 = {"copy":"_styles-module__copy__3J5hd","message":"_styles-module__message__3RWnQ","button":"_styles-module__button__2YqEb","icon":"_styles-module__icon__25GMO"};
 
 var Copy = function Copy(_ref) {
   var children = _ref.children,
@@ -347,7 +350,7 @@ var Copy = function Copy(_ref) {
   }, successMessage ? successMessage : t('copied')));
 };
 
-var css$7 = {"code":"_3gARj","copy":"_m44gX","icon":"_ZmZbg"};
+var css$7 = {"code":"_styles-module__code__3gARj","copy":"_styles-module__copy__m44gX","icon":"_styles-module__icon__ZmZbg"};
 
 var CodeViewer = function CodeViewer(_ref) {
   var className = _ref.className,
@@ -369,7 +372,7 @@ var CodeViewer = function CodeViewer(_ref) {
   }));
 };
 
-var css$8 = {"dropdown":"_1qRCw","button":"_fzNEm","menu":"_AJ1Y3","item":"_3lbfY"};
+var css$8 = {"dropdown":"_styles-module__dropdown__1qRCw","button":"_styles-module__button__fzNEm","menu":"_styles-module__menu__AJ1Y3","item":"_styles-module__item__3lbfY"};
 
 var Dropdown = function Dropdown(_ref) {
   var className = _ref.className,
@@ -516,7 +519,26 @@ var parseStackParams = (function (attachments) {
   return fields;
 });
 
-var css$9 = {"dnd":"_3uYii","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
+var fileToBase64 = function fileToBase64(file) {
+  try {
+    return Promise.resolve(new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = function () {
+        return resolve(reader.result.split(',')[1]);
+      };
+
+      reader.onerror = function (error) {
+        return reject(error);
+      };
+    }));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+var css$9 = {"dnd":"_style-module__dnd__3uYii","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
 
 var FileDragnDrop = function FileDragnDrop(_ref) {
   var formats = _ref.formats,
@@ -641,7 +663,7 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
   }, t('upload')), ' ', t('fromYourComputer'), "."));
 };
 
-var css$a = {"loader":"_18_Ho","text":"_3dZu_","stacks-pulse":"_350eA","grid":"_Uki0v","item":"_MvjKB","pic":"_Pc6fT","section":"_2EIKh"};
+var css$a = {"loader":"_styles-module__loader__18_Ho","text":"_styles-module__text__3dZu_","stacks-pulse":"_styles-module__stacks-pulse__350eA","grid":"_styles-module__grid__Uki0v","item":"_styles-module__item__MvjKB","pic":"_styles-module__pic__Pc6fT","section":"_styles-module__section__2EIKh"};
 
 var Loader = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
@@ -696,7 +718,7 @@ var MarkdownRender = function MarkdownRender(props) {
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, newProps));
 };
 
-var css$b = {"modal":"_3FQ59","dialog":"_268e0","close":"_1Y7yz","title":"_knxNI"};
+var css$b = {"modal":"_styles-module__modal__3FQ59","dialog":"_styles-module__dialog__268e0","close":"_styles-module__close__1Y7yz","title":"_styles-module__title__knxNI"};
 
 var Modal = function Modal(_ref) {
   var title = _ref.title,
@@ -730,7 +752,7 @@ var Modal = function Modal(_ref) {
 
 var image$1 = require("./404~FXFqzVOe.svg");
 
-var css$c = {"not-found":"_tAZyq","message":"_3Ok1U","help":"_Aa8x8"};
+var css$c = {"not-found":"_style-module__not-found__tAZyq","message":"_style-module__message__3Ok1U","help":"_style-module__help__Aa8x8"};
 
 var NotFound = function NotFound(_ref) {
   var children = _ref.children;
@@ -775,7 +797,7 @@ var usePrevious = (function (value) {
   return ref.current;
 });
 
-var css$d = {"bar":"_12oWc","progress":"_3JWjz"};
+var css$d = {"bar":"_styles-module__bar__12oWc","progress":"_styles-module__progress__3JWjz"};
 
 var ProgressBar = function ProgressBar(_ref) {
   var className = _ref.className,
@@ -858,7 +880,7 @@ var ProgressBar = function ProgressBar(_ref) {
   }));
 };
 
-var css$e = {"field":"_3WCaE","input":"_9Tk5W","label":"_1mHtq","error":"_3jOrk"};
+var css$e = {"field":"_styles-module__field__3WCaE","input":"_styles-module__input__9Tk5W","label":"_styles-module__label__1mHtq","error":"_styles-module__error__3jOrk"};
 
 var TextField = function TextField(_ref) {
   var label = _ref.label,
@@ -887,7 +909,7 @@ var TextField = function TextField(_ref) {
   }, errors.join(', '))));
 };
 
-var css$f = {"search":"_3s1gr","field":"_17rsB","clear":"_3oKZ5","button":"_3BfRl"};
+var css$f = {"search":"_styles-module__search__3s1gr","field":"_styles-module__field__17rsB","clear":"_styles-module__clear__3oKZ5","button":"_styles-module__button__3BfRl"};
 
 var SearchField = function SearchField(_ref) {
   var className = _ref.className,
@@ -934,7 +956,7 @@ var SearchField = function SearchField(_ref) {
   })));
 };
 
-var css$g = {"field":"_2jF9E","label":"_iehEi","rcSelectLoadingIcon":"_VtsrG","rcSelectDropdownSlideUpIn":"_27wr-","rcSelectDropdownSlideUpOut":"_1QVN6","rcSelectDropdownSlideDownIn":"_1vYLX","rcSelectDropdownSlideDownOut":"_1-lNh","select-field":"_1mUh_","select-field-selector":"_V9Ufm","select-field-arrow":"_c4k8s","mdi":"_2hNDK","select-field-selection-placeholder":"_2Vdv0","select-field-selection-search":"_3GdNa","select-field-selection-search-input":"_3BOaB","select-field-selection-item":"_2uDu7","select-field-item-option-checkbox":"_2K_G1","select-field-selection-item-remove":"_1k1IW","select-field-show-search":"_3EVnU","select-field-show-arrow":"_1xlmm","select-field-open":"__jEZ1","select-field-multiple":"_2YFSs","select-field-single":"_1n3qF","select-field-clear":"_Mg5xq","select-field-item-option-state":"_2yGkG","select-field-selection__choice-zoom":"_3NUb5","select-field-selection__choice-zoom-appear":"_ZO73y","select-field-selection__choice-zoom-leave":"_2i54q","select-field-dropdown":"_14ngc"};
+var css$g = {"field":"_styles-module__field__2jF9E","label":"_styles-module__label__iehEi","rcSelectLoadingIcon":"_styles-module__rcSelectLoadingIcon__VtsrG","rcSelectDropdownSlideUpIn":"_styles-module__rcSelectDropdownSlideUpIn__27wr-","rcSelectDropdownSlideUpOut":"_styles-module__rcSelectDropdownSlideUpOut__1QVN6","rcSelectDropdownSlideDownIn":"_styles-module__rcSelectDropdownSlideDownIn__1vYLX","rcSelectDropdownSlideDownOut":"_styles-module__rcSelectDropdownSlideDownOut__1-lNh","select-field":"_styles-module__select-field__1mUh_","select-field-selector":"_styles-module__select-field-selector__V9Ufm","select-field-arrow":"_styles-module__select-field-arrow__c4k8s","mdi":"_styles-module__mdi__2hNDK","select-field-selection-placeholder":"_styles-module__select-field-selection-placeholder__2Vdv0","select-field-selection-search":"_styles-module__select-field-selection-search__3GdNa","select-field-selection-search-input":"_styles-module__select-field-selection-search-input__3BOaB","select-field-selection-item":"_styles-module__select-field-selection-item__2uDu7","select-field-item-option-checkbox":"_styles-module__select-field-item-option-checkbox__2K_G1","select-field-selection-item-remove":"_styles-module__select-field-selection-item-remove__1k1IW","select-field-show-search":"_styles-module__select-field-show-search__3EVnU","select-field-show-arrow":"_styles-module__select-field-show-arrow__1xlmm","select-field-open":"_styles-module__select-field-open___jEZ1","select-field-multiple":"_styles-module__select-field-multiple__2YFSs","select-field-single":"_styles-module__select-field-single__1n3qF","select-field-clear":"_styles-module__select-field-clear__Mg5xq","select-field-item-option-state":"_styles-module__select-field-item-option-state__2yGkG","select-field-selection__choice-zoom":"_styles-module__select-field-selection__choice-zoom__3NUb5","select-field-selection__choice-zoom-appear":"_styles-module__select-field-selection__choice-zoom-appear__ZO73y","select-field-selection__choice-zoom-leave":"_styles-module__select-field-selection__choice-zoom-leave__2i54q","select-field-dropdown":"_styles-module__select-field-dropdown__14ngc"};
 
 var allValue = 'all';
 
@@ -1014,7 +1036,7 @@ var SelectField = function SelectField(_ref) {
   }, label));
 };
 
-var css$h = {"field":"_2_NXc","rcSliderTooltipZoomDownIn":"_2jvao","rcSliderTooltipZoomDownOut":"_2HgMB","slider":"_31Ylv","label":"_Zo_r8","rc-slider":"_1hLjI","rc-slider-rail":"_v9bxI","rc-slider-track":"__3emJ","rc-slider-handle":"_12sQ3","rc-slider-handle-dragging":"_2u63-","rc-slider-handle-click-focused":"_7xSSR","rc-slider-mark":"_1l2Qm","rc-slider-mark-text":"_2zf2c","rc-slider-mark-text-active":"_25tuh","rc-slider-step":"_3wC_L","rc-slider-dot":"_17-SM","rc-slider-dot-active":"_1eLwY","rc-slider-dot-reverse":"_Ewb1d","rc-slider-disabled":"_1YO43","rc-slider-vertical":"_12Juq","rc-slider-tooltip-zoom-down-enter":"_2a95b","rc-slider-tooltip-zoom-down-appear":"_2wvsD","rc-slider-tooltip-zoom-down-leave":"_3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_P9_lk","rc-slider-tooltip":"_1PZK2","rc-slider-tooltip-hidden":"_2CvyB","rc-slider-tooltip-placement-top":"_qzmlA","rc-slider-tooltip-inner":"_27Bp4","rc-slider-tooltip-arrow":"_35-HY"};
+var css$h = {"field":"_styles-module__field__2_NXc","rcSliderTooltipZoomDownIn":"_styles-module__rcSliderTooltipZoomDownIn__2jvao","rcSliderTooltipZoomDownOut":"_styles-module__rcSliderTooltipZoomDownOut__2HgMB","slider":"_styles-module__slider__31Ylv","label":"_styles-module__label__Zo_r8","rc-slider":"_styles-module__rc-slider__1hLjI","rc-slider-rail":"_styles-module__rc-slider-rail__v9bxI","rc-slider-track":"_styles-module__rc-slider-track___3emJ","rc-slider-handle":"_styles-module__rc-slider-handle__12sQ3","rc-slider-handle-dragging":"_styles-module__rc-slider-handle-dragging__2u63-","rc-slider-handle-click-focused":"_styles-module__rc-slider-handle-click-focused__7xSSR","rc-slider-mark":"_styles-module__rc-slider-mark__1l2Qm","rc-slider-mark-text":"_styles-module__rc-slider-mark-text__2zf2c","rc-slider-mark-text-active":"_styles-module__rc-slider-mark-text-active__25tuh","rc-slider-step":"_styles-module__rc-slider-step__3wC_L","rc-slider-dot":"_styles-module__rc-slider-dot__17-SM","rc-slider-dot-active":"_styles-module__rc-slider-dot-active__1eLwY","rc-slider-dot-reverse":"_styles-module__rc-slider-dot-reverse__Ewb1d","rc-slider-disabled":"_styles-module__rc-slider-disabled__1YO43","rc-slider-vertical":"_styles-module__rc-slider-vertical__12Juq","rc-slider-tooltip-zoom-down-enter":"_styles-module__rc-slider-tooltip-zoom-down-enter__2a95b","rc-slider-tooltip-zoom-down-appear":"_styles-module__rc-slider-tooltip-zoom-down-appear__2wvsD","rc-slider-tooltip-zoom-down-leave":"_styles-module__rc-slider-tooltip-zoom-down-leave__3jMC3","rc-slider-tooltip-zoom-down-enter-active":"_styles-module__rc-slider-tooltip-zoom-down-enter-active__1M8Be","rc-slider-tooltip-zoom-down-appear-active":"_styles-module__rc-slider-tooltip-zoom-down-appear-active__3tu2z","rc-slider-tooltip-zoom-down-leave-active":"_styles-module__rc-slider-tooltip-zoom-down-leave-active__P9_lk","rc-slider-tooltip":"_styles-module__rc-slider-tooltip__1PZK2","rc-slider-tooltip-hidden":"_styles-module__rc-slider-tooltip-hidden__2CvyB","rc-slider-tooltip-placement-top":"_styles-module__rc-slider-tooltip-placement-top__qzmlA","rc-slider-tooltip-inner":"_styles-module__rc-slider-tooltip-inner__27Bp4","rc-slider-tooltip-arrow":"_styles-module__rc-slider-tooltip-arrow__35-HY"};
 
 var CustomHandle = function CustomHandle(props) {
   var style = {
@@ -1065,7 +1087,7 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"filters":"_kiZkv","select":"_4Up3c","field":"_3_9Ku"};
+var css$i = {"filters":"_styles-module__filters__kiZkv","select":"_styles-module__select__4Up3c","field":"_styles-module__field__3_9Ku"};
 
 var StackFilters = function StackFilters(_ref) {
   var className = _ref.className,
@@ -1121,7 +1143,7 @@ var StackFilters = function StackFilters(_ref) {
   }));
 };
 
-var css$j = {"field":"_2DYF1","hidden":"_3z5o2"};
+var css$j = {"field":"_styles-module__field__2DYF1","hidden":"_styles-module__hidden__3z5o2"};
 
 var StretchTitleField = function StretchTitleField(_ref) {
   var propValue = _ref.value,
@@ -1155,7 +1177,7 @@ var StretchTitleField = function StretchTitleField(_ref) {
   }, value.length ? value : placeholder));
 };
 
-var css$k = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
+var css$k = {"tabs":"_styles-module__tabs__-hQvT","tab":"_styles-module__tab__2dsXN","soon":"_styles-module__soon__2_DJa"};
 
 var Tabs = function Tabs(_ref) {
   var className = _ref.className,
@@ -1183,7 +1205,7 @@ var Tabs = function Tabs(_ref) {
   }));
 };
 
-var css$l = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
+var css$l = {"field":"_styles-module__field__3PgPN","textarea":"_styles-module__textarea__2Ok_K","label":"_styles-module__label__1qnsP","error":"_styles-module__error__1C6bH"};
 
 var TextAreaField = function TextAreaField(_ref) {
   var label = _ref.label,
@@ -1212,7 +1234,7 @@ var TextAreaField = function TextAreaField(_ref) {
   }, errors.join(', '))));
 };
 
-var css$m = {"tooltip":"_rE8Jn"};
+var css$m = {"tooltip":"_style-module__tooltip__rE8Jn"};
 
 var Tooltip = function Tooltip(_ref) {
   var children = _ref.children,
@@ -1240,7 +1262,7 @@ var Tooltip = function Tooltip(_ref) {
   }, props), children);
 };
 
-var css$n = {"switcher":"_3NMzC"};
+var css$n = {"switcher":"_styles-module__switcher__3NMzC"};
 
 var ViewSwitcher = function ViewSwitcher(_ref) {
   var _ref$value = _ref.value,
@@ -1305,7 +1327,7 @@ function _catch(body, recover) {
 	return result;
 }
 
-var css$o = {"table":"_3tMWP"};
+var css$o = {"table":"_styles-module__table__3tMWP"};
 
 var Table = function Table(_ref) {
   var data = _ref.data;
@@ -1427,6 +1449,7 @@ var actions = (function () {
 
   var fetchAttachment = function fetchAttachment(stack, frameId, id, onSuccess) {
     try {
+      var token = localStorage.getItem('token');
       dispatch({
         type: actionsTypes.FETCH,
         meta: {
@@ -1438,7 +1461,10 @@ var actions = (function () {
       var _temp2 = _catch(function () {
         return Promise.resolve(axios({
           baseURL: apiUrl,
-          url: config.STACK_ATTACHMENT(stack, frameId, id)
+          url: config.STACK_ATTACHMENT(stack, frameId, id),
+          headers: {
+            Authorization: token ? "Bearer " + token : ''
+          }
         })).then(function (request) {
           dispatch({
             type: actionsTypes.FETCH_SUCCESS,
@@ -1482,7 +1508,7 @@ var actions = (function () {
   };
 });
 
-var css$p = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD","message":"_1IDQc"};
+var css$p = {"attachment":"_styles-module__attachment__3NILI","loading-pulse":"_styles-module__loading-pulse__IhCO3","view":"_styles-module__view__3UWqG","text":"_styles-module__text__MOcaD","message":"_styles-module__message__1IDQc"};
 
 var base64ToJSON = function base64ToJSON(base64) {
   var parsedJSON;
@@ -1729,7 +1755,7 @@ var Attachment = function Attachment(_ref) {
   }, renderAttachment()));
 };
 
-var css$q = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
+var css$q = {"item":"_styles-module__item__fLtf5","preview":"_styles-module__preview__2dbXz","previewWrap":"_styles-module__previewWrap__2tToy","emptyMessage":"_styles-module__emptyMessage__3HPC2","attachment":"_styles-module__attachment__2ggOS","section":"_styles-module__section__1ugjv","content":"_styles-module__content__2S1Sc","name":"_styles-module__name__147V3","by":"_styles-module__by__3t2iA","permissions":"_styles-module__permissions__2SUP0","dropdown":"_styles-module__dropdown__35FwM","preview-stack-pulse":"_styles-module__preview-stack-pulse__YESUl"};
 
 var Item = function Item(_ref) {
   var _ref$Component = _ref.Component,
@@ -1738,7 +1764,8 @@ var Item = function Item(_ref) {
       data = _ref.data,
       deleteAction = _ref.deleteAction,
       otherOwner = _ref.otherOwner,
-      rest = _objectWithoutPropertiesLoose(_ref, ["Component", "onClick", "data", "deleteAction", "otherOwner"]);
+      renderContent = _ref.renderContent,
+      rest = _objectWithoutPropertiesLoose(_ref, ["Component", "onClick", "data", "deleteAction", "otherOwner", "renderContent"]);
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -1769,7 +1796,7 @@ var Item = function Item(_ref) {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), otherOwner && /*#__PURE__*/React__default.createElement("div", {
     className: css$q.by
-  }, t('by'), " ", data.user)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
+  }, t('by'), " ", data.user), renderContent && renderContent(data)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$q.dropdown,
     items: [{
       title: t('delete'),
@@ -1780,7 +1807,7 @@ var Item = function Item(_ref) {
   })));
 };
 
-var css$r = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
+var css$r = {"howto":"_styles-module__howto__2kGrG","tabs":"_styles-module__tabs__RLKw7","description":"_styles-module__description__3Ul2-","code":"_styles-module__code__11v2r","footer":"_styles-module__footer__nTy2P"};
 
 var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
 var installRPackageCode = 'install.packages("dstack")';
@@ -1868,7 +1895,7 @@ var HowTo = function HowTo(_ref) {
   }));
 };
 
-var css$s = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$s = {"list":"_styles-module__list__3CcWo","title":"_styles-module__title__2HbVV","side":"_styles-module__side__I1N48","message":"_styles-module__message__3XJKG","text":"_styles-module__text__1_wO5","grid":"_styles-module__grid__1BjLa","search":"_styles-module__search__3VlZv","mobileSearch":"_styles-module__mobileSearch__IxVfV","modal":"_styles-module__modal__1BJIQ","description":"_styles-module__description__1U-iN","buttons":"_styles-module__buttons__19NkE","button":"_styles-module__button__3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -1878,7 +1905,8 @@ var List = function List(_ref) {
       currentUser = _ref.currentUser,
       user = _ref.user,
       currentUserToken = _ref.currentUserToken,
-      renderSideTitle = _ref.renderSideTitle;
+      renderSideTitle = _ref.renderSideTitle,
+      renderItemContent = _ref.renderItemContent;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -2005,7 +2033,8 @@ var List = function List(_ref) {
       data: item,
       otherOwner: user !== item.user,
       to: "/" + item.user + "/" + item.name,
-      deleteAction: currentUser === item.user && showDeleteConfirmation
+      deleteAction: currentUser === item.user && showDeleteConfirmation,
+      renderItemContent: renderItemContent
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.text
@@ -2192,7 +2221,7 @@ var useOnClickOutside = (function (ref, handler) {
   }, [ref, handler]);
 });
 
-var css$t = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+var css$t = {"frames":"_styles-module__frames__3D3R4","frames-dropdown":"_styles-module__frames-dropdown__3hapH","button":"_styles-module__button__Tn4o_","name":"_styles-module__name__YzOn7","label":"_styles-module__label__Hg7hs","dropdown":"_styles-module__dropdown__16pcp","item":"_styles-module__item__1q46l","mark":"_styles-module__mark__1h8Eq","info":"_styles-module__info__2BnTD","modal":"_styles-module__modal__pk61B","description":"_styles-module__description__2GOOp","buttons":"_styles-module__buttons__3Ml-A"};
 
 var getFrameName = function getFrameName(frame) {
   return moment(frame.timestamp).format('D MMM YYYY h:mm a');
@@ -2328,7 +2357,7 @@ var Frames = function Frames(_ref) {
   }, t('cancel')))));
 };
 
-var css$u = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+var css$u = {"loader":"_styles-module__loader__2wNmt","title":"_styles-module__title__1Ms-2","stacks-pulse":"_styles-module__stacks-pulse__FjfKI","label":"_styles-module__label__1rFaq","description":"_styles-module__description__1Rg_O","diagram":"_styles-module__diagram__2Aj7C"};
 
 var Loader$1 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
@@ -2449,7 +2478,7 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 });
 
-var css$v = {"details":"_3iAZb","section":"__r9FQ","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","copy":"_2ikHm","link":"_21w9U","dropdown":"_3axDI","attachment-head":"_282UU","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","filters":"_1-hdZ","attachment":"_3IGZo","sidebar":"_U0_wY","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$v = {"details":"_styles-module__details__3iAZb","section":"_styles-module__section___r9FQ","header":"_styles-module__header__2kekg","title":"_styles-module__title__1zGvd","sideHeader":"_styles-module__sideHeader__1FUDu","dropdown":"_styles-module__dropdown__3axDI","attachment-head":"_styles-module__attachment-head__282UU","description":"_styles-module__description__Y6gJz","label":"_styles-module__label__2FemD","label-tooltip":"_styles-module__label-tooltip__2Oe5S","actions":"_styles-module__actions__sZkKa","size":"_styles-module__size__Ja107","revisions":"_styles-module__revisions__bLqAO","filters":"_styles-module__filters__1-hdZ","attachment":"_styles-module__attachment__3IGZo","sidebar":"_styles-module__sidebar__U0_wY","modal":"_styles-module__modal__2TdJX","buttons":"_styles-module__buttons__RhHmq","button":"_styles-module__button__26mqa"};
 
 var Details = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
@@ -2467,7 +2496,9 @@ var Details = function Details(_ref) {
       toggleUpload = _ref.toggleUpload,
       backUrl = _ref.backUrl,
       user = _ref.user,
-      stack = _ref.stack;
+      stack = _ref.stack,
+      renderHeader = _ref.renderHeader,
+      renderSideHeader = _ref.renderSideHeader;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -2574,7 +2605,9 @@ var Details = function Details(_ref) {
     className: css$v.title
   }, data.name, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
+  })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
+    className: css$v.sideHeader
+  }, renderSideHeader && renderSideHeader(), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$v.dropdown,
     items: [{
       title: t('upload'),
@@ -2585,7 +2618,7 @@ var Details = function Details(_ref) {
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
-  })))), /*#__PURE__*/React__default.createElement(Frames, {
+  }))))), /*#__PURE__*/React__default.createElement(Frames, {
     frames: lodashEs.get(data, 'frames', []),
     frame: currentFrameId,
     headId: headId,
@@ -2634,6 +2667,208 @@ var Details = function Details(_ref) {
     },
     modalMode: true
   })));
+};
+
+var useDebounce = (function (callback, depsOrDelay, deps) {
+  var delay = 300;
+  if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
+  return React.useCallback(lodashEs.debounce(callback, delay), deps);
+});
+
+var css$w = {"upload":"_style-module__upload__1HGtr","content":"_style-module__content__zyXjr","subtitle":"_style-module__subtitle__2QLXi","field":"_style-module__field__2kyid","dragndrop":"_style-module__dragndrop__1_81H","buttons":"_style-module__buttons__1PXB0","button":"_style-module__button__1nx-b"};
+
+var MB = 1048576;
+
+var Upload = function Upload(_ref) {
+  var stack = _ref.stack,
+      className = _ref.className,
+      isShow = _ref.isShow,
+      onClose = _ref.onClose,
+      refresh = _ref.refresh,
+      withButton = _ref.withButton,
+      apiUrl = _ref.apiUrl,
+      user = _ref.user;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(false),
+      isShowModal = _useState[0],
+      setIsShowModal = _useState[1];
+
+  var _useState2 = React.useState(null),
+      uploading = _useState2[0],
+      setUploading = _useState2[1];
+
+  var _useState3 = React.useState(null),
+      progress = _useState3[0],
+      setProgress = _useState3[1];
+
+  var _useState4 = React.useState(null),
+      file = _useState4[0],
+      setFile = _useState4[1];
+
+  var isDidMount = React.useRef(true);
+
+  var _useForm = useForm({
+    stack: stack || ''
+  }, {
+    stack: ['required', 'no-spaces-stack', 'stack-name']
+  }),
+      form = _useForm.form,
+      onChange = _useForm.onChange,
+      formErrors = _useForm.formErrors,
+      checkValidForm = _useForm.checkValidForm;
+
+  var runValidation = useDebounce(checkValidForm);
+  React.useEffect(function () {
+    if (!isDidMount.current) runValidation();else isDidMount.current = false;
+  }, [form.stack]);
+  React.useEffect(function () {
+    if (isShow !== undefined) setIsShowModal(isShow);
+  }, [isShow]);
+
+  var toggleModal = function toggleModal() {
+    return setIsShowModal(!isShowModal);
+  };
+
+  var closeHandle = function closeHandle() {
+    if (onClose) onClose();else setIsShowModal(false);
+  };
+
+  var getErrorsText = function getErrorsText(fieldName) {
+    if (formErrors[fieldName] && formErrors[fieldName].length) return [t("formErrors." + formErrors[fieldName][0])];
+  };
+
+  var submit = function submit() {
+    try {
+      var _temp7 = function _temp7() {
+        var _temp4 = _catch(function () {
+          var token = localStorage.getItem('token');
+          return Promise.resolve(axios({
+            method: 'post',
+            headers: {
+              Authorization: token ? "Bearer " + token : ''
+            },
+            baseURL: apiUrl,
+            url: config.STACK_PUSH,
+            data: params
+          })).then(function (_ref2) {
+            var data = _ref2.data;
+
+            function _temp3() {
+              setUploading(false);
+              closeHandle();
+              if (refresh) refresh();
+            }
+
+            var _temp2 = function () {
+              if (data.attachments && data.attachments.length) {
+                var _data$attachments = data.attachments,
+                    attachment = _data$attachments[0];
+
+                var _temp9 = function () {
+                  if (attachment['upload_url']) {
+                    return Promise.resolve(axios.put(attachment['upload_url'], file, {
+                      headers: {
+                        'Content-Type': 'application/octet-stream'
+                      },
+                      onUploadProgress: function onUploadProgress(progressEvent) {
+                        var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+                        setProgress(percentCompleted);
+                      }
+                    })).then(function () {});
+                  }
+                }();
+
+                if (_temp9 && _temp9.then) return _temp9.then(function () {});
+              }
+            }();
+
+            return _temp2 && _temp2.then ? _temp2.then(_temp3) : _temp3(_temp2);
+          });
+        }, function () {
+          closeHandle();
+        });
+
+        if (_temp4 && _temp4.then) return _temp4.then(function () {});
+      };
+
+      setProgress(null);
+      setUploading(true);
+      var params = {
+        type: file.type,
+        timestamp: Date.now(),
+        id: uuid.v4(),
+        stack: user + "/" + form.stack,
+        size: file.size
+      };
+
+      var _temp8 = function () {
+        if (file.size > MB) params.attachments = [{
+          length: file.size
+        }];else return Promise.resolve(fileToBase64(file)).then(function (_fileToBaseTo) {
+          params.attachments = [{
+            data: _fileToBaseTo
+          }];
+        });
+      }();
+
+      return Promise.resolve(_temp8 && _temp8.then ? _temp8.then(_temp7) : _temp7(_temp8));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement(React.Fragment, null, withButton && /*#__PURE__*/React__default.createElement(Tooltip, {
+    overlayContent: t('uploadTooltip')
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$w.upload, className),
+    size: "small",
+    color: "secondary",
+    onClick: toggleModal
+  }, t('upload'))), /*#__PURE__*/React__default.createElement(Modal, {
+    title: t('uploadFile'),
+    isShow: isShowModal,
+    size: "small"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.content
+  }, !stack && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.subtitle
+  }, t('theUploadedFileWouldBeSavedAsANewStack')), /*#__PURE__*/React__default.createElement(TextField, {
+    size: "middle",
+    className: css$w.field,
+    name: "stack",
+    onChange: onChange,
+    value: form.value,
+    maxLength: 30,
+    placeholder: t('stackName') + ", " + t('noSpaces') + ", " + t('maxSymbol', {
+      count: 30
+    }),
+    errors: getErrorsText('stack')
+  })), stack && file && /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.subtitle
+  }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop, {
+    className: css$w.dragndrop,
+    formats: ['.csv', '.png', '.svg', '.jpg'],
+    onChange: setFile,
+    loading: uploading,
+    progressPercent: progress
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$w.button,
+    variant: "contained",
+    color: "primary",
+    disabled: !file || !form.stack.length || uploading,
+    onClick: submit
+  }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
+    onClick: closeHandle,
+    className: css$w.button,
+    variant: "contained",
+    color: "secondary",
+    disabled: uploading
+  }, t('cancel')))));
 };
 
 function move(array, oldIndex, newIndex) {
@@ -2746,33 +2981,27 @@ var DnDItem = React.memo(function (_ref) {
   });
 });
 
-var css$w = {"loader":"_2RpBO","text":"_3gk1Z","dashboards-details-pulse":"_3HZ82","filters":"_3ZZJL","grid":"_ZafPr","item":"_LIYeR"};
+var css$x = {"loader":"_styles-module__loader__2RpBO","text":"_styles-module__text__3gk1Z","dashboards-details-pulse":"_styles-module__dashboards-details-pulse__3HZ82","filters":"_styles-module__filters__3ZZJL","grid":"_styles-module__grid__ZafPr","item":"_styles-module__item__LIYeR"};
 
 var Loader$2 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.loader
+    className: css$x.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.text
+    className: css$x.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.filters
+    className: css$x.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.grid
+    className: css$x.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.item
+    className: css$x.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.item
+    className: css$x.item
   })));
 };
 
-var useDebounce = (function (callback, depsOrDelay, deps) {
-  var delay = 300;
-  if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
-  return React.useCallback(lodashEs.debounce(callback, delay), deps);
-});
-
-var css$x = {"card":"_17jo7","inner":"_YLuSm","head":"_2dKop","name":"_1blF_","nameEdit":"_3omHN","nameValue":"_wx2sM","info":"_1Tbhc","dropdown":"_1NvWp","button":"_d6fLT","move":"_312qk","link":"_NfDp4","infoTime":"_2QMrW","emptyMessage":"_7aBhX","attachment":"_2ajkc"};
+var css$y = {"card":"_styles-module__card__17jo7","inner":"_styles-module__inner__YLuSm","head":"_styles-module__head__2dKop","name":"_styles-module__name__1blF_","nameEdit":"_styles-module__nameEdit__3omHN","nameValue":"_styles-module__nameValue__wx2sM","info":"_styles-module__info__1Tbhc","dropdown":"_styles-module__dropdown__1NvWp","button":"_styles-module__button__d6fLT","move":"_styles-module__move__312qk","link":"_styles-module__link__NfDp4","infoTime":"_styles-module__infoTime__2QMrW","emptyMessage":"_styles-module__emptyMessage__7aBhX","attachment":"_styles-module__attachment__2ajkc"};
 
 var Card = React.memo(function (_ref) {
   var data = _ref.data,
@@ -2838,72 +3067,72 @@ var Card = React.memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$x.card, "type-" + type, className),
+    className: cx(css$y.card, "type-" + type, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.inner
+    className: css$y.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.head
+    className: css$y.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$x.name, {
+    className: cx(css$y.name, {
       readonly: !updateCardTitle
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.nameValue
+    className: css$y.nameValue
   }, title.length ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$x.nameEdit, {
+    className: cx(css$y.nameEdit, {
       active: !title.length
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$x.infoTime
+      className: css$y.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.info
+    className: css$y.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$x.button, css$x.link),
+    className: cx(css$y.button, css$y.link),
     color: "secondary",
     Component: reactRouterDom.Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), Boolean(deleteCard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$x.dropdown,
+    className: css$y.dropdown,
     items: [].concat(deleteCard ? [{
       title: t('delete'),
       onClick: deleteCard
     }] : [])
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$x.button,
+    className: css$y.button,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$x.button, css$x.move),
+    className: cx(css$y.button, css$y.move),
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-cursor-move"
   }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$x.attachment,
+    className: css$y.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.emptyMessage
+    className: css$y.emptyMessage
   }, t('emptyDashboard'))));
 });
 
-var css$y = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","permissions":"_1up3B","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
+var css$z = {"details":"_styles-module__details__2U9YD","header":"_styles-module__header__2Lioj","title":"_styles-module__title__353_b","edit":"_styles-module__edit__14H-Y","permissions":"_styles-module__permissions__1up3B","dropdown":"_styles-module__dropdown__1OYBD","section":"_styles-module__section__3ZM3A","cards":"_styles-module__cards__2idlU","fields":"_styles-module__fields__3zxn3","filters":"_styles-module__filters__QjWiF","controls":"_styles-module__controls__9DqNJ","addButton":"_styles-module__addButton__ezy69","viewSwitcher":"_styles-module__viewSwitcher__2LheQ","empty":"_styles-module__empty__j9SPi"};
 
 var Details$1 = function Details(_ref) {
   var addCards = _ref.addCards,
@@ -3034,7 +3263,7 @@ var Details$1 = function Details(_ref) {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$y.filters, {
+      className: cx(css$z.filters, {
         'with-select': hasSelectField
       })
     });
@@ -3051,7 +3280,7 @@ var Details$1 = function Details(_ref) {
   if (!data) return null;
   var CardWrapComponent = withSorting ? DnDItem : React.Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.details
+    className: css$z.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -3060,11 +3289,11 @@ var Details$1 = function Details(_ref) {
   }, currentUser === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.header
+    className: css$z.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.title
+    className: css$z.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$y.edit,
+    className: css$z.edit,
     value: data === null || data === void 0 ? void 0 : data.title,
     onChange: onChangeTitleDebounce,
     readOnly: currentUser !== data.user,
@@ -3072,36 +3301,36 @@ var Details$1 = function Details(_ref) {
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$y.dropdown,
+    className: css$z.dropdown,
     items: [].concat(Boolean(deleteDashboard) ? [{
       title: t('delete'),
       onClick: deleteDashboard
     }] : [])
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$y['dropdown-button'],
+    className: css$z['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   })))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.section
+    className: css$z.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.fields
+    className: css$z.fields
   }, renderFilters()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.controls
+    className: css$z.controls
   }, getAddClickAction() && /*#__PURE__*/React__default.createElement("a", {
-    className: css$y.addButton,
+    className: css$z.addButton,
     onClick: getAddClickAction(),
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     value: view,
-    className: css$y.viewSwitcher,
+    className: css$z.viewSwitcher,
     onChange: function onChange(view) {
       return setView(view);
     }
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$y.cards, view)
+    className: cx(css$z.cards, view)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -3117,15 +3346,15 @@ var Details$1 = function Details(_ref) {
       moveAvailable: withSorting
     }));
   }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.empty
+    className: css$z.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), getAddClickAction() && /*#__PURE__*/React__default.createElement(React.Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$y.addButton,
+    className: css$z.addButton,
     onClick: getAddClickAction(),
     href: "#"
   }, t('addStack')), ".")));
 };
 
-var css$z = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
+var css$A = {"item":"_styles-module__item__3urCL","preview":"_styles-module__preview__cxR4e","label":"_styles-module__label__tCzQe","previewWrap":"_styles-module__previewWrap__15fuU","emptyMessage":"_styles-module__emptyMessage__2pDKf","attachment":"_styles-module__attachment__35KB8","section":"_styles-module__section__LeHWu","content":"_styles-module__content__Bgbe4","name":"_styles-module__name__2PrtI","by":"_styles-module__by__1_qsJ","permissions":"_styles-module__permissions__3ZdE1","dropdown":"_styles-module__dropdown__vK4SD","preview-stack-pulse":"_styles-module__preview-stack-pulse__3NFJT"};
 
 var Item$1 = function Item(_ref) {
   var dashboard = _ref.dashboard,
@@ -3151,35 +3380,35 @@ var Item$1 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteDashboard);
   return /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/" + user + "/d/" + dashboard.id,
-    className: css$z.item,
+    className: css$A.item,
     ref: ref
   }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.label
+    className: css$A.label
   }, t('stacksWithCount', {
     count: dashboard.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.previewWrap
+    className: css$A.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$z.attachment,
+    className: css$A.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.emptyMessage
+    className: css$A.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.section
+    className: css$A.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.content
+    className: css$A.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.name
+    className: css$A.name
   }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.by
+    className: css$A.by
   }, t('by'), " ", dashboard.user)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$z.dropdown,
+    className: css$A.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
@@ -3187,33 +3416,33 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$A = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
+var css$B = {"loader":"_styles-module__loader__PK0JP","text":"_styles-module__text__1F-rx","dashboards-pulse":"_styles-module__dashboards-pulse__29IbF","grid":"_styles-module__grid__ef-jq","item":"_styles-module__item__1HBd8","pic":"_styles-module__pic__1z0LR","section":"_styles-module__section__14O5G"};
 
 var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.loader
+    className: css$B.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.text
+    className: css$B.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.grid
+    className: css$B.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.item
+    className: css$B.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.pic
+    className: css$B.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.section
+    className: css$B.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.item
+    className: css$B.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.pic
+    className: css$B.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.section
+    className: css$B.section
   }))));
 };
 
-var css$B = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
+var css$C = {"list":"_styles-module__list__2tGd9","title":"_styles-module__title__lNufF","search":"_styles-module__search__3Vnt-","mobileSearch":"_styles-module__mobileSearch__28J_R","text":"_styles-module__text__2QiEZ","grid":"_styles-module__grid__31LQw","add":"_styles-module__add__1VMC5","caption":"_styles-module__caption__pTzl3"};
 
 var List$1 = function List(_ref) {
   var addDashboard = _ref.addDashboard,
@@ -3250,37 +3479,37 @@ var List$1 = function List(_ref) {
   var items = getItems();
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$3, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.list
+    className: css$C.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$B.search,
+    className: css$C.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.title
+    className: css$C.title
   }, currentUser === user ? t('myDashboards') : t('dashboardsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$B.mobileSearch,
+    className: css$C.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.grid
+    className: css$C.grid
   }, currentUser === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: addDashboard,
-    className: cx(css$B.add, {
+    className: cx(css$C.add, {
       disabled: addDashboardDisable
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.caption
+    className: css$C.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newDashboard'))), items.map(function (item, index) {
@@ -3293,39 +3522,39 @@ var List$1 = function List(_ref) {
   })));
 };
 
-var css$C = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
+var css$D = {"loader":"_styles-module__loader__FMgKh","text":"_styles-module__text__3kMB4","stacks-pulse":"_styles-module__stacks-pulse__2uZ4b","grid":"_styles-module__grid__1i-Vy","item":"_styles-module__item__3Q6le","pic":"_styles-module__pic__2gd5L","section":"_styles-module__section__BzTYi"};
 
 var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.loader
+    className: css$D.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.text
+    className: css$D.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.grid
+    className: css$D.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
+    className: css$D.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.pic
+    className: css$D.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.section
+    className: css$D.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
+    className: css$D.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.pic
+    className: css$D.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.section
+    className: css$D.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
+    className: css$D.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.pic
+    className: css$D.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.section
+    className: css$D.section
   }))));
 };
 
-var css$D = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
+var css$E = {"stacks":"_style-module__stacks__1YlOe","grid":"_style-module__grid__2Xblj","search":"_style-module__search__2JDJR","message":"_style-module__message__30aty","text":"_style-module__text__1qJHA","item":"_style-module__item__1AIvq","checkbox":"_style-module__checkbox__I8MzQ","buttons":"_style-module__buttons__3uEfC","button":"_style-module__button__22J0P"};
 
 var AddStacksModal = function AddStacksModal(_ref) {
   var _ref$stacks = _ref.stacks,
@@ -3407,13 +3636,13 @@ var AddStacksModal = function AddStacksModal(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$D.stacks,
+    dialogClassName: css$E.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$D.search,
+    className: css$E.search,
     isDark: true,
     size: "middle",
     showEverything: true,
@@ -3421,20 +3650,20 @@ var AddStacksModal = function AddStacksModal(_ref) {
     value: searchQuery,
     onChange: onChangeSearch
   }), loading && /*#__PURE__*/React__default.createElement(Loader$4, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.message
+    className: css$E.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.text
+    className: css$E.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.grid
+    className: css$E.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$D.item,
+      className: css$E.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$D.checkbox,
+      className: css$E.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
@@ -3442,19 +3671,66 @@ var AddStacksModal = function AddStacksModal(_ref) {
       otherOwner: params.user !== item.user
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.buttons
+    className: css$E.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$D.button,
+    className: css$E.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$D.button,
+    className: css$E.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
   }, t('cancel')))));
+};
+
+var css$F = {"header":"_styles-module__header__3C4T1","logo":"_styles-module__logo__1jfuS","buttons":"_styles-module__buttons__2EQYi","button":"_styles-module__button__3cb7N"};
+
+var Header = function Header(_ref) {
+  var className = _ref.className,
+      push = _ref.history.push;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var logIn = function logIn() {
+    return push(routes.authLogin());
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$F.header, className)
+  }, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
+    to: "/",
+    className: css$F.logo
+  }, /*#__PURE__*/React__default.createElement("img", {
+    width: "129",
+    height: "35",
+    src: logo,
+    alt: "logo"
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$F.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$F.button,
+    color: "primary",
+    onClick: logIn
+  }, t('logIn'))));
+};
+
+var Header$1 = reactRouterDom.withRouter(Header);
+
+var css$G = {"layout":"_styles-module__layout__23bi3","header":"_styles-module__header__1chFa","main":"_styles-module__main__70hee"};
+
+var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
+  var children = _ref.children;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$G.layout
+  }, /*#__PURE__*/React__default.createElement(Header$1, {
+    className: css$G.header
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$G.main
+  }, children));
 };
 
 Object.defineProperty(exports, 'DndProvider', {
@@ -3497,11 +3773,13 @@ exports.StackHowTo = HowTo;
 exports.StackHowToFetchData = HowTo$1;
 exports.StackList = List;
 exports.StackListItem = Item;
+exports.StackUpload = Upload;
 exports.StretchTitleField = StretchTitleField;
 exports.Tabs = Tabs;
 exports.TextAreaField = TextAreaField;
 exports.TextField = TextField;
 exports.Tooltip = Tooltip;
+exports.UnAuthorizedLayout = UnAuthorizedLayout;
 exports.ViewSwitcher = ViewSwitcher;
 exports.Yield = Yield;
 exports.config = config;

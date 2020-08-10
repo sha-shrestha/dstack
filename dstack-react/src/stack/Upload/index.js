@@ -1,15 +1,18 @@
 // @flow
 import React, {Fragment, useEffect, useRef, useState} from 'react';
-import {uuid} from 'uuidv4';
+import {v4} from 'uuid';
 import axios from 'axios';
-import api from 'api';
 import {useTranslation} from 'react-i18next';
-import {useParams} from 'react-router';
 import cx from 'classnames';
-import {Button, Modal, Tooltip, TextField, FileDragnDrop} from '@dstackai/dstack-react';
-import {fileToBaseTo64} from '@dstackai/dstack-react/dist/utils';
-import {useForm, useDebounce} from 'hooks';
-import config from 'config';
+import Button from '../../Button';
+import Modal from '../../Modal';
+import Tooltip from '../../Tooltip';
+import TextField from '../../TextField';
+import FileDragnDrop from '../../FileDragnDrop';
+import {fileToBaseTo64} from '../../utils';
+import useForm from '../../hooks/useForm';
+import useDebounce from '../../hooks/useDebounce';
+import config from '../../config';
 import css from './style.module.css';
 
 type Props = {
@@ -18,18 +21,19 @@ type Props = {
     refresh?: Function,
     onClose?: Function,
     isShow?: Function,
+    apiUrl: string,
+    user: string,
 };
 
 const MB = 1048576;
 
-const Upload = ({stack, className, isShow, onClose, refresh, withButton}: Props) => {
+const Upload = ({stack, className, isShow, onClose, refresh, withButton, apiUrl, user}: Props) => {
     const {t} = useTranslation();
     const [isShowModal, setIsShowModal] = useState(false);
     const [uploading, setUploading] = useState(null);
     const [progress, setProgress] = useState(null);
     const [file, setFile] = useState(null);
     const isDidMount = useRef(true);
-    const {user} = useParams();
 
     const {form, onChange, formErrors, checkValidForm} = useForm(
         {stack: stack || ''},
@@ -71,7 +75,7 @@ const Upload = ({stack, className, isShow, onClose, refresh, withButton}: Props)
         const params = {
             type: file.type,
             timestamp: Date.now(),
-            id: uuid(),
+            id: v4(),
             stack: `${user}/${form.stack}`,
             size: file.size,
         };
@@ -82,7 +86,15 @@ const Upload = ({stack, className, isShow, onClose, refresh, withButton}: Props)
             params.attachments = [{data: await fileToBaseTo64(file)}];
 
         try {
-            const {data} = await api.post(config.STACK_PUSH, params);
+            const token = localStorage.getItem('token');
+
+            const {data} = await axios({
+                method: 'post',
+                headers: {Authorization: token ? `Bearer ${token}` : ''},
+                baseURL: apiUrl,
+                url: config.STACK_PUSH,
+                data: params,
+            });
 
             if (data.attachments && data.attachments.length) {
                 const [attachment] = data.attachments;

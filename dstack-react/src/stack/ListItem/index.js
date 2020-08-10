@@ -14,7 +14,8 @@ type Props = {
     },
 
     otherOwner?: boolean,
-    deleteAction: Function,
+    deleteAction?: Function,
+    renderContent?: Function,
 };
 
 const Item = ({
@@ -23,6 +24,7 @@ const Item = ({
     data,
     deleteAction,
     otherOwner,
+    renderContent,
     ...rest
 }: Props) => {
     const {t} = useTranslation();
@@ -61,6 +63,8 @@ const Item = ({
                     {otherOwner && (
                         <div className={css.by}>{t('by')} {data.user}</div>
                     )}
+
+                    {renderContent && renderContent(data)}
                 </div>
 
                 {deleteAction && (

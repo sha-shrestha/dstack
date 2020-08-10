@@ -23,6 +23,7 @@ type Props = {
     loading: boolean,
     currentUser?: string,
     currentUserToken?: string,
+    renderItemContent: Function,
 };
 
 const List = ({
@@ -33,6 +34,7 @@ const List = ({
     user,
     currentUserToken,
     renderSideTitle,
+    renderItemContent,
 }: Props) => {
     const {t} = useTranslation();
     const [deletingStack, setDeletingStack] = useState(null);
@@ -157,6 +159,7 @@ const List = ({
                     otherOwner={user !== item.user}
                     to={`/${item.user}/${item.name}`}
                     deleteAction={currentUser === item.user &&  showDeleteConfirmation}
+                    renderItemContent={renderItemContent}
                 />)}
             </div>}
 

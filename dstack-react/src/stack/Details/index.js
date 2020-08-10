@@ -39,6 +39,8 @@ type Props = {
     onChangeHeadFrame: Function,
     onChangeAttachmentIndex: Function,
     onChangeFrame: Function,
+    renderHeader?: Function,
+    renderSideHeader?: Function,
 }
 
 const Details = ({
@@ -58,6 +60,8 @@ const Details = ({
     backUrl,
     user,
     stack,
+    renderHeader,
+    renderSideHeader,
 }: Props) => {
     const {t} = useTranslation();
     const didMountRef = useRef(false);
@@ -177,25 +181,31 @@ const Details = ({
                         <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                     </div>
 
-                    {data && data.user === currentUser && (
-                        <Dropdown
-                            className={css.dropdown}
+                    {renderHeader && renderHeader()}
 
-                            items={[
-                                {
-                                    title: t('upload'),
-                                    onClick: toggleUpload,
-                                },
-                            ]}
-                        >
-                            <Button
-                                className={css['dropdown-button']}
-                                color="secondary"
+                    <div className={css.sideHeader}>
+                        {renderSideHeader && renderSideHeader()}
+
+                        {data && data.user === currentUser && (
+                            <Dropdown
+                                className={css.dropdown}
+
+                                items={[
+                                    {
+                                        title: t('upload'),
+                                        onClick: toggleUpload,
+                                    },
+                                ]}
                             >
-                                <span className="mdi mdi-dots-horizontal" />
-                            </Button>
-                        </Dropdown>
-                    )}
+                                <Button
+                                    className={css['dropdown-button']}
+                                    color="secondary"
+                                >
+                                    <span className="mdi mdi-dots-horizontal" />
+                                </Button>
+                            </Dropdown>
+                        )}
+                    </div>
                 </div>
 
                 <StackFrames

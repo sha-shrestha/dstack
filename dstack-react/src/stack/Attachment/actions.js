@@ -8,6 +8,8 @@ export default () => {
     const [{apiUrl}, dispatch] = useStateValue();
 
     const fetchAttachment = async (stack, frameId, id, onSuccess) => {
+        const token = localStorage.getItem('token');
+
         dispatch({
             type: actionsTypes.FETCH,
             meta: {frameId, id},
@@ -17,6 +19,7 @@ export default () => {
             const request = await axios({
                 baseURL: apiUrl,
                 url: config.STACK_ATTACHMENT(stack, frameId, id),
+                headers: {Authorization: token ? `Bearer ${token}` : ''},
             });
 
             dispatch({
