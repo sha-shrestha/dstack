@@ -20,7 +20,6 @@ import Settings from 'Settings';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {fetchUser} from './actions';
 import css from './styles.module.css';
-import {useTracking} from 'hooks';
 
 const DefaultLayoutRoute = ({component: Component, ...rest}) => {
     return (
@@ -63,8 +62,6 @@ type Props = {
 const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
     const [loading, setLoading] = useState(true);
     const isInitialMount = useRef(true);
-
-    useTracking();
 
     useEffect(() => {
         if (isSignedIn())
