@@ -1,3 +1,4 @@
+@import "styles/media.css";
 @import "styles/variables.css";
 :root {
     --mobile-colum-size: 280px;

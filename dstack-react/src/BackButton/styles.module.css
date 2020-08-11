@@ -1,4 +1,5 @@
 @import "styles/variables.css";
+@import "styles/media.css";
 .back {
     font-size: 14px;
     line-height: 22px;
