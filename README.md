@@ -55,8 +55,11 @@ The package comes with a command line tool called `dstack`. This command line to
 
 If you're using R and don't need the command line tool, you can install the `dstack` package for R via the following command:
 
+Note, the R CRAN package is still under review. In order to install it, please use the following commands:
+
 ```R
-install.packages("dstack")
+install.packages(c('uuid', 'bit64', 'rjson', 'rlist'), repos = 'http://cran.us.r-project.org')
+install.packages('https://drive.google.com/uc?export=download&id=1RREfEk_rZFvZN-
 ```
 
 ## Quick start
