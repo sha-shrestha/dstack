@@ -4902,6 +4902,7 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     align-items: center;
 }
 ._3cb7N {
+    white-space: nowrap;
     width: auto !important;
     flex-shrink: 0;
 }

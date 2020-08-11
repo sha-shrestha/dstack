@@ -5,12 +5,18 @@ const Yield = ({name, className, children}) => {
     if (!name)
         return null;
 
-    if (children)
+    if (children) {
+        const node = document && document.getElementById(name);
+
+        if (!node)
+            return null;
+
         return (
-            <Portal node={document && document.getElementById(name)}>
+            <Portal node={node}>
                 {children}
             </Portal>
         );
+    }
 
     return (
         <div className={className} id={name} />

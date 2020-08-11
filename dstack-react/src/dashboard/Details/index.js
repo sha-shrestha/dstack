@@ -45,7 +45,7 @@ const Details = ({
     deleteCard,
     deleteDashboard,
     loading,
-    onChangeTitle,
+    onChangeTitle = () => {},
     updateCard,
     user,
     withSorting,
@@ -89,10 +89,11 @@ const Details = ({
 
         const {stack} = items[indexFrom].card;
 
-        updateCard({
-            stack,
-            index: indexTo,
-        });
+        if (updateCard)
+            updateCard({
+                stack,
+                index: indexTo,
+            });
 
         moveItem(indexFrom, indexTo);
     };

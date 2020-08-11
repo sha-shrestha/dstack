@@ -1294,9 +1294,15 @@ var Yield = function Yield(_ref) {
       className = _ref.className,
       children = _ref.children;
   if (!name) return null;
-  if (children) return /*#__PURE__*/React__default.createElement(Portal, {
-    node: document && document.getElementById(name)
-  }, children);
+
+  if (children) {
+    var node = document && document.getElementById(name);
+    if (!node) return null;
+    return /*#__PURE__*/React__default.createElement(Portal, {
+      node: node
+    }, children);
+  }
+
   return /*#__PURE__*/React__default.createElement("div", {
     className: className,
     id: name
@@ -3138,7 +3144,8 @@ var Details$1 = function Details(_ref) {
       deleteCard = _ref.deleteCard,
       deleteDashboard = _ref.deleteDashboard,
       loading = _ref.loading,
-      onChangeTitle = _ref.onChangeTitle,
+      _ref$onChangeTitle = _ref.onChangeTitle,
+      onChangeTitle = _ref$onChangeTitle === void 0 ? function () {} : _ref$onChangeTitle,
       updateCard = _ref.updateCard,
       user = _ref.user,
       withSorting = _ref.withSorting;
@@ -3194,7 +3201,7 @@ var Details$1 = function Details(_ref) {
   var moveCard = function moveCard(indexFrom, indexTo) {
     if (indexTo < 0 || indexFrom < 0) return;
     var stack = items[indexFrom].card.stack;
-    updateCard({
+    if (updateCard) updateCard({
       stack: stack,
       index: indexTo
     });

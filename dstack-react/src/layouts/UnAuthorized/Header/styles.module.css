@@ -28,6 +28,7 @@
     align-items: center;
 }
 .button {
+    white-space: nowrap;
     width: auto !important;
     flex-shrink: 0;
     @media (--mobile) {
