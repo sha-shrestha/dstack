@@ -159,7 +159,7 @@ const List = ({
                     otherOwner={user !== item.user}
                     to={`/${item.user}/${item.name}`}
                     deleteAction={currentUser === item.user &&  showDeleteConfirmation}
-                    renderItemContent={renderItemContent}
+                    renderContent={renderItemContent}
                 />)}
             </div>}
 

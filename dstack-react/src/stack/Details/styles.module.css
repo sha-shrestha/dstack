@@ -1,7 +1,7 @@
 @import "styles/variables.css";
 @import "styles/media.css";
 :root {
-    --sidebar-width: 0px;
+    --sidebar-width: 240px;
 }
 
 .details {
@@ -11,12 +11,22 @@
     }
     @media (--desktop) {
         display: grid;
-        grid-template-columns: calc(100% - var(--sidebar-width)) var(--sidebar-width);
-        grid-template-areas: "section sidebar";
         border: 1px solid rgba(180, 184, 199, .3);
         box-sizing: border-box;
         border-radius: 4px;
         min-height: calc(100vh - 100px);
+    }
+    &:not(:global(.with-sidebar)) {
+        @media (--desktop) {
+            grid-template-areas: "section";
+            grid-template-columns: 100%;
+        }
+    }
+    &:global(.with-sidebar) {
+        @media (--desktop) {
+            grid-template-areas: "section sidebar";
+            grid-template-columns: calc(100% - var(--sidebar-width)) var(--sidebar-width);
+        }
     }
 }
 .section {

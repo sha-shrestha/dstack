@@ -2038,7 +2038,7 @@ var List = function List(_ref) {
       otherOwner: user !== item.user,
       to: "/" + item.user + "/" + item.name,
       deleteAction: currentUser === item.user && showDeleteConfirmation,
-      renderItemContent: renderItemContent
+      renderContent: renderItemContent
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.text
@@ -2502,7 +2502,8 @@ var Details = function Details(_ref) {
       user = _ref.user,
       stack = _ref.stack,
       renderHeader = _ref.renderHeader,
-      renderSideHeader = _ref.renderSideHeader;
+      renderSideHeader = _ref.renderSideHeader,
+      renderSidebar = _ref.renderSidebar;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -2593,7 +2594,9 @@ var Details = function Details(_ref) {
   var attachment = lodashEs.get(frame, "attachments[" + attachmentIndex + "]");
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.details
+    className: cx(css$v.details, {
+      'with-sidebar': Boolean(renderSidebar)
+    })
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -2655,7 +2658,9 @@ var Details = function Details(_ref) {
     stack: user + "/" + stack,
     frameId: frame.id,
     id: attachmentIndex || 0
-  })), /*#__PURE__*/React__default.createElement(Modal, {
+  })), Boolean(renderSidebar) && /*#__PURE__*/React__default.createElement("aside", {
+    className: css$v.sidebar
+  }, renderSidebar()), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowHowToModal,
     withCloseButton: true,
     onClose: hideHowToModal,

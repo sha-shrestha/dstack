@@ -41,6 +41,7 @@ type Props = {
     onChangeFrame: Function,
     renderHeader?: Function,
     renderSideHeader?: Function,
+    renderSidebar?: Function,
 }
 
 const Details = ({
@@ -62,6 +63,7 @@ const Details = ({
     stack,
     renderHeader,
     renderSideHeader,
+    renderSidebar,
 }: Props) => {
     const {t} = useTranslation();
     const didMountRef = useRef(false);
@@ -161,7 +163,7 @@ const Details = ({
         return <Loader />;
 
     return (
-        <div className={css.details}>
+        <div className={cx(css.details, {'with-sidebar': Boolean(renderSidebar)})}>
             <Yield name="header-yield">
                 <BackButton
                     Component={Link}
@@ -258,6 +260,12 @@ const Details = ({
                     />
                 )}
             </section>
+
+            {Boolean(renderSidebar) && (
+                <aside className={css.sidebar}>
+                    {renderSidebar()}
+                </aside>
+            )}
 
             <Modal
                 isShow={isShowHowToModal}

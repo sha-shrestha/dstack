@@ -3813,14 +3813,24 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 @media (min-width: 981px) {
 ._3iAZb {
         display: grid;
-        grid-template-columns: calc(100% - 0px) 0px;
-        grid-template-areas: "section sidebar";
         border: 1px solid rgba(180, 184, 199, .3);
         box-sizing: border-box;
         border-radius: 4px;
         min-height: calc(100vh - 100px)
 }
     }
+@media (min-width: 981px) {
+._3iAZb:not(.with-sidebar) {
+            grid-template-areas: "section";
+            grid-template-columns: 100%
+    }
+        }
+@media (min-width: 981px) {
+._3iAZb.with-sidebar {
+            grid-template-areas: "section sidebar";
+            grid-template-columns: calc(100% - 240px) 240px
+    }
+        }
 @media (min-width: 981px) {
 .__r9FQ {
         grid-area: section;
