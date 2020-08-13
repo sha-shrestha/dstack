@@ -26,6 +26,7 @@ const List = ({
     currentUser,
     createDashboard,
     creatingDashboard,
+    deleteDashboard,
     fetchList,
     data,
     loading,

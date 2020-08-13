@@ -3141,7 +3141,7 @@ var Card = React.memo(function (_ref) {
   }, t('emptyDashboard'))));
 });
 
-var css$z = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","permissions":"_1up3B","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
+var css$z = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","sideHeader":"_3zX4a","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
 
 var Details$1 = function Details(_ref) {
   var addCards = _ref.addCards,
@@ -3156,7 +3156,9 @@ var Details$1 = function Details(_ref) {
       onChangeTitle = _ref$onChangeTitle === void 0 ? function () {} : _ref$onChangeTitle,
       updateCard = _ref.updateCard,
       user = _ref.user,
-      withSorting = _ref.withSorting;
+      withSorting = _ref.withSorting,
+      renderHeader = _ref.renderHeader,
+      renderSideHeader = _ref.renderSideHeader;
 
   var _useContext = React.useContext(GridContext),
       items = _useContext.items,
@@ -3310,7 +3312,9 @@ var Details$1 = function Details(_ref) {
     placeholder: t('newDashboard')
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
+  })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.sideHeader
+  }, renderSideHeader && renderSideHeader(), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$z.dropdown,
     items: [].concat(Boolean(deleteDashboard) ? [{
       title: t('delete'),
@@ -3321,7 +3325,7 @@ var Details$1 = function Details(_ref) {
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
-  })))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+  }))))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
     className: css$z.section
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$z.fields

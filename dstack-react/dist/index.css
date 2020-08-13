@@ -4343,15 +4343,17 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 ._353_b {
     display: flex;
     align-items: center;
-    margin-right: auto;
 }
 ._353_b ._14H-Y {}
 ._353_b .mdi {
         margin-left: 5px;
         opacity: .3;
     }
-._1up3B {
-    margin-left: 10px;
+._3zX4a {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    padding-left: 10px;
 }
 ._1OYBD-button {
         outline: none;

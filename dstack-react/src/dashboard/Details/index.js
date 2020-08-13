@@ -34,6 +34,8 @@ type Props = {
     updateCard?: Function,
     user: string,
     withSorting?: boolean,
+    renderHeader?: Function,
+    renderSideHeader?: Function,
 }
 
 const Details = ({
@@ -49,6 +51,8 @@ const Details = ({
     updateCard,
     user,
     withSorting,
+    renderHeader,
+    renderSideHeader,
 }: Props) => {
     const {items, moveItem, setItems} = useContext(DnDGridContext);
 
@@ -225,23 +229,29 @@ const Details = ({
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {Boolean(deleteDashboard) && <Dropdown
-                    className={css.dropdown}
+                {renderHeader && renderHeader()}
 
-                    items={[
-                        ...(Boolean(deleteDashboard) ? [{
-                            title: t('delete'),
-                            onClick: deleteDashboard,
-                        }] : []),
-                    ]}
-                >
-                    <Button
-                        className={css['dropdown-button']}
-                        color="secondary"
+                <div className={css.sideHeader}>
+                    {renderSideHeader && renderSideHeader()}
+
+                    {Boolean(deleteDashboard) && <Dropdown
+                        className={css.dropdown}
+
+                        items={[
+                            ...(Boolean(deleteDashboard) ? [{
+                                title: t('delete'),
+                                onClick: deleteDashboard,
+                            }] : []),
+                        ]}
                     >
-                        <span className="mdi mdi-dots-horizontal" />
-                    </Button>
-                </Dropdown>}
+                        <Button
+                            className={css['dropdown-button']}
+                            color="secondary"
+                        >
+                            <span className="mdi mdi-dots-horizontal" />
+                        </Button>
+                    </Dropdown>}
+                </div>
             </div>
 
             {Boolean(items.length) && (

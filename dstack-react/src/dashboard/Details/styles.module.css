@@ -21,15 +21,17 @@
 .title {
     display: flex;
     align-items: center;
-    margin-right: auto;
     & .edit {}
     & :global(.mdi) {
         margin-left: 5px;
         opacity: .3;
     }
 }
-.permissions {
-    margin-left: 10px;
+.sideHeader {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    padding-left: 10px;
 }
 .dropdown {
     &-button {
