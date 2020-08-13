@@ -14,6 +14,7 @@ type Props = {
     currentUser?: string,
     data: ?Array<{}>,
     deleteDashboard: Function,
+    renderItemContent?: Function,
     loading: boolean,
     user: string,
 }
@@ -26,6 +27,7 @@ const List = ({
     deleteDashboard,
     loading,
     user,
+    renderItemContent,
 }: Props) => {
     const [search, setSearch] = useState('');
     const {t} = useTranslation();
@@ -101,6 +103,7 @@ const List = ({
                         user={user}
                         dashboard={item}
                         deleteDashboard={currentUser === item.user && deleteDashboard}
+                        renderContent={renderItemContent}
                     />
                 ))}
             </div>

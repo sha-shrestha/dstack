@@ -11,9 +11,10 @@ import css from './styles.module.css';
 type Props = {
     dashboard: Dashboard,
     deleteDashboard?: Function,
+    renderContent?: Function,
 }
 
-const Item = ({dashboard, deleteDashboard, user}: Props) => {
+const Item = ({dashboard, deleteDashboard, user, renderContent}: Props) => {
     const {t} = useTranslation();
     const ref = useRef(null);
 
@@ -67,6 +68,8 @@ const Item = ({dashboard, deleteDashboard, user}: Props) => {
                     {user !== dashboard.user && (
                         <div className={css.by}>{t('by')} {dashboard.user}</div>
                     )}
+
+                    {renderContent && renderContent(dashboard)}
                 </div>
 
                 {isShowDropdown && <Dropdown

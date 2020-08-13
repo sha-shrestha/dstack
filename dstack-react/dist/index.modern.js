@@ -3370,7 +3370,8 @@ var css$A = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"
 var Item$1 = function Item(_ref) {
   var dashboard = _ref.dashboard,
       deleteDashboard = _ref.deleteDashboard,
-      user = _ref.user;
+      user = _ref.user,
+      renderContent = _ref.renderContent;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
@@ -3418,7 +3419,7 @@ var Item$1 = function Item(_ref) {
     className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
     className: css$A.by
-  }, t('by'), " ", dashboard.user)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
+  }, t('by'), " ", dashboard.user), renderContent && renderContent(dashboard)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$A.dropdown,
     items: [{
       title: t('delete'),
@@ -3462,7 +3463,8 @@ var List$1 = function List(_ref) {
       data = _ref.data,
       deleteDashboard = _ref.deleteDashboard,
       loading = _ref.loading,
-      user = _ref.user;
+      user = _ref.user,
+      renderItemContent = _ref.renderItemContent;
 
   var _useState = useState(''),
       search = _useState[0],
@@ -3528,7 +3530,8 @@ var List$1 = function List(_ref) {
       key: index,
       user: user,
       dashboard: item,
-      deleteDashboard: currentUser === item.user && deleteDashboard
+      deleteDashboard: currentUser === item.user && deleteDashboard,
+      renderContent: renderItemContent
     });
   })));
 };
