@@ -1679,10 +1679,10 @@
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
 
-"@dstackai/dstack-react@^1.0.18":
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.0.18.tgz#653010f973355b14f2c22670ca131e9ed1bb2967"
-  integrity sha512-KY7zO0jVf27Wu+fnv7dtQ06+OmqR7QWk/n0bS5b/Lqpw9sjY8sK4juZvK7vfrOl9SUuSNxO0dTSr/k2TY6CcRA==
+"@dstackai/dstack-react@^1.0.20":
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.0.20.tgz#015096bee7cac49026b85409ed54839ce4e8b9ce"
+  integrity sha512-S6QdxE6y2z24P3UERRJjeNRWLSxHUDUsA2AiR7x5UaWfo2OYGkmjWryGYqvTG2b07LG0kZj3tkBEC+rJ2gLmuw==
   dependencies:
     "@mdi/font" "^5.3.45"
     axios "^0.19.2"

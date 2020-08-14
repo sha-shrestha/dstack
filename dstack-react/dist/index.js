@@ -1331,7 +1331,7 @@ function _catch(body, recover) {
 	return result;
 }
 
-var css$o = {"table":"_3tMWP"};
+var css$o = {"table":"_2TzH3"};
 
 var Table = function Table(_ref) {
   var data = _ref.data;
@@ -1353,6 +1353,185 @@ var Table = function Table(_ref) {
     }));
   }))));
 };
+
+var isImageType = function isImageType(type) {
+  return /^image/.test(type);
+};
+var base64ToJSON = function base64ToJSON(base64) {
+  var parsedJSON;
+
+  try {
+    parsedJSON = JSON.parse(atob(base64));
+  } catch (e) {
+    console.log(e);
+  }
+
+  return parsedJSON;
+};
+
+var css$p = {"view":"_1T-AH","text":"_6S5f-","message":"_1p-0w"};
+
+var base64ImagePrefixes = {
+  'image/svg+xml': 'data:image/svg+xml;charset=utf-8;',
+  'image/png': 'data:image/png;charset=utf-8;',
+  'image/jpeg': 'data:image/jpeg;charset=utf-8;'
+};
+
+var View = function View(_ref) {
+  var frameId = _ref.frameId,
+      attachment = _ref.attachment,
+      fullAttachment = _ref.fullAttachment,
+      isList = _ref.isList,
+      className = _ref.className,
+      requestStatus = _ref.requestStatus;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var viewRef = React.useRef(null);
+
+  var _useState = React.useState(1),
+      tableScale = _useState[0],
+      setTableScale = _useState[1];
+
+  var onResizeCard = function onResizeCard() {
+    if (viewRef.current) {
+      var containerWidth = viewRef.current.parentElement.offsetWidth;
+      var viewWidth = viewRef.current.offsetWidth / tableScale;
+      var newScale = containerWidth / viewWidth;
+      if (newScale > 1) newScale = 1;
+      setTableScale(newScale);
+    }
+  };
+
+  React.useEffect(function () {
+    if (window && isList) window.addEventListener('resize', onResizeCard);
+    return function () {
+      if (window && isList) window.removeEventListener('resize', onResizeCard);
+    };
+  }, []);
+  React.useEffect(function () {
+    if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
+      var json = base64ToJSON(attachment.data);
+      if (json && document.querySelector("#bokeh-" + frameId)) Bokeh.embed.embed_item(json, "bokeh-" + frameId);
+    }
+
+    if (isList) setTimeout(function () {
+      return onResizeCard();
+    }, 10);
+  }, [attachment]);
+
+  var renderImage = function renderImage() {
+    if (!attachment.preview) return /*#__PURE__*/React__default.createElement("img", {
+      src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
+      alt: ""
+    });else if (fullAttachment) {
+      if (fullAttachment['download_url']) {
+        return /*#__PURE__*/React__default.createElement("img", {
+          src: fullAttachment['download_url'],
+          alt: ""
+        });
+      } else return /*#__PURE__*/React__default.createElement("img", {
+        src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
+        alt: ""
+      });
+    }
+    return null;
+  };
+
+  var renderCSV = function renderCSV() {
+    var decodeCSV = unicodeBase64Decode(attachment.data);
+
+    if (decodeCSV) {
+      var data = CSV.parse(decodeCSV);
+      if (Array.isArray(data) && data.length) return /*#__PURE__*/React__default.createElement(Table, {
+        data: data
+      });
+    }
+
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.text
+    }, t('notSupportedAttachment'));
+  };
+
+  var renderPlotly = function renderPlotly() {
+    var json = base64ToJSON(attachment.data);
+    if (!json) return null;
+    json.layout.width = '100%';
+    json.layout.margin = 0;
+    json.layout.autosize = true;
+    json.config = {
+      responsive: true
+    };
+    return /*#__PURE__*/React__default.createElement(Plot, _extends({}, json, {
+      style: {
+        width: '100%',
+        height: '100%'
+      },
+      useResizeHandler: true
+    }));
+  };
+
+  var renderBokeh = function renderBokeh() {
+    return /*#__PURE__*/React__default.createElement("div", {
+      id: "bokeh-" + frameId
+    });
+  };
+
+  var renderAttachment = function renderAttachment() {
+    if (requestStatus === 404 && isList) return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.message
+    }, t('notFound'));
+    if (requestStatus === 404 && !isList) return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.text
+    }, t('noPreview'));
+    if (attachment.preview && isList && isImageType(attachment['content_type'])) return /*#__PURE__*/React__default.createElement("div", {
+      className: css$p.message
+    }, t('noPreview'));
+
+    switch (true) {
+      case attachment['content_type'] === 'image/svg+xml':
+      case attachment['content_type'] === 'image/png':
+      case attachment['content_type'] === 'image/jpeg':
+        return renderImage();
+
+      case attachment['content_type'] === 'text/csv':
+        return renderCSV();
+
+      case attachment['application'] === 'plotly':
+        return renderPlotly();
+
+      case attachment['application'] === 'bokeh':
+        return renderBokeh();
+
+      case undefined:
+      case lodashEs.isEqual(attachment, {}):
+        return null;
+
+      default:
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: isList ? css$p.message : css$p.text
+        }, t('notSupportedAttachment'));
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    ref: viewRef,
+    className: cx(css$p.view, className, {
+      'table': attachment && attachment.data && attachment['content_type'] === 'text/csv',
+      'bokeh': attachment && attachment.data && attachment['application'] === 'bokeh'
+    }),
+    style: attachment && attachment['content_type'] === 'text/csv' ? {
+      transform: "scale(" + tableScale + ")"
+    } : {}
+  }, renderAttachment());
+};
+
+var areEqual = function areEqual(prevProps, nextProps) {
+  return lodashEs.isEqual(prevProps.attachment, nextProps.attachment);
+};
+
+var View$1 = React.memo(View, areEqual);
 
 var useIntersectionObserver = (function (callBack, _ref, deps) {
   var _ref$rootMargin = _ref.rootMargin,
@@ -1512,29 +1691,7 @@ var actions = (function () {
   };
 });
 
-var css$p = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD","message":"_1IDQc"};
-
-var base64ToJSON = function base64ToJSON(base64) {
-  var parsedJSON;
-
-  try {
-    parsedJSON = JSON.parse(atob(base64));
-  } catch (e) {
-    console.log(e);
-  }
-
-  return parsedJSON;
-};
-
-var base64ImagePrefixes = {
-  'image/svg+xml': 'data:image/svg+xml;charset=utf-8;',
-  'image/png': 'data:image/png;charset=utf-8;',
-  'image/jpeg': 'data:image/jpeg;charset=utf-8;'
-};
-
-var isImageType = function isImageType(type) {
-  return /^image/.test(type);
-};
+var css$q = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD"};
 
 var Attachment = function Attachment(_ref) {
   var id = _ref.id,
@@ -1543,9 +1700,6 @@ var Attachment = function Attachment(_ref) {
       isList = _ref.isList,
       withLoader = _ref.withLoader,
       stack = _ref.stack;
-
-  var _useTranslation = reactI18next.useTranslation(),
-      t = _useTranslation.t;
 
   var _actions = actions(),
       fetchAttachment = _actions.fetchAttachment;
@@ -1561,26 +1715,15 @@ var Attachment = function Attachment(_ref) {
       requestStatus = _get.requestStatus,
       attachment = _objectWithoutPropertiesLoose(_get, ["loading", "error", "requestStatus"]);
 
-  var _useState = React.useState(1),
-      tableScale = _useState[0],
-      setTableScale = _useState[1];
+  var _useState = React.useState(false),
+      loadingFullAttachment = _useState[0],
+      setLoadingFullAttachment = _useState[1];
 
-  var _useState2 = React.useState(false),
-      loadingFullAttachment = _useState2[0],
-      setLoadingFullAttachment = _useState2[1];
+  var _useState2 = React.useState(null),
+      fullAttachment = _useState2[0],
+      setFullAttachment = _useState2[1];
 
-  var _useState3 = React.useState(null),
-      fullAttachment = _useState3[0],
-      setFullAttachment = _useState3[1];
-
-  var viewRef = React.useRef(null);
   var prevAttachment = usePrevious(attachment);
-  React.useEffect(function () {
-    if (window && isList) window.addEventListener('resize', onResizeCard);
-    return function () {
-      if (window && isList) window.removeEventListener('resize', onResizeCard);
-    };
-  }, []);
 
   var fetchFullAttachment = function fetchFullAttachment() {
     try {
@@ -1625,141 +1768,22 @@ var Attachment = function Attachment(_ref) {
   }, {}, [id, frameId, data]),
       ref = _useIntersectionObser[0];
 
-  React.useEffect(function () {
-    if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
-      var json = base64ToJSON(attachment.data);
-      if (json && document.querySelector("#bokeh-" + frameId)) Bokeh.embed.embed_item(json, "bokeh-" + frameId);
-    }
-
-    if (isList) setTimeout(function () {
-      return onResizeCard();
-    }, 10);
-  }, [data]);
-
-  var onResizeCard = function onResizeCard() {
-    if (ref.current && viewRef.current) {
-      var containerWidth = ref.current.offsetWidth;
-      var viewWidth = viewRef.current.offsetWidth / tableScale;
-      var newScale = containerWidth / viewWidth;
-      if (newScale > 1) newScale = 1;
-      setTableScale(newScale);
-    }
-  };
-
-  var renderImage = function renderImage() {
-    if (!attachment.preview) return /*#__PURE__*/React__default.createElement("img", {
-      src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
-      alt: ""
-    });else if (fullAttachment) {
-      if (fullAttachment['download_url']) {
-        return /*#__PURE__*/React__default.createElement("img", {
-          src: fullAttachment['download_url'],
-          alt: ""
-        });
-      } else return /*#__PURE__*/React__default.createElement("img", {
-        src: base64ImagePrefixes[attachment['content_type']] + "base64," + attachment.data,
-        alt: ""
-      });
-    }
-    return null;
-  };
-
-  var renderCSV = function renderCSV() {
-    var decodeCSV = unicodeBase64Decode(attachment.data);
-
-    if (decodeCSV) {
-      var _data = CSV.parse(decodeCSV);
-
-      if (Array.isArray(_data) && _data.length) return /*#__PURE__*/React__default.createElement(Table, {
-        data: _data
-      });
-    }
-
-    return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.text
-    }, t('notSupportedAttachment'));
-  };
-
-  var renderPlotly = function renderPlotly() {
-    var json = base64ToJSON(attachment.data);
-    if (!json) return null;
-    json.layout.width = '100%';
-    json.layout.margin = 0;
-    json.layout.autosize = true;
-    json.config = {
-      responsive: true
-    };
-    return /*#__PURE__*/React__default.createElement(Plot, _extends({}, json, {
-      style: {
-        width: '100%',
-        height: '100%'
-      },
-      useResizeHandler: true
-    }));
-  };
-
-  var renderBokeh = function renderBokeh() {
-    return /*#__PURE__*/React__default.createElement("div", {
-      id: "bokeh-" + frameId
-    });
-  };
-
-  var renderAttachment = function renderAttachment() {
-    if (loading) return null;
-    if (requestStatus === 404 && isList) return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.message
-    }, t('notFound'));
-    if (requestStatus === 404 && !isList) return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.text
-    }, t('noPreview'));
-    if (attachment.preview && isList && isImageType(attachment['content_type'])) return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.message
-    }, t('noPreview'));
-
-    switch (true) {
-      case attachment['content_type'] === 'image/svg+xml':
-      case attachment['content_type'] === 'image/png':
-      case attachment['content_type'] === 'image/jpeg':
-        return renderImage();
-
-      case attachment['content_type'] === 'text/csv':
-        return renderCSV();
-
-      case attachment['application'] === 'plotly':
-        return renderPlotly();
-
-      case attachment['application'] === 'bokeh':
-        return renderBokeh();
-
-      case undefined:
-        return null;
-
-      default:
-        return /*#__PURE__*/React__default.createElement("div", {
-          className: isList ? css$p.message : css$p.text
-        }, t('notSupportedAttachment'));
-    }
-  };
-
   return /*#__PURE__*/React__default.createElement("div", {
     ref: ref,
-    className: cx(css$p.attachment, className, {
+    className: cx(css$q.attachment, className, {
       'is-list': isList,
       loading: loading && withLoader || loadingFullAttachment
     })
-  }, /*#__PURE__*/React__default.createElement("div", {
-    ref: viewRef,
-    className: cx(css$p.view, {
-      'table': attachment && attachment.data && attachment['content_type'] === 'text/csv',
-      'bokeh': attachment && attachment.data && attachment['application'] === 'bokeh'
-    }),
-    style: attachment && attachment['content_type'] === 'text/csv' ? {
-      transform: "scale(" + tableScale + ")"
-    } : {}
-  }, renderAttachment()));
+  }, !loading && /*#__PURE__*/React__default.createElement(View$1, {
+    requestStatus: requestStatus,
+    className: css$q.view,
+    isList: isList,
+    fullAttachment: fullAttachment,
+    attachment: attachment
+  }));
 };
 
-var css$q = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
+var css$r = {"item":"_fLtf5","preview":"_2dbXz","previewWrap":"_2tToy","emptyMessage":"_3HPC2","attachment":"_2ggOS","section":"_1ugjv","content":"_2S1Sc","name":"_147V3","by":"_3t2iA","permissions":"_2SUP0","dropdown":"_35FwM","preview-stack-pulse":"_YESUl"};
 
 var Item = function Item(_ref) {
   var _ref$Component = _ref.Component,
@@ -1776,32 +1800,32 @@ var Item = function Item(_ref) {
 
   var ref = React.useRef(null);
   return /*#__PURE__*/React__default.createElement(Component, _extends({
-    className: css$q.item,
+    className: css$r.item,
     ref: ref,
     onClick: onClick
   }, rest), /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.previewWrap
+    className: css$r.previewWrap
   }, data.head ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$q.attachment,
+    className: css$r.attachment,
     isList: true,
     withLoader: true,
     stack: data.user + "/" + data.name,
     frameId: data.head,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.emptyMessage
+    className: css$r.emptyMessage
   }, t('emptyStack'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.section
+    className: css$r.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.content
+    className: css$r.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.name
+    className: css$r.name
   }, data.name, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), otherOwner && /*#__PURE__*/React__default.createElement("div", {
-    className: css$q.by
+    className: css$r.by
   }, t('by'), " ", data.user), renderContent && renderContent(data)), deleteAction && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$q.dropdown,
+    className: css$r.dropdown,
     items: [{
       title: t('delete'),
       onClick: function onClick() {
@@ -1811,7 +1835,7 @@ var Item = function Item(_ref) {
   })));
 };
 
-var css$r = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
+var css$s = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
 
 var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
 var installRPackageCode = 'install.packages("dstack")';
@@ -1833,9 +1857,9 @@ var HowTo = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.howto
+    className: css$s.howto
   }, /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$r.tabs,
+    className: css$s.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
@@ -1846,9 +1870,9 @@ var HowTo = function HowTo(_ref) {
       value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$r.tabs,
+    className: css$s.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -1859,38 +1883,38 @@ var HowTo = function HowTo(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "bash"
   }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "python"
   }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "r"
   }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "r"
   }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "r"
   }, reportPlotRCode)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.footer,
+    className: css$s.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks', {
         href: config.DOCS_URL
@@ -1899,7 +1923,7 @@ var HowTo = function HowTo(_ref) {
   }));
 };
 
-var css$s = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$t = {"list":"_3CcWo","title":"_2HbVV","side":"_I1N48","message":"_3XJKG","text":"_1_wO5","grid":"_1BjLa","search":"_3VlZv","mobileSearch":"_IxVfV","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -1990,32 +2014,32 @@ var List = function List(_ref) {
 
   var items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.list
+    className: css$t.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$s.search,
+    className: css$t.search,
     placeholder: t('findStack'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.title
+    className: css$t.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.side
+    className: css$t.side
   }, renderSideTitle && renderSideTitle())), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement(Loader, null), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.message
+    className: css$t.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
   })), !loading && !Boolean(data.length) && currentUser === user && /*#__PURE__*/React__default.createElement(HowTo, {
     user: currentUser,
     token: currentUserToken
   }), Boolean(data.length && items.length) && currentUser === user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.text
+    className: css$t.text
   }, t('youHaveStacks', {
     count: data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
@@ -2023,13 +2047,13 @@ var List = function List(_ref) {
     onClick: showHowToModal
   }, t('seeHowToGuide')), "."), Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$s.mobileSearch,
+    className: css$t.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.grid
+    className: css$t.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
       Component: reactRouterDom.Link,
@@ -2041,51 +2065,51 @@ var List = function List(_ref) {
       renderContent: renderItemContent
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.text
+    className: css$t.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
     title: t('deleteStack'),
-    className: css$s.modal
+    className: css$t.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('areYouSureYouWantToDelete', {
     name: deletingStack
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.buttons
+    className: css$t.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideDeleteConfirmation,
-    className: css$s.button
+    className: css$t.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: deleteItem,
-    className: css$s.button
+    className: css$t.button
   }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
     title: t('welcomeToDStack') + "\uD83D\uDC4B",
-    className: css$s.modal
+    className: css$t.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.buttons
+    className: css$t.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideWelcomeModal,
-    className: css$s.button
+    className: css$t.button
   }, t('getStarted')))), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowHowToModal,
     withCloseButton: true,
     onClose: hideHowToModal,
     size: "big",
     title: t('howToConnectYourDataWithDStack'),
-    className: css$s.modal
+    className: css$t.modal
   }, /*#__PURE__*/React__default.createElement(HowTo, {
     user: currentUser,
     token: currentUserToken,
@@ -2138,11 +2162,11 @@ var HowTo$1 = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.howto
+    className: css$s.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.title
+    className: css$s.title
   }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$r.tabs,
+    className: css$s.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
@@ -2153,9 +2177,9 @@ var HowTo$1 = function HowTo(_ref) {
       value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$r.tabs,
+    className: css$s.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -2166,38 +2190,38 @@ var HowTo$1 = function HowTo(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "bash"
   }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "python"
   }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "r"
   }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "r"
   }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.description
+    className: css$s.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$r.code,
+    className: css$s.code,
     language: "r"
   }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.footer,
+    className: css$s.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
         href: config.DOCS_URL
@@ -2225,7 +2249,7 @@ var useOnClickOutside = (function (ref, handler) {
   }, [ref, handler]);
 });
 
-var css$t = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+var css$u = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
 
 var getFrameName = function getFrameName(frame) {
   return moment(frame.timestamp).format('D MMM YYYY h:mm a');
@@ -2292,22 +2316,22 @@ var Frames = function Frames(_ref) {
   }
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.frames, className),
+    className: cx(css$u.frames, className),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t['frames-dropdown']),
+    className: cx(css$u['frames-dropdown']),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.button,
+    className: css$u.button,
     onClick: toggleDropdown
   }, /*#__PURE__*/React__default.createElement("span", {
-    className: css$t.name
+    className: css$u.name
   }, getFrameName(activeFrame)), headId === activeFrame.id && /*#__PURE__*/React__default.createElement("span", {
-    className: css$t.label
+    className: css$u.label
   }, t('head')), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.dropdown, {
+    className: cx(css$u.dropdown, {
       show: isShowDropdown
     })
   }, frames.map(function (f) {
@@ -2321,19 +2345,19 @@ var Frames = function Frames(_ref) {
       onClick: onClickItem(f.id),
       overlayContent: f.description
     }, /*#__PURE__*/React__default.createElement("div", {
-      className: css$t.item
+      className: css$u.item
     }, /*#__PURE__*/React__default.createElement("span", {
-      className: css$t.name
+      className: css$u.name
     }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
-      className: css$t.label
+      className: css$u.label
     }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
-      className: css$t.mark,
+      className: css$u.mark,
       onClick: onClickMarkAsHead(f)
     }, t('markAsHead'))));
   }))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: activeFrame.description
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.info)
+    className: cx(css$u.info)
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-variant"
   }))), /*#__PURE__*/React__default.createElement(Modal, {
@@ -2341,41 +2365,41 @@ var Frames = function Frames(_ref) {
     onClose: hideConfirmation,
     size: "confirmation",
     title: t('changeHeadRevision'),
-    className: css$t.modal
+    className: css$u.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('areYouSureYouWantToChangeTheCurrentHeadRevisionToByName', {
     frame: frameForMarkingAsHead && getFrameName(frameForMarkingAsHead)
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.buttons
+    className: css$u.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: confirmMarkFrameAsHead,
-    className: css$t.button
+    className: css$u.button
   }, t('yesChangeHead')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: hideConfirmation,
-    className: css$t.button
+    className: css$u.button
   }, t('cancel')))));
 };
 
-var css$u = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+var css$v = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
 
 var Loader$1 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.loader
+    className: css$v.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.title
+    className: css$v.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.label
+    className: css$v.label
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.diagram
+    className: css$v.diagram
   }));
 };
 
@@ -2482,7 +2506,7 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 });
 
-var css$v = {"details":"_3iAZb","section":"__r9FQ","header":"_2kekg","title":"_1zGvd","sideHeader":"_1FUDu","dropdown":"_3axDI","attachment-head":"_282UU","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","filters":"_1-hdZ","attachment":"_3IGZo","sidebar":"_U0_wY","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$w = {"details":"_3iAZb","section":"__r9FQ","header":"_2kekg","title":"_1zGvd","sideHeader":"_1FUDu","dropdown":"_3axDI","attachment-head":"_282UU","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","filters":"_1-hdZ","attachment":"_3IGZo","sidebar":"_U0_wY","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
 
 var Details = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
@@ -2580,7 +2604,7 @@ var Details = function Details(_ref) {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$v.filters, {
+      className: cx(css$w.filters, {
         'with-select': hasSelectField
       })
     });
@@ -2594,7 +2618,7 @@ var Details = function Details(_ref) {
   var attachment = lodashEs.get(frame, "attachments[" + attachmentIndex + "]");
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v.details, {
+    className: cx(css$w.details, {
       'with-sidebar': Boolean(renderSidebar)
     })
   }, /*#__PURE__*/React__default.createElement(Yield, {
@@ -2605,23 +2629,23 @@ var Details = function Details(_ref) {
   }, currentUser === user ? t('backToMyStacks') : t('backToStacksOF', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("section", {
-    className: css$v.section
+    className: css$w.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.header
+    className: css$w.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.title
+    className: css$w.title
   }, data.name, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.sideHeader
+    className: css$w.sideHeader
   }, renderSideHeader && renderSideHeader(), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$v.dropdown,
+    className: css$w.dropdown,
     items: [{
       title: t('upload'),
       onClick: toggleUpload
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$v['dropdown-button'],
+    className: css$w['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
@@ -2631,19 +2655,19 @@ var Details = function Details(_ref) {
     headId: headId,
     onMarkAsHead: onChangeHeadFrame,
     onChange: onChangeFrame,
-    className: css$v.revisions
+    className: css$w.revisions
   }), renderFields(), attachment && /*#__PURE__*/React__default.createElement("div", {
-    className: css$v['attachment-head']
+    className: css$w['attachment-head']
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
+    className: css$w.description
   }, attachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
     source: attachment.description
   })), attachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.actions
+    className: css$w.actions
   }, attachment.preview && /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.label
+    className: css$w.label
   }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v['label-tooltip']
+    className: css$w['label-tooltip']
   }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
     href: "#",
     onClick: showHowToModal
@@ -2651,22 +2675,22 @@ var Details = function Details(_ref) {
     href: "#",
     onClick: onClickDownloadAttachment
   }, t('download')), attachment.length && /*#__PURE__*/React__default.createElement("span", {
-    className: css$v.size
+    className: css$w.size
   }, "(", formatBytes(attachment.length), ")"))), frame && /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$v.attachment,
+    className: css$w.attachment,
     withLoader: true,
     stack: user + "/" + stack,
     frameId: frame.id,
     id: attachmentIndex || 0
   })), Boolean(renderSidebar) && /*#__PURE__*/React__default.createElement("aside", {
-    className: css$v.sidebar
+    className: css$w.sidebar
   }, renderSidebar()), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowHowToModal,
     withCloseButton: true,
     onClose: hideHowToModal,
     size: "big",
     title: t('howToFetchDataUsingTheAPI'),
-    className: css$v.modal
+    className: css$w.modal
   }, /*#__PURE__*/React__default.createElement(HowTo$1, {
     user: currentUser,
     token: currentUserToken,
@@ -2684,7 +2708,7 @@ var useDebounce = (function (callback, depsOrDelay, deps) {
   return React.useCallback(lodashEs.debounce(callback, delay), deps);
 });
 
-var css$w = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
+var css$x = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
 
 var MB = 1048576;
 
@@ -2832,7 +2856,7 @@ var Upload = function Upload(_ref) {
   return /*#__PURE__*/React__default.createElement(React.Fragment, null, withButton && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$w.upload, className),
+    className: cx(css$x.upload, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -2841,12 +2865,12 @@ var Upload = function Upload(_ref) {
     isShow: isShowModal,
     size: "small"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.content
+    className: css$x.content
   }, !stack && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.subtitle
+    className: css$x.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewStack')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$w.field,
+    className: css$x.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -2856,24 +2880,24 @@ var Upload = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.subtitle
+    className: css$x.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop, {
-    className: css$w.dragndrop,
+    className: css$x.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.buttons
+    className: css$x.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$w.button,
+    className: css$x.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: closeHandle,
-    className: css$w.button,
+    className: css$x.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
@@ -2990,27 +3014,27 @@ var DnDItem = React.memo(function (_ref) {
   });
 });
 
-var css$x = {"loader":"_2RpBO","text":"_3gk1Z","dashboards-details-pulse":"_3HZ82","filters":"_3ZZJL","grid":"_ZafPr","item":"_LIYeR"};
+var css$y = {"loader":"_2RpBO","text":"_3gk1Z","dashboards-details-pulse":"_3HZ82","filters":"_3ZZJL","grid":"_ZafPr","item":"_LIYeR"};
 
 var Loader$2 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.loader
+    className: css$y.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.text
+    className: css$y.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.filters
+    className: css$y.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.grid
+    className: css$y.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.item
+    className: css$y.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.item
+    className: css$y.item
   })));
 };
 
-var css$y = {"card":"_17jo7","inner":"_YLuSm","head":"_2dKop","name":"_1blF_","nameEdit":"_3omHN","nameValue":"_wx2sM","info":"_1Tbhc","dropdown":"_1NvWp","button":"_d6fLT","move":"_312qk","link":"_NfDp4","infoTime":"_2QMrW","emptyMessage":"_7aBhX","attachment":"_2ajkc"};
+var css$z = {"card":"_17jo7","inner":"_YLuSm","head":"_2dKop","name":"_1blF_","nameEdit":"_3omHN","nameValue":"_wx2sM","info":"_1Tbhc","dropdown":"_1NvWp","button":"_d6fLT","move":"_312qk","link":"_NfDp4","infoTime":"_2QMrW","emptyMessage":"_7aBhX","attachment":"_2ajkc"};
 
 var Card = React.memo(function (_ref) {
   var data = _ref.data,
@@ -3076,72 +3100,72 @@ var Card = React.memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$y.card, "type-" + type, className),
+    className: cx(css$z.card, "type-" + type, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.inner
+    className: css$z.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.head
+    className: css$z.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$y.name, {
+    className: cx(css$z.name, {
       readonly: !updateCardTitle
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.nameValue
+    className: css$z.nameValue
   }, title.length ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$y.nameEdit, {
+    className: cx(css$z.nameEdit, {
       active: !title.length
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$y.infoTime
+      className: css$z.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.info
+    className: css$z.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$y.button, css$y.link),
+    className: cx(css$z.button, css$z.link),
     color: "secondary",
     Component: reactRouterDom.Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), Boolean(deleteCard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$y.dropdown,
+    className: css$z.dropdown,
     items: [].concat(deleteCard ? [{
       title: t('delete'),
       onClick: deleteCard
     }] : [])
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$y.button,
+    className: css$z.button,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$y.button, css$y.move),
+    className: cx(css$z.button, css$z.move),
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-cursor-move"
   }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$y.attachment,
+    className: css$z.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.emptyMessage
+    className: css$z.emptyMessage
   }, t('emptyDashboard'))));
 });
 
-var css$z = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","sideHeader":"_3zX4a","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
+var css$A = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","sideHeader":"_3zX4a","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
 
 var Details$1 = function Details(_ref) {
   var addCards = _ref.addCards,
@@ -3275,7 +3299,7 @@ var Details$1 = function Details(_ref) {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$z.filters, {
+      className: cx(css$A.filters, {
         'with-select': hasSelectField
       })
     });
@@ -3292,7 +3316,7 @@ var Details$1 = function Details(_ref) {
   if (!data) return null;
   var CardWrapComponent = withSorting ? DnDItem : React.Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.details
+    className: css$A.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -3301,11 +3325,11 @@ var Details$1 = function Details(_ref) {
   }, currentUser === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.header
+    className: css$A.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.title
+    className: css$A.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$z.edit,
+    className: css$A.edit,
     value: data === null || data === void 0 ? void 0 : data.title,
     onChange: onChangeTitleDebounce,
     readOnly: currentUser !== data.user,
@@ -3313,38 +3337,38 @@ var Details$1 = function Details(_ref) {
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.sideHeader
+    className: css$A.sideHeader
   }, renderSideHeader && renderSideHeader(), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$z.dropdown,
+    className: css$A.dropdown,
     items: [].concat(Boolean(deleteDashboard) ? [{
       title: t('delete'),
       onClick: deleteDashboard
     }] : [])
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$z['dropdown-button'],
+    className: css$A['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.section
+    className: css$A.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.fields
+    className: css$A.fields
   }, renderFilters()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.controls
+    className: css$A.controls
   }, getAddClickAction() && /*#__PURE__*/React__default.createElement("a", {
-    className: css$z.addButton,
+    className: css$A.addButton,
     onClick: getAddClickAction(),
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     value: view,
-    className: css$z.viewSwitcher,
+    className: css$A.viewSwitcher,
     onChange: function onChange(view) {
       return setView(view);
     }
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$z.cards, view)
+    className: cx(css$A.cards, view)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -3360,15 +3384,15 @@ var Details$1 = function Details(_ref) {
       moveAvailable: withSorting
     }));
   }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.empty
+    className: css$A.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), getAddClickAction() && /*#__PURE__*/React__default.createElement(React.Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$z.addButton,
+    className: css$A.addButton,
     onClick: getAddClickAction(),
     href: "#"
   }, t('addStack')), ".")));
 };
 
-var css$A = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
+var css$B = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
 
 var Item$1 = function Item(_ref) {
   var dashboard = _ref.dashboard,
@@ -3395,35 +3419,35 @@ var Item$1 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteDashboard);
   return /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/" + user + "/d/" + dashboard.id,
-    className: css$A.item,
+    className: css$B.item,
     ref: ref
   }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.label
+    className: css$B.label
   }, t('stacksWithCount', {
     count: dashboard.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.previewWrap
+    className: css$B.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$A.attachment,
+    className: css$B.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.emptyMessage
+    className: css$B.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.section
+    className: css$B.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.content
+    className: css$B.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.name
+    className: css$B.name
   }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.by
+    className: css$B.by
   }, t('by'), " ", dashboard.user), renderContent && renderContent(dashboard)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$A.dropdown,
+    className: css$B.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
@@ -3431,33 +3455,33 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$B = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
+var css$C = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
 
 var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.loader
+    className: css$C.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.text
+    className: css$C.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.grid
+    className: css$C.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.item
+    className: css$C.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.pic
+    className: css$C.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.section
+    className: css$C.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.item
+    className: css$C.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.pic
+    className: css$C.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.section
+    className: css$C.section
   }))));
 };
 
-var css$C = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
+var css$D = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
 
 var List$1 = function List(_ref) {
   var addDashboard = _ref.addDashboard,
@@ -3495,37 +3519,37 @@ var List$1 = function List(_ref) {
   var items = getItems();
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$3, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.list
+    className: css$D.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$C.search,
+    className: css$D.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.title
+    className: css$D.title
   }, currentUser === user ? t('myDashboards') : t('dashboardsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$C.mobileSearch,
+    className: css$D.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.grid
+    className: css$D.grid
   }, currentUser === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: addDashboard,
-    className: cx(css$C.add, {
+    className: cx(css$D.add, {
       disabled: addDashboardDisable
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.caption
+    className: css$D.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newDashboard'))), items.map(function (item, index) {
@@ -3539,39 +3563,39 @@ var List$1 = function List(_ref) {
   })));
 };
 
-var css$D = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
+var css$E = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
 
 var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.loader
+    className: css$E.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.text
+    className: css$E.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.grid
+    className: css$E.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$E.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.pic
+    className: css$E.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.section
+    className: css$E.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$E.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.pic
+    className: css$E.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.section
+    className: css$E.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$E.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.pic
+    className: css$E.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.section
+    className: css$E.section
   }))));
 };
 
-var css$E = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
+var css$F = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
 
 var AddStacksModal = function AddStacksModal(_ref) {
   var _ref$stacks = _ref.stacks,
@@ -3653,13 +3677,13 @@ var AddStacksModal = function AddStacksModal(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$E.stacks,
+    dialogClassName: css$F.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$E.search,
+    className: css$F.search,
     isDark: true,
     size: "middle",
     showEverything: true,
@@ -3667,20 +3691,20 @@ var AddStacksModal = function AddStacksModal(_ref) {
     value: searchQuery,
     onChange: onChangeSearch
   }), loading && /*#__PURE__*/React__default.createElement(Loader$4, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.message
+    className: css$F.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.text
+    className: css$F.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.grid
+    className: css$F.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$E.item,
+      className: css$F.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$E.checkbox,
+      className: css$F.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
@@ -3688,15 +3712,15 @@ var AddStacksModal = function AddStacksModal(_ref) {
       otherOwner: params.user !== item.user
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.buttons
+    className: css$F.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$E.button,
+    className: css$F.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$E.button,
+    className: css$F.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
@@ -3705,7 +3729,7 @@ var AddStacksModal = function AddStacksModal(_ref) {
 
 var logo = require("./logo~gyFSAwBb.svg");
 
-var css$F = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
+var css$G = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -3714,35 +3738,35 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$F.header, className)
+    className: cx(css$G.header, className)
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/",
-    className: css$F.logo
+    className: css$G.logo
   }, /*#__PURE__*/React__default.createElement("img", {
     width: "129",
     height: "35",
     src: logo,
     alt: "logo"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.buttons
+    className: css$G.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: reactRouterDom.Link,
     to: "/auth/login",
-    className: css$F.button,
+    className: css$G.button,
     color: "primary"
   }, t('logIn'))));
 };
 
-var css$G = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
+var css$H = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.layout
+    className: css$H.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$G.header
+    className: css$H.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.main
+    className: css$H.main
   }, children));
 };
 
