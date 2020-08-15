@@ -7,6 +7,7 @@ dependencies {
     compile(Deps.sqlite_dialect)
     compile(Deps.sqlite_jdbc)
     compile(Deps.commons_cli)
+    compile(Deps.jackson_yaml)
     compile(project(":server-base-local"))
 }
 

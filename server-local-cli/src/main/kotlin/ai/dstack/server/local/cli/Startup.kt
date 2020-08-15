@@ -1,9 +1,13 @@
 package ai.dstack.server.local.cli
 
+import ai.dstack.server.local.cli.config.Config
+import ai.dstack.server.local.cli.config.Profile
 import ai.dstack.server.model.*
-import ai.dstack.server.services.*
+import ai.dstack.server.services.AppConfig
+import ai.dstack.server.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
+import java.io.File
 import java.security.SecureRandom
 import java.time.LocalDate
 import java.util.*
@@ -14,7 +18,7 @@ import javax.annotation.PostConstruct
 @Configuration
 open class Startup {
     @Autowired
-    lateinit var config: AppConfig
+    lateinit var appConfig: AppConfig
 
     @Autowired
     lateinit var userService: UserService
@@ -38,17 +42,43 @@ open class Startup {
             )
             userService.create(user)
         }
-        println("To access the dstack server, open one of these URLs in the browser:")
-        println("\t\thttp://localhost:${config.internalPort}/auth/verify?user=dstack&code=${user.verificationCode}&next=/")
-        println("\tor\thttp://127.0.0.1:${config.internalPort}/auth/verify?user=dstack&code=${user.verificationCode}&next=/")
+        var autoConfigured = false
+        val defaultConfigFile = File(appConfig.homeDirectory + "/config.yaml")
+        val defaultConfig = if (defaultConfigFile.exists()) Config.read(defaultConfigFile) else Config()
+        val server = "http://localhost:${appConfig.internalPort}/api"
+        val profile = defaultConfig["default"]
+        if (profile != null) {
+            autoConfigured = profile.user == "dstack"
+                    && profile.token == user.token
+                    && profile.server == server
+        } else {
+            defaultConfig["default"] = Profile(user.name, user.token, server)
+            Config.write(defaultConfigFile, defaultConfig)
+            autoConfigured = true
+        }
+        val ANSI_RESET = "\u001B[0m"
+        val ANSI_UNDERLINE = "\u001B[4m"
+        val ANSI_BOLD = "\u001B[1m"
+        val ANSI_BLUE = "\u001B[34m"
+        val ANSI_BRIGHT_WHITE = "\u001B[33m"
+        val ANSI_YELLOW = "\u001B[37m"
+        println("To access the application, open this URL in the browser: ${ANSI_BLUE}${ANSI_UNDERLINE}http://localhost:${appConfig.internalPort}/auth/verify?user=dstack&code=${user.verificationCode}&next=/${ANSI_RESET}")
+        if (autoConfigured) {
+            println()
+            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is configured. You are now welcome to push your data using Python or R packages.")
+        } else {
+            println()
+            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is not configured.")
+        }
         println()
-        println("If you're using Python, use the following command line command to configure your dstack profile:")
-        println("\tpip install dstack")
-        println("\tdstack config add --token ${user.token} --user ${user.name} --server http://localhost:${config.internalPort}/api")
+        println("To configure your profile manually, use this command in the Terminal:")
+        println("\t${ANSI_BRIGHT_WHITE}dstack config add --token ${user.token} --user ${user.name} --server http://localhost:${appConfig.internalPort}/api${ANSI_RESET}")
         println()
-        println("If you're using R, use the following R command to configure your dstack profile:")
-        println("\tinstall.packages(\"dstack\")")
-        println("\tdstack::configure(user = \"${user.name}\", token = \"${user.token}\", persist = \"global\", server = \"http://localhost:${config.internalPort}/api\")")
+        println("${ANSI_YELLOW}What's next?${ANSI_RESET}")
+        println("${ANSI_YELLOW}------------${ANSI_RESET}")
+        println("${ANSI_YELLOW}-${ANSI_RESET} Checkout our documentation: ${ANSI_BLUE}${ANSI_UNDERLINE}https://docs.dstack.ai${ANSI_RESET}")
+        println("${ANSI_YELLOW}-${ANSI_RESET} Ask questions and share feedback: ${ANSI_BLUE}${ANSI_UNDERLINE}https://discord.gg/8xfhEYa${ANSI_RESET}")
+        println("${ANSI_YELLOW}-${ANSI_RESET} Star us on GitHub: ${ANSI_BLUE}${ANSI_UNDERLINE}https://github.com/dstackai/dstack${ANSI_RESET}")
     }
 
     class RandomString(length: Int, random: Random, symbols: String) {
