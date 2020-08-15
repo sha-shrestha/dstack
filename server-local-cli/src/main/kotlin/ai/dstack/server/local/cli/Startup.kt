@@ -67,7 +67,7 @@ open class Startup {
             println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is already configured. You are welcome to push your data using Python or R packages.")
         } else {
             println()
-            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \\\"$defaultConfigFile\\\" is not configured. To configure it, use this command:")
+            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is not configured. To configure it, use this command:")
             println("\t${ANSI_BRIGHT_WHITE}dstack config add --token ${user.token} --user ${user.name} --server http://localhost:${appConfig.internalPort}/api${ANSI_RESET}")
         }
         println()
