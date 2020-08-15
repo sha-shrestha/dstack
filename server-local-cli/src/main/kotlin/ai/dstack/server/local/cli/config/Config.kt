@@ -3,11 +3,12 @@ package ai.dstack.server.local.cli.config
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
 import java.io.FileWriter
 
-val mapper = ObjectMapper(YAMLFactory())
+val mapper = ObjectMapper(YAMLFactory().enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
         .also {
             it.registerModule(KotlinModule())
         }
