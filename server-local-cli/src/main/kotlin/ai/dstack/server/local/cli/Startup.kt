@@ -42,19 +42,18 @@ open class Startup {
             )
             userService.create(user)
         }
-        var autoConfigured = false
+        var autoConfigure = false
         val defaultConfigFile = File(appConfig.homeDirectory + "/config.yaml")
         val defaultConfig = if (defaultConfigFile.exists()) Config.read(defaultConfigFile) else Config()
         val server = "http://localhost:${appConfig.internalPort}/api"
         val profile = defaultConfig["default"]
-        if (profile != null) {
-            autoConfigured = profile.user == "dstack"
+        autoConfigure = profile == null ||
+            (profile.user == "dstack"
                     && profile.token == user.token
-                    && profile.server == server
-        } else {
+                    && profile.server.orEmpty().startsWith("http://localhost:"))
+        if (autoConfigure) {
             defaultConfig["default"] = Profile(user.name, user.token, server)
             Config.write(defaultConfigFile, defaultConfig)
-            autoConfigured = true
         }
         val ANSI_RESET = "\u001B[0m"
         val ANSI_UNDERLINE = "\u001B[4m"
@@ -63,16 +62,14 @@ open class Startup {
         val ANSI_BRIGHT_WHITE = "\u001B[33m"
         val ANSI_YELLOW = "\u001B[37m"
         println("To access the application, open this URL in the browser: ${ANSI_BLUE}${ANSI_UNDERLINE}http://localhost:${appConfig.internalPort}/auth/verify?user=dstack&code=${user.verificationCode}&next=/${ANSI_RESET}")
-        if (autoConfigured) {
+        if (autoConfigure) {
             println()
-            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is configured. You are now welcome to push your data using Python or R packages.")
+            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is already configured. You are welcome to push your data using Python or R packages.")
         } else {
             println()
-            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is not configured.")
+            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \\\"$defaultConfigFile\\\" is not configured. To configure it, use this command:")
+            println("\t${ANSI_BRIGHT_WHITE}dstack config add --token ${user.token} --user ${user.name} --server http://localhost:${appConfig.internalPort}/api${ANSI_RESET}")
         }
-        println()
-        println("To configure your profile manually, use this command in the Terminal:")
-        println("\t${ANSI_BRIGHT_WHITE}dstack config add --token ${user.token} --user ${user.name} --server http://localhost:${appConfig.internalPort}/api${ANSI_RESET}")
         println()
         println("${ANSI_YELLOW}What's next?${ANSI_RESET}")
         println("${ANSI_YELLOW}------------${ANSI_RESET}")
