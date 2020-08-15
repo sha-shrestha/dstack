@@ -8,10 +8,13 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
 import java.io.FileWriter
 
-val mapper = ObjectMapper(YAMLFactory().enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
-        .also {
-            it.registerModule(KotlinModule())
-        }
+val mapper = ObjectMapper(
+        YAMLFactory()
+                .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+                .enable(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS)
+).also {
+    it.registerModule(KotlinModule())
+}
 
 data class Profile(val user: String, val token: String?, val server: String?)
 
