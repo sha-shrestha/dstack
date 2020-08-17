@@ -1,5 +1,5 @@
 import i18n from 'i18next';
-import en from 'locales/en';
+import {en} from '@dstackai/dstack-react/dist/locales';
 import {initReactI18next} from 'react-i18next';
 
 i18n
