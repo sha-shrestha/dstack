@@ -1,16 +1,16 @@
 @import "styles/variables.css";
 @import "styles/media.css";
 :root {
-    --mobile-colum-size: 280px;
     --colum-size: 262px;
 }
 .list {
 
 }
-.title {
+.header {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+}
+.title {
     color: var(--color-dark-gray);
     @media (--mobile) {
         font-weight: 500;
@@ -22,9 +22,22 @@
         line-height: 28px;
     }
 }
-.side {
+.headerSide {
+    display: flex;
+    align-content: center;
+    justify-content: flex-end;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 0;
+    margin-left: 20px;
+}
+.headerSideSection {
+    margin-left: 12px;
     flex-shrink: 0;
-    margin-left: auto;
+}
+.viewSwitcher {
+    flex-shrink: 0;
+    margin-left: 12px;
 }
 .message {
     font-size: 14px;
@@ -36,6 +49,7 @@
     }
 }
 .text {
+    margin-top: 9px;
     font-size: 14px;
     line-height: 20px;
     & > a {
@@ -45,34 +59,30 @@
 
     }
 }
-.grid {
-    margin-top: 16px;
+.itemList {
+    margin-top: 20px;
     display: grid;
-    grid-gap: 30px;
-    @media (--mobile) {
-        grid-template-columns: repeat(auto-fill, minmax(var(--mobile-colum-size), 1fr));
-    }
-    @media (--desktop) {
-        grid-template-columns: repeat(auto-fill, var(--colum-size));
-    }
-}
-.search {
-    @media (--mobile) {
-        display: none;
-    }
-}
-.mobileSearch {
-    margin-top: 7px;
-    width: 100%;
-    @media (--mobile) {
-        & +.text {
-            margin-top: 6px;
+    &:global(.list) {
+        row-gap: 18px;
+        @media (--mobile) {
+            grid-template-columns: 1fr;
         }
     }
-    @media (--desktop) {
-        display: none;
+    &:global(.grid) {
+        grid-gap: 40px;
+        @media (--mobile) {
+            grid-template-columns: repeat(auto-fill, minmax(var(--colum-size), 1fr));
+        }
+        @media (--desktop) {
+            grid-template-columns: repeat(auto-fill, var(--colum-size));
+        }
     }
 }
+
+.item {
+    max-width: fit-content;
+}
+
 .modal {
     & .description {
         font-size: 14px;

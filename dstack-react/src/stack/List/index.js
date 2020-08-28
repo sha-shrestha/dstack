@@ -1,14 +1,16 @@
 // @flow
 
 import React, {useState, useEffect, useRef} from 'react';
+import cn from 'classnames';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Button from '../../Button';
 import Loader from '../../Loader';
 import Modal from '../../Modal';
+import ViewSwitcher from '../../ViewSwitcher';
 import SearchField from '../../SearchField';
-import Yield from '../../Yield';
 import StackListItem from '../ListItem';
+import routes from '../../routes';
 import StackHowTo from '../HowTo';
 import css from './styles.module.css';
 
@@ -37,6 +39,7 @@ const List = ({
     renderItemContent,
 }: Props) => {
     const {t} = useTranslation();
+    const [view, setView] = useState('list');
     const [deletingStack, setDeletingStack] = useState(null);
     const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
     const [isShowHowToModal, setIsShowHowToModal] = useState(false);
@@ -73,7 +76,9 @@ const List = ({
         hideDeleteConfirmation();
     };
 
-    const showDeleteConfirmation = name => setDeletingStack(name);
+    const showDeleteConfirmation = name => {
+        setDeletingStack(name);
+    };
     const hideDeleteConfirmation = () => setDeletingStack(null);
 
     const getItems = () => {
@@ -93,26 +98,35 @@ const List = ({
 
     return (
         <div className={css.list}>
-            <Yield name="header-yield">
-                <SearchField
-                    showEverything
-                    isDark
-                    className={css.search}
-                    placeholder={t('findStack')}
-                    size="small"
-                    value={search}
-                    onChange={onChangeSearch}
-                />
-            </Yield>
+            <div className={css.header}>
+                <div className={css.title}>
+                    {currentUser === user
+                        ? t('stacks')
+                        : t('stacksOf', {name: user})
+                    }
+                </div>
 
-            <div className={css.title}>
-                {currentUser === user
-                    ? t('stacks')
-                    : t('stacksOf', {name: user})
-                }
+                <div className={css.headerSide}>
+                    {Boolean(data.length) && (
+                        <SearchField
+                            showEverything
+                            isDark
+                            placeholder={t('findStack')}
+                            size="small"
+                            value={search}
+                            onChange={onChangeSearch}
+                        />
+                    )}
 
-                <div className={css.side}>
-                    {renderSideTitle && renderSideTitle()}
+                    <div className={css.headerSideSection}>
+                        {renderSideTitle && renderSideTitle()}
+                    </div>
+
+                    <ViewSwitcher
+                        className={css.viewSwitcher}
+                        value={view}
+                        onChange={setView}
+                    />
                 </div>
             </div>
 
@@ -142,26 +156,19 @@ const List = ({
                 </div>
             )}
 
-            {Boolean(data.length) && <SearchField
-                placeholder={t('search')}
-                className={css.mobileSearch}
-                showEverything
-                size="small"
-                value={search}
-                onChange={onChangeSearch}
-            />}
-
-            {Boolean(data.length && items.length) && <div className={css.grid}>
-                {items.map((item, index) => <StackListItem
-                    Component={Link}
-                    key={index}
-                    data={item}
-                    otherOwner={user !== item.user}
-                    to={`/${item.user}/${item.name}`}
-                    deleteAction={currentUser === item.user &&  showDeleteConfirmation}
-                    renderContent={renderItemContent}
-                />)}
-            </div>}
+            {Boolean(data.length && items.length) && (
+                <div className={cn(css.itemList, view)}>
+                    {items.map((item, index) => <StackListItem
+                        className={css.item}
+                        Component={Link}
+                        key={index}
+                        data={item}
+                        to={routes.stackDetails(item.user, item.name)}
+                        deleteAction={currentUser === item.user && showDeleteConfirmation}
+                        renderContent={renderItemContent}
+                    />)}
+                </div>
+            )}
 
             {Boolean(data.length && !items.length) && <div className={css.text}>
                 {t('noStacksAreFoundedMatchedTheSearchCriteria')}

@@ -1,10 +1,13 @@
 import React, {useRef} from 'react';
 import {useTranslation} from 'react-i18next';
-import Dropdown from '../../Dropdown';
-import Attachment from '../Attachment';
+import moment from 'moment';
+import cn from 'classnames';
+import chartIcon from './assets/chart.svg';
+// import tableIcon from './assets/table.svg';
 import css from './styles.module.css';
 
 type Props = {
+    className?: string,
     userData: {user: string},
 
     data: {
@@ -13,73 +16,57 @@ type Props = {
         head: {id: string}
     },
 
-    otherOwner?: boolean,
     deleteAction?: Function,
     renderContent?: Function,
 };
 
 const Item = ({
+    className,
     Component = 'div',
-    onClick,
     data,
     deleteAction,
-    otherOwner,
     renderContent,
     ...rest
 }: Props) => {
     const {t} = useTranslation();
     const ref = useRef(null);
 
+    const onClickDelete = event => {
+        event.stopPropagation();
+        event.preventDefault();
+        deleteAction(data.name);
+    };
+
     return (
         <Component
-            className={css.item}
+            className={cn(css.item, className)}
             ref={ref}
-            onClick={onClick}
             {...rest}
         >
-            <div className={css.previewWrap}>
-                {data.head
-                    ? <Attachment
-                        className={css.attachment}
-                        isList
-                        withLoader
-                        stack={`${data.user}/${data.name}`}
-                        frameId={data.head}
-                        id={0}
-                    />
-
-                    : <div className={css.emptyMessage}>{t('emptyStack')}</div>
-                }
+            <div className={css.icon}>
+                <img src={chartIcon} alt="" />
             </div>
 
-            <div className={css.section}>
-                <div className={css.content}>
-                    <div className={css.name}>
-                        {data.name}
-                        {' '}
-                        <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
+            <div className={css.top}>
+                <div className={css.name}>{data.name}</div>
+                <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
+
+                {renderContent && (
+                    <div className={css.additional}>
+                        {renderContent(data)}
                     </div>
-
-                    {otherOwner && (
-                        <div className={css.by}>{t('by')} {data.user}</div>
-                    )}
-
-                    {renderContent && renderContent(data)}
-                </div>
-
-                {deleteAction && (
-                    <Dropdown
-                        className={css.dropdown}
-
-                        items={[
-                            {
-                                title: t('delete'),
-                                onClick: () => deleteAction(data.name),
-                            },
-                        ]}
-                    />
                 )}
             </div>
+
+            {data.head && (
+                <div className={css.date}>{t('updated')} {moment(data.head.timestamp).format('L')}</div>
+            )}
+
+            {deleteAction && (
+                <span className={css.delete} onClick={onClickDelete}>
+                    <span className="mdi mdi-close" />
+                </span>
+            )}
         </Component>
     );
 };
