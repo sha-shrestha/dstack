@@ -19,6 +19,10 @@ class SQLiteAttachmentService @Autowired constructor(private val repository: Att
         return repository.findById(mapId(frame, index)).toNullable()?.toAttachment()
     }
 
+    override fun deleteByStackPath(stackPath: String) {
+        repository.deleteAllByStack(stackPath)
+    }
+
     override fun create(attachment: Attachment) {
         if (!repository.existsById(attachment.mapId)) {
             repository.save(attachment.toAttachmentItem())

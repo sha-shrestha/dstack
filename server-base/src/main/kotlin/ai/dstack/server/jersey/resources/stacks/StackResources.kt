@@ -205,7 +205,8 @@ class StackResources {
                 }
                 ok(GetStacksStatus(permittedStacks.map { stack ->
                     BasicStackInfo(
-                            stack.userName, stack.name, stack.private, stack.head?.id,
+                            stack.userName, stack.name, stack.private,
+                            stack.head?.let { HeadInfo(it.id, it.timestampMillis) },
                             if (owner) permissionService.findByPath(stack.path)
                                     .map {
                                         PermissionInfo(
@@ -253,7 +254,7 @@ class StackResources {
                                 payload.attachments.size
                             else
                                 payload.size,
-                            payload.params.orEmpty().let{ it.mapValues { it.value }.toMap() },
+                            payload.params.orEmpty().let { it.mapValues { it.value }.toMap() },
                             payload.message?.let { if (it.isNotEmpty()) it else null }
                     )
                     frameService.create(frame)
@@ -387,6 +388,8 @@ class StackResources {
                     } else {
                         sessionService.renew(session)
                         stackService.delete(stack)
+                        frameService.deleteByStackPath(stack.path)
+                        attachmentService.deleteByStackPath(stack.path)
                         permissionService.deleteByPath(stack.path)
                         commentService.deleteByStackPath(stack.path)
                         cardService.deleteByStackPath(stack.path)

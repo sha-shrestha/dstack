@@ -32,6 +32,10 @@ class InMemoryFrameService : FrameService {
         return frames.filter { it.stackPath == stackPath }
     }
 
+    override fun deleteByStackPath(stackPath: String) {
+        frames.removeIf { it.stackPath == stackPath }
+    }
+
     fun reset(frames: List<Frame> = emptyList()) {
         this.frames.clear()
         this.frames.addAll(frames)

@@ -31,6 +31,10 @@ class SQLiteFrameService @Autowired constructor(private val repository: FrameRep
         return repository.findAllByStack(stackPath).asSequence().map { it.toFrame() }.toList()
     }
 
+    override fun deleteByStackPath(stackPath: String) {
+        return repository.deleteAllByStack(stackPath)
+    }
+
     private val Frame.mapId
         get() = mapId(stackPath, id)
 
