@@ -53,7 +53,9 @@ class FilesResources {
     ): Response? {
         val u = userStream.get(user)
         return if (u != null && u.verificationCode == code) {
-            val inputStream: FileInputStream = File("${appConfig.fileDirectory}/$path").inputStream()
+            val file = File("${appConfig.fileDirectory}/$path")
+            val length = file.length()
+            val inputStream: FileInputStream = file.inputStream()
             val streamingOutput = StreamingOutput { output ->
                 try {
                     inputStream.copyTo(output)
@@ -65,6 +67,7 @@ class FilesResources {
                 .header("content-disposition", "attachment; filename=$filename")
                 .chainIfNotNull(type) {
                     header("content-type", type)
+                    header("content-length", length)
                 }.build()
         } else {
             Response.status(Response.Status.FORBIDDEN).build()
