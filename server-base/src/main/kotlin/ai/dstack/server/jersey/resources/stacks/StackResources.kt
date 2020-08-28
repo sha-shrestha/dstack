@@ -387,6 +387,8 @@ class StackResources {
                     } else {
                         sessionService.renew(session)
                         stackService.delete(stack)
+                        frameService.deleteByStackPath(stack.path)
+                        attachmentService.deleteByStackPath(stack.path)
                         permissionService.deleteByPath(stack.path)
                         commentService.deleteByStackPath(stack.path)
                         cardService.deleteByStackPath(stack.path)

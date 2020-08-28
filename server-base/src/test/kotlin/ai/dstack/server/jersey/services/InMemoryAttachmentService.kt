@@ -24,6 +24,10 @@ class InMemoryAttachmentService: AttachmentService {
         return attachs.find { it.framePath == frame && it.index == index }
     }
 
+    override fun deleteByStackPath(stackPath: String) {
+        attachs.removeIf { it.framePath.startsWith(stackPath) }
+    }
+
     fun reset(attachs: List<Attachment> = emptyList()) {
         this.attachs.clear()
         this.attachs.addAll(attachs)
