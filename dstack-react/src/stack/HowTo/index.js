@@ -8,12 +8,12 @@ import css from './styles.module.css';
 import config from '../../config';
 
 export const reportPlotPythonCode = `import matplotlib.pyplot as plt
-from dstack import push_frame
+import dstack as ds
 
 fig = plt.figure()
 plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
 
-push_frame("simple", fig, "My first plot")`;
+ds.push_frame("simple", fig, "My first plot")`;
 
 export const installRPackageCode = 'install.packages("dstack")';
 
