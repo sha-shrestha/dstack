@@ -45,6 +45,9 @@ class StackResources {
     private lateinit var stackService: StackService
 
     @Inject
+    private lateinit var analyticsService: AnalyticsService
+
+    @Inject
     private lateinit var frameService: FrameService
 
     @Inject
@@ -118,48 +121,48 @@ class StackResources {
                     val head = stack.head?.let { frameService.get(stack.path, it.id) }
                     val frames = frameService.findByStackPath(stack.path)
                     session?.let { sessionService.renew(it) }
-                    ok(
-                            GetStackStatus(
-                                    StackInfo(stack.userName,
-                                            stack.name,
-                                            stack.private,
-                                            head?.let {
-                                                val attachments = attachmentService.findByFrame(it.path)
-                                                FrameInfo(
-                                                        it.id, it.timestampMillis,
-                                                        attachments.map { a ->
-                                                            AttachmentInfo(
-                                                                    a.description,
-                                                                    a.legacyType,
-                                                                    a.application,
-                                                                    a.contentType,
-                                                                    a.params.orEmpty(),
-                                                                    a.settings,
-                                                                    a.length
-                                                            )
-                                                        }, it.params, it.message
+                    val status = GetStackStatus(
+                            StackInfo(stack.userName,
+                                    stack.name,
+                                    stack.private,
+                                    head?.let {
+                                        val attachments = attachmentService.findByFrame(it.path)
+                                        FrameInfo(
+                                                it.id, it.timestampMillis,
+                                                attachments.map { a ->
+                                                    AttachmentInfo(
+                                                            a.description,
+                                                            a.legacyType,
+                                                            a.application,
+                                                            a.contentType,
+                                                            a.params.orEmpty(),
+                                                            a.settings,
+                                                            a.length
+                                                    )
+                                                }, it.params, it.message
+                                        )
+                                    },
+                                    if (owner) permissionService.findByPath(stack.path)
+                                            .map {
+                                                PermissionInfo(
+                                                        it.userName,
+                                                        it.email
                                                 )
-                                            },
-                                            if (owner) permissionService.findByPath(stack.path)
-                                                    .map {
-                                                        PermissionInfo(
-                                                                it.userName,
-                                                                it.email
-                                                        )
-                                                    }.toList() else null,
-                                            commentService.findByStackPath(stack.path).map {
-                                                CommentInfo(it.id, it.timestampMillis, it.userName, it.text)
-                                            },
-                                            frames.map {
-                                                BasicFrameInfo(
-                                                        it.id,
-                                                        it.timestampMillis,
-                                                        it.params, it.message
-                                                )
-                                            }
-                                    )
+                                            }.toList() else null,
+                                    commentService.findByStackPath(stack.path).map {
+                                        CommentInfo(it.id, it.timestampMillis, it.userName, it.text)
+                                    },
+                                    frames.map {
+                                        BasicFrameInfo(
+                                                it.id,
+                                                it.timestampMillis,
+                                                it.params, it.message
+                                        )
+                                    }
                             )
                     )
+                    analyticsService.track("Stack Resources", "stacks/:user/:stack", "Get Stack", status)
+                    ok(status)
                 } else {
                     badCredentials()
                 }
