@@ -89,7 +89,7 @@ var config = {
     return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
   }
 };
-var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
+var reportPlotPythonCode = "import matplotlib.pyplot as plt\nimport dstack as ds\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\nds.push_frame(\"simple\", fig, \"My first plot\")";
 var installRPackageCode = 'install.packages("dstack")';
 var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
 
@@ -2142,7 +2142,7 @@ var pullPythonCode = function pullPythonCode(data) {
     a.push('params={' + p.join(', ') + '}');
   }
 
-  return "import pandas as pd\nfrom dstack import pull\n\ndf = pull(" + a.join(', ') + ")";
+  return "import pandas as pd\nimport dstack as ds\n\ndf = ds.pull(" + a.join(', ') + ")";
 };
 var pullRCode = function pullRCode(data) {
   var a = ["\"/" + data.stack + "\""];
