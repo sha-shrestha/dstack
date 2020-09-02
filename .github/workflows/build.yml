@@ -151,6 +151,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml
           pip install requests
+          pip install tqdm
           pip install dstack
           dstack config add --user dstack --token ${{ secrets.DSTACK_TOKEN_PROD }}
           VERSION=${GITHUB_REF#refs/tags/v}
