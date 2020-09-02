@@ -217,12 +217,12 @@ Here's an example of the code that pushes a single dataset:
 ```python
 import pandas as pd
 import numpy as np
-from dstack import push_frame
+import dstack as ds
 
 dates = pd.date_range('20130101', periods=6)
 df = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list('ABCD'))
 
-push_frame("static_dataset_example", df, "static dataset")
+ds.push_frame("static_dataset_example", df, "static dataset")
 ```
 
 **R**
@@ -243,9 +243,9 @@ Here's an example of the code that pulls a dataset from the server:
 **Python**
 ```python
 import pandas as pd
-from dstack import pull
+import dstack as ds
 
-df = pull("/<username>/<stackname>")
+df = ds.pull("/<username>/<stackname>")
 df.head()
 ```
 

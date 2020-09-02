@@ -26,9 +26,9 @@ export const pullPythonCode = data => {
     }
 
     return `import pandas as pd
-from dstack import pull
+import dstack as ds
 
-df = pull(${a.join(', ')})`;
+df = ds.pull(${a.join(', ')})`;
 };
 
 export const pullRCode = data => {
