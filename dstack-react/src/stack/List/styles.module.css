@@ -1,7 +1,7 @@
 @import "styles/variables.css";
 @import "styles/media.css";
 :root {
-    --colum-size: 262px;
+    --colum-size: 255px;
 }
 .list {
 
@@ -31,13 +31,39 @@
     min-width: 0;
     margin-left: 20px;
 }
-.headerSideSection {
+.uploadButton {
     margin-left: 12px;
-    flex-shrink: 0;
+}
+.controls {
+    display: flex;
+    align-items: center;
+    margin-top: 13px;
 }
 .viewSwitcher {
     flex-shrink: 0;
-    margin-left: 12px;
+}
+.sorting {
+    margin-left: 8px;
+}
+.sortingButton {
+    color: var(--color-dark-gray);
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    transition: opacity .2s ease;
+    outline: none;
+    cursor: pointer;
+    &:hover {
+        opacity: .7;
+    }
+    & :global(.mdi) {
+        margin-left: 4px;
+    }
 }
 .message {
     font-size: 14px;
@@ -81,6 +107,12 @@
 
 .item {
     max-width: fit-content;
+}
+.loadingItem {
+    height: 50px;
+    max-width: 400px;
+    background: linear-gradient(90deg, #F7F9FB -3.86%, #EEF1F3 34.95%, #FDFDFD 107.97%);
+    animation: stacks-pulse 1.5s infinite;
 }
 
 .modal {

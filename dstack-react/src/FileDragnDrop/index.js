@@ -1,8 +1,9 @@
 // @flow
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, forwardRef, useImperativeHandle} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import {formatBytes} from '../utils';
+import Button from '../Button';
 import css from './style.module.css';
 
 type Props = {
@@ -19,12 +20,14 @@ const FileDragnDrop = ({
     loading,
     progressPercent = null,
     onChange,
-}: Props) => {
+}: Props, ref) => {
     const {t} = useTranslation();
     const inputRef = useRef(null);
     const [active, setActive] = useState(false);
     const [selectedFile, setSelectedFile] = useState();
     const isDidMount = useRef(true);
+
+    useImperativeHandle(ref, () => ({clear: () => removeFile()}));
 
     useEffect(() => {
         if (!isDidMount.current) {
@@ -113,18 +116,22 @@ const FileDragnDrop = ({
         );
 
     if (selectedFile)
-        return <div className={cx(css.file, className)}>
-            <div className={css.fileExtend}>
-                .csv
-            </div>
+        return (
+            <div className={cx(css.fileWrapper, className)}>
+                <div className={css.file}>
+                    <div className={css.fileExtend}>
+                        {selectedFile.name.split('.').pop()}
+                    </div>
 
-            <div className={css.fileSection}>
-                <div className={css.fileName}>{selectedFile.name}</div>
-                <div className={css.fileSize}>{formatBytes(selectedFile.size)}</div>
-            </div>
+                    <div className={css.fileSection}>
+                        <div className={css.fileName}>{selectedFile.name}</div>
+                        <div className={css.fileSize}>{formatBytes(selectedFile.size)}</div>
+                    </div>
 
-            <div onClick={removeFile} className={cx(css.fileRemove, 'mdi mdi-close')} />
-        </div>;
+                    <div onClick={removeFile} className={cx(css.fileRemove, 'mdi mdi-close')} />
+                </div>
+            </div>
+        );
 
 
     return (
@@ -148,12 +155,19 @@ const FileDragnDrop = ({
                 {' '}
                 {t('or')}
                 {' '}
-                <a onClick={onClick} href="#">{t('upload')}</a>
-                {' '}
-                {t('fromYourComputer')}.
             </div>
+
+            <Button
+                className={css.button}
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={onClick}
+            >
+                {t('chooseAFile')}
+            </Button>
         </div>
     );
 };
 
-export default FileDragnDrop;
+export default forwardRef(FileDragnDrop);

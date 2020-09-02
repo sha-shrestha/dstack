@@ -6,7 +6,7 @@ import Tabs from '../../Tabs';
 import CodeViewer from '../../CodeViewer';
 import {isString} from 'lodash-es';
 import config from '../../config';
-import css from '../HowTo/styles.module.css';
+import css from './styles.module.css';
 
 export const pullPythonCode = data => {
     let a = [`\'/${data.stack}\'`];

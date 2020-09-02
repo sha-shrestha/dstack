@@ -5,13 +5,14 @@ import cn from 'classnames';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Button from '../../Button';
-import Loader from '../../Loader';
 import Modal from '../../Modal';
+import Dropdown from '../../Dropdown';
 import ViewSwitcher from '../../ViewSwitcher';
 import SearchField from '../../SearchField';
 import StackListItem from '../ListItem';
 import routes from '../../routes';
-import StackHowTo from '../HowTo';
+import Tooltip from '../../Tooltip';
+import useListViewSwitcher from '../../hooks/useListViewSwitcher';
 import css from './styles.module.css';
 
 type Stack = {
@@ -20,11 +21,10 @@ type Stack = {
 
 type Props = {
     deleteStack: Function,
-    renderSideTitle?: Function,
+    renderUploadStack?: Function,
     data: Array<Stack>,
     loading: boolean,
     currentUser?: string,
-    currentUserToken?: string,
     renderItemContent: Function,
 };
 
@@ -34,17 +34,20 @@ const List = ({
     deleteStack,
     currentUser,
     user,
-    currentUserToken,
-    renderSideTitle,
+    renderUploadStack = () => {},
     renderItemContent,
 }: Props) => {
     const {t} = useTranslation();
-    const [view, setView] = useState('list');
+
+    const [view, setView] = useListViewSwitcher('stack-list');
     const [deletingStack, setDeletingStack] = useState(null);
     const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
-    const [isShowHowToModal, setIsShowHowToModal] = useState(false);
+    const [isShowUploadStackModal, setIsShowUploadStackModal] = useState(false);
     const [search, setSearch] = useState('');
     const isInitialMount = useRef(true);
+    const [sorting, setSorting] = useState(null);
+
+    const sortingItems = {lastSource: {title: t('lastChanged')}};
 
     const showWelcomeModal = () => setIsShowWelcomeModal(true);
     const onChangeSearch = value => setSearch(value);
@@ -64,12 +67,12 @@ const List = ({
     }, [data]);
 
 
-    const showHowToModal = event => {
+    const showUploadStackModal = event => {
         event.preventDefault();
-        setIsShowHowToModal(true);
+        setIsShowUploadStackModal(true);
     };
 
-    const hideHowToModal = () => setIsShowHowToModal(false);
+    const hideUploadStackModal = () => setIsShowUploadStackModal(false);
 
     const deleteItem = () => {
         deleteStack(deletingStack);
@@ -118,19 +121,58 @@ const List = ({
                         />
                     )}
 
-                    <div className={css.headerSideSection}>
-                        {renderSideTitle && renderSideTitle()}
-                    </div>
-
-                    <ViewSwitcher
-                        className={css.viewSwitcher}
-                        value={view}
-                        onChange={setView}
-                    />
+                    {renderUploadStack && (
+                        <Tooltip
+                            overlayContent={t('uploadTooltip')}
+                        >
+                            <Button
+                                className={css.uploadButton}
+                                onClick={showUploadStackModal}
+                                color="primary"
+                                variant="contained"
+                                size="small"
+                            >
+                                {t('uploadStack')}
+                            </Button>
+                        </Tooltip>
+                    )}
                 </div>
             </div>
 
-            {loading && !Boolean(data.length) && <Loader />}
+            <div className={css.controls}>
+                <ViewSwitcher
+                    className={css.viewSwitcher}
+                    value={view}
+                    onChange={setView}
+                />
+
+                {false && (
+                    <Dropdown
+                        className={css.sorting}
+                        items={
+                            Object.keys(sortingItems).map(key => ({
+                                title: sortingItems[key].title,
+                                onClick: () => setSorting(key),
+                            }))
+                        }
+                    >
+                        <button
+                            className={css.sortingButton}
+                        >
+                            {sorting ? sortingItems[sorting].title : t('sort')}
+                            <span className="mdi mdi-chevron-down" />
+                        </button>
+                    </Dropdown>
+                )}
+            </div>
+
+            {loading && !Boolean(data.length) && (
+                <div className={cn(css.itemList, view)}>
+                    {new Array(view === 'grid' ? 12 : 8).fill({}).map((i, index) => (
+                        <div key={index} className={css.loadingItem} />
+                    ))}
+                </div>
+            )}
 
             {!loading && !data.length && (
                 <div className={css.message}>
@@ -141,20 +183,7 @@ const List = ({
                 </div>
             )}
 
-            {!loading && !Boolean(data.length) && currentUser === user && (
-                <StackHowTo
-                    user={currentUser}
-                    token={currentUserToken}
-                />
-            )}
-
-            {Boolean(data.length && items.length) && currentUser === user && (
-                <div className={css.text}>
-                    {t('youHaveStacks', {count: data.length})}
-                    {' '}
-                    <a href="#" onClick={showHowToModal}>{t('seeHowToGuide')}</a>.
-                </div>
-            )}
+            {!loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack()}
 
             {Boolean(data.length && items.length) && (
                 <div className={cn(css.itemList, view)}>
@@ -223,16 +252,16 @@ const List = ({
                 </Modal>
             )}
 
-            <Modal
-                isShow={isShowHowToModal}
+            {renderUploadStack && <Modal
+                isShow={isShowUploadStackModal}
                 withCloseButton
-                onClose={hideHowToModal}
+                onClose={hideUploadStackModal}
                 size="big"
                 title={t('howToConnectYourDataWithDStack')}
                 className={css.modal}
             >
-                <StackHowTo user={currentUser} token={currentUserToken} modalMode />
-            </Modal>
+                {renderUploadStack()}
+            </Modal>}
         </div>
     );
 };

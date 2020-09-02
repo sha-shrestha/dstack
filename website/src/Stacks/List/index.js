@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import {NotFound, StackList, StackUpload} from '@dstackai/dstack-react';
+import {NotFound, StackList, UploadStack} from '@dstackai/dstack-react';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {startAppProgress, completeAppProgress, resetAppProgress} from 'App/actions';
 import {fetchList, deleteStack} from './actions';
@@ -84,17 +84,21 @@ const List = ({
                 data={data}
                 loading={loading}
                 currentUser={currentUser}
-                currentUserToken={currentUserToken}
                 deleteStack={deleteStack}
-                renderSideTitle={() => (
-                    currentUser === user && (
-                        <StackUpload
-                            withButton
-                            refresh={fetchData}
-                            apiUrl={config.API_URL}
-                            user={user}
-                        />
-                    )
+
+                {...(currentUser === user
+                    ? {
+                        renderUploadStack: () => (
+                            <UploadStack
+                                user={user}
+                                token={currentUserToken}
+                                refresh={fetchData}
+                                apiUrl={config.API_URL}
+                            />
+                        ),
+                    }
+
+                    : {}
                 )}
             />
         </Fragment>

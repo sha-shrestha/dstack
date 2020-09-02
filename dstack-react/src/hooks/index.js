@@ -4,6 +4,7 @@ import useForm from './useForm';
 import useIntersectionObserver from './useIntersectionObserver';
 import useDebounce from './useDebounce';
 import useTimeout from './useTimeout';
+import useListViewSwitcher from './useListViewSwitcher';
 
 export {
     usePrevious,
@@ -11,5 +12,6 @@ export {
     useForm,
     useIntersectionObserver,
     useDebounce,
-    useTimeout
+    useTimeout,
+    useListViewSwitcher
 };

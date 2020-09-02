@@ -4,34 +4,19 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import CodeViewer from '../../CodeViewer';
 import Tabs from '../../Tabs';
+import Upload from './Upload';
 import css from './styles.module.css';
 import config from '../../config';
-
-export const reportPlotPythonCode = `import matplotlib.pyplot as plt
-from dstack import push_frame
-
-fig = plt.figure()
-plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
-
-push_frame("simple", fig, "My first plot")`;
-
-export const installRPackageCode = 'install.packages("dstack")';
-
-export const reportPlotRCode = `library(ggplot2)
-library(dstack)
-
-df <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))
-image <- ggplot(data = df, aes(x = x, y = y)) + geom_line()
-
-push_frame("simple", image, "My first plot")`;
+import {reportPlotPythonCode, installRPackageCode, reportPlotRCode} from '../../config';
 
 type Props = {
     user?: string,
     token?: string,
-    modalMode?: boolean,
+    refresh?: Function,
+    apiUrl: string,
 }
 
-const HowTo = ({user, token}: Props) => {
+const UploadStack = ({user, token, refresh, apiUrl}: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
@@ -52,6 +37,11 @@ const HowTo = ({user, token}: Props) => {
                     {
                         label: t('r'),
                         value: 2,
+                    },
+
+                    {
+                        label: t('upload'),
+                        value: 3,
                     },
                 ]}
             />
@@ -139,6 +129,12 @@ const HowTo = ({user, token}: Props) => {
                 </CodeViewer>
             </div>}
 
+            {activeCodeTab === 3 && <Upload
+                user={user}
+                refresh={refresh}
+                apiUrl={apiUrl}
+            />}
+
             <div
                 className={css.footer}
                 dangerouslySetInnerHTML={{__html: t('notClearCheckTheDocks', {href: config.DOCS_URL})}}
@@ -147,4 +143,4 @@ const HowTo = ({user, token}: Props) => {
     );
 };
 
-export default HowTo;
+export default UploadStack;

@@ -44,3 +44,21 @@ export default {
             + `, server = "${origin}/api")`;
     },
 };
+
+export const reportPlotPythonCode = `import matplotlib.pyplot as plt
+from dstack import push_frame
+
+fig = plt.figure()
+plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
+
+push_frame("simple", fig, "My first plot")`;
+
+export const installRPackageCode = 'install.packages("dstack")';
+
+export const reportPlotRCode = `library(ggplot2)
+library(dstack)
+
+df <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))
+image <- ggplot(data = df, aes(x = x, y = y)) + geom_line()
+
+push_frame("simple", image, "My first plot")`;

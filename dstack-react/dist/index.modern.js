@@ -1,4 +1,4 @@
-import React__default, { forwardRef, useState, useRef, useEffect, useCallback, memo, createContext, useReducer, useContext, Fragment, Component } from 'react';
+import React__default, { forwardRef, useState, useRef, useEffect, useImperativeHandle, memo, useCallback, createContext, useReducer, useContext, Fragment, Component } from 'react';
 import cx from 'classnames';
 import Highlight from 'react-highlight.js';
 import { useTranslation } from 'react-i18next';
@@ -89,6 +89,9 @@ var config = {
     return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
   }
 };
+var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
+var installRPackageCode = 'install.packages("dstack")';
+var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
 
 var image = require("./lock~ZBorChcU.svg");
 
@@ -533,9 +536,9 @@ var fileToBase64 = function fileToBase64(file) {
   }
 };
 
-var css$9 = {"dnd":"_3uYii","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
+var css$9 = {"dnd":"_3uYii","fileWrapper":"_1GUx_","file":"_2LG6L","fileExtend":"_3w6--","fileSection":"_B8y5t","fileName":"_3Juxo","fileSize":"_3G6N8","fileRemove":"_16dzP","placeholder":"_Wr_Zp","button":"_14ku1","loading":"_2KndP","progressBar":"_DHbC1","progress":"_2-dth","animate-stripes":"_1Iecq"};
 
-var FileDragnDrop = function FileDragnDrop(_ref) {
+var FileDragnDrop = function FileDragnDrop(_ref, ref) {
   var formats = _ref.formats,
       className = _ref.className,
       loading = _ref.loading,
@@ -557,6 +560,13 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
       setSelectedFile = _useState2[1];
 
   var isDidMount = useRef(true);
+  useImperativeHandle(ref, function () {
+    return {
+      clear: function clear() {
+        return removeFile();
+      }
+    };
+  });
   useEffect(function () {
     if (!isDidMount.current) {
       if (onChange) onChange(selectedFile);
@@ -625,10 +635,12 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
     }
   })));
   if (selectedFile) return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$9.file, className)
+    className: cx(css$9.fileWrapper, className)
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$9.file
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$9.fileExtend
-  }, ".csv"), /*#__PURE__*/React__default.createElement("div", {
+  }, selectedFile.name.split('.').pop()), /*#__PURE__*/React__default.createElement("div", {
     className: css$9.fileSection
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$9.fileName
@@ -637,7 +649,7 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
   }, formatBytes(selectedFile.size))), /*#__PURE__*/React__default.createElement("div", {
     onClick: removeFile,
     className: cx(css$9.fileRemove, 'mdi mdi-close')
-  }));
+  })));
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$9.dnd, className, {
       active: active
@@ -652,11 +664,16 @@ var FileDragnDrop = function FileDragnDrop(_ref) {
     type: "file"
   }), /*#__PURE__*/React__default.createElement("div", {
     className: css$9.placeholder
-  }, t('dragHereAFile'), '', Boolean(formats) && "(" + formats.join(', ') + ")", ' ', t('or'), ' ', /*#__PURE__*/React__default.createElement("a", {
-    onClick: onClick,
-    href: "#"
-  }, t('upload')), ' ', t('fromYourComputer'), "."));
+  }, t('dragHereAFile'), '', Boolean(formats) && "(" + formats.join(', ') + ")", ' ', t('or'), ' '), /*#__PURE__*/React__default.createElement(Button, {
+    className: css$9.button,
+    variant: "contained",
+    color: "primary",
+    size: "small",
+    onClick: onClick
+  }, t('chooseAFile')));
 };
+
+var FileDragnDrop$1 = forwardRef(FileDragnDrop);
 
 var css$a = {"loader":"_18_Ho","text":"_3dZu_","stacks-pulse":"_350eA","grid":"_Uki0v","item":"_MvjKB","pic":"_Pc6fT","section":"_2EIKh"};
 
@@ -850,14 +867,14 @@ var ProgressBar = function ProgressBar(_ref) {
     requestAnimationFrame(calculateProgress);
   };
 
-  var calculateProgress = useCallback(function () {
+  var calculateProgress = function calculateProgress() {
     currentProgress.current += step.current;
     var progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
     setProgress(progress);
     if (progress > 70) step.current = 0.005;
-    if (progress >= 100) cancelAnimationFrame(requestFrame.current);
-    requestFrame.current = requestAnimationFrame(calculateProgress);
-  }, [isActive]);
+    if (progress >= 100 || !isActive) cancelAnimationFrame(requestFrame.current);
+    if (isActive) requestFrame.current = requestAnimationFrame(calculateProgress);
+  };
 
   var onResize = function onResize() {
     if (ref.current) setWidth(ref.current.offsetWidth);
@@ -1884,95 +1901,29 @@ var routes = {
   }
 };
 
-var css$s = {"howto":"_2kGrG","tabs":"_RLKw7","description":"_3Ul2-","code":"_11v2r","footer":"_nTy2P"};
+var useListViewSwitcher = (function (id, defaultValue) {
+  if (defaultValue === void 0) {
+    defaultValue = 'list';
+  }
 
-var reportPlotPythonCode = "import matplotlib.pyplot as plt\nfrom dstack import push_frame\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\npush_frame(\"simple\", fig, \"My first plot\")";
-var installRPackageCode = 'install.packages("dstack")';
-var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
+  var _useState = useState(null),
+      value = _useState[0],
+      setValue = _useState[1];
 
-var HowTo = function HowTo(_ref) {
-  var user = _ref.user,
-      token = _ref.token;
+  useEffect(function () {
+    var savedValue = localStorage.getItem("list-view-value-" + id);
+    if (savedValue) setValue(savedValue);else setValue(defaultValue);
+  }, []);
 
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
+  var onChange = function onChange(value) {
+    setValue(value);
+    localStorage.setItem("list-view-value-" + id, value);
+  };
 
-  var _useState = useState(1),
-      activeCodeTab = _useState[0],
-      setActiveCodeTab = _useState[1];
+  return [value, onChange];
+});
 
-  var _useState2 = useState(1),
-      activePlatformTab = _useState2[0],
-      setActivePlatformTab = _useState2[1];
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.howto
-  }, /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
-    value: activeCodeTab,
-    onChange: setActiveCodeTab,
-    tabs: [{
-      label: t('python'),
-      value: 1
-    }, {
-      label: t('r'),
-      value: 2
-    }]
-  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
-    value: activePlatformTab,
-    onChange: setActivePlatformTab,
-    tabs: [{
-      label: t('pip'),
-      value: 1
-    }, {
-      label: t('conda'),
-      value: 2
-    }]
-  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "bash"
-  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "bash"
-  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "bash"
-  }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "python"
-  }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "r"
-  }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "r"
-  }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
-  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
-    language: "r"
-  }, reportPlotRCode)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.footer,
-    dangerouslySetInnerHTML: {
-      __html: t('notClearCheckTheDocks', {
-        href: config.DOCS_URL
-      })
-    }
-  }));
-};
-
-var css$t = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","headerSideSection":"_2_8bG","viewSwitcher":"_1boU7","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$s = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -1981,34 +1932,42 @@ var List = function List(_ref) {
       deleteStack = _ref.deleteStack,
       currentUser = _ref.currentUser,
       user = _ref.user,
-      currentUserToken = _ref.currentUserToken,
-      renderSideTitle = _ref.renderSideTitle,
+      _ref$renderUploadStac = _ref.renderUploadStack,
+      renderUploadStack = _ref$renderUploadStac === void 0 ? function () {} : _ref$renderUploadStac,
       renderItemContent = _ref.renderItemContent;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
 
-  var _useState = useState('list'),
-      view = _useState[0],
-      setView = _useState[1];
+  var _useListViewSwitcher = useListViewSwitcher('stack-list'),
+      view = _useListViewSwitcher[0],
+      setView = _useListViewSwitcher[1];
 
-  var _useState2 = useState(null),
-      deletingStack = _useState2[0],
-      setDeletingStack = _useState2[1];
+  var _useState = useState(null),
+      deletingStack = _useState[0],
+      setDeletingStack = _useState[1];
+
+  var _useState2 = useState(false),
+      isShowWelcomeModal = _useState2[0],
+      setIsShowWelcomeModal = _useState2[1];
 
   var _useState3 = useState(false),
-      isShowWelcomeModal = _useState3[0],
-      setIsShowWelcomeModal = _useState3[1];
+      isShowUploadStackModal = _useState3[0],
+      setIsShowUploadStackModal = _useState3[1];
 
-  var _useState4 = useState(false),
-      isShowHowToModal = _useState4[0],
-      setIsShowHowToModal = _useState4[1];
-
-  var _useState5 = useState(''),
-      search = _useState5[0],
-      setSearch = _useState5[1];
+  var _useState4 = useState(''),
+      search = _useState4[0],
+      setSearch = _useState4[1];
 
   var isInitialMount = useRef(true);
+
+  var _useState5 = useState(null);
+
+  var sortingItems = {
+    lastSource: {
+      title: t('lastChanged')
+    }
+  };
 
   var showWelcomeModal = function showWelcomeModal() {
     return setIsShowWelcomeModal(true);
@@ -2031,13 +1990,13 @@ var List = function List(_ref) {
     }
   }, [data]);
 
-  var showHowToModal = function showHowToModal(event) {
+  var showUploadStackModal = function showUploadStackModal(event) {
     event.preventDefault();
-    setIsShowHowToModal(true);
+    setIsShowUploadStackModal(true);
   };
 
-  var hideHowToModal = function hideHowToModal() {
-    return setIsShowHowToModal(false);
+  var hideUploadStackModal = function hideUploadStackModal() {
+    return setIsShowUploadStackModal(false);
   };
 
   var deleteItem = function deleteItem() {
@@ -2067,15 +2026,15 @@ var List = function List(_ref) {
 
   var items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.list
+    className: css$s.list
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.header
+    className: css$s.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.title
+    className: css$s.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.headerSide
+    className: css$s.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
@@ -2083,31 +2042,36 @@ var List = function List(_ref) {
     size: "small",
     value: search,
     onChange: onChangeSearch
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.headerSideSection
-  }, renderSideTitle && renderSideTitle()), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$t.viewSwitcher,
+  }), renderUploadStack && /*#__PURE__*/React__default.createElement(Tooltip, {
+    overlayContent: t('uploadTooltip')
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$s.uploadButton,
+    onClick: showUploadStackModal,
+    color: "primary",
+    variant: "contained",
+    size: "small"
+  }, t('uploadStack'))))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.controls
+  }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
+    className: css$s.viewSwitcher,
     value: view,
     onChange: setView
-  }))), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement(Loader, null), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.message
+  }), false ), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$s.itemList, view)
+  }, new Array(view === 'grid' ? 12 : 8).fill({}).map(function (i, index) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: index,
+      className: css$s.loadingItem
+    });
+  })), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
+    className: css$s.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
-  })), !loading && !Boolean(data.length) && currentUser === user && /*#__PURE__*/React__default.createElement(HowTo, {
-    user: currentUser,
-    token: currentUserToken
-  }), Boolean(data.length && items.length) && currentUser === user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.text
-  }, t('youHaveStacks', {
-    count: data.length
-  }), ' ', /*#__PURE__*/React__default.createElement("a", {
-    href: "#",
-    onClick: showHowToModal
-  }, t('seeHowToGuide')), "."), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.itemList, view)
+  })), !loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack(), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$s.itemList, view)
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
-      className: css$t.item,
+      className: css$s.item,
       Component: Link,
       key: index,
       data: item,
@@ -2116,57 +2080,55 @@ var List = function List(_ref) {
       renderContent: renderItemContent
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.text
+    className: css$s.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
     title: t('deleteStack'),
-    className: css$t.modal
+    className: css$s.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$s.description
   }, t('areYouSureYouWantToDelete', {
     name: deletingStack
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.buttons
+    className: css$s.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideDeleteConfirmation,
-    className: css$t.button
+    className: css$s.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: deleteItem,
-    className: css$t.button
+    className: css$s.button
   }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
     title: t('welcomeToDStack') + "\uD83D\uDC4B",
-    className: css$t.modal
+    className: css$s.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$s.description
   }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.buttons
+    className: css$s.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideWelcomeModal,
-    className: css$t.button
-  }, t('getStarted')))), /*#__PURE__*/React__default.createElement(Modal, {
-    isShow: isShowHowToModal,
+    className: css$s.button
+  }, t('getStarted')))), renderUploadStack && /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: isShowUploadStackModal,
     withCloseButton: true,
-    onClose: hideHowToModal,
+    onClose: hideUploadStackModal,
     size: "big",
     title: t('howToConnectYourDataWithDStack'),
-    className: css$t.modal
-  }, /*#__PURE__*/React__default.createElement(HowTo, {
-    user: currentUser,
-    token: currentUserToken,
-    modalMode: true
-  })));
+    className: css$s.modal
+  }, renderUploadStack()));
 };
+
+var css$t = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
 
 var pullPythonCode = function pullPythonCode(data) {
   var a = ["'/" + data.stack + "'"];
@@ -2195,7 +2157,7 @@ var pullRCode = function pullRCode(data) {
   return "library(dstack)\n\ndf <- read.csv(pull(" + a.join(', ') + "))";
 };
 
-var HowTo$1 = function HowTo(_ref) {
+var HowTo = function HowTo(_ref) {
   var modalMode = _ref.modalMode,
       user = _ref.user,
       token = _ref.token,
@@ -2213,11 +2175,11 @@ var HowTo$1 = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.howto
+    className: css$t.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.title
+    className: css$t.title
   }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
+    className: css$t.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
@@ -2228,9 +2190,9 @@ var HowTo$1 = function HowTo(_ref) {
       value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$s.tabs,
+    className: css$t.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -2241,38 +2203,38 @@ var HowTo$1 = function HowTo(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "bash"
   }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "python"
   }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "r"
   }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "r"
   }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$s.code,
+    className: css$t.code,
     language: "r"
   }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.footer,
+    className: css$t.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
         href: config.DOCS_URL
@@ -2742,7 +2704,7 @@ var Details = function Details(_ref) {
     size: "big",
     title: t('howToFetchDataUsingTheAPI'),
     className: css$w.modal
-  }, /*#__PURE__*/React__default.createElement(HowTo$1, {
+  }, /*#__PURE__*/React__default.createElement(HowTo, {
     user: currentUser,
     token: currentUserToken,
     data: {
@@ -2932,7 +2894,7 @@ var Upload = function Upload(_ref) {
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
     className: css$x.subtitle
-  }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop, {
+  }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
     className: css$x.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
@@ -2953,6 +2915,280 @@ var Upload = function Upload(_ref) {
     color: "secondary",
     disabled: uploading
   }, t('cancel')))));
+};
+
+var css$y = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
+
+var MB$1 = 1048576;
+
+var Upload$1 = function Upload(_ref) {
+  var stack = _ref.stack,
+      className = _ref.className,
+      refresh = _ref.refresh,
+      apiUrl = _ref.apiUrl,
+      user = _ref.user;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = useState(null),
+      uploading = _useState[0],
+      setUploading = _useState[1];
+
+  var _useState2 = useState(null),
+      progress = _useState2[0],
+      setProgress = _useState2[1];
+
+  var _useState3 = useState(null),
+      file = _useState3[0],
+      setFile = _useState3[1];
+
+  var isDidMount = useRef(true);
+  var fileFieldRef = useRef(null);
+
+  var _useForm = useForm({
+    stack: stack || ''
+  }, {
+    stack: ['required', 'no-spaces-stack', 'stack-name']
+  }),
+      form = _useForm.form,
+      onChange = _useForm.onChange,
+      setForm = _useForm.setForm,
+      formErrors = _useForm.formErrors,
+      checkValidForm = _useForm.checkValidForm;
+
+  var runValidation = useDebounce(checkValidForm);
+  useEffect(function () {
+    if (!isDidMount.current) runValidation();else isDidMount.current = false;
+  }, [form.stack]);
+
+  var clearForm = function clearForm() {
+    setFile(null);
+    setForm({
+      stack: ''
+    });
+    if (fileFieldRef.current) fileFieldRef.current.clear();
+  };
+
+  var getErrorsText = function getErrorsText(fieldName) {
+    if (formErrors[fieldName] && formErrors[fieldName].length) return [t("formErrors." + formErrors[fieldName][0])];
+  };
+
+  var submit = function submit() {
+    try {
+      var _temp7 = function _temp7() {
+        var _temp4 = _catch(function () {
+          var token = localStorage.getItem('token');
+          return Promise.resolve(axios({
+            method: 'post',
+            headers: {
+              Authorization: token ? "Bearer " + token : ''
+            },
+            baseURL: apiUrl,
+            url: config.STACK_PUSH,
+            data: params
+          })).then(function (_ref2) {
+            var data = _ref2.data;
+
+            function _temp3() {
+              setUploading(false);
+              if (refresh) refresh();
+              clearForm();
+            }
+
+            var _temp2 = function () {
+              if (data.attachments && data.attachments.length) {
+                var _data$attachments = data.attachments,
+                    attachment = _data$attachments[0];
+
+                var _temp9 = function () {
+                  if (attachment['upload_url']) {
+                    return Promise.resolve(axios.put(attachment['upload_url'], file, {
+                      headers: {
+                        'Content-Type': 'application/octet-stream'
+                      },
+                      onUploadProgress: function onUploadProgress(progressEvent) {
+                        var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+                        setProgress(percentCompleted);
+                      }
+                    })).then(function () {});
+                  }
+                }();
+
+                if (_temp9 && _temp9.then) return _temp9.then(function () {});
+              }
+            }();
+
+            return _temp2 && _temp2.then ? _temp2.then(_temp3) : _temp3(_temp2);
+          });
+        }, function (e) {
+          console.log(e);
+          clearForm();
+        });
+
+        if (_temp4 && _temp4.then) return _temp4.then(function () {});
+      };
+
+      setProgress(null);
+      setUploading(true);
+      var params = {
+        type: file.type,
+        timestamp: Date.now(),
+        id: v4(),
+        stack: user + "/" + form.stack,
+        size: file.size
+      };
+
+      var _temp8 = function () {
+        if (file.size > MB$1) params.attachments = [{
+          length: file.size
+        }];else return Promise.resolve(fileToBase64(file)).then(function (_fileToBaseTo) {
+          params.attachments = [{
+            data: _fileToBaseTo
+          }];
+        });
+      }();
+
+      return Promise.resolve(_temp8 && _temp8.then ? _temp8.then(_temp7) : _temp7(_temp8));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$y.upload, className)
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.content
+  }, !stack && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.subtitle
+  }, t('stackName')), /*#__PURE__*/React__default.createElement(TextField, {
+    size: "middle",
+    className: css$y.field,
+    name: "stack",
+    onChange: onChange,
+    value: form.value,
+    maxLength: 30,
+    placeholder: t('stackName') + ", " + t('noSpaces') + ", " + t('maxSymbol', {
+      count: 30
+    }),
+    errors: getErrorsText('stack')
+  })), stack && file && /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.subtitle
+  }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
+    ref: fileFieldRef,
+    className: css$y.dragndrop,
+    formats: ['.csv', '.png', '.svg', '.jpg'],
+    onChange: setFile,
+    loading: uploading,
+    progressPercent: progress
+  })), file && /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.buttons
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$y.button,
+    variant: "contained",
+    color: "primary",
+    disabled: !file || !form.stack.length || uploading,
+    onClick: submit
+  }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
+    onClick: clearForm,
+    className: css$y.button,
+    variant: "contained",
+    color: "secondary",
+    disabled: uploading
+  }, t('cancel'))));
+};
+
+var css$z = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
+
+var UploadStack = function UploadStack(_ref) {
+  var user = _ref.user,
+      token = _ref.token,
+      refresh = _ref.refresh,
+      apiUrl = _ref.apiUrl;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = useState(1),
+      activeCodeTab = _useState[0],
+      setActiveCodeTab = _useState[1];
+
+  var _useState2 = useState(1),
+      activePlatformTab = _useState2[0],
+      setActivePlatformTab = _useState2[1];
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.howto
+  }, /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$z.tabs,
+    value: activeCodeTab,
+    onChange: setActiveCodeTab,
+    tabs: [{
+      label: t('python'),
+      value: 1
+    }, {
+      label: t('r'),
+      value: 2
+    }, {
+      label: t('upload'),
+      value: 3
+    }]
+  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.description
+  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$z.tabs,
+    value: activePlatformTab,
+    onChange: setActivePlatformTab,
+    tabs: [{
+      label: t('pip'),
+      value: 1
+    }, {
+      label: t('conda'),
+      value: 2
+    }]
+  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "bash"
+  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "bash"
+  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "bash"
+  }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.description
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "python"
+  }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.description
+  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "r"
+  }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.description
+  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "r"
+  }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.description
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$z.code,
+    language: "r"
+  }, reportPlotRCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {
+    user: user,
+    refresh: refresh,
+    apiUrl: apiUrl
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$z.footer,
+    dangerouslySetInnerHTML: {
+      __html: t('notClearCheckTheDocks', {
+        href: config.DOCS_URL
+      })
+    }
+  }));
 };
 
 function move(array, oldIndex, newIndex) {
@@ -3065,27 +3301,27 @@ var DnDItem = memo(function (_ref) {
   });
 });
 
-var css$y = {"loader":"_2RpBO","text":"_3gk1Z","dashboards-details-pulse":"_3HZ82","filters":"_3ZZJL","grid":"_ZafPr","item":"_LIYeR"};
+var css$A = {"loader":"_2RpBO","text":"_3gk1Z","dashboards-details-pulse":"_3HZ82","filters":"_3ZZJL","grid":"_ZafPr","item":"_LIYeR"};
 
 var Loader$2 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.loader
+    className: css$A.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.text
+    className: css$A.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.filters
+    className: css$A.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.grid
+    className: css$A.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.item
+    className: css$A.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.item
+    className: css$A.item
   })));
 };
 
-var css$z = {"card":"_17jo7","inner":"_YLuSm","head":"_2dKop","name":"_1blF_","nameEdit":"_3omHN","nameValue":"_wx2sM","info":"_1Tbhc","dropdown":"_1NvWp","button":"_d6fLT","move":"_312qk","link":"_NfDp4","infoTime":"_2QMrW","emptyMessage":"_7aBhX","attachment":"_2ajkc"};
+var css$B = {"card":"_17jo7","inner":"_YLuSm","head":"_2dKop","name":"_1blF_","nameEdit":"_3omHN","nameValue":"_wx2sM","info":"_1Tbhc","dropdown":"_1NvWp","button":"_d6fLT","move":"_312qk","link":"_NfDp4","infoTime":"_2QMrW","emptyMessage":"_7aBhX","attachment":"_2ajkc"};
 
 var Card = memo(function (_ref) {
   var data = _ref.data,
@@ -3151,72 +3387,72 @@ var Card = memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$z.card, "type-" + type, className),
+    className: cx(css$B.card, "type-" + type, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.inner
+    className: css$B.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.head
+    className: css$B.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$z.name, {
+    className: cx(css$B.name, {
       readonly: !updateCardTitle
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.nameValue
+    className: css$B.nameValue
   }, title.length ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$z.nameEdit, {
+    className: cx(css$B.nameEdit, {
       active: !title.length
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$z.infoTime
+      className: css$B.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.info
+    className: css$B.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$z.button, css$z.link),
+    className: cx(css$B.button, css$B.link),
     color: "secondary",
     Component: Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), Boolean(deleteCard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$z.dropdown,
+    className: css$B.dropdown,
     items: [].concat(deleteCard ? [{
       title: t('delete'),
       onClick: deleteCard
     }] : [])
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$z.button,
+    className: css$B.button,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$z.button, css$z.move),
+    className: cx(css$B.button, css$B.move),
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-cursor-move"
   }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$z.attachment,
+    className: css$B.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.emptyMessage
+    className: css$B.emptyMessage
   }, t('emptyDashboard'))));
 });
 
-var css$A = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","sideHeader":"_3zX4a","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
+var css$C = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","sideHeader":"_3zX4a","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
 
 var Details$1 = function Details(_ref) {
   var addCards = _ref.addCards,
@@ -3350,7 +3586,7 @@ var Details$1 = function Details(_ref) {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$A.filters, {
+      className: cx(css$C.filters, {
         'with-select': hasSelectField
       })
     });
@@ -3367,7 +3603,7 @@ var Details$1 = function Details(_ref) {
   if (!data) return null;
   var CardWrapComponent = withSorting ? DnDItem : Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.details
+    className: css$C.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -3376,11 +3612,11 @@ var Details$1 = function Details(_ref) {
   }, currentUser === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.header
+    className: css$C.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.title
+    className: css$C.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$A.edit,
+    className: css$C.edit,
     value: data === null || data === void 0 ? void 0 : data.title,
     onChange: onChangeTitleDebounce,
     readOnly: currentUser !== data.user,
@@ -3388,38 +3624,38 @@ var Details$1 = function Details(_ref) {
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.sideHeader
+    className: css$C.sideHeader
   }, renderSideHeader && renderSideHeader(), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$A.dropdown,
+    className: css$C.dropdown,
     items: [].concat(Boolean(deleteDashboard) ? [{
       title: t('delete'),
       onClick: deleteDashboard
     }] : [])
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$A['dropdown-button'],
+    className: css$C['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.section
+    className: css$C.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.fields
+    className: css$C.fields
   }, renderFilters()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.controls
+    className: css$C.controls
   }, getAddClickAction() && /*#__PURE__*/React__default.createElement("a", {
-    className: css$A.addButton,
+    className: css$C.addButton,
     onClick: getAddClickAction(),
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     value: view,
-    className: css$A.viewSwitcher,
+    className: css$C.viewSwitcher,
     onChange: function onChange(view) {
       return setView(view);
     }
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$A.cards, view)
+    className: cx(css$C.cards, view)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -3435,15 +3671,15 @@ var Details$1 = function Details(_ref) {
       moveAvailable: withSorting
     }));
   }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.empty
+    className: css$C.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), getAddClickAction() && /*#__PURE__*/React__default.createElement(Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$A.addButton,
+    className: css$C.addButton,
     onClick: getAddClickAction(),
     href: "#"
   }, t('addStack')), ".")));
 };
 
-var css$B = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
+var css$D = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
 
 var Item$1 = function Item(_ref) {
   var dashboard = _ref.dashboard,
@@ -3470,35 +3706,35 @@ var Item$1 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteDashboard);
   return /*#__PURE__*/React__default.createElement(Link, {
     to: "/" + user + "/d/" + dashboard.id,
-    className: css$B.item,
+    className: css$D.item,
     ref: ref
   }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.label
+    className: css$D.label
   }, t('stacksWithCount', {
     count: dashboard.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.previewWrap
+    className: css$D.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$B.attachment,
+    className: css$D.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.emptyMessage
+    className: css$D.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.section
+    className: css$D.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.content
+    className: css$D.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.name
+    className: css$D.name
   }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.by
+    className: css$D.by
   }, t('by'), " ", dashboard.user), renderContent && renderContent(dashboard)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$B.dropdown,
+    className: css$D.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
@@ -3506,33 +3742,33 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$C = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
+var css$E = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
 
 var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.loader
+    className: css$E.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.text
+    className: css$E.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.grid
+    className: css$E.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
+    className: css$E.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.pic
+    className: css$E.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.section
+    className: css$E.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
+    className: css$E.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.pic
+    className: css$E.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.section
+    className: css$E.section
   }))));
 };
 
-var css$D = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
+var css$F = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
 
 var List$1 = function List(_ref) {
   var addDashboard = _ref.addDashboard,
@@ -3570,37 +3806,37 @@ var List$1 = function List(_ref) {
   var items = getItems();
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$3, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.list
+    className: css$F.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$D.search,
+    className: css$F.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.title
+    className: css$F.title
   }, currentUser === user ? t('myDashboards') : t('dashboardsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$D.mobileSearch,
+    className: css$F.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.grid
+    className: css$F.grid
   }, currentUser === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: addDashboard,
-    className: cx(css$D.add, {
+    className: cx(css$F.add, {
       disabled: addDashboardDisable
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.caption
+    className: css$F.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newDashboard'))), items.map(function (item, index) {
@@ -3614,39 +3850,39 @@ var List$1 = function List(_ref) {
   })));
 };
 
-var css$E = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
+var css$G = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
 
 var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.loader
+    className: css$G.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.text
+    className: css$G.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.grid
+    className: css$G.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.item
+    className: css$G.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.pic
+    className: css$G.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.section
+    className: css$G.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.item
+    className: css$G.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.pic
+    className: css$G.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.section
+    className: css$G.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.item
+    className: css$G.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.pic
+    className: css$G.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.section
+    className: css$G.section
   }))));
 };
 
-var css$F = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
+var css$H = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
 
 var AddStacksModal = function AddStacksModal(_ref) {
   var _ref$stacks = _ref.stacks,
@@ -3728,13 +3964,13 @@ var AddStacksModal = function AddStacksModal(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$F.stacks,
+    dialogClassName: css$H.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$F.search,
+    className: css$H.search,
     isDark: true,
     size: "middle",
     showEverything: true,
@@ -3742,20 +3978,20 @@ var AddStacksModal = function AddStacksModal(_ref) {
     value: searchQuery,
     onChange: onChangeSearch
   }), loading && /*#__PURE__*/React__default.createElement(Loader$4, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.message
+    className: css$H.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.text
+    className: css$H.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.grid
+    className: css$H.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$F.item,
+      className: css$H.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$F.checkbox,
+      className: css$H.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
@@ -3763,15 +3999,15 @@ var AddStacksModal = function AddStacksModal(_ref) {
       otherOwner: params.user !== item.user
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.buttons
+    className: css$H.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$F.button,
+    className: css$H.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$F.button,
+    className: css$H.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
@@ -3780,7 +4016,7 @@ var AddStacksModal = function AddStacksModal(_ref) {
 
 var logo = require("./logo~gyFSAwBb.svg");
 
-var css$G = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
+var css$I = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -3789,37 +4025,37 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$G.header, className)
+    className: cx(css$I.header, className)
   }, /*#__PURE__*/React__default.createElement(Link, {
     to: "/",
-    className: css$G.logo
+    className: css$I.logo
   }, /*#__PURE__*/React__default.createElement("img", {
     width: "129",
     height: "35",
     src: logo,
     alt: "logo"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.buttons
+    className: css$I.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: Link,
     to: "/auth/login",
-    className: css$G.button,
+    className: css$I.button,
     color: "primary"
   }, t('logIn'))));
 };
 
-var css$H = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
+var css$J = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.layout
+    className: css$J.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$H.header
+    className: css$J.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.main
+    className: css$J.main
   }, children));
 };
 
-export { AccessForbidden, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, AddStacksModal as DashboardAddStacksModal, Details$1 as DashboardDetails, List$1 as DashboardList, Item$1 as DashboardListItem, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowTo, HowTo$1 as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, ViewSwitcher, Yield, config };
+export { AccessForbidden, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, AddStacksModal as DashboardAddStacksModal, Details$1 as DashboardDetails, List$1 as DashboardList, Item$1 as DashboardListItem, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, config };
 //# sourceMappingURL=index.modern.js.map

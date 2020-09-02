@@ -32,11 +32,11 @@ export {default as StackAttachment} from './stack/Attachment';
 export {StateProvider as StackAttachmentProvider} from './stack/Attachment/store';
 export {default as StackList} from './stack/List';
 export {default as StackListItem} from './stack/ListItem';
-export {default as StackHowTo} from './stack/HowTo';
 export {default as StackHowToFetchData} from './stack/HowToFetchData';
 export {default as StackFrames} from './stack/Frames';
 export {default as StackDetails} from './stack/Details';
 export {default as StackUpload} from './stack/Upload';
+export {default as UploadStack} from './stack/UploadStack';
 
 export {default as DashboardDetails} from './dashboard/Details';
 export {default as DashboardListItem} from './dashboard/ListItem';

@@ -1,5 +1,5 @@
 // @flow
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import cx from 'classnames';
 import usePrevious from '../hooks/usePrevious';
 import css from './styles.module.css';
@@ -63,7 +63,7 @@ const ProgressBar = ({className, isActive, progress: globalProgress}: Props) => 
         requestAnimationFrame(calculateProgress);
     };
 
-    const calculateProgress = useCallback(() => {
+    const calculateProgress = () => {
         currentProgress.current += step.current;
         const progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
 
@@ -72,11 +72,12 @@ const ProgressBar = ({className, isActive, progress: globalProgress}: Props) => 
         if (progress > 70)
             step.current = 0.005;
 
-        if (progress >= 100)
+        if (progress >= 100 || !isActive)
             cancelAnimationFrame(requestFrame.current);
 
-        requestFrame.current = requestAnimationFrame(calculateProgress);
-    }, [isActive]);
+        if (isActive)
+            requestFrame.current = requestAnimationFrame(calculateProgress);
+    };
 
     const onResize = () => {
         if (ref.current)
