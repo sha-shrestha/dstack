@@ -3,6 +3,10 @@ export default {
 
     LOGIN_URL: '/users/login',
     VERIFY_EMAIL_URL: '/users/verify',
+    SUPPORT_URL: '/support/submit',
+    SIGN_UP_URL: '/users/register',
+    RESET_PASSWORD_URL: '/users/reset',
+    UPDATE_PASSWORD_URL: '/users/update/password',
 
     USER_DATA_URL: '/users/remember',
     UPDATE_TOKEN_URL: '/users/update/token',

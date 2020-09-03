@@ -66,6 +66,7 @@
     }
 }
 .message {
+    margin-top: 16px;
     font-size: 14px;
     @media (--mobile) {
         line-height: 22px;

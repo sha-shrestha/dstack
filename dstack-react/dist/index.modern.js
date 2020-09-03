@@ -25,6 +25,10 @@ var config = {
   DOCS_URL: 'http://docs.dstack.ai',
   LOGIN_URL: '/users/login',
   VERIFY_EMAIL_URL: '/users/verify',
+  SUPPORT_URL: '/support/submit',
+  SIGN_UP_URL: '/users/register',
+  RESET_PASSWORD_URL: '/users/reset',
+  UPDATE_PASSWORD_URL: '/users/update/password',
   USER_DATA_URL: '/users/remember',
   UPDATE_TOKEN_URL: '/users/update/token',
   UPDATE_SETTINGS_URL: '/users/update/settings',
@@ -2033,7 +2037,7 @@ var List = function List(_ref) {
     className: css$s.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
-  })), /*#__PURE__*/React__default.createElement("div", {
+  })), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
@@ -2050,7 +2054,7 @@ var List = function List(_ref) {
     color: "primary",
     variant: "contained",
     size: "small"
-  }, t('uploadStack'))))), /*#__PURE__*/React__default.createElement("div", {
+  }, t('uploadStack'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     className: css$s.viewSwitcher,

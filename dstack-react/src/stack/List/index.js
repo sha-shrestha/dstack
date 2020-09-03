@@ -109,62 +109,66 @@ const List = ({
                     }
                 </div>
 
-                <div className={css.headerSide}>
-                    {Boolean(data.length) && (
-                        <SearchField
-                            showEverything
-                            isDark
-                            placeholder={t('findStack')}
-                            size="small"
-                            value={search}
-                            onChange={onChangeSearch}
-                        />
-                    )}
-
-                    {renderUploadStack && (
-                        <Tooltip
-                            overlayContent={t('uploadTooltip')}
-                        >
-                            <Button
-                                className={css.uploadButton}
-                                onClick={showUploadStackModal}
-                                color="primary"
-                                variant="contained"
+                {Boolean(data.length) && (
+                    <div className={css.headerSide}>
+                        {Boolean(data.length) && (
+                            <SearchField
+                                showEverything
+                                isDark
+                                placeholder={t('findStack')}
                                 size="small"
+                                value={search}
+                                onChange={onChangeSearch}
+                            />
+                        )}
+
+                        {renderUploadStack && (
+                            <Tooltip
+                                overlayContent={t('uploadTooltip')}
                             >
-                                {t('uploadStack')}
-                            </Button>
-                        </Tooltip>
-                    )}
-                </div>
-            </div>
-
-            <div className={css.controls}>
-                <ViewSwitcher
-                    className={css.viewSwitcher}
-                    value={view}
-                    onChange={setView}
-                />
-
-                {false && (
-                    <Dropdown
-                        className={css.sorting}
-                        items={
-                            Object.keys(sortingItems).map(key => ({
-                                title: sortingItems[key].title,
-                                onClick: () => setSorting(key),
-                            }))
-                        }
-                    >
-                        <button
-                            className={css.sortingButton}
-                        >
-                            {sorting ? sortingItems[sorting].title : t('sort')}
-                            <span className="mdi mdi-chevron-down" />
-                        </button>
-                    </Dropdown>
+                                <Button
+                                    className={css.uploadButton}
+                                    onClick={showUploadStackModal}
+                                    color="primary"
+                                    variant="contained"
+                                    size="small"
+                                >
+                                    {t('uploadStack')}
+                                </Button>
+                            </Tooltip>
+                        )}
+                    </div>
                 )}
             </div>
+
+            {!(!loading && !Boolean(data.length)) && (
+                <div className={css.controls}>
+                    <ViewSwitcher
+                        className={css.viewSwitcher}
+                        value={view}
+                        onChange={setView}
+                    />
+
+                    {false && (
+                        <Dropdown
+                            className={css.sorting}
+                            items={
+                                Object.keys(sortingItems).map(key => ({
+                                    title: sortingItems[key].title,
+                                    onClick: () => setSorting(key),
+                                }))
+                            }
+                        >
+                            <button
+                                className={css.sortingButton}
+                            >
+                                {sorting ? sortingItems[sorting].title : t('sort')}
+                                <span className="mdi mdi-chevron-down" />
+                            </button>
+                        </Dropdown>
+                    )}
+                </div>
+            )}
 
             {loading && !Boolean(data.length) && (
                 <div className={cn(css.itemList, view)}>
