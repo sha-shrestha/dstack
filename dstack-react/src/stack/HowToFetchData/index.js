@@ -51,12 +51,12 @@ df <- read.csv(pull(${a.join(', ')}))`;
 };
 
 type Props = {
-    user?: string,
-    token?: string,
+    configurePythonCommand: string,
+    configureRCommand: string,
     modalMode?: boolean,
 }
 
-const HowTo = ({modalMode, user, token, data}: Props) => {
+const HowTo = ({modalMode, data, configurePythonCommand, configureRCommand}: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
@@ -126,7 +126,7 @@ const HowTo = ({modalMode, user, token, data}: Props) => {
                     className={css.code}
                     language="bash"
                 >
-                    {config.CONFIGURE_PYTHON_COMMAND(token, user)}
+                    {configurePythonCommand}
                 </CodeViewer>
 
                 <div className={css.description}>{t('pullDatasetIntro')}</div>
@@ -155,7 +155,7 @@ const HowTo = ({modalMode, user, token, data}: Props) => {
                     className={css.code}
                     language="r"
                 >
-                    {config.CONFIGURE_R_COMMAND(token, user)}
+                    {configureRCommand}
                 </CodeViewer>
 
                 <div className={css.description}>{t('pullDatasetIntro')}</div>

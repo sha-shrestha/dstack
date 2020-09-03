@@ -91,7 +91,8 @@ const List = ({
                         renderUploadStack: () => (
                             <UploadStack
                                 user={user}
-                                token={currentUserToken}
+                                configurePythonCommand={config.CONFIGURE_PYTHON_COMMAND(currentUserToken, user)}
+                                configureRCommand={config.CONFIGURE_R_COMMAND(currentUserToken, user)}
                                 refresh={fetchData}
                                 apiUrl={config.API_URL}
                             />

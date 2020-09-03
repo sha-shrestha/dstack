@@ -11,12 +11,17 @@ import {reportPlotPythonCode, installRPackageCode, reportPlotRCode} from '../../
 
 type Props = {
     user?: string,
-    token?: string,
     refresh?: Function,
     apiUrl: string,
 }
 
-const UploadStack = ({user, token, refresh, apiUrl}: Props) => {
+const UploadStack = ({
+    user,
+    refresh,
+    apiUrl,
+    configurePythonCommand,
+    configureRCommand,
+}: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
@@ -87,7 +92,7 @@ const UploadStack = ({user, token, refresh, apiUrl}: Props) => {
                     className={css.code}
                     language="bash"
                 >
-                    {config.CONFIGURE_PYTHON_COMMAND(token, user)}
+                    {configurePythonCommand}
                 </CodeViewer>
 
                 <div className={css.description}>{t('reportPlotIntro')}</div>
@@ -116,7 +121,7 @@ const UploadStack = ({user, token, refresh, apiUrl}: Props) => {
                     className={css.code}
                     language="r"
                 >
-                    {config.CONFIGURE_R_COMMAND(token, user)}
+                    {configureRCommand}
                 </CodeViewer>
 
                 <div className={css.description}>{t('reportPlotIntro')}</div>

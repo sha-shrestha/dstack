@@ -67,31 +67,7 @@ var config = {
   DISCORD_URL: 'https://discord.gg/8xfhEYa',
   TWITTER_URL: 'https://twitter.com/dstackai',
   GITHUB_URL: 'https://github.com/dstackai',
-  BLOG_URL: 'https://blog.dstack.ai',
-  CONFIGURE_PYTHON_COMMAND: function CONFIGURE_PYTHON_COMMAND(token, userName) {
-    if (token === void 0) {
-      token = '<token>';
-    }
-
-    if (userName === void 0) {
-      userName = '<username>';
-    }
-
-    var origin = window ? window.location.origin : '';
-    return "dstack config add --token " + token + " --user " + userName + " --server " + origin + "/api";
-  },
-  CONFIGURE_R_COMMAND: function CONFIGURE_R_COMMAND(token, userName) {
-    if (token === void 0) {
-      token = '<token>';
-    }
-
-    if (userName === void 0) {
-      userName = '<username>';
-    }
-
-    var origin = window ? window.location.origin : '';
-    return "dstack::configure(user = \"" + userName + "\", token = \"" + token + "\", persist = \"global\"" + (", server = \"" + origin + "/api\")");
-  }
+  BLOG_URL: 'https://blog.dstack.ai'
 };
 var reportPlotPythonCode = "import matplotlib.pyplot as plt\nimport dstack as ds\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\nds.push_frame(\"simple\", fig, \"My first plot\")";
 var installRPackageCode = 'install.packages("dstack")';
@@ -2163,9 +2139,9 @@ var pullRCode = function pullRCode(data) {
 
 var HowTo = function HowTo(_ref) {
   var modalMode = _ref.modalMode,
-      user = _ref.user,
-      token = _ref.token,
-      data = _ref.data;
+      data = _ref.data,
+      configurePythonCommand = _ref.configurePythonCommand,
+      configureRCommand = _ref.configureRCommand;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
@@ -2217,7 +2193,7 @@ var HowTo = function HowTo(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$t.code,
     language: "bash"
-  }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
     className: css$t.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$t.code,
@@ -2232,7 +2208,7 @@ var HowTo = function HowTo(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$t.code,
     language: "r"
-  }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
     className: css$t.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$t.code,
@@ -2537,14 +2513,15 @@ var Details = function Details(_ref) {
       frame = _ref.frame,
       loading = _ref.loading,
       currentUser = _ref.currentUser,
-      currentUserToken = _ref.currentUserToken,
       toggleUpload = _ref.toggleUpload,
       backUrl = _ref.backUrl,
       user = _ref.user,
       stack = _ref.stack,
       renderHeader = _ref.renderHeader,
       renderSideHeader = _ref.renderSideHeader,
-      renderSidebar = _ref.renderSidebar;
+      renderSidebar = _ref.renderSidebar,
+      configurePythonCommand = _ref.configurePythonCommand,
+      configureRCommand = _ref.configureRCommand;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
@@ -2709,8 +2686,8 @@ var Details = function Details(_ref) {
     title: t('howToFetchDataUsingTheAPI'),
     className: css$w.modal
   }, /*#__PURE__*/React__default.createElement(HowTo, {
-    user: currentUser,
-    token: currentUserToken,
+    configurePythonCommand: configurePythonCommand,
+    configureRCommand: configureRCommand,
     data: {
       stack: user + "/" + stack,
       params: form
@@ -3106,9 +3083,10 @@ var css$z = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU
 
 var UploadStack = function UploadStack(_ref) {
   var user = _ref.user,
-      token = _ref.token,
       refresh = _ref.refresh,
-      apiUrl = _ref.apiUrl;
+      apiUrl = _ref.apiUrl,
+      configurePythonCommand = _ref.configurePythonCommand,
+      configureRCommand = _ref.configureRCommand;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
@@ -3161,7 +3139,7 @@ var UploadStack = function UploadStack(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$z.code,
     language: "bash"
-  }, config.CONFIGURE_PYTHON_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
     className: css$z.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$z.code,
@@ -3176,7 +3154,7 @@ var UploadStack = function UploadStack(_ref) {
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$z.code,
     language: "r"
-  }, config.CONFIGURE_R_COMMAND(token, user)), /*#__PURE__*/React__default.createElement("div", {
+  }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
     className: css$z.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$z.code,

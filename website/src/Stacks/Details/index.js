@@ -194,6 +194,8 @@ const Details = ({
                 onChangeHeadFrame={setHeadFrame}
                 onChangeAttachmentIndex={setAttachmentIndex}
                 downloadAttachment={downloadAttachmentHandle}
+                configurePythonCommand={config.CONFIGURE_PYTHON_COMMAND(currentUserToken, currentUser)}
+                configureRCommand={config.CONFIGURE_R_COMMAND(currentUserToken, currentUser)}
             />
 
             <StackUpload

@@ -29,7 +29,6 @@ type Props = {
     frame: ?{},
     data: {},
     currentUser?: string,
-    currentUserToken?: string,
     downloadAttachment: Function,
     toggleUpload: Function,
     backUrl: string,
@@ -42,6 +41,8 @@ type Props = {
     renderHeader?: Function,
     renderSideHeader?: Function,
     renderSidebar?: Function,
+    configurePythonCommand: string,
+    configureRCommand: string,
 }
 
 const Details = ({
@@ -56,7 +57,6 @@ const Details = ({
     frame,
     loading,
     currentUser,
-    currentUserToken,
     toggleUpload,
     backUrl,
     user,
@@ -64,6 +64,8 @@ const Details = ({
     renderHeader,
     renderSideHeader,
     renderSidebar,
+    configurePythonCommand,
+    configureRCommand,
 }: Props) => {
     const {t} = useTranslation();
     const didMountRef = useRef(false);
@@ -276,8 +278,8 @@ const Details = ({
                 className={css.modal}
             >
                 <StackHowToFetchData
-                    user={currentUser}
-                    token={currentUserToken}
+                    configurePythonCommand={configurePythonCommand}
+                    configureRCommand={configureRCommand}
 
                     data={{
                         stack: `${user}/${stack}`,
