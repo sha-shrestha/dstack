@@ -34,6 +34,9 @@ class UserResources {
     private lateinit var userService: UserService
 
     @Inject
+    private lateinit var newsletterService: NewsletterService
+
+    @Inject
     private lateinit var sessionService: SessionService
 
     @Inject
@@ -172,7 +175,6 @@ class UserResources {
             val unverifiedUser = userService.findUnverified(userName, verificationCode = verificationCode)
             if (unverifiedUser != null && !unverifiedUser.verified) {
                 try {
-                    userService.delete(unverifiedUser)
                     val verifiedUser = User(
                         userName,
                         unverifiedUser.email,
@@ -187,6 +189,7 @@ class UserResources {
                     )
                     userService.create(verifiedUser)
                     userService.delete(unverifiedUser)
+                    newsletterService.subscribe(verifiedUser)
                     val session = createSession(verifiedUser)
                     ok(AuthStatus(session.id, true))
                 } catch (e: EntityAlreadyExists) {

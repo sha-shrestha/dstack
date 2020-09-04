@@ -2,6 +2,7 @@ package ai.dstack.server.services
 
 import ai.dstack.server.model.Comment
 
+@Deprecated("Gonna be removed in October")
 interface CommentService {
     fun get(id: String): Comment?
     fun findByStackPath(path: String): List<Comment>

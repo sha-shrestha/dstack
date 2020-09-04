@@ -9,6 +9,7 @@ import ai.dstack.server.local.cli.sqlite.toNullable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+@Deprecated("Gonna be removed in October")
 @Component
 class SQLiteCommentService @Autowired constructor(private val repository: CommentRepository) : CommentService {
     override fun get(id: String): Comment? {

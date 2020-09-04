@@ -406,6 +406,7 @@ class StackResources {
         }
     }
 
+    @Deprecated("Gonna be removed in October")
     @POST
     @Path("comments/create")
     @Consumes(JSON_UTF8)
@@ -450,6 +451,7 @@ class StackResources {
         }
     }
 
+    @Deprecated("Gonna be removed in October")
     @POST
     @Path("comments/delete")
     @Consumes(JSON_UTF8)
@@ -476,6 +478,7 @@ class StackResources {
         }
     }
 
+    @Deprecated("Gonna be removed in October")
     @POST
     @Path("comments/edit")
     @Consumes(JSON_UTF8)
