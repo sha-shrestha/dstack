@@ -1,6 +1,7 @@
-import React, {memo, useEffect, useRef, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
+import {useMeasure} from 'react-use';
 import Plot from 'react-plotly.js';
 import {isEqual} from 'lodash-es';
 import {unicodeBase64Decode} from '../../../utils';
@@ -18,8 +19,8 @@ const base64ImagePrefixes = {
 
 const View = ({frameId, attachment, fullAttachment, isList, className, requestStatus}) => {
     const {t} = useTranslation();
-    const viewRef = useRef(null);
     const [tableScale, setTableScale] = useState(1);
+    const [viewRef, {width: viewWidth}] = useMeasure();
 
     const onResizeCard = () => {
         if (viewRef.current) {
@@ -108,7 +109,7 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
         if (!json)
             return null;
 
-        json.layout.width = '100%';
+        json.layout.width = viewWidth;
         json.layout.margin = 0;
         json.layout.autosize = true;
         json.config = {responsive: true};
