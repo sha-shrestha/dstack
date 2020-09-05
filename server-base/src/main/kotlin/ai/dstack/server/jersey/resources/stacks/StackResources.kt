@@ -24,6 +24,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.*
 import javax.inject.Inject
+import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.*
 import javax.ws.rs.container.ResourceContext
 import javax.ws.rs.core.Context
@@ -97,7 +98,7 @@ class StackResources {
     @Produces(JSON_UTF8)
     fun stack(
             @PathParam("user") u: String?, @PathParam("stack") s: String?,
-            @Context headers: HttpHeaders
+            @Context headers: HttpHeaders, @Context request: HttpServletRequest
     ): Response {
         logger.debug { "user: $u, stack: $s" }
         return if (u.isNullOrBlank() || s.isNullOrBlank()) {
@@ -161,7 +162,8 @@ class StackResources {
                                     }
                             )
                     )
-                    analyticsService.track("Stack Resources", "stacks/:user/:stack", "Get Stack", status)
+                    analyticsService.track("Stack Resources", "stacks/:user/:stack", "Get Stack",
+                            status, request.remoteAddr)
                     ok(status)
                 } else {
                     badCredentials()
@@ -404,6 +406,7 @@ class StackResources {
         }
     }
 
+    @Deprecated("Gonna be removed in October")
     @POST
     @Path("comments/create")
     @Consumes(JSON_UTF8)
@@ -448,6 +451,7 @@ class StackResources {
         }
     }
 
+    @Deprecated("Gonna be removed in October")
     @POST
     @Path("comments/delete")
     @Consumes(JSON_UTF8)
@@ -474,6 +478,7 @@ class StackResources {
         }
     }
 
+    @Deprecated("Gonna be removed in October")
     @POST
     @Path("comments/edit")
     @Consumes(JSON_UTF8)

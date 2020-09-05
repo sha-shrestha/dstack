@@ -20,8 +20,10 @@ data class UserItemSettingsGeneral(
 
 @Embeddable
 data class UserItemSettingNotifications(
+    @Deprecated("Gonna be removed in October")
     @Column
     val comments: Boolean,
+    @Deprecated("Gonna be removed in October")
     @Column
     val newsletter: Boolean
 )

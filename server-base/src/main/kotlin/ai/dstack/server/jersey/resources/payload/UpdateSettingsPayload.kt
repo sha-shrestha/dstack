@@ -10,7 +10,9 @@ data class UpdateSettingsPayloadGeneral(
 )
 
 data class UpdateSettingsPayloadNotifications(
+    @Deprecated("Gonna be removed in October")
     val comments: Boolean?,
+    @Deprecated("Gonna be removed in October")
     val newsletter: Boolean?
 )
 

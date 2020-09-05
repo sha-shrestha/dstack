@@ -33,6 +33,7 @@ class JerseyApplicationTests : JerseyTest() {
     private lateinit var commentService: CommentService
     private lateinit var schedulerService: SchedulerService
     private lateinit var analyticsService: AnalyticsService
+    private lateinit var newsletterService: NewsletterService
 
     private lateinit var stackService: InMemoryStackService
     private lateinit var frameService: InMemoryFrameService
@@ -51,6 +52,7 @@ class JerseyApplicationTests : JerseyTest() {
         commentService = Mockito.mock(CommentService::class.java)
         schedulerService = Mockito.mock(SchedulerService::class.java)
         analyticsService = Mockito.mock(AnalyticsService::class.java)
+        newsletterService = Mockito.mock(NewsletterService::class.java)
 
         stackService = InMemoryStackService()
         frameService = InMemoryFrameService()
@@ -78,6 +80,7 @@ class JerseyApplicationTests : JerseyTest() {
                         bind(commentService).to(CommentService::class.java)
                         bind(schedulerService).to(SchedulerService::class.java)
                         bind(analyticsService).to(AnalyticsService::class.java)
+                        bind(newsletterService).to(NewsletterService::class.java)
 
                         bind(jobService).to(JobService::class.java)
                         bind(userService).to(UserService::class.java)
@@ -93,7 +96,8 @@ class JerseyApplicationTests : JerseyTest() {
                 emailService,
                 permissionService,
                 commentService,
-                analyticsService
+                analyticsService,
+                newsletterService
         )
 
         dashboardService.reset()

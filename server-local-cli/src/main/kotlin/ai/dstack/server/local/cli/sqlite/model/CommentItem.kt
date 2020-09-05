@@ -2,6 +2,7 @@ package ai.dstack.server.local.cli.sqlite.model
 
 import javax.persistence.*
 
+@Deprecated("Gonna be removed in October")
 @Entity
 @Table(
     name = "comments",
