@@ -106,7 +106,6 @@ const Sidebar = ({
                 <NavLink
                     activeClassName="active"
                     to={routes.settings()}
-                    target="_blank"
                 >
                     <span className={cx(css.icon, 'mdi mdi-settings')} />
                     <span className={css.label}>{t('settings')}</span>
