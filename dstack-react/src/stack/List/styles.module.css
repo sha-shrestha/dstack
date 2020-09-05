@@ -7,8 +7,10 @@
 
 }
 .header {
-    display: flex;
-    align-items: center;
+    @media (--desktop) {
+        display: flex;
+        align-items: center;
+    }
 }
 .title {
     color: var(--color-dark-gray);
@@ -18,6 +20,9 @@
         line-height: 18px;
     }
     @media (--desktop) {
+        flex-grow: 1;
+        min-width: 0;
+        flex-basis: 0;
         font-size: 24px;
         line-height: 28px;
     }
@@ -26,13 +31,23 @@
     display: flex;
     align-content: center;
     justify-content: flex-end;
-    flex-grow: 1;
-    flex-basis: 0;
-    min-width: 0;
-    margin-left: 20px;
+    @media (--mobile) {
+        margin-top: 16px;
+    }
+    @media (--desktop) {
+        margin-left: 20px;
+    }
+}
+.search {
+    @media (--mobile) {
+        flex-grow: 1;
+        flex-basis: 0;
+        min-width: 0;
+    }
 }
 .uploadButton {
     margin-left: 12px;
+    white-space: nowrap;
 }
 .controls {
     display: flex;

@@ -1908,7 +1908,7 @@ var useListViewSwitcher = (function (id, defaultValue) {
   return [value, onChange];
 });
 
-var css$s = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$s = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -2021,6 +2021,7 @@ var List = function List(_ref) {
   })), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+    className: css$s.search,
     showEverything: true,
     isDark: true,
     placeholder: t('findStack'),

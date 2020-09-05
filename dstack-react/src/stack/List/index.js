@@ -113,6 +113,7 @@ const List = ({
                     <div className={css.headerSide}>
                         {Boolean(data.length) && (
                             <SearchField
+                                className={css.search}
                                 showEverything
                                 isDark
                                 placeholder={t('findStack')}
