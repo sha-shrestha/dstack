@@ -51,6 +51,7 @@ const Sidebar = ({
 
     const menuItems = [
         {
+            icon: 'mdi-view-dashboard',
             to: routes.stacks(currentUser),
             label: t('stacks'),
 
@@ -64,13 +65,9 @@ const Sidebar = ({
         },
 
         {
+            icon: 'mdi-chart-arc',
             to: routes.dashboards(currentUser),
             label: t('dashboards'),
-        },
-
-        {
-            to: routes.settings(),
-            label: t('settings'),
         },
     ];
 
@@ -92,7 +89,9 @@ const Sidebar = ({
                         activeClassName="active"
                         isActive={item.isActive}
                     >
+                        <span className={cx(css.icon, 'mdi', item.icon)} />
                         <span className={css.label}>{item.label}</span>
+                        {/*<span className={css.count}>11</span>*/}
 
                         {item.beta && <sub className={cx(css.sub, 'green-text')}>
                             {t('beta')}
@@ -101,12 +100,36 @@ const Sidebar = ({
                 </li>
             ))}
 
+            <li className={css.itemSeparator} />
+
+            <li className={css.item}>
+                <NavLink
+                    activeClassName="active"
+                    to={routes.settings()}
+                    target="_blank"
+                >
+                    <span className={cx(css.icon, 'mdi mdi-settings')} />
+                    <span className={css.label}>{t('settings')}</span>
+                </NavLink>
+            </li>
+
             <li className={css.item}>
                 <a
                     href={config.DOCS_URL}
                     target="_blank"
                 >
-                    <span className={css.label}>{t('docs')}</span>
+                    <span className={cx(css.icon, 'mdi mdi-file-document')} />
+                    <span className={css.label}>{t('documentation')}</span>
+                </a>
+            </li>
+
+            <li className={css.item}>
+                <a
+                    href={config.DISCORD_URL}
+                    target="_blank"
+                >
+                    <span className={cx(css.icon, 'mdi mdi-discord')} />
+                    <span className={css.label}>{t('discordChat')}</span>
                 </a>
             </li>
         </ul>}

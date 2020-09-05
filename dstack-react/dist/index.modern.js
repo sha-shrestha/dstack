@@ -2030,7 +2030,7 @@ var List = function List(_ref) {
     color: "primary",
     variant: "contained",
     size: "small"
-  }, t('uploadStack'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
+  }, t('uploadData'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
     className: css$s.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     className: css$s.viewSwitcher,
