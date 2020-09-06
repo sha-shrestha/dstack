@@ -1,7 +1,6 @@
-import React, {memo, useEffect, useState} from 'react';
+import React, {memo, useEffect, useState, useRef} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
-import {useMeasure} from 'react-use';
 import Plot from 'react-plotly.js';
 import {isEqual} from 'lodash-es';
 import {unicodeBase64Decode} from '../../../utils';
@@ -19,8 +18,9 @@ const base64ImagePrefixes = {
 
 const View = ({frameId, attachment, fullAttachment, isList, className, requestStatus}) => {
     const {t} = useTranslation();
+    const viewRef = useRef();
     const [tableScale, setTableScale] = useState(1);
-    const [viewRef, {width: viewWidth}] = useMeasure();
+    const [viewWidth, setVieWidth] = useState(0);
 
     const onResizeCard = () => {
         if (viewRef.current) {
@@ -33,6 +33,7 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
                 newScale = 1;
 
             setTableScale(newScale);
+            setVieWidth(containerWidth);
         }
     };
 
