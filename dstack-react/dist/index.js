@@ -1415,8 +1415,17 @@ var View = function View(_ref) {
     };
   }, []);
   React.useEffect(function () {
-    if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
+    if (attachment && attachment['application'] === 'bokeh') {
+      var Bokeh;
       var json = base64ToJSON(attachment.data);
+      var version = lodashEs.get(attachment, 'settings.bokeh_version');
+
+      if (version && parseInt(version.split('.')[0], 10) === 2) {
+        Bokeh = window.Bokeh['2.2.1'];
+      } else {
+        Bokeh = window.Bokeh;
+      }
+
       if (json && document.querySelector("#bokeh-" + frameId)) Bokeh.embed.embed_item(json, "bokeh-" + frameId);
     }
 

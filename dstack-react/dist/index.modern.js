@@ -4,7 +4,7 @@ import Highlight from 'react-highlight.js';
 import { useTranslation } from 'react-i18next';
 import copy from 'copy-to-clipboard';
 import RcTooltip from 'rc-tooltip';
-import { isEqual, get, isString, debounce, unionBy } from 'lodash-es';
+import { get, isEqual, isString, debounce, unionBy } from 'lodash-es';
 import moment from 'moment';
 import ReactMarkdown from 'react-markdown';
 import MathJax from 'react-mathjax';
@@ -1412,8 +1412,17 @@ var View = function View(_ref) {
     };
   }, []);
   useEffect(function () {
-    if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
+    if (attachment && attachment['application'] === 'bokeh') {
+      var Bokeh;
       var json = base64ToJSON(attachment.data);
+      var version = get(attachment, 'settings.bokeh_version');
+
+      if (version && parseInt(version.split('.')[0], 10) === 2) {
+        Bokeh = window.Bokeh['2.2.1'];
+      } else {
+        Bokeh = window.Bokeh;
+      }
+
       if (json && document.querySelector("#bokeh-" + frameId)) Bokeh.embed.embed_item(json, "bokeh-" + frameId);
     }
 

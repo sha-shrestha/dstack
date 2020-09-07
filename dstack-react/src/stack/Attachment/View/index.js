@@ -2,7 +2,7 @@ import React, {memo, useEffect, useState, useRef} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import Plot from 'react-plotly.js';
-import {isEqual} from 'lodash-es';
+import {isEqual, get} from 'lodash-es';
 import {unicodeBase64Decode} from '../../../utils';
 import Table from './Table';
 import {isImageType, base64ToJSON} from '../utils';
@@ -48,8 +48,16 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
     }, []);
 
     useEffect(() => {
-        if (attachment && attachment['application'] === 'bokeh' && Bokeh) {
+        if (attachment && attachment['application'] === 'bokeh') {
+            let Bokeh;
             const json = base64ToJSON(attachment.data);
+            const version = get(attachment, 'settings.bokeh_version');
+
+            if (version && parseInt(version.split('.')[0], 10) === 2) {
+                Bokeh = window.Bokeh['2.2.1'];
+            } else {
+                Bokeh = window.Bokeh;
+            }
 
             if (json && document.querySelector(`#bokeh-${frameId}`))
                 Bokeh.embed.embed_item(json, `bokeh-${frameId}`);
