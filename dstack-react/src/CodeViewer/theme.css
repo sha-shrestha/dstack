@@ -46,7 +46,7 @@
     font-style: italic
 }
 
-(.hljs-strong) {
+:global(.hljs-strong) {
     font-weight: bold
 }
 
