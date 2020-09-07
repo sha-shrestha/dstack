@@ -15,7 +15,7 @@ const Tooltip = ({
     arrowContent = null,
     placement = 'bottomLeft',
     trigger = ['hover'],
-    overlayStyle = {'pointer-events': 'none'},
+    overlayStyle = {pointerEvents: 'none'},
     ...props
 }: Props) => {
 

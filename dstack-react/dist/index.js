@@ -1242,7 +1242,7 @@ var Tooltip = function Tooltip(_ref) {
       trigger = _ref$trigger === void 0 ? ['hover'] : _ref$trigger,
       _ref$overlayStyle = _ref.overlayStyle,
       overlayStyle = _ref$overlayStyle === void 0 ? {
-    'pointer-events': 'none'
+    pointerEvents: 'none'
   } : _ref$overlayStyle,
       props = _objectWithoutPropertiesLoose(_ref, ["children", "overlayContent", "arrowContent", "placement", "trigger", "overlayStyle"]);
 
@@ -3096,7 +3096,8 @@ var UploadStack = function UploadStack(_ref) {
       refresh = _ref.refresh,
       apiUrl = _ref.apiUrl,
       configurePythonCommand = _ref.configurePythonCommand,
-      configureRCommand = _ref.configureRCommand;
+      configureRCommand = _ref.configureRCommand,
+      withFileUpload = _ref.withFileUpload;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -3109,22 +3110,24 @@ var UploadStack = function UploadStack(_ref) {
       activePlatformTab = _useState2[0],
       setActivePlatformTab = _useState2[1];
 
+  var tabs = [{
+    label: t('python'),
+    value: 1
+  }, {
+    label: t('r'),
+    value: 2
+  }];
+  if (withFileUpload) tabs.push({
+    label: t('upload'),
+    value: 3
+  });
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$z.howto
   }, /*#__PURE__*/React__default.createElement(Tabs, {
     className: css$z.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
-    tabs: [{
-      label: t('python'),
-      value: 1
-    }, {
-      label: t('r'),
-      value: 2
-    }, {
-      label: t('upload'),
-      value: 3
-    }]
+    tabs: tabs
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
     className: css$z.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
@@ -4049,6 +4052,41 @@ var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   }, children));
 };
 
+var css$K = {"infoButton":"_2zmYM"};
+
+var SettingsInformation = function SettingsInformation(_ref) {
+  var className = _ref.className,
+      renderModalContent = _ref.renderModalContent;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(false),
+      isShowModal = _useState[0],
+      setIsShowModal = _useState[1];
+
+  var toggleModal = function toggleModal() {
+    return setIsShowModal(function (value) {
+      return !value;
+    });
+  };
+
+  return /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$K.infoButton, className),
+    size: "small",
+    color: "secondary",
+    onClick: toggleModal
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-information-outline"
+  })), renderModalContent && /*#__PURE__*/React__default.createElement(Modal, {
+    withCloseButton: true,
+    title: t('howToConnectYourDataWithDStack'),
+    isShow: isShowModal,
+    size: "big",
+    onClose: toggleModal
+  }, renderModalContent()));
+};
+
 Object.defineProperty(exports, 'DndProvider', {
     enumerable: true,
     get: function () {
@@ -4078,6 +4116,7 @@ exports.NotFound = NotFound;
 exports.ProgressBar = ProgressBar;
 exports.SearchField = SearchField;
 exports.SelectField = SelectField;
+exports.SettingsInformation = SettingsInformation;
 exports.SliderField = SliderField;
 exports.Spinner = Spinner;
 exports.StackAttachment = Attachment;

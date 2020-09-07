@@ -50,5 +50,7 @@ export {default as DnDItem} from './dnd/DnDItem';
 
 export {default as UnAuthorizedLayout} from './layouts/UnAuthorized';
 
+export {default as SettingsInformation} from './settings/Information';
+
 
 

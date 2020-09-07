@@ -13,6 +13,7 @@ type Props = {
     user?: string,
     refresh?: Function,
     apiUrl: string,
+    withFileUpload?: boolean,
 }
 
 const UploadStack = ({
@@ -21,10 +22,29 @@ const UploadStack = ({
     apiUrl,
     configurePythonCommand,
     configureRCommand,
+    withFileUpload,
 }: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
+
+    const tabs = [
+        {
+            label: t('python'),
+            value: 1,
+        },
+
+        {
+            label: t('r'),
+            value: 2,
+        },
+    ];
+
+    if (withFileUpload)
+        tabs.push({
+            label: t('upload'),
+            value: 3,
+        });
 
     return (
         <div className={css.howto}>
@@ -32,23 +52,7 @@ const UploadStack = ({
                 className={css.tabs}
                 value={activeCodeTab}
                 onChange={setActiveCodeTab}
-
-                tabs={[
-                    {
-                        label: t('python'),
-                        value: 1,
-                    },
-
-                    {
-                        label: t('r'),
-                        value: 2,
-                    },
-
-                    {
-                        label: t('upload'),
-                        value: 3,
-                    },
-                ]}
+                tabs={tabs}
             />
 
             {activeCodeTab === 1 && <div>

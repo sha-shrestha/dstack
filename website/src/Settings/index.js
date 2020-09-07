@@ -3,25 +3,24 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
-import {debounce as _debounce, get} from 'lodash-es';
-import {Button, TextField, Copy} from '@dstackai/dstack-react';
+import {debounce as _debounce} from 'lodash-es';
+import {Button, TextField, Copy, SettingsInformation, UploadStack} from '@dstackai/dstack-react';
 import {updateToken} from 'App/actions';
 import {updateSettings} from './actions';
+import config from 'config';
 import css from './styles.module.css';
 
 type Props = {
     updateToken: Function,
     updateSettings: Function,
 
-    userData: {
-        user: string,
-        token: string,
-    },
+    currentUser: string,
+    currentUserToken: string,
 
     history: {push: Function}
 }
 
-const Settings = ({updateToken, userData, updateSettings}: Props) => {
+const Settings = ({updateToken, currentUser, currentUserToken, updateSettings}: Props) => {
     const {t} = useTranslation();
     const availableSendingSettings = useRef(false);
     const [isEditName, setIsEditName] = useState(false);
@@ -31,22 +30,22 @@ const Settings = ({updateToken, userData, updateSettings}: Props) => {
 
     useEffect(() => {
         setForm({...form});
-    }, [userData]);
+    }, [currentUser]);
 
     useEffect(() => {
         if (availableSendingSettings.current)
             updateSettingsDebounce({
-                user: userData.user,
+                user: currentUser,
                 general: {},
             });
         else
             availableSendingSettings.current = true;
-    }, [form.comments, form.newsletter]);
+    }, [form.comments]);
 
     const cancelEditName = () => {
         setForm({
             ...form,
-            name: get(userData, 'user'),
+            name: currentUser,
         });
 
         setIsEditName(false);
@@ -114,7 +113,7 @@ const Settings = ({updateToken, userData, updateSettings}: Props) => {
 
                     {isEditName
                         ? renderNameField()
-                        : <div className={css.value}>{get(userData, 'user')}</div>
+                        : <div className={css.value}>{currentUser}</div>
                     }
                 </div>
             </div>
@@ -123,11 +122,11 @@ const Settings = ({updateToken, userData, updateSettings}: Props) => {
                 <div className={css['section-title']}>{t('token')}</div>
 
                 <div className={css.apitoken}>
-                    <div className={css.token}>{get(userData, 'token')}</div>
+                    <div className={css.token}>{currentUserToken}</div>
 
                     <Copy
                         className={css.copy}
-                        copyText={get(userData, 'token')}
+                        copyText={currentUserToken}
                         successMessage={t('tokenIsCopied')}
                     >
                         {({onClick}) => (
@@ -136,6 +135,18 @@ const Settings = ({updateToken, userData, updateSettings}: Props) => {
                             </div>
                         )}
                     </Copy>
+
+                    <SettingsInformation
+                        renderModalContent={() => (
+                            <UploadStack
+                                user={currentUser}
+                                configurePythonCommand={config.CONFIGURE_PYTHON_COMMAND(currentUserToken, currentUser)}
+                                configureRCommand={config.CONFIGURE_R_COMMAND(currentUserToken, currentUser)}
+                                refresh={() => {}}
+                                apiUrl={config.API_URL}
+                            />
+                        )}
+                    />
                 </div>
 
                 <div className={css.reset}>
@@ -149,6 +160,9 @@ const Settings = ({updateToken, userData, updateSettings}: Props) => {
 };
 
 export default connect(
-    state => ({userData: state.app.userData}),
+    state => ({
+        currentUser: state.app.userData?.user,
+        currentUserToken: state.app.userData?.token,
+    }),
     {updateToken, updateSettings}
 )(Settings);

@@ -90,6 +90,7 @@ const List = ({
                     ? {
                         renderUploadStack: () => (
                             <UploadStack
+                                withFileUpload
                                 user={user}
                                 configurePythonCommand={config.CONFIGURE_PYTHON_COMMAND(currentUserToken, user)}
                                 configureRCommand={config.CONFIGURE_R_COMMAND(currentUserToken, user)}

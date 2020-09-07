@@ -743,6 +743,7 @@ button._2lKoS {
 }
 ._3RWnQ:not(.is-show) {
         opacity: 0;
+        pointer-events: none;
     }
 ._2YqEb {
     font-size: 14px;
@@ -759,7 +760,65 @@ button._2lKoS {
         margin-right: 2px;
     }
 
-._1V_Rv{display:block;overflow-x:auto;padding:.5em;background:#FFFFFF}._1V_Rv,._1ZKhA{color:#434f54}._2iVct,._1A5rd,._2oUpC,._1N0iq,._QUkpg{color:#00979D}._1-UCW,._pTaVU,._2I-Fz,._1D4yg,._2G8jx{color:#D35400}._2l2Do,._20bMT,._6vdcN,._3fURs,._2oZyw,._3MzIL,._2Kio9{color:#00979D}._dCWIx,._ciF-z,._2y7FZ,._2Uvy2,._U0yuJ,._3cV3t,._2pJRb{color:#005C5F}._2962r,._28jSP{color:#880000;font-weight:bold}._3O0tm{color:rgba(149,165,166,0.8)}._aXckI{color:#728E00}._19HSV{color:#434f54}._1q5oH{font-style:italic}._1-zWM{font-weight:bold}._1BEsD{color:#728E00}._32Px_{color:#8A7B52}
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: .5em;
+    background: #FFFFFF
+}
+
+.hljs, .hljs-subst {
+    color: #434f54
+}
+
+.hljs-keyword, .hljs-attribute, .hljs-selector-tag, .hljs-doctag, .hljs-name {
+    color: #00979D
+}
+
+.hljs-built_in, .hljs-literal, .hljs-bullet, .hljs-code, .hljs-addition {
+    color: #D35400
+}
+
+.hljs-regexp, .hljs-symbol, .hljs-variable, .hljs-template-variable, .hljs-link, .hljs-selector-attr, .hljs-selector-pseudo {
+    color: #00979D
+}
+
+.hljs-type, .hljs-string, .hljs-selector-id, .hljs-selector-class, .hljs-quote, .hljs-template-tag, .hljs-deletion {
+    color: #005C5F
+}
+
+.hljs-title, .hljs-section {
+    color: #880000;
+    font-weight: bold
+}
+
+.hljs-comment {
+    color: rgba(149, 165, 166, 0.8)
+}
+
+.hljs-meta-keyword {
+    color: #728E00
+}
+
+.hljs-meta {
+    color: #434f54
+}
+
+.hljs-emphasis {
+    font-style: italic
+}
+
+(._1-zWM) {
+    font-weight: bold
+}
+
+.hljs-function {
+    color: #728E00
+}
+
+.hljs-number {
+    color: #8A7B52
+}
 
 ._3gARj {
     max-width: -webkit-fit-content;
@@ -5066,4 +5125,12 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     flex-grow: 1;
     min-height: 0;
     flex-basis: 0;
+}
+
+._2zmYM {
+    padding: 0;
+    width: 24px;
+    max-width: 24px !important;
+    height: 24px !important;
+    outline: none;
 }
