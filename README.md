@@ -276,13 +276,13 @@ This is a Spring Boot application written in Kotlin, that bundles a pre-build Re
 The `dstack-react` is like the component library which is bundled using [microbundle](https://github.com/developit/microbundle) after which the `website` consumes the bundle by importing `@dstackai/dstack-react`
 
 
-**1.1. In the `dstack-react` folder, run the following**
+**In the `dstack-react` folder, run the following**
 
 ```bash
 $ yarn install && npm run-script build
 ```
 
-**1.2. In the `website` folder, run the following**
+**In the `website` folder, run the following**
 
 ```bash
 $ yarn install && npm run-script build
@@ -290,25 +290,25 @@ $ yarn install && npm run-script build
 
 ### 2. Gradle Server
 
-**2.1. In the home (parent) directory, first run the build command for gradle**
+**In the home (parent) directory, first run the build command for gradle**
 
 ```bash
 $ gradle build
 ```
 
-**2.2. The `copyWebsite` Gradle Task is used move files from `("../website/build")` into `("src/main/resources/website")`**
+**The `copyWebsite` Gradle Task is used move files from `("../website/build")` into `("src/main/resources/website")`**
 
 ```bash
 $ ./gradlew copyWebsite
 ```
 
-**2.3. Running the SpringBoot Application**
+**Running the SpringBoot Application**
 
 ```bash
 $ ./gradlew bootRun
 ```
 
-**You're all set! You'll should see the following output:**
+**That's it! You're all set 🎉 You'll should see the following output:**
 
 ```bash
 > Task :server-local-cli:bootRun
