@@ -266,52 +266,56 @@ Here's a list of things not implemented yet but considered for the nearest time:
 - Stacks that can run user code (aka Callbacks) – using these stacks it will be possible to implement Live Dashboards
 - User interfaces for published Machine Learning models (so users may interface with ML models from the web application)
 
-## Instructions to Run from Source
+## Contribution
 
-This is a Spring Boot application written in Kotlin, that bundles a pre-build React application written in JavaScript. In order to run the entire server with both front-end and back-end together, one must build both React and Spring applications. Here are the steps for doing exactly that:
+If you'd like to contribute, be sure to write us first in the [Discord channel](https://discord.gg/8xfhEYa). Our team will be very happy to 
+help you with onboarding, finding the areas where you can help best, and of course getting technical help!   
 
-### 1. React Application
+### Building dstack from source
 
+#### 1. Set up your environment
 
-The `dstack-react` is like the component library which is bundled using [microbundle](https://github.com/developit/microbundle) after which the `website` consumes the bundle by importing `@dstackai/dstack-react`
+dstack is a Spring Boot application written in Kotlin, that bundles a pre-build React application written in JavaScript.
+In order to run the entire server with both front-end and back-end together, one must build both React and Spring applications.
 
+In order to build dstack locally, you'll need to have `Java`, `yarn`, and `npm`. Make sure you have them installed locally.
 
-**In the `dstack-react` folder, run the following**
+#### 2. Building React application
+
+The code of the React application resides in the folder `website`. This application bundles using [microbundle](https://github.com/developit/microbundle) 
+the React component that resides in the `dstack-react` folder. The `website` React application consumes the `dstack-react` component by importing `@dstackai/dstack-react`.
+
+Before you can build the `website` React application, you first have to build the `dstack-react` React component by running 
+the following command from the folder `dstack-react`:
 
 ```bash
 $ yarn install && npm run-script build
 ```
 
-**In the `website` folder, run the following**
+Now, you can build the React application folder by running the following command from the `website`:
 
 ```bash
 $ yarn install && npm run-script build
 ```
 
-### 2. Gradle Server
+#### 3. Building Spring Boot application
 
-**In the home (parent) directory, first run the build command for gradle**
-
-```bash
-$ gradle build
-```
-
-**The `copyWebsite` Gradle Task is used move files from `("../website/build")` into `("src/main/resources/website")`**
+Before building the Spring Boot application, you first have to copy the pre-built distributive of the React application 
+from `website/build` to `server-local-cli/src/main/resources/website`. This can be done by the following Gradle task:
 
 ```bash
-$ ./gradlew copyWebsite
+$ /.gradlew copyWebsite
 ```
 
-**Running the SpringBoot Application**
+Now, that you've copied the front-end application, you can run the Spring Boot application the following way:
 
 ```bash
 $ ./gradlew bootRun
 ```
 
-**That's it! You're all set 🎉 You'll should see the following output:**
+That's it! You're all set 🎉 When you do it, you'll see the following output:
 
 ```bash
 > Task :server-local-cli:bootRun
 To access the application, open this URL in the browser: http://localhost:8080/auth/verify?user=dstack&code=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&next=/
-
 ```
