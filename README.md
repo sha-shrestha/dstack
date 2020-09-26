@@ -304,7 +304,7 @@ Before building the Spring Boot application, you first have to copy the pre-buil
 from `website/build` to `server-local-cli/src/main/resources/website`. This can be done by the following Gradle task:
 
 ```bash
-$ /.gradlew copyWebsite
+$ ./gradlew copyWebsite
 ```
 
 Now, that you've copied the front-end application, you can run the Spring Boot application the following way:
