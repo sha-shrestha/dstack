@@ -17,6 +17,12 @@ fun main(args: Array<String>) {
     val home = Option("h", "home", true, "dstack home directory")
     options.addOption(home)
 
+    val pythonExecutable = Option("y", "python", true, "path to python executable")
+    options.addOption(pythonExecutable)
+
+    val rscriptExecutable = Option("a", "rscript", true, "path to R executable")
+    options.addOption(rscriptExecutable)
+
     val parser: CommandLineParser = DefaultParser()
     val formatter = HelpFormatter()
     val cmd: CommandLine
@@ -35,7 +41,15 @@ fun main(args: Array<String>) {
         LocalCliAppConfig.defaultHomeDirectory = cmd.getOptionValue("home")
     }
 
+    if (cmd.hasOption("python_executable")) {
+        LocalCliAppConfig.defaultPythonExecutable = cmd.getOptionValue("python_executable")
+    }
+
+    if (cmd.hasOption("r_executable")) {
+        LocalCliAppConfig.defaultRscriptExecutable = cmd.getOptionValue("r_executable")
+    }
+
     val application = SpringApplication(Application::class.java)
-    application.setBannerMode(Banner.Mode.OFF);
+    application.setBannerMode(Banner.Mode.OFF)
     application.run(*args)
 }

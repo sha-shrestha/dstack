@@ -27,7 +27,7 @@ class LocalCliAppConfig : AppConfig {
 
     override val address: String
         get() {
-            val p = if (port == 80 && !ssl || port == 443 && ssl) "" else port!!
+            val p = if (port == 80 && !ssl || port == 443 && ssl) "" else port!!.toString()
             return ((if (ssl) "https" else "http") + "://") + hostName + ":$p"
         }
 
@@ -82,8 +82,20 @@ class LocalCliAppConfig : AppConfig {
             return System.getenv("dstack_smtp_from")
         }
 
+    override val pythonExecutable: String?
+        get() {
+            return System.getenv("dstack_python_executable") ?: defaultPythonExecutable
+        }
+
+    override val rscriptExecutable: String?
+        get() {
+            return System.getenv("dstack_rscript_executable") ?: defaultRscriptExecutable
+        }
+
     companion object {
         var defaultInternalPort: String = "8080"
         var defaultHomeDirectory: String? = System.getProperty("user.home")
+        var defaultPythonExecutable: String? = null
+        var defaultRscriptExecutable: String? = null
     }
 }

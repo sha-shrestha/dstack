@@ -16,4 +16,6 @@ interface AppConfig {
     val smtpPassword: String?
     val smtpStartTLS: Boolean
     val smtpFrom: String
+    val pythonExecutable: String?
+    val rscriptExecutable: String?
 }

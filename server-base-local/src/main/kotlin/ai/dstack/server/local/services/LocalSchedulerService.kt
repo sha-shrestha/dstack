@@ -3,20 +3,33 @@ package ai.dstack.server.local.services
 import ai.dstack.server.model.Job
 import ai.dstack.server.model.JobStatus
 import ai.dstack.server.model.User
+import ai.dstack.server.services.AppConfig
 import ai.dstack.server.services.JobService
 import ai.dstack.server.services.SchedulerService
 import ai.dstack.server.services.UserService
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ClassPathResource
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.io.File
+import java.io.FileOutputStream
 
 @Component
 class LocalSchedulerService @Autowired constructor(
     private val jobService: JobService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val config: AppConfig
 ) : SchedulerService {
     companion object : KLogging()
+
+    val jobsPath = File(config.homeDirectory + "/jobs")
+    val runnerFile = File(jobsPath.path + "/runner.py")
+
+    init {
+        jobsPath.mkdirs()
+        ClassPathResource("runner.py", this.javaClass.classLoader).inputStream.copyTo(FileOutputStream(runnerFile))
+    }
 
     @Scheduled(cron = "0 0 0 * * ?")
     fun scheduleHe0M0() {
@@ -175,10 +188,15 @@ class LocalSchedulerService @Autowired constructor(
     }
 
     override fun schedule(job: Job, user: User) {
+        val commands = mutableListOf(config.pythonExecutable ?: "python3", runnerFile.name,
+                "--server", "http://127.0.0.1:8080/api", "--user", user.name, "--token", user.token,
+                "--runtime", job.runtime, "--job", job.id, "--code", job.code)
+        if (config.rscriptExecutable != null) {
+            commands.addAll(listOf("--rscript", config.rscriptExecutable!!))
+        }
+        val pb = ProcessBuilder(commands)
+        pb.directory(jobsPath)
         jobService.update(job.copy(status = JobStatus.Scheduled))
-        val pb = ProcessBuilder(
-            "python3", "runner.py", "--server", "http://127.0.0.1:8080/api", "--user", user.name, "--token", user.token, "--runtime", job.runtime, "--job", job.id, "--code", job.code
-        )
         pb.start()
     }
 }
