@@ -41,12 +41,12 @@ fun main(args: Array<String>) {
         LocalCliAppConfig.defaultHomeDirectory = cmd.getOptionValue("home")
     }
 
-    if (cmd.hasOption("python_executable")) {
-        LocalCliAppConfig.defaultPythonExecutable = cmd.getOptionValue("python_executable")
+    if (cmd.hasOption("python")) {
+        LocalCliAppConfig.defaultPythonExecutable = cmd.getOptionValue("python")
     }
 
-    if (cmd.hasOption("r_executable")) {
-        LocalCliAppConfig.defaultRscriptExecutable = cmd.getOptionValue("r_executable")
+    if (cmd.hasOption("rscript")) {
+        LocalCliAppConfig.defaultRscriptExecutable = cmd.getOptionValue("rscript")
     }
 
     val application = SpringApplication(Application::class.java)

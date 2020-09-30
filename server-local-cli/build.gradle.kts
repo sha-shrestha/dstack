@@ -21,6 +21,10 @@ springBoot {
     mainClassName = "ai.dstack.server.local.cli.LauncherKt"
 }
 
+tasks.bootRun {
+    args(project.properties["args"]?.toString()?.split (',').orEmpty().toMutableList())
+}
+
 buildscript {
     repositories {
         maven {
