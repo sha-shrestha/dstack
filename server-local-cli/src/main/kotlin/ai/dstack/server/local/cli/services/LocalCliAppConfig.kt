@@ -47,6 +47,11 @@ class LocalCliAppConfig : AppConfig {
             return "${homeDirectory}/files"
         }
 
+    override val jobDirectory: String
+        get() {
+            return "${homeDirectory}/jobs"
+        }
+
     override val supportEmail: String
         get() {
             return System.getenv("dstack_support_email")

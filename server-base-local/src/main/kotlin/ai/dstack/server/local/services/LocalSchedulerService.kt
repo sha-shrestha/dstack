@@ -23,11 +23,10 @@ class LocalSchedulerService @Autowired constructor(
 ) : SchedulerService {
     companion object : KLogging()
 
-    val jobsPath = File(config.homeDirectory + "/jobs")
-    val runnerFile = File(jobsPath.path + "/runner.py")
+    val runnerFile = File(config.jobDirectory + "/runner.py")
 
     init {
-        jobsPath.mkdirs()
+        File(config.jobDirectory).mkdirs()
         ClassPathResource("runner.py", this.javaClass.classLoader).inputStream.copyTo(FileOutputStream(runnerFile))
     }
 
@@ -188,15 +187,15 @@ class LocalSchedulerService @Autowired constructor(
     }
 
     override fun schedule(job: Job, user: User) {
+        jobService.update(job.copy(status = JobStatus.Scheduled))
         val commands = mutableListOf(config.pythonExecutable ?: "python3", runnerFile.name,
                 "--server", "http://127.0.0.1:8080/api", "--user", user.name, "--token", user.token,
                 "--runtime", job.runtime, "--job", job.id, "--code", job.code)
         if (config.rscriptExecutable != null) {
             commands.addAll(listOf("--rscript", config.rscriptExecutable!!))
         }
-        val pb = ProcessBuilder(commands)
-        pb.directory(jobsPath)
-        jobService.update(job.copy(status = JobStatus.Scheduled))
-        pb.start()
+        ProcessBuilder(commands)
+                .directory(File(config.jobDirectory))
+                .start()
     }
 }

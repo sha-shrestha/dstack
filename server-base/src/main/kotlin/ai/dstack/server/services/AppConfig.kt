@@ -9,6 +9,7 @@ interface AppConfig {
     val homeDirectory: String
     val dataDirectory: String
     val fileDirectory: String
+    val jobDirectory: String
     val supportEmail: String
     val smtpHost: String
     val smtpPort: Int
