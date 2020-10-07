@@ -49,7 +49,8 @@ fun main(args: Array<String>) {
         LocalCliAppConfig.defaultRscriptExecutable = cmd.getOptionValue("rscript")
     }
 
-    val application = SpringApplication(Application::class.java, SQLiteConfig::class.java)
+    val application = SpringApplication(Application::class.java)
+    application.setAdditionalProfiles("sqlite")
     application.setBannerMode(Banner.Mode.OFF)
     application.run(*args)
 }

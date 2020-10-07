@@ -7,12 +7,18 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import java.io.File
 import javax.sql.DataSource
 import org.springframework.core.io.ClassPathResource
 
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
+@Configuration
+@Profile("sqlite")
+@EnableJpaRepositories(basePackages=["ai.dstack.server.local.sqlite.repositories"])
 open class SQLiteConfig {
     @Bean
     open fun dataSource(@Autowired config: AppConfig): DataSource? {
