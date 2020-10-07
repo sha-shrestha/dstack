@@ -2,11 +2,11 @@ package ai.dstack.server.local.cli
 
 import ai.dstack.server.local.Application
 import ai.dstack.server.local.cli.services.LocalCliAppConfig
+import ai.dstack.server.local.sqlite.SQLiteConfig
 import org.apache.commons.cli.*
 import org.springframework.boot.Banner
 import org.springframework.boot.SpringApplication
 import kotlin.system.exitProcess
-
 
 fun main(args: Array<String>) {
     val options = Options()
@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
         LocalCliAppConfig.defaultRscriptExecutable = cmd.getOptionValue("rscript")
     }
 
-    val application = SpringApplication(Application::class.java)
+    val application = SpringApplication(Application::class.java, SQLiteConfig::class.java)
     application.setBannerMode(Banner.Mode.OFF)
     application.run(*args)
 }
