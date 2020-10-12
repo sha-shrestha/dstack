@@ -51,7 +51,7 @@ class SQLiteCardService (private val repository: CardRepository) : CardService {
 
     private fun CardItem.toCard(): Card {
         return this.let { c ->
-            ai.dstack.server.model.Card(c.dashboard, c.index, c.stack, c.title)
+            Card(c.dashboard, c.index, c.stack, c.title, c.description, c.columns ?: 1)
         }
     }
 
@@ -61,7 +61,9 @@ class SQLiteCardService (private val repository: CardRepository) : CardService {
                 c.dashboardPath,
                 c.stackPath,
                 c.index,
-                c.title
+                c.title,
+                c.description,
+                c.columns
             )
         }
     }

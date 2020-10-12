@@ -1,5 +1,6 @@
 package ai.dstack.server.jersey.resources.stacks
 
+import ai.dstack.server.chainIfNotNull
 import ai.dstack.server.model.AccessLevel
 import ai.dstack.server.model.Card
 import ai.dstack.server.model.Dashboard
@@ -41,14 +42,17 @@ private val InsertCardsPayload?.isMalformed: Boolean
             || this.dashboard.isNullOrBlank()
             || this.index == null
             || this.index < 0
-            || this.cards?.none { it.stack.isNullOrBlank() } != true
+            || this.cards?.none {
+                it.stack.isNullOrBlank() || (it.columns != null && it.columns != 1 && it.columns != 2)
+            } != true
 
 private val UpdateCardPayload?.isMalformed: Boolean
     get() = this == null
             || this.user.isNullOrBlank()
             || this.dashboard.isNullOrBlank()
             || this.stack.isNullOrBlank()
-            || (this.index == null && this.title == null)
+            || (this.columns != null && this.columns != 1 && this.columns != 2)
+            || (this.index == null && this.title == null && this.description == null && this.columns == null)
 
 private val DeleteCardPayload?.isMalformed: Boolean
     get() = this == null
@@ -130,6 +134,8 @@ class DashboardResources {
                                         c.stackPath,
                                         c.index,
                                         c.title,
+                                        c.description,
+                                        c.columns,
                                         stack?.let { s ->
                                             s.head?.let { h ->
                                                 BasicFrameInfo(
@@ -206,6 +212,8 @@ class DashboardResources {
                                                     CardInfo(it.stackPath,
                                                             it.index,
                                                             it.title,
+                                                            it.description,
+                                                            it.columns,
                                                             head?.let { h ->
                                                                 val attachments = attachmentService.findByFrame(h.path)
                                                                 FrameInfo(
@@ -388,7 +396,9 @@ class DashboardResources {
                             }
                             val card = Card(
                                     dashboard.path, index, cardPayload.stack,
-                                    if (cardPayload.title.isNullOrBlank()) stack.name else cardPayload.title
+                                    if (cardPayload.title.isNullOrBlank()) stack.name else cardPayload.title,
+                                    if (cardPayload.description.isNullOrBlank()) null else cardPayload.description,
+                                    cardPayload.columns ?: 1
                             )
                             cards.add(index, card)
                             cardService.create(card)
@@ -415,6 +425,8 @@ class DashboardResources {
                                         CardInfo(card.stackPath,
                                                 card.index,
                                                 card.title,
+                                                card.description,
+                                                card.columns,
                                                 head?.let { h ->
                                                     val attachs = attachmentService.findByFrame(h.path)
                                                     FrameInfo(
@@ -494,10 +506,13 @@ class DashboardResources {
                                 cards.remove(card)
                                 cards.add(
                                         index,
-                                        if (payload.title != null)
-                                            card.copy(title = payload.title)
-                                        else
-                                            card
+                                        card.chainIfNotNull(payload.title) {
+                                            this.copy(title = it)
+                                        }.chainIfNotNull(payload.description) {
+                                            this.copy(description = if (it.isNotBlank()) it else null)
+                                        }.chainIfNotNull(payload.columns) {
+                                            this.copy(columns = it)
+                                        }
                                 )
                                 updateIndexes(cards)
                                 cardService.update(cards)
@@ -512,6 +527,8 @@ class DashboardResources {
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
+                                                            it.description,
+                                                            it.columns,
                                                             null
                                                     )
                                                 }
@@ -525,7 +542,13 @@ class DashboardResources {
                             } else {
                                 cardService.update(
                                         listOf(
-                                                card.copy(title = payload.title!!)
+                                                card.chainIfNotNull(payload.title) {
+                                                    this.copy(title = it)
+                                                }.chainIfNotNull(payload.description) {
+                                                    this.copy(description = if (it.isNotBlank()) it else null)
+                                                }.chainIfNotNull(payload.columns) {
+                                                    this.copy(columns = it)
+                                                }
                                         )
                                 )
                                 val cards =
@@ -541,6 +564,8 @@ class DashboardResources {
                                                             it.stackPath,
                                                             it.index,
                                                             it.title,
+                                                            it.description,
+                                                            it.columns,
                                                             null
                                                     )
                                                 }
@@ -603,6 +628,8 @@ class DashboardResources {
                                                         it.stackPath,
                                                         it.index,
                                                         it.title,
+                                                        it.description,
+                                                        it.columns,
                                                         null
                                                 )
                                             }

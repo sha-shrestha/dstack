@@ -4,6 +4,8 @@ data class CardBasicInfo(
     val stack: String,
     val index: Int,
     val title: String,
+    val description: String?,
+    val columns: Int,
     val head: BasicFrameInfo?
 )
 

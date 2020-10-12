@@ -10,5 +10,7 @@ data class UpdateCardPayload(
     val dashboard: String?,
     val stack: String?,
     val index: Int?,
-    val title: String?
+    val title: String?,
+    val description: String?,
+    val columns: Int?
 )
