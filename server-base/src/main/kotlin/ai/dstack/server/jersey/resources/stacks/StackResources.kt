@@ -634,9 +634,11 @@ val PushPayload?.isMalformed: Boolean
                 && this?.attachments?.any {
             it.type == null || it.contentType == null
         } == true
+        // TODO: Do additional validation for parameters
         val containsMalformedAttachments = this?.attachments?.any {
             (it.data == null && it.length == null) ||
-                    it.params?.values?.any { p -> !(p is String || p is Number || p is Boolean) } == true
+                    it.params?.values?.any { p -> !(p is String || p is Number || p is Boolean
+                            || (p is Map<*, *> && p["type"] != null)) } == true
         } == true
         val missingIndex = this?.index == null
         val missingSingleAttachment = this?.attachments?.size != 1

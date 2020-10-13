@@ -45,7 +45,21 @@ class UserResources {
     @Inject
     private lateinit var permissionService: PermissionService
 
+    @Inject
+    private lateinit var config: AppConfig
+
     companion object : KLogging()
+
+    val runtimes: List<String> by lazy {
+            val runtimes = mutableListOf<String>()
+            if (config.pythonExecutable != null) {
+                runtimes.add("python")
+            }
+            if (config.rscriptExecutable != null) {
+                runtimes.add("r")
+            }
+            runtimes
+        }
 
     @POST
     @Path("/info")
@@ -70,7 +84,8 @@ class UserResources {
                         )
                     ),
                     user.createdDate.toString(),
-                    user.plan.code
+                    user.plan.code,
+                    runtimes.map { RuntimeInfo(it) }
                 ))
             }
         }
@@ -274,7 +289,8 @@ class UserResources {
                             user.settings.notifications.comments,
                             user.settings.notifications.newsletter
                         )
-                    )
+                    ),
+                    runtimes.map { RuntimeInfo(it) }
                 )
             )
         }

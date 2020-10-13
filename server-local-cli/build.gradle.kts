@@ -3,9 +3,6 @@ dependencies {
     compile(Deps.spring_boot_starter_web)
     compile(Deps.slf4j_log4j12)
     compile(Deps.commons_io)
-    compile(Deps.spring_data_jpa)
-    compile(Deps.sqlite_dialect)
-    compile(Deps.sqlite_jdbc)
     compile(Deps.commons_cli)
     compile(Deps.jackson_yaml)
     compile(project(":server-base-local"))
@@ -21,18 +18,9 @@ springBoot {
     mainClassName = "ai.dstack.server.local.cli.LauncherKt"
 }
 
-buildscript {
-    repositories {
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-noarg:${Deps.KOTLIN_VERSION}")
-    }
+tasks.bootRun {
+    args(project.properties["args"]?.toString()?.split (',').orEmpty().toMutableList())
 }
-
-apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 
 tasks {
     val npmInstall by registering(Exec::class) {

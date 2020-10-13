@@ -14,10 +14,15 @@ data class SettingsInfo(
     val notifications: NotificationsInfo
 )
 
+data class RuntimeInfo(
+        val name: String
+)
+
 data class SessionStatus(
     val user: String,
     val token: String,
     val email: String,
     val verified: Boolean,
-    val settings: SettingsInfo
+    val settings: SettingsInfo,
+    val runtimes: List<RuntimeInfo>
 )

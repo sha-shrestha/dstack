@@ -9,6 +9,7 @@ interface AppConfig {
     val homeDirectory: String
     val dataDirectory: String
     val fileDirectory: String
+    val jobDirectory: String
     val supportEmail: String
     val smtpHost: String
     val smtpPort: Int
@@ -16,4 +17,6 @@ interface AppConfig {
     val smtpPassword: String?
     val smtpStartTLS: Boolean
     val smtpFrom: String
+    val pythonExecutable: String?
+    val rscriptExecutable: String?
 }

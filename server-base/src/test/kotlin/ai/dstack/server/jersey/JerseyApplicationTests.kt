@@ -397,8 +397,8 @@ class JerseyApplicationTests : JerseyTest() {
                         Entity.json(
                                 InsertCardsPayload("test_user", createDashboardStatus.dashboard.id,
                                         0, listOf(
-                                        InsertCardsPayloadCard("test_user/test_stack_1", null),
-                                        InsertCardsPayloadCard("test_user/test_stack_2", null)
+                                        InsertCardsPayloadCard("test_user/test_stack_1", null, "test description 1", null),
+                                        InsertCardsPayloadCard("test_user/test_stack_2", null, "test description 2", 2)
                                 ))
                         )
                 )
@@ -406,8 +406,8 @@ class JerseyApplicationTests : JerseyTest() {
         val updateDashboardStatus = insertCardsResponse.entity<UpdateDashboardStatus>()
         Truth.assertThat(updateDashboardStatus.dashboard.id).isEqualTo(createDashboardStatus.dashboard.id)
         Truth.assertThat(updateDashboardStatus.dashboard.cards).containsExactly(
-                CardInfo("test_user/test_stack_1", 0, "test_stack_1", null),
-                CardInfo("test_user/test_stack_2", 1, "test_stack_2", null)
+                CardInfo("test_user/test_stack_1", 0, "test_stack_1", "test description 1", 1, null),
+                CardInfo("test_user/test_stack_2", 1, "test_stack_2", "test description 2", 2, null)
         )
 
         val insertCardsResponse2: Response = target("/dashboards/cards/insert").request()
@@ -416,8 +416,8 @@ class JerseyApplicationTests : JerseyTest() {
                         Entity.json(
                                 InsertCardsPayload("test_user", createDashboardStatus.dashboard.id,
                                         0, listOf(
-                                        InsertCardsPayloadCard("test_user/test_stack_3", null),
-                                        InsertCardsPayloadCard("test_user/test_stack_4", null)
+                                        InsertCardsPayloadCard("test_user/test_stack_3", null, "test description 3", 2),
+                                        InsertCardsPayloadCard("test_user/test_stack_4", null, null, null)
                                 ))
                         )
                 )
@@ -425,10 +425,10 @@ class JerseyApplicationTests : JerseyTest() {
         val updateDashboardStatus2 = insertCardsResponse2.entity<UpdateDashboardStatus>()
         Truth.assertThat(updateDashboardStatus2.dashboard.id).isEqualTo(createDashboardStatus.dashboard.id)
         Truth.assertThat(updateDashboardStatus2.dashboard.cards).containsExactly(
-                CardInfo("test_user/test_stack_3", 0, "test_stack_3", null),
-                CardInfo("test_user/test_stack_4", 1, "test_stack_4", null),
-                CardInfo("test_user/test_stack_1", 2, "test_stack_1", null),
-                CardInfo("test_user/test_stack_2", 3, "test_stack_2", null)
+                CardInfo("test_user/test_stack_3", 0, "test_stack_3", "test description 3", 2, null),
+                CardInfo("test_user/test_stack_4", 1, "test_stack_4", null, 1, null),
+                CardInfo("test_user/test_stack_1", 2, "test_stack_1", "test description 1", 1, null),
+                CardInfo("test_user/test_stack_2", 3, "test_stack_2", "test description 2", 2, null)
         )
     }
 

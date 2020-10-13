@@ -16,5 +16,7 @@ data class InsertCardsPayload(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class InsertCardsPayloadCard(
     val stack: String?,
-    val title: String?
+    val title: String?,
+    val description: String?,
+    val columns: Int?
 )
