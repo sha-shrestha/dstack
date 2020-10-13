@@ -93,6 +93,7 @@ var parseStackParams = (function (attachments) {
   if (!attachments || !attachments.length) return;
   attachments.forEach(function (i) {
     Object.keys(i.params).forEach(function (key) {
+      if (i.params[key] instanceof Object) return;
       if (fields[key]) fields[key].options.push(i.params[key]);else fields[key] = {
         options: [i.params[key]]
       };
@@ -129,6 +130,26 @@ var parseStackParams = (function (attachments) {
     }
   });
   return fields;
+});
+
+var parseStackTabs = (function (attachments) {
+  var tabs = [];
+  if (!attachments || !attachments.length) return;
+  attachments.forEach(function (i) {
+    Object.keys(i.params).forEach(function (key) {
+      if (i.params[key] instanceof Object && i.params[key].type === 'tab') {
+        var tab = i.params[key].title || key;
+        if (!tabs.find(function (i) {
+          return i.value === tab;
+        })) tabs.push({
+          label: tab,
+          value: tab,
+          key: key
+        });
+      }
+    });
+  });
+  return tabs;
 });
 
 var getFormattedDuration = (function (duration) {
@@ -176,5 +197,6 @@ exports.getFormattedDuration = getFormattedDuration;
 exports.isSignedIn = isSignedIn;
 exports.parseSearch = parseSearch;
 exports.parseStackParams = parseStackParams;
+exports.parseStackTabs = parseStackTabs;
 exports.unicodeBase64Decode = unicodeBase64Decode;
 //# sourceMappingURL=utils.js.map

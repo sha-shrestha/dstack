@@ -18,8 +18,9 @@ import StackHowToFetchData from '../HowToFetchData';
 import StackAttachment from '../Attachment';
 import StackFrames from '../Frames';
 import Loader from './components/Loader';
+import Tabs from './components/Tabs';
 import useForm from '../../hooks/useForm';
-import {formatBytes, parseStackParams} from '../../utils';
+import {formatBytes, parseStackParams, parseStackTabs} from '../../utils';
 import css from './styles.module.css';
 
 type Props = {
@@ -70,7 +71,9 @@ const Details = ({
     const {t} = useTranslation();
     const didMountRef = useRef(false);
     const {form, setForm, onChange} = useForm({});
+    const [activeTab, setActiveTab] = useState(null);
     const [fields, setFields] = useState({});
+    const [tabs, setTabs] = useState([]);
     const prevFrame = usePrevious(frame);
 
     const [isShowHowToModal, setIsShowHowToModal] = useState(false);
@@ -87,16 +90,25 @@ const Details = ({
             parseParams();
     }, [frame]);
 
-    const findAttach = (form, attachmentIndex) => {
+    const findAttach = useCallback((form, tabName, attachmentIndex) => {
         const attachments = get(frame, 'attachments');
         const fields = Object.keys(form);
+        const tab = tabs.find(t => t.value === tabName);
 
         if (!attachments)
             return;
 
-        if (fields.length) {
+        if (fields.length || tabs.length) {
             attachments.some((attach, index) => {
                 let valid = true;
+
+                console.log(tab, attach.params);
+
+                if (tab
+                    && attach.params[tab.value]?.type !== 'tab'
+                    && attach.params[tab.key]?.title !== tab.value
+                )
+                    return false;
 
                 fields.forEach(key => {
                     if (!attach.params || !isEqual(attach.params[key], form[key]))
@@ -109,13 +121,13 @@ const Details = ({
                 return valid;
             });
         }
-    };
+    }, [form, tabs]);
 
-    const findAttachDebounce = useCallback(_debounce(findAttach, 300), [data, frame]);
+    const findAttachDebounce = useCallback(_debounce(findAttach, 300), [data, frame, findAttach]);
 
     useEffect(() => {
         if (didMountRef.current)
-            findAttachDebounce(form, attachmentIndex);
+            findAttachDebounce(form, activeTab, attachmentIndex);
         else
             didMountRef.current = true;
     }, [form]);
@@ -127,36 +139,40 @@ const Details = ({
             return;
 
         const fields = parseStackParams(attachments);
+        const tabs = parseStackTabs(attachments);
 
+        setTabs(tabs);
         setFields(fields);
 
+        let attachment;
+
         if (attachmentIndex !== undefined) {
-            if (attachments[attachmentIndex])
-                setForm(attachments[attachmentIndex].params);
-        } else
-            setForm(attachments[0].params);
+            if (attachments[attachmentIndex]) {
+                attachment = attachments[attachmentIndex];
 
-    };
+            }
+        } else {
+            attachment = attachments[0];
+        }
 
-    const renderFields = () => {
-        if (!Object.keys(fields).length)
-            return null;
+        if (attachment) {
+            const params = {...attachment.params};
+            const tab = Object.keys(params).find(key => params[key]?.type === 'tab');
 
-        const hasSelectField = Object.keys(fields).some(key => fields[key].type === 'select');
-
-        return (
-            <StackFilters
-                fields={fields}
-                form={form}
-                onChange={onChange}
-                className={cx(css.filters, {'with-select': hasSelectField})}
-            />
-        );
+            setActiveTab(params[tab]?.title || tab || null);
+            delete params[tab];
+            setForm(params);
+        }
     };
 
     const onClickDownloadAttachment = event => {
         event.preventDefault();
         downloadAttachment();
+    };
+
+    const onChangeTab = tabName => {
+        findAttachDebounce(form, tabName, attachmentIndex);
+        setActiveTab(tabName);
     };
 
     const attachment = get(frame, `attachments[${attachmentIndex}]`);
@@ -178,50 +194,62 @@ const Details = ({
                 </BackButton>
             </Yield>
 
-            <section className={css.section}>
-                <div className={css.header}>
-                    <div className={css.title}>
-                        {data.name}
-                        <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
-                    </div>
-
-                    {renderHeader && renderHeader()}
-
-                    <div className={css.sideHeader}>
-                        {renderSideHeader && renderSideHeader()}
-
-                        {data && data.user === currentUser && (
-                            <Dropdown
-                                className={css.dropdown}
-
-                                items={[
-                                    {
-                                        title: t('upload'),
-                                        onClick: toggleUpload,
-                                    },
-                                ]}
-                            >
-                                <Button
-                                    className={css['dropdown-button']}
-                                    color="secondary"
-                                >
-                                    <span className="mdi mdi-dots-horizontal" />
-                                </Button>
-                            </Dropdown>
-                        )}
-                    </div>
+            <div className={css.header}>
+                <div className={css.title}>
+                    {data.name}
+                    <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                <StackFrames
-                    frames={get(data, 'frames', [])}
-                    frame={currentFrameId}
-                    headId={headId}
-                    onMarkAsHead={onChangeHeadFrame}
-                    onChange={onChangeFrame}
-                    className={css.revisions}
-                />
+                {renderHeader && renderHeader()}
 
-                {renderFields()}
+                <div className={css.sideHeader}>
+                    {renderSideHeader && renderSideHeader()}
+
+                    {data && data.user === currentUser && (
+                        <Dropdown
+                            className={css.dropdown}
+
+                            items={[
+                                {
+                                    title: t('upload'),
+                                    onClick: toggleUpload,
+                                },
+                            ]}
+                        >
+                            <Button
+                                className={css['dropdown-button']}
+                                color="secondary"
+                            >
+                                <span className="mdi mdi-dots-horizontal" />
+                            </Button>
+                        </Dropdown>
+                    )}
+                </div>
+            </div>
+
+            <StackFrames
+                frames={get(data, 'frames', [])}
+                frame={currentFrameId}
+                headId={headId}
+                onMarkAsHead={onChangeHeadFrame}
+                onChange={onChangeFrame}
+                className={css.revisions}
+            />
+
+            {Boolean(tabs.length) && <Tabs
+                className={css.tabs}
+                onChange={onChangeTab}
+                value={activeTab}
+                items={tabs}
+            />}
+
+            <div className={css.container}>
+                <StackFilters
+                    fields={fields}
+                    form={form}
+                    onChange={onChange}
+                    className={cx(css.filters)}
+                />
 
                 {attachment && (
                     <div className={css['attachment-head']}>
@@ -261,13 +289,7 @@ const Details = ({
                         id={attachmentIndex || 0}
                     />
                 )}
-            </section>
-
-            {Boolean(renderSidebar) && (
-                <aside className={css.sidebar}>
-                    {renderSidebar()}
-                </aside>
-            )}
+            </div>
 
             <Modal
                 isShow={isShowHowToModal}

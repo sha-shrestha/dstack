@@ -6,6 +6,9 @@ export default attachments => {
 
     attachments.forEach(i => {
         Object.keys(i.params).forEach(key => {
+            if (i.params[key] instanceof Object)
+                return;
+
             if (fields[key])
                 fields[key].options.push(i.params[key]);
             else

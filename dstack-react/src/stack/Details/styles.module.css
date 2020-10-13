@@ -9,34 +9,6 @@
     @media (--mobile) {
         padding-bottom: 20px;
     }
-    @media (--desktop) {
-        display: grid;
-        border: 1px solid rgba(180, 184, 199, .3);
-        box-sizing: border-box;
-        border-radius: 4px;
-        min-height: calc(100vh - 100px);
-    }
-    &:not(:global(.with-sidebar)) {
-        @media (--desktop) {
-            grid-template-areas: "section";
-            grid-template-columns: 100%;
-        }
-    }
-    &:global(.with-sidebar) {
-        @media (--desktop) {
-            grid-template-areas: "section sidebar";
-            grid-template-columns: calc(100% - var(--sidebar-width)) var(--sidebar-width);
-        }
-    }
-}
-.section {
-    @media (--desktop) {
-        grid-area: section;
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-        padding: 20px 15px 20px 30px;
-    }
 }
 .header {
     display: flex;
@@ -74,16 +46,7 @@
         padding-right: 6px;
     }
 }
-.attachment-head {
-    display: flex;
-    align-items: flex-start;
-    @media (--mobile) {
-        margin-top: 20px;
-    }
-    @media (--desktop) {
-        margin-top: 24px;
-    }
-}
+
 .description {
     flex-grow: 1;
     min-width: 0;
@@ -174,34 +137,38 @@
     }
 }
 .revisions {
-    margin-top: 10px;
+    margin-top: 8px;
+}
+.tabs {
+    margin-top: 20px;
+}
+.tabs + .container {
+    margin-top: -1px;
+    border-top-left-radius: 0;
+}
+.container {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid rgb(233, 234, 238);
 }
 .filters {
-    &:not(:global(.with-select)) {
+
+}
+.attachment-head {
+    display: flex;
+    align-items: flex-start;
+    @media (--mobile) {
         margin-top: 20px;
     }
-    &:global(.with-select) {
-        margin-top: 38px;
-    }
-    @media (--mobile) {
-        margin-bottom: -20px;
-    }
     @media (--desktop) {
-
+        margin-top: 24px;
     }
 }
 .attachment {
     margin-top: 16px;
 }
-.sidebar {
-    @media (--mobile) {
-        margin-top: 20px;
-    }
-    @media (--desktop) {
-        grid-area: sidebar;
-        border-left: 1px solid rgba(180, 184, 199, .3);
-    }
-}
+
 .modal {
     & .description {
         font-size: 14px;

@@ -5,6 +5,9 @@
     align-items: center;
     flex-wrap: wrap;
     margin-bottom: -20px;
+    &:global(.with-select) {
+        padding-top: 18px;
+    }
 }
 .select {
     @media (--desktop) {

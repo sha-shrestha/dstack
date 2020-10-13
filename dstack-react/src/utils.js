@@ -4,6 +4,7 @@ import unicodeBase64Decode from './utils/unicodeBase64Decode';
 import formatBytes from './utils/formatBytesSize';
 import downloadFile from './utils/downloadFile';
 import parseStackParams from './utils/parseStackParams';
+import parseStackTabs from './utils/parseStackTabs';
 import getFormattedDuration from './utils/getFormattedDuration';
 import fileToBaseTo64 from './utils/fileToBaseTo64';
 
@@ -21,6 +22,7 @@ export {
     getDataFailedRequest,
     unicodeBase64Decode,
     parseStackParams,
+    parseStackTabs,
     getFormattedDuration,
     fileToBaseTo64
 };
