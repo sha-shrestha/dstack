@@ -1421,6 +1421,10 @@ var View = function View(_ref) {
       viewWidth = _useState2[0],
       setVieWidth = _useState2[1];
 
+  var _useState3 = useState(false),
+      noRender = _useState3[0],
+      setNoRender = _useState3[1];
+
   var onResizeCard = function onResizeCard() {
     if (viewRef.current) {
       var containerWidth = viewRef.current.parentElement.offsetWidth;
@@ -1441,6 +1445,13 @@ var View = function View(_ref) {
     };
   }, []);
   useEffect(function () {
+    if (noRender) setNoRender(false);
+  }, [noRender]);
+  useEffect(function () {
+    if (attachment && attachment['application'] === 'plotly') {
+      setNoRender(true);
+    }
+
     if (attachment && attachment['application'] === 'bokeh') {
       var Bokeh;
       var json = base64ToJSON(attachment.data);
@@ -1499,7 +1510,7 @@ var View = function View(_ref) {
     json.layout.width = viewWidth;
     json.layout.margin = 0;
     json.layout.autosize = true;
-    json.config = {
+    if (json.config) json.config.responsive = true;else json.config = {
       responsive: true
     };
     return /*#__PURE__*/React__default.createElement(Plot, _extends({}, json, {
@@ -1518,6 +1529,7 @@ var View = function View(_ref) {
   };
 
   var renderAttachment = function renderAttachment() {
+    if (noRender) return null;
     if (requestStatus === 404 && isList) return /*#__PURE__*/React__default.createElement("div", {
       className: css$p.message
     }, t('notFound'));
@@ -2643,7 +2655,6 @@ var Details = function Details(_ref) {
         var _attach$params$tab$va, _attach$params$tab$ke;
 
         var valid = true;
-        console.log(tab, attach.params);
         if (tab && ((_attach$params$tab$va = attach.params[tab.value]) === null || _attach$params$tab$va === void 0 ? void 0 : _attach$params$tab$va.type) !== 'tab' && ((_attach$params$tab$ke = attach.params[tab.key]) === null || _attach$params$tab$ke === void 0 ? void 0 : _attach$params$tab$ke.title) !== tab.value) return false;
         fields.forEach(function (key) {
           if (!attach.params || !isEqual(attach.params[key], form[key])) valid = false;

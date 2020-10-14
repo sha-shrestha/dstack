@@ -102,8 +102,6 @@ const Details = ({
             attachments.some((attach, index) => {
                 let valid = true;
 
-                console.log(tab, attach.params);
-
                 if (tab
                     && attach.params[tab.value]?.type !== 'tab'
                     && attach.params[tab.key]?.title !== tab.value

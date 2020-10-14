@@ -21,6 +21,7 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
     const viewRef = useRef();
     const [tableScale, setTableScale] = useState(1);
     const [viewWidth, setVieWidth] = useState(0);
+    const [noRender, setNoRender] = useState(false);
 
     const onResizeCard = () => {
         if (viewRef.current) {
@@ -48,6 +49,14 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
     }, []);
 
     useEffect(() => {
+        if (noRender)
+            setNoRender(false);
+    }, [noRender]);
+
+    useEffect(() => {
+        if (attachment && attachment['application'] === 'plotly') {
+            setNoRender(true);
+        }
         if (attachment && attachment['application'] === 'bokeh') {
             let Bokeh;
             const json = base64ToJSON(attachment.data);
@@ -121,7 +130,11 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
         json.layout.width = viewWidth;
         json.layout.margin = 0;
         json.layout.autosize = true;
-        json.config = {responsive: true};
+
+        if (json.config)
+            json.config.responsive = true;
+        else
+            json.config = {responsive: true};
 
         return (
             <Plot
@@ -138,6 +151,9 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
     const renderBokeh = () => <div id={`bokeh-${frameId}`} />;
 
     const renderAttachment = () => {
+        if (noRender)
+            return null;
+
         if (requestStatus === 404 && isList)
             return <div className={css.message}>{t('notFound')}</div>;
 
