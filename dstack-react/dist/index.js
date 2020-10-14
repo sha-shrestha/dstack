@@ -67,6 +67,17 @@ var config = {
   DASHBOARD_CARDS_INSERT: '/dashboards/cards/insert',
   DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
   DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
+  JOB_LIST: function JOB_LIST(userName) {
+    return "/jobs/" + userName;
+  },
+  JOB_DETAILS: function JOB_DETAILS(userName, id) {
+    return "/jobs/" + userName + "/" + id;
+  },
+  JOB_CREATE: '/jobs/create',
+  JOB_UPDATE: '/jobs/update',
+  JOB_DELETE: '/jobs/delete',
+  JOB_RUN: '/jobs/run',
+  JOB_STOP: '/jobs/stop',
   DISCORD_URL: 'https://discord.gg/8xfhEYa',
   TWITTER_URL: 'https://twitter.com/dstackai',
   GITHUB_URL: 'https://github.com/dstackai',
@@ -1934,6 +1945,24 @@ var routes = {
     }
 
     return "/" + user + "/d/" + id;
+  },
+  jobs: function jobs(user) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    return "/" + user + "/j";
+  },
+  jobsDetails: function jobsDetails(user, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (id === void 0) {
+      id = ':id';
+    }
+
+    return "/" + user + "/j/" + id;
   },
   settings: function settings() {
     return '/settings';

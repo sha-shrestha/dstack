@@ -47,6 +47,24 @@ var routes = {
 
     return "/" + user + "/d/" + id;
   },
+  jobs: function jobs(user) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    return "/" + user + "/j";
+  },
+  jobsDetails: function jobsDetails(user, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (id === void 0) {
+      id = ':id';
+    }
+
+    return "/" + user + "/j/" + id;
+  },
   settings: function settings() {
     return '/settings';
   }

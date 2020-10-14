@@ -30,6 +30,14 @@ export default {
     DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
     DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
 
+    JOB_LIST: userName => `/jobs/${userName}`,
+    JOB_DETAILS: (userName, id) => `/jobs/${userName}/${id}`,
+    JOB_CREATE: '/jobs/create',
+    JOB_UPDATE: '/jobs/update',
+    JOB_DELETE: '/jobs/delete',
+    JOB_RUN: '/jobs/run',
+    JOB_STOP: '/jobs/stop',
+
     DISCORD_URL: 'https://discord.gg/8xfhEYa',
     TWITTER_URL: 'https://twitter.com/dstackai',
     GITHUB_URL: 'https://github.com/dstackai',

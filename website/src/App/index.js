@@ -15,6 +15,7 @@ import ConfirmEmail from 'Auth/ConfirmEmail';
 
 import Dashboards from 'Dashboards';
 import Stacks from 'Stacks';
+import Jobs from 'Jobs';
 import Settings from 'Settings';
 
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
@@ -110,6 +111,7 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                             <DefaultLayoutRoute path={routes.notFound()} component={NotFound} />
                             <DefaultLayoutRoute path={routes.settings()} component={Settings} />
                             <DefaultLayoutRoute path={routes.dashboards()} component={Dashboards} />
+                            <DefaultLayoutRoute path={routes.jobs()} component={Jobs} />
                             <DefaultLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
                     )}
@@ -118,6 +120,7 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                         <Switch>
                             <UnAuthorizedLayoutRoute path={routes.notFound()} component={NotFound} />
                             <UnAuthorizedLayoutRoute path={routes.dashboards()} component={Dashboards} />
+                            <DefaultLayoutRoute path={routes.jobs()} component={Jobs} />
                             <UnAuthorizedLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
                     )}

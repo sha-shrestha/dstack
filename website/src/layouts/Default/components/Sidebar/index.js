@@ -69,6 +69,12 @@ const Sidebar = ({
             to: routes.dashboards(currentUser),
             label: t('dashboards'),
         },
+
+        {
+            icon: 'mdi-code-tags',
+            to: routes.jobs(currentUser),
+            label: t('jobs'),
+        },
     ];
 
     return <div className={cx(css.sidebar, className, {show: isShow})} ref={sidebarRef}>

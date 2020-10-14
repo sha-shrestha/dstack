@@ -12,6 +12,10 @@ export default {
     dashboards: (user = ':user') => `/${user}/d`,
     dashboardsDetails: (user = ':user', id = ':id') => `/${user}/d/${id}`,
 
+    // jobs
+    jobs: (user = ':user') => `/${user}/j`,
+    jobsDetails: (user = ':user', id = ':id') => `/${user}/j/${id}`,
+
     // settings
     settings: () => '/settings',
 };
