@@ -8,7 +8,7 @@ export default () => {
     const [{apiUrl}, dispatch] = useStateValue();
 
     const fetchAttachment = async (stack, frameId, id, onSuccess) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
 
         dispatch({
             type: actionsTypes.FETCH,

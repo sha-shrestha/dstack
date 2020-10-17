@@ -86,7 +86,7 @@ const Upload = ({stack, className, isShow, onClose, refresh, withButton, apiUrl,
             params.attachments = [{data: await fileToBaseTo64(file)}];
 
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
 
             const {data} = await axios({
                 method: 'post',

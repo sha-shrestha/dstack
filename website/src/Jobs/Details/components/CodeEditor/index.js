@@ -17,7 +17,7 @@ type Props = {
     language: 'python' | 'r',
 }
 
-const CodeEditor = ({value, onChange, language, className, saved}: Props) => {
+const CodeEditor = ({value = '', onChange, language, className, saved}: Props) => {
     const {t} = useTranslation();
     const successMessageRef = useRef();
     const lines = (value.match(/\n/g) || []).length + 2;

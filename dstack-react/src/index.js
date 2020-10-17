@@ -1,6 +1,7 @@
 import './global.css';
 
 export {default as config} from './config';
+export {default as apiFabric} from './apiFabric';
 export {default as AccessForbidden} from './AccessForbidden';
 export {default as Avatar} from './Avatar';
 export {default as BackButton} from './BackButton';

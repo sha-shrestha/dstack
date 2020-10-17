@@ -1,16 +1,18 @@
 // @flow
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {get} from 'lodash-es';
+import useSWR from 'swr';
 import {connect} from 'react-redux';
 import {useHistory, useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import {Button, SearchField, Yield} from '@dstackai/dstack-react';
+import {dataFetcher} from '@dstackai/dstack-react/dist/utils';
 import TableRow from './components/TableRow';
 import Loader from './components/Loader';
 import routes from 'routes';
 import config from 'config';
-import {create as createJob, remove as removeJob} from 'Jobs/Details/actions';
-import {fetchList} from './actions';
+// import {create as createJob, remove as removeJob} from 'Jobs/Details/actions';
+import {createJob, removeJob} from '../utils';
 import css from './styles.module.css';
 
 type Props = {
@@ -23,24 +25,23 @@ type Props = {
     removeJob: Function,
 }
 
-const List = ({
-    currentUser,
-    data = [],
-    fetchList,
-    createJob,
-    removeJob,
-    loading,
-}: Props) => {
+const dataFormat = data => data.jobs;
+
+const List = ({currentUser}: Props) => {
     const {t} = useTranslation();
     const [search, setSearch] = useState('');
     const {user} = useParams();
     const {push} = useHistory();
 
-    const onChangeSearch = value => setSearch(value);
+    const {data, mutate} = useSWR(
+        [
+            config.API_URL + config.JOB_LIST(user),
+            dataFormat,
+        ],
+        dataFetcher,
+    );
 
-    useEffect(() => {
-        fetchList(user);
-    }, []);
+    const onChangeSearch = value => setSearch(value);
 
     const getItems = () => {
         let items = [];
@@ -57,26 +58,30 @@ const List = ({
 
     const items = getItems();
 
-    const onAdd = () => {
+    const onAdd = async () => {
         const lastRuntime = localStorage.getItem('lastRuntime') || 'python';
 
-        createJob(
+        const data = await createJob(
             {
                 user,
                 runtime: lastRuntime,
-            },
-            ({job}) => push(routes.jobsDetails(user, job.id)),
+            }
         );
+
+        push(routes.jobsDetails(user, data.job.id));
     };
 
-    const getOnRemove = job => () => {
-        removeJob({
+    const getOnRemove = job => async () => {
+        await removeJob({
             user,
             id: job.id,
         });
+
+
+        mutate(data.filter(j => j.id !== job.id));
     };
 
-    if (loading)
+    if (!data)
         return <Loader />;
 
     return (
@@ -154,10 +159,5 @@ const List = ({
 };
 
 export default connect(
-    state => ({
-        currentUser: get(state.app.userData, 'user'),
-        data: state.jobs.list.data,
-        loading: state.jobs.list.loading,
-    }),
-    {fetchList, createJob, removeJob}
+    state => ({currentUser: get(state.app.userData, 'user')}),
 )(List);

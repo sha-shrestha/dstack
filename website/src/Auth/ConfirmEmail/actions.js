@@ -11,7 +11,7 @@ export const verifyUser = (data: {[key: string]: any}, onSuccess: Function) => a
         const request = await api.get(config.VERIFY_EMAIL_URL, {params: {...data}});
 
         dispatch({type: actionsTypes.CONFIRM_SUCCESS});
-        localStorage.setItem('token', request.data.session);
+        localStorage.setItem(config.TOKEN_STORAGE_KEY, request.data.session);
 
         if (onSuccess)
             onSuccess();

@@ -1,17 +1,17 @@
 // @flow
-import React, {useEffect, useState, useRef, memo} from 'react';
-import {isEqual} from 'lodash-es';
+import React, {useEffect, useState, memo} from 'react';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
 import cx from 'classnames';
 import {Dropdown} from '@dstackai/dstack-react';
-import {usePrevious} from '@dstackai/dstack-react/dist/hooks';
-import {fetchJob, runJob, stopJob} from 'Jobs/utils';
+import {runJob, stopJob} from 'Jobs/utils';
 import Progress from 'Jobs/Details/components/Progress';
-import {getFormattedDuration} from '@dstackai/dstack-react/dist/utils';
+import {dataFetcher, getFormattedDuration} from '@dstackai/dstack-react/dist/utils';
 import css from './styles.module.css';
+import useSWR from 'swr';
+import config from 'config';
 
 type Props = {
     data: {[key: string]: any},
@@ -26,6 +26,7 @@ type Props = {
 };
 
 const REFRESH_TIMEOUT = 2000;
+const dataFormat = data => data.job;
 
 const TableRow = memo(({
     data,
@@ -36,43 +37,20 @@ const TableRow = memo(({
 }: Props) => {
     const {t} = useTranslation();
     const {user} = useParams();
-    const prevData = usePrevious(data);
-    const [jobData, setJobData] = useState(data);
-    const refreshTimeout = useRef();
-    const isAutoRefresh = useRef(false);
-    const autoRefresh = useRef(() => {});
+    const [refreshInterval, setRefreshInterval] = useState(0);
 
-    useEffect(() => {
-        clearTimeout(refreshTimeout.current);
-
-        autoRefresh.current = () => {
-            refreshTimeout.current = setTimeout(async () => {
-                if (isAutoRefresh.current) {
-                    const {job} = await fetchJob({user, id: jobData.id});
-
-                    if (job)
-                        setJobData({
-                            ...jobData,
-                            ...job,
-                        });
-                }
-
-                autoRefresh.current();
-            }, REFRESH_TIMEOUT);
-        };
-
-        autoRefresh.current();
-
-        return () => {
-            isAutoRefresh.current = false;
-            clearTimeout(refreshTimeout.current);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!isEqual(prevData, data))
-            setJobData(data);
-    }, [data]);
+    const {data: jobData, mutate} = useSWR(
+        [
+            config.API_URL + config.JOB_DETAILS(user, data.id),
+            dataFormat,
+        ],
+        dataFetcher,
+        {
+            refreshInterval,
+            initialData: data,
+            revalidateOnFocus: false,
+        }
+    );
 
     const rowClick = () => {
         if (onClickRow)
@@ -81,11 +59,10 @@ const TableRow = memo(({
 
     useEffect(() => {
         if (['RUNNING', 'SCHEDULED'].indexOf(jobData?.status) >= 0) {
-            if (!isAutoRefresh.current) {
-                isAutoRefresh.current = true;
-            }
-        } else if (isAutoRefresh.current) {
-            isAutoRefresh.current = false;
+            if (!refreshInterval)
+                setRefreshInterval(REFRESH_TIMEOUT);
+        } else if (refreshInterval) {
+            setRefreshInterval(0);
         }
     }, [jobData]);
 
@@ -93,7 +70,7 @@ const TableRow = memo(({
         const {job} = await runJob({user, id: jobData.id});
 
         if (job)
-            setJobData({
+            mutate({
                 ...jobData,
                 ...job,
             });
@@ -103,7 +80,7 @@ const TableRow = memo(({
         const {job} = await stopJob({user, id: jobData.id});
 
         if (job)
-            setJobData({
+            mutate({
                 ...jobData,
                 ...job,
             });

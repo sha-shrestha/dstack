@@ -7,9 +7,11 @@ import parseStackParams from './utils/parseStackParams';
 import parseStackTabs from './utils/parseStackTabs';
 import getFormattedDuration from './utils/getFormattedDuration';
 import fileToBaseTo64 from './utils/fileToBaseTo64';
+import dataFetcher from './utils/dataFetcher';
+import config from './config';
 
 const isSignedIn = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
 
     return Boolean(token && token.length);
 };
@@ -24,5 +26,6 @@ export {
     parseStackParams,
     parseStackTabs,
     getFormattedDuration,
-    fileToBaseTo64
+    fileToBaseTo64,
+    dataFetcher
 };

@@ -11,7 +11,7 @@ export const login = (data: {[key: string]: any}, onSuccess: Function) => async 
         const request = await api.get(config.LOGIN_URL, {params: {...data}});
 
         dispatch({type: actionsTypes.USER_LOGIN_SUCCESS});
-        localStorage.setItem('token', request.data.session);
+        localStorage.setItem(config.TOKEN_STORAGE_KEY, request.data.session);
 
         if (onSuccess)
             onSuccess();

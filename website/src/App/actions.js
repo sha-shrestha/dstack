@@ -17,7 +17,7 @@ export const fetchUser = (onSuccess: Function, onFail: Function) => async (dispa
         if (onSuccess)
             onSuccess(request.data);
     } catch (e) {
-        localStorage.removeItem('token');
+        localStorage.removeItem(config.TOKEN_STORAGE_KEY);
         dispatch({type: actionsTypes.FETCH_USER_FAIL});
 
         if (onFail)
@@ -55,7 +55,7 @@ export const logOut = (onSuccess: Function) => async (dispatch: Function) => {
         payload: null,
     });
 
-    localStorage.removeItem('token');
+    localStorage.removeItem(config.TOKEN_STORAGE_KEY);
 
     if (onSuccess)
         onSuccess();

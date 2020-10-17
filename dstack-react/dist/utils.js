@@ -2,6 +2,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var lodashEs = require('lodash-es');
 var moment = _interopDefault(require('moment'));
+var axios = _interopDefault(require('axios'));
 
 var parseSearch = function parseSearch(searchString) {
   var search = searchString.substring(1);
@@ -184,11 +185,136 @@ var fileToBase64 = function fileToBase64(file) {
   }
 };
 
+// A type of promise-like that resolves synchronously and supports only one observer
+
+const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
+
+const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
+
+// Asynchronously call a function and send errors to recovery continuation
+function _catch(body, recover) {
+	try {
+		var result = body();
+	} catch(e) {
+		return recover(e);
+	}
+	if (result && result.then) {
+		return result.then(void 0, recover);
+	}
+	return result;
+}
+
+var config = {
+  DOCS_URL: 'http://docs.dstack.ai',
+  LOGIN_URL: '/users/login',
+  VERIFY_EMAIL_URL: '/users/verify',
+  SUPPORT_URL: '/support/submit',
+  SIGN_UP_URL: '/users/register',
+  RESET_PASSWORD_URL: '/users/reset',
+  UPDATE_PASSWORD_URL: '/users/update/password',
+  USER_DATA_URL: '/users/remember',
+  UPDATE_TOKEN_URL: '/users/update/token',
+  UPDATE_SETTINGS_URL: '/users/update/settings',
+  CHECK_USER: function CHECK_USER(userName) {
+    return "/users/exists/" + userName;
+  },
+  STACKS_LIST: function STACKS_LIST(userName) {
+    return "/stacks/" + userName;
+  },
+  DELETE_STACK: function DELETE_STACK() {
+    return '/stacks/delete';
+  },
+  STACK_DETAILS: function STACK_DETAILS(userName, stack) {
+    return "/stacks/" + userName + "/" + stack;
+  },
+  STACK_FRAME: function STACK_FRAME(userName, stack, frameId) {
+    return "/frames/" + userName + "/" + stack + "/" + frameId;
+  },
+  STACK_ATTACHMENT: function STACK_ATTACHMENT(stack, frameId, id) {
+    return "/attachs/" + stack + "/" + frameId + "/" + id;
+  },
+  STACK_UPDATE: '/stacks/update',
+  STACK_PUSH: '/stacks/push',
+  DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
+    return "/dashboards/" + userName;
+  },
+  DASHBOARD_DETAILS: function DASHBOARD_DETAILS(userName, id) {
+    return "/dashboards/" + userName + "/" + id;
+  },
+  DASHBOARD_CREATE: '/dashboards/create',
+  DASHBOARD_UPDATE: '/dashboards/update',
+  DASHBOARD_DELETE: '/dashboards/delete',
+  DASHBOARD_CARDS_INSERT: '/dashboards/cards/insert',
+  DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
+  DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
+  JOB_LIST: function JOB_LIST(userName) {
+    return "/jobs/" + userName;
+  },
+  JOB_DETAILS: function JOB_DETAILS(userName, id) {
+    return "/jobs/" + userName + "/" + id;
+  },
+  JOB_CREATE: '/jobs/create',
+  JOB_UPDATE: '/jobs/update',
+  JOB_DELETE: '/jobs/delete',
+  JOB_RUN: '/jobs/run',
+  JOB_STOP: '/jobs/stop',
+  DISCORD_URL: 'https://discord.gg/8xfhEYa',
+  TWITTER_URL: 'https://twitter.com/dstackai',
+  GITHUB_URL: 'https://github.com/dstackai',
+  BLOG_URL: 'https://blog.dstack.ai',
+  TOKEN_STORAGE_KEY: 'token'
+};
+
+var fetcher = function fetcher(url, responseDataFormat) {
+  if (responseDataFormat === void 0) {
+    responseDataFormat = function responseDataFormat(data) {
+      return data;
+    };
+  }
+
+  try {
+    var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
+    return Promise.resolve(_catch(function () {
+      return Promise.resolve(axios({
+        url: url,
+        headers: {
+          Authorization: token ? "Bearer " + token : ''
+        }
+      })).then(function (request) {
+        return responseDataFormat(request.data);
+      });
+    }, function (e) {
+      var errorBody = null;
+      var status = null;
+
+      try {
+        errorBody = JSON.parse(lodashEs.get(e, 'request.response'));
+      } catch (e) {
+        console.log(e);
+      }
+
+      try {
+        status = lodashEs.get(e, 'request.status');
+      } catch (e) {
+        console.log(e);
+      }
+
+      var error = new Error('An error occurred while fetching the data.');
+      error.info = errorBody;
+      error.status = status;
+      throw error;
+    }));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 var isSignedIn = function isSignedIn() {
-  var token = localStorage.getItem('token');
+  var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
   return Boolean(token && token.length);
 };
 
+exports.dataFetcher = fetcher;
 exports.downloadFile = downloadFile;
 exports.fileToBaseTo64 = fileToBase64;
 exports.formatBytes = formatBytes;

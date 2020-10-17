@@ -42,6 +42,8 @@ export default {
     TWITTER_URL: 'https://twitter.com/dstackai',
     GITHUB_URL: 'https://github.com/dstackai',
     BLOG_URL: 'https://blog.dstack.ai',
+
+    TOKEN_STORAGE_KEY: 'token',
 };
 
 export const reportPlotPythonCode = `import matplotlib.pyplot as plt

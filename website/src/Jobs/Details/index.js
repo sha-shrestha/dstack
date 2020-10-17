@@ -2,9 +2,12 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {useHistory, useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
+import useSWR from 'swr';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {AccessForbidden, NotFound, StretchTitleField, Dropdown, Button} from '@dstackai/dstack-react';
+import {AccessForbidden, NotFound, StretchTitleField,
+    Dropdown, Button, BackButton, Yield} from '@dstackai/dstack-react';
+import {dataFetcher} from '@dstackai/dstack-react/dist/utils';
 import ScheduleSettings from './components/ScheduleSettings';
 import CodeEditor from './components/CodeEditor';
 import Status from './components/Status';
@@ -14,9 +17,10 @@ import Loader from './components/Loader';
 import {usePrevious, useDebounce} from '@dstackai/dstack-react/dist/hooks';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import routes from 'routes';
-import {fetch, update, remove, run, stop} from './actions';
+import config from 'config';
 import {setAppProgress, resetAppProgress} from 'App/actions';
 import {Job} from 'Jobs/types';
+import {runJob, stopJob, updateJob, removeJob, calculateJobProgress} from '../utils';
 import css from './styles.module.css';
 
 type Props = {
@@ -28,41 +32,66 @@ type Props = {
     update: Function,
     setAppProgress: Function,
     resetAppProgress: Function,
-    loading: boolean,
-    running: boolean,
-    stopping: boolean,
     currentUser?: string,
     requestStatus: ?number,
 }
 
 const REFRESH_TIMEOUT = 3000;
 
+const dataFormat = data => data.job;
+
 const Details = ({
-    data, loading, remove, run, stop, running,
-    stopping, fetch, requestStatus, currentUser, update, setAppProgress, resetAppProgress,
+    currentUser,
+    setAppProgress,
+    resetAppProgress,
 }: Props) => {
     const {user, id} = useParams();
+    const [refreshInterval, setRefreshInterval] = useState(0);
+
+    const {data: jobData, error, mutate} = useSWR(
+        [
+            config.API_URL + config.JOB_DETAILS(user, id),
+            dataFormat,
+        ],
+        dataFetcher,
+        {refreshInterval}
+    );
+
     const {push} = useHistory();
     const {t} = useTranslation();
-    const prevData = usePrevious(data);
-    const [titleValue, setTitleValue] = useState(data ? data.title : '');
-    const [code, setCode] = useState(data ? data.code : '');
+    const [titleValue, setTitleValue] = useState('');
+    const [code, setCode] = useState('');
+    const [running, setRunning] = useState(false);
+    const [stopping, setStopping] = useState(false);
     const [codeSaved, setCodeSaved] = useState(true);
-    const isDidMount = useRef(true);
+    const progressTimer = useRef(null);
+
+    const update = async params => {
+        const data = await updateJob(params);
+
+        mutate({
+            ...jobData,
+            ...data.job,
+        });
+    };
+
     const updateDebounce = useDebounce(update, 1000, []);
     const updateLongDebounce = useDebounce(update, 2000, []);
-    const isAutoRefresh = useRef(false);
-    const autoRefresh = useRef(() => {});
-    const refreshTimeout = useRef();
 
-    useEffect(() => {
-        fetch(user, id);
-    }, []);
+
+    const prevData = usePrevious(jobData);
 
     useEffect(() => {
         window.addEventListener('keydown', detectEnterPress);
         return () => window.removeEventListener('keydown', detectEnterPress);
-    }, [data, code]);
+    }, [jobData, code]);
+
+    useEffect(() => {
+        if (jobData) {
+            setTitleValue(jobData.title);
+            setCode(jobData.code);
+        }
+    }, []);
 
     const detectEnterPress = event => {
         if (event.code === 'Enter' && (event.shiftKey || event.ctrlKey)) {
@@ -74,61 +103,47 @@ const Details = ({
     };
 
     useEffect(() => {
-        clearTimeout(refreshTimeout.current);
+        if (['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData?.status) >= 0) {
+            clearInterval(progressTimer.current);
 
-        autoRefresh.current = () => {
-            refreshTimeout.current = setTimeout(() => {
-                if (isAutoRefresh.current)
-                    fetch(user, id, autoRefresh.current, autoRefresh.current);
-                else
-                    autoRefresh.current();
-            }, REFRESH_TIMEOUT);
-        };
+            progressTimer.current = setInterval(() => {
+                const [progress] = calculateJobProgress(jobData);
 
-        autoRefresh.current();
-
-        return () => {
-            isAutoRefresh.current = false;
-            clearTimeout(refreshTimeout.current);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (prevData?.id !== data?.id) {
-            setTitleValue(data.title);
-            setCode(data.code);
+                setAppProgress(progress);
+            }, 50);
+        } else {
+            clearInterval(progressTimer.current);
         }
 
-        if (isDidMount.current)
-            isDidMount.current = false;
+        return () => clearInterval(progressTimer.current);
+    }, [refreshInterval, jobData]);
 
-        if (data?.status === 'RUNNING') {
-            const estimatedDuration = data['estimated_duration'] || 600000;
-            const currentDuration = Date.now() - data.started;
-            const progress = Math.min(currentDuration / estimatedDuration * 100, 100).toFixed();
+    useEffect(() => {
+        if (prevData?.id !== jobData?.id) {
+            setTitleValue(jobData.title);
+            setCode(jobData.code);
+        }
 
-            setAppProgress(progress);
-        } else
+        if (['RUNNING', 'SCHEDULED'].indexOf(jobData?.status) >= 0) {
+            if (!refreshInterval)
+                setRefreshInterval(REFRESH_TIMEOUT);
+        } else if (refreshInterval) {
+            setRefreshInterval(0);
             resetAppProgress();
-
-        if (['RUNNING', 'SCHEDULED'].indexOf(data?.status) >= 0) {
-            if (!isAutoRefresh.current)
-                isAutoRefresh.current = true;
-        } else if (isAutoRefresh.current)
-            isAutoRefresh.current = false;
+        }
 
         return () => {
             resetAppProgress();
         };
-    }, [data]);
+    }, [jobData]);
 
-    const onChangeTitle = event => {
-        setTitleValue(event.target.value);
+    const onChangeTitle = value => {
+        setTitleValue(value);
 
         updateDebounce({
             user: user,
-            id: data.id,
-            title: event.target.value,
+            id: jobData?.id,
+            title: value,
         });
     };
 
@@ -139,7 +154,7 @@ const Details = ({
         updateLongDebounce(
             {
                 user: user,
-                id: data.id,
+                id: jobData?.id,
                 code: value,
             },
 
@@ -150,7 +165,7 @@ const Details = ({
     const onChangeRuntime = runtime => {
         update({
             user: user,
-            id: data.id,
+            id: jobData?.id,
             runtime: runtime,
         });
     };
@@ -158,37 +173,67 @@ const Details = ({
     const onChangeSchedule = schedule => {
         update({
             user: user,
-            id: data.id,
+            id: jobData?.id,
             schedule: schedule,
         });
     };
 
-    const onClickRun = () => run({
-        user: user,
-        id: data.id,
-        code,
-    });
+    const onClickRun = async () => {
+        setRunning(true);
 
-    const onClickStop = () => stop({
-        user: user,
-        id: data.id,
-    });
-
-    const onClickDelete = () => {
-        remove(
-            {
+        try {
+            const data = await runJob({
                 user: user,
-                id: data.id,
-            },
+                id: jobData?.id,
+                code,
+            });
 
-            () => push(routes.jobs(user))
-        );
+            mutate({
+                ...jobData,
+                ...data,
+            });
+
+            setRefreshInterval(REFRESH_TIMEOUT);
+        } catch (e) {
+            console.log(e);
+        }
+
+        setRunning(false);
     };
 
-    if (loading && (!data || data.id !== id))
+    const onClickStop = async () => {
+        setStopping(true);
+
+        try {
+            const data = await stopJob({
+                user: user,
+                id: jobData?.id,
+            });
+
+            mutate({
+                ...jobData,
+                ...data,
+            });
+        } catch (e) {
+            console.log(e);
+        }
+
+        setStopping(false);
+    };
+
+    const onClickDelete = async () => {
+        await removeJob({
+            user: user,
+            id: jobData?.id,
+        });
+
+        push(routes.jobs(user));
+    };
+
+    if (!jobData && !error)
         return <Loader />;
 
-    if (requestStatus === 403)
+    if (error?.status === 403)
         return <AccessForbidden>
             {t('youDontHaveAnAccessToThisJob')}.
 
@@ -203,7 +248,7 @@ const Details = ({
             )}
         </AccessForbidden>;
 
-    if (requestStatus === 404)
+    if (error?.status === 404)
         return <NotFound>
             {t('theJobYouAreRookingForCouldNotBeFound')}
             {' '}
@@ -216,11 +261,23 @@ const Details = ({
             )}
         </NotFound>;
 
-    if (!data)
+    if (!jobData)
         return null;
 
     return (
         <div className={css.details}>
+            <Yield name="header-yield">
+                <BackButton
+                    Component={Link}
+                    to={routes.jobs(user)}
+                >
+                    {(currentUser === user)
+                        ? t('backToJobs')
+                        : t('backToJobsOf', {name: user})
+                    }
+                </BackButton>
+            </Yield>
+
             <div className={css.header}>
                 <div className={css.title}>
                     <StretchTitleField
@@ -233,15 +290,15 @@ const Details = ({
                 </div>
 
                 <div className={css.side}>
-                    {data.status === 'RUNNING' && (
-                        <Progress onlyDuration className={css.progress} data={data} />
+                    {jobData.status === 'RUNNING' && (
+                        <Progress onlyDuration className={css.progress} data={jobData} />
                     )}
 
-                    {data.status === 'FAILED' && (
+                    {jobData.status === 'FAILED' && (
                         <div className="red-text">{t('sorryButYourCodeDoesntLookLikePythonJob')}</div>
                     )}
 
-                    {['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(data.status) >= 0
+                    {['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0
                         ? <Button
                             className={css.button}
                             color="fail"
@@ -287,11 +344,11 @@ const Details = ({
                 </Dropdown>}
             </div>
 
-            <Status data={data} />
+            <Status data={jobData} />
 
             <ScheduleSettings
                 className={css.schedule}
-                data={data}
+                data={jobData}
                 onChange={onChangeSchedule}
                 onChangeRuntime={onChangeRuntime}
             />
@@ -300,26 +357,19 @@ const Details = ({
                 className={css.codeEditor}
                 value={code}
                 onChange={onChangeCode}
-                language={data.runtime}
+                language={jobData.runtime}
                 saved={codeSaved}
             />
 
             <Logs
                 className={css.logs}
-                data={data}
+                data={jobData}
             />
         </div>
     );
 };
 
 export default connect(
-    state => ({
-        currentUser: state.app.userData?.user,
-        data: state.jobs.details.data,
-        loading: state.jobs.details.loading,
-        running: state.jobs.details.running,
-        stopping: state.jobs.details.stopping,
-        requestStatus: state.jobs.details.requestStatus,
-    }),
-    {fetch, update, remove, run, stop, setAppProgress, resetAppProgress}
+    state => ({currentUser: state.app.userData?.user}),
+    {setAppProgress, resetAppProgress}
 )(Details);

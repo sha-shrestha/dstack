@@ -9,11 +9,11 @@ const instance = axios.create({
     crossDomain: true,
 });
 
-instance.interceptors.request.use(config => {
-    const token = localStorage.getItem('token');
+instance.interceptors.request.use(requestConfig => {
+    const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
 
-    config.headers.Authorization = token ? `Bearer ${token}` : '';
-    return config;
+    requestConfig.headers.Authorization = token ? `Bearer ${token}` : '';
+    return requestConfig;
 });
 
 instance.interceptors.response.use(
