@@ -3,10 +3,10 @@ import React, {useState} from 'react';
 import moment from 'moment';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
-import {Button} from '@dstackai/dstack-react';
+import Button from '../../../../Button';
 import css from './styles.module.css';
 
-import type {Job} from 'Jobs/types';
+import type {Job} from '../../../types';
 
 type Props = {
     data: Job,

@@ -1,33 +1,26 @@
 // @flow
 import React, {useState} from 'react';
-import {get} from 'lodash-es';
 import useSWR from 'swr';
-import {connect} from 'react-redux';
 import {useHistory, useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
-import {Button, SearchField, Yield} from '@dstackai/dstack-react';
-import {dataFetcher} from '@dstackai/dstack-react/dist/utils';
-import TableRow from './components/TableRow';
+import Button from '../../Button';
+import SearchField from '../../SearchField';
+import Yield from '../../Yield';
+import {useAppStore} from '../../AppStore';
+import {dataFetcher} from '../../utils';
+import routes from '../../routes';
+import config from '../../config';
+import useActions from '../actions';
 import Loader from './components/Loader';
-import routes from 'routes';
-import config from 'config';
-// import {create as createJob, remove as removeJob} from 'Jobs/Details/actions';
-import {createJob, removeJob} from '../utils';
+import TableRow from './components/TableRow';
 import css from './styles.module.css';
-
-type Props = {
-    loading: boolean,
-    search: string,
-    currentUser?: string,
-    setSearch: Function,
-    fetchList: Function,
-    createJob: Function,
-    removeJob: Function,
-}
 
 const dataFormat = data => data.jobs;
 
-const List = ({currentUser}: Props) => {
+const List = () => {
+    const {createJob, removeJob} = useActions();
+    const [{currentUser, apiUrl}] = useAppStore();
+    const currentUserName = currentUser.data?.user;
     const {t} = useTranslation();
     const [search, setSearch] = useState('');
     const {user} = useParams();
@@ -35,7 +28,7 @@ const List = ({currentUser}: Props) => {
 
     const {data, mutate} = useSWR(
         [
-            config.API_URL + config.JOB_LIST(user),
+            apiUrl + config.JOB_LIST(user),
             dataFormat,
         ],
         dataFetcher,
@@ -99,7 +92,7 @@ const List = ({currentUser}: Props) => {
             </Yield>
 
             <div className={css.title}>
-                {currentUser === user
+                {currentUserName === user
                     ? t('myJobs')
                     : t('jobsOf', {name: user})
                 }
@@ -158,6 +151,4 @@ const List = ({currentUser}: Props) => {
     );
 };
 
-export default connect(
-    state => ({currentUser: get(state.app.userData, 'user')}),
-)(List);
+export default List;

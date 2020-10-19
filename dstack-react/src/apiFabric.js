@@ -2,7 +2,7 @@ import axios from 'axios';
 import {get as _get} from 'lodash-es';
 import config from './config';
 
-const apiFabric = ({apiUrl}) => {
+const apiFabric = ({apiUrl} = {}) => {
     const CancelToken = axios.CancelToken;
 
     const instance = axios.create({

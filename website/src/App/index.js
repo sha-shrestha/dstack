@@ -7,7 +7,7 @@ import routes from 'routes';
 import '@mdi/font/css/materialdesignicons.min.css';
 import '@dstackai/dstack-react/dist/index.css';
 
-import {NotFound, Loader, UnAuthorizedLayout} from '@dstackai/dstack-react';
+import {NotFound, Loader, UnAuthorizedLayout, appStoreActionTypes, useAppStore, Jobs} from '@dstackai/dstack-react';
 import DefaultLayout from 'layouts/Default';
 
 import Login from 'Auth/Login';
@@ -15,7 +15,6 @@ import ConfirmEmail from 'Auth/ConfirmEmail';
 
 import Dashboards from 'Dashboards';
 import Stacks from 'Stacks';
-import Jobs from 'Jobs';
 import Settings from 'Settings';
 
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
@@ -62,18 +61,29 @@ type Props = {
 
 const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
     const [loading, setLoading] = useState(true);
+    const [, dispatch] = useAppStore();
     const isInitialMount = useRef(true);
 
+    // FETCH_CURRENT_USER
+    // FETCH_CURRENT_USER_SUCCESS
+    // FETCH_CURRENT_USER_FAIL
+
     useEffect(() => {
-        if (isSignedIn())
+        if (isSignedIn()) {
+            dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER});
+
             fetchUser(
-                () => {},
+                data => dispatch({
+                    type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
+                    payload: data,
+                }),
                 () => {
                     setLoading(false);
+                    dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER_FAIL});
                     push(routes.authLogin());
                 }
             );
-        else
+        } else
             setLoading(false);
     }, []);
 
@@ -120,7 +130,7 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                         <Switch>
                             <UnAuthorizedLayoutRoute path={routes.notFound()} component={NotFound} />
                             <UnAuthorizedLayoutRoute path={routes.dashboards()} component={Dashboards} />
-                            <DefaultLayoutRoute path={routes.jobs()} component={Jobs} />
+                            {/*<DefaultLayoutRoute path={routes.jobs()} component={Jobs} />*/}
                             <UnAuthorizedLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
                     )}

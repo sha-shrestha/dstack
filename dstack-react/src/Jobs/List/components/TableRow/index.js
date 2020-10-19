@@ -1,28 +1,23 @@
 // @flow
 import React, {useEffect, useState, memo} from 'react';
-import {connect} from 'react-redux';
+import useSWR from 'swr';
+import cx from 'classnames';
+import moment from 'moment';
 import {useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
-import moment from 'moment';
-import cx from 'classnames';
-import {Dropdown} from '@dstackai/dstack-react';
-import {runJob, stopJob} from 'Jobs/utils';
-import Progress from 'Jobs/Details/components/Progress';
-import {dataFetcher, getFormattedDuration} from '@dstackai/dstack-react/dist/utils';
+import Dropdown from '../../../../Dropdown';
+import {useAppStore} from '../../../../AppStore';
+import {dataFetcher, getFormattedDuration} from '../../../../utils';
+import useActions from '../../../actions';
+import Progress from '../../../Details/components/Progress';
+import config from '../../../../config';
 import css from './styles.module.css';
-import useSWR from 'swr';
-import config from 'config';
 
 type Props = {
     data: {[key: string]: any},
-    currentUSer?: string,
     onClickRow?: Function,
     onEdit?: Function,
-    onRun?: Function,
     onDelete?: Function,
-    fetch: Function,
-    run: Function,
-    stop: Function,
 };
 
 const REFRESH_TIMEOUT = 2000;
@@ -30,18 +25,20 @@ const dataFormat = data => data.job;
 
 const TableRow = memo(({
     data,
-    currentUSer,
     onClickRow,
     onEdit,
     onDelete,
 }: Props) => {
+    const {runJob, stopJob} = useActions();
+    const [{currentUser, apiUrl}] = useAppStore();
+    const currentUserName = currentUser.data?.user;
     const {t} = useTranslation();
     const {user} = useParams();
     const [refreshInterval, setRefreshInterval] = useState(0);
 
     const {data: jobData, mutate} = useSWR(
         [
-            config.API_URL + config.JOB_DETAILS(user, data.id),
+            apiUrl + config.JOB_DETAILS(user, data.id),
             dataFormat,
         ],
         dataFetcher,
@@ -137,7 +134,7 @@ const TableRow = memo(({
             <div className={css.cell}>
                 {renderStatus()}
 
-                {currentUSer === user && (
+                {currentUserName === user && (
                     <Dropdown
                         className={css.dropdown}
 
@@ -171,6 +168,4 @@ const TableRow = memo(({
     );
 });
 
-export default connect(
-    state => ({currentUSer: state.app.userData?.user}),
-)(TableRow);
+export default TableRow;

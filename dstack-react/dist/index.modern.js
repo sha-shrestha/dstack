@@ -1,6 +1,6 @@
+import React__default, { createContext, useReducer, useContext, forwardRef, useState, useRef, useEffect, useImperativeHandle, useMemo, memo, useCallback, Fragment, Component } from 'react';
 import axios from 'axios';
 import { get, isEqual, isString, debounce, unionBy } from 'lodash-es';
-import React__default, { forwardRef, useState, useRef, useEffect, useImperativeHandle, useMemo, memo, useCallback, createContext, useReducer, useContext, Fragment, Component } from 'react';
 import cx from 'classnames';
 import Highlight from 'react-highlight.js';
 import { useTranslation } from 'react-i18next';
@@ -15,11 +15,107 @@ import Select, { Option, OptGroup } from 'rc-select';
 import Slider from 'rc-slider';
 import Plot from 'react-plotly.js';
 import { parse } from 'csv-string';
-import { Link } from 'react-router-dom';
+import { Link, Switch, Route } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useDrag, useDrop } from 'react-dnd';
 export { DndProvider } from 'react-dnd';
-import { useParams } from 'react-router';
+import { useParams, useHistory } from 'react-router';
+import useSWR from 'swr';
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-r';
+import 'prismjs/themes/prism.css';
+
+var actionsTypes = {
+  FETCH_CURRENT_USER: 'app/user/FETCH',
+  FETCH_CURRENT_USER_SUCCESS: 'app/user/FETCH_SUCCESS',
+  FETCH_CURRENT_USER_FAIL: 'app/user/FETCH_FAIL',
+  START_PROGRESS: 'app/START_PROGRESS',
+  SET_PROGRESS: 'app/SET_PROGRESS',
+  COMPLETE_PROGRESS: 'app/COMPLETE_PROGRESS',
+  RESET_PROGRESS: 'app/RESET_PROGRESS'
+};
+
+const initialState = {
+  currentUser: {
+    loading: false,
+    data: null
+  },
+  appProgress: {
+    active: null,
+    value: null
+  }
+};
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case actionsTypes.FETCH_CURRENT_USER:
+      return { ...state,
+        currentUser: { ...state.currentUser,
+          loading: true
+        }
+      };
+
+    case actionsTypes.FETCH_CURRENT_USER_SUCCESS:
+      return { ...state,
+        currentUser: { ...state.currentUser,
+          data: action.payload,
+          loading: false
+        }
+      };
+
+    case actionsTypes.FETCH_FAIL:
+      return { ...state,
+        currentUser: { ...state.currentUser,
+          loading: false
+        }
+      };
+
+    case actionsTypes.START_PROGRESS:
+      return { ...state,
+        appProgress: { ...state.appProgress,
+          active: true,
+          value: null
+        }
+      };
+
+    case actionsTypes.SET_PROGRESS:
+      return { ...state,
+        appProgress: { ...state.appProgress,
+          value: action.payload
+        }
+      };
+
+    case actionsTypes.COMPLETE_PROGRESS:
+      return { ...state,
+        appProgress: { ...state.appProgress,
+          active: false,
+          value: null
+        }
+      };
+
+    case actionsTypes.RESET_PROGRESS:
+      return { ...state,
+        appProgress: { ...state.appProgress,
+          active: null,
+          value: null
+        }
+      };
+
+    default:
+      return state;
+  }
+};
+const StateContext = createContext();
+const AppStoreProvider = ({
+  children,
+  apiUrl
+}) => /*#__PURE__*/React__default.createElement(StateContext.Provider, {
+  value: useReducer(reducer, { ...initialState,
+    apiUrl
+  })
+}, children);
+const useAppStore = () => useContext(StateContext);
 
 var config = {
   DOCS_URL: 'http://docs.dstack.ai',
@@ -79,7 +175,7 @@ push_frame("simple", image, "My first plot")`;
 
 const apiFabric = ({
   apiUrl
-}) => {
+} = {}) => {
   const CancelToken = axios.CancelToken;
   const instance = axios.create({
     baseURL: apiUrl,
@@ -475,6 +571,19 @@ var parseStackTabs = (attachments => {
   return tabs;
 });
 
+var getFormattedDuration = (duration => {
+  if (duration < 1000) return '0sec';
+  let string = '';
+  const momentDuration = moment.duration(duration);
+  const hours = momentDuration.hours();
+  const minutes = momentDuration.minutes();
+  const seconds = momentDuration.seconds();
+  if (hours) string += `${moment.duration(hours, 'hours').as('hours')}h`;
+  if (minutes) string += ` ${moment.duration(minutes, 'minutes').as('minutes')}min`;
+  if (seconds) string += ` ${moment.duration(seconds, 'seconds').asSeconds()}sec`;
+  return string;
+});
+
 const fileToBase64 = async file => new Promise((resolve, reject) => {
   const reader = new FileReader();
   reader.readAsDataURL(file);
@@ -483,6 +592,45 @@ const fileToBase64 = async file => new Promise((resolve, reject) => {
 
   reader.onerror = error => reject(error);
 });
+
+const fetcher = async (url, responseDataFormat = data => data) => {
+  const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
+
+  try {
+    const request = await axios({
+      url: url,
+      headers: {
+        Authorization: token ? `Bearer ${token}` : ''
+      }
+    });
+    return responseDataFormat(request.data);
+  } catch (e) {
+    let errorBody = null;
+    let status = null;
+
+    try {
+      errorBody = JSON.parse(get(e, 'request.response'));
+    } catch (e) {
+      console.log(e);
+    }
+
+    try {
+      status = get(e, 'request.status');
+    } catch (e) {
+      console.log(e);
+    }
+
+    const error = new Error('An error occurred while fetching the data.');
+    error.info = errorBody;
+    error.status = status;
+    throw error;
+  }
+};
+
+const isSignedIn = () => {
+  const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
+  return Boolean(token && token.length);
+};
 
 var css$9 = {"dnd":"_style-module__dnd__3uYii","fileWrapper":"_style-module__fileWrapper__1GUx_","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","button":"_style-module__button__14ku1","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
 
@@ -1444,20 +1592,20 @@ var useIntersectionObserver = ((callBack, {
   return [ref];
 });
 
-var actionsTypes = {
+var actionsTypes$1 = {
   FETCH: 'stacks/attachments/FETCH',
   FETCH_SUCCESS: 'stacks/attachments/FETCH_SUCCESS',
   FETCH_FAIL: 'stacks/attachments/FETCH_FAIL'
 };
 
-const initialState = {
+const initialState$1 = {
   data: {},
   errors: {},
   requestStatus: null
 };
-const reducer = (state = initialState, action) => {
+const reducer$1 = (state = initialState$1, action) => {
   switch (action.type) {
-    case actionsTypes.FETCH:
+    case actionsTypes$1.FETCH:
       return { ...state,
         data: { ...state.data,
           [action.meta.frameId]: { ...state.data[action.meta.frameId],
@@ -1470,7 +1618,7 @@ const reducer = (state = initialState, action) => {
         }
       };
 
-    case actionsTypes.FETCH_SUCCESS:
+    case actionsTypes$1.FETCH_SUCCESS:
       return { ...state,
         data: { ...state.data,
           [action.meta.frameId]: { ...state.data[action.meta.frameId],
@@ -1481,7 +1629,7 @@ const reducer = (state = initialState, action) => {
         }
       };
 
-    case actionsTypes.FETCH_FAIL:
+    case actionsTypes$1.FETCH_FAIL:
       return { ...state,
         data: { ...state.data,
           [action.meta.frameId]: { ...state.data[action.meta.frameId],
@@ -1498,16 +1646,16 @@ const reducer = (state = initialState, action) => {
       return state;
   }
 };
-const StateContext = createContext();
+const StateContext$1 = createContext();
 const StateProvider = ({
   children,
   apiUrl
-}) => /*#__PURE__*/React__default.createElement(StateContext.Provider, {
-  value: useReducer(reducer, { ...initialState,
+}) => /*#__PURE__*/React__default.createElement(StateContext$1.Provider, {
+  value: useReducer(reducer$1, { ...initialState$1,
     apiUrl
   })
 }, children);
-const useStateValue = () => useContext(StateContext);
+const useStateValue = () => useContext(StateContext$1);
 
 var actions = (() => {
   const [{
@@ -1517,7 +1665,7 @@ var actions = (() => {
   const fetchAttachment = async (stack, frameId, id, onSuccess) => {
     const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
     dispatch({
-      type: actionsTypes.FETCH,
+      type: actionsTypes$1.FETCH,
       meta: {
         frameId,
         id
@@ -1533,7 +1681,7 @@ var actions = (() => {
         }
       });
       dispatch({
-        type: actionsTypes.FETCH_SUCCESS,
+        type: actionsTypes$1.FETCH_SUCCESS,
         meta: {
           frameId,
           id
@@ -1551,7 +1699,7 @@ var actions = (() => {
       }
 
       dispatch({
-        type: actionsTypes.FETCH_FAIL,
+        type: actionsTypes$1.FETCH_FAIL,
         meta: {
           frameId,
           id
@@ -3612,9 +3760,954 @@ const AddStacksModal = ({
   }, t('cancel')))));
 };
 
+const api = apiFabric();
+var useActions = (() => {
+  const [{
+    apiUrl
+  }] = useAppStore();
+
+  const fetchJob = ({
+    user,
+    id
+  }) => {
+    return new Promise(async resolve => {
+      try {
+        const request = await api.get(apiUrl + config.JOB_DETAILS(user, id));
+        resolve(request.data);
+      } catch (e) {
+        resolve({});
+      }
+    });
+  };
+
+  const runJob = params => {
+    return new Promise(async resolve => {
+      try {
+        const request = await api.post(apiUrl + config.JOB_RUN, params);
+        resolve(request.data);
+      } catch (e) {
+        resolve({});
+      }
+    });
+  };
+
+  const stopJob = params => {
+    return new Promise(async resolve => {
+      try {
+        const request = await api.post(apiUrl + config.JOB_STOP, params);
+        resolve(request.data);
+      } catch (e) {
+        resolve({});
+      }
+    });
+  };
+
+  const createJob = params => {
+    return new Promise(async resolve => {
+      try {
+        const request = await api.post(apiUrl + config.JOB_CREATE, params);
+        resolve(request.data);
+      } catch (e) {
+        resolve({});
+      }
+    });
+  };
+
+  const updateJob = params => {
+    return new Promise(async resolve => {
+      try {
+        const request = await api.post(apiUrl + config.JOB_UPDATE, params);
+        resolve(request.data);
+      } catch (e) {
+        resolve({});
+      }
+    });
+  };
+
+  const removeJob = params => {
+    return new Promise(async resolve => {
+      try {
+        const request = await api.post(apiUrl + config.JOB_DELETE, params);
+        resolve(request.data);
+      } catch (e) {
+        resolve({});
+      }
+    });
+  };
+
+  return {
+    fetchJob,
+    runJob,
+    stopJob,
+    createJob,
+    updateJob,
+    removeJob
+  };
+});
+
+var css$J = {"loader":"_styles-module__loader__DHDDF","title":"_styles-module__title__3eHle","loader-pulsee":"_styles-module__loader-pulsee__3Q4hE","text":"_styles-module__text__2QdBi","table":"_styles-module__table__3c_Ia","item":"_styles-module__item__2_9nD"};
+
+const Loader$5 = ({}) => {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.title
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.text
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.table
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  })));
+};
+
+const calculateJobProgress = job => {
+  const estimatedDuration = job['estimated_duration'] || JOB_DEFAULT_ESTIMATED_DURATION;
+  const currentDuration = Date.now() - job.started;
+  const leftDuration = estimatedDuration - currentDuration;
+  const progress = Math.min(currentDuration / estimatedDuration * 100, 100).toFixed();
+  return [progress, leftDuration];
+};
+
+var css$K = {"section":"_styles-module__section__3RnYw","progressBar":"_styles-module__progressBar__3xjSa","progress":"_styles-module__progress__3eEzL","time":"_styles-module__time__1q33r"};
+
+const Progress = ({
+  data,
+  className,
+  onlyDuration
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const progressTimer = useRef(null);
+  const [, set] = useState(null);
+  useEffect(() => {
+    if (data.status === 'RUNNING') {
+      clearInterval(progressTimer.current);
+      progressTimer.current = setInterval(() => {
+        set(Date.now());
+      }, 50);
+    } else {
+      clearInterval(progressTimer.current);
+    }
+
+    return () => clearInterval(progressTimer.current);
+  }, [data]);
+  if (!data.started) return null;
+  const [progress, leftDuration] = calculateJobProgress(data);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$K.section, className)
+  }, !onlyDuration && /*#__PURE__*/React__default.createElement("div", {
+    className: css$K.progressBar
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$K.progress,
+    style: {
+      width: `${progress}%`
+    }
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$K.time
+  }, getFormattedDuration(leftDuration), " ", t('left')));
+};
+
+var css$L = {"row":"_styles-module__row__2f7FO","dropdown":"_styles-module__dropdown__2hTQP","cell":"_styles-module__cell__3ntzL","status":"_styles-module__status__2MUSr","progress":"_styles-module__progress__1J2il"};
+
+const REFRESH_TIMEOUT = 2000;
+
+const dataFormat = data => data.job;
+
+const TableRow = memo(({
+  data,
+  onClickRow,
+  onEdit,
+  onDelete
+}) => {
+  var _currentUser$data;
+
+  const {
+    runJob,
+    stopJob
+  } = useActions();
+  const [{
+    currentUser,
+    apiUrl
+  }] = useAppStore();
+  const currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
+  const {
+    t
+  } = useTranslation();
+  const {
+    user
+  } = useParams();
+  const [refreshInterval, setRefreshInterval] = useState(0);
+  const {
+    data: jobData,
+    mutate
+  } = useSWR([apiUrl + config.JOB_DETAILS(user, data.id), dataFormat], fetcher, {
+    refreshInterval,
+    initialData: data,
+    revalidateOnFocus: false
+  });
+
+  const rowClick = () => {
+    if (onClickRow) onClickRow(jobData);
+  };
+
+  useEffect(() => {
+    if (['RUNNING', 'SCHEDULED'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
+      if (!refreshInterval) setRefreshInterval(REFRESH_TIMEOUT);
+    } else if (refreshInterval) {
+      setRefreshInterval(0);
+    }
+  }, [jobData]);
+
+  const onRun = async () => {
+    const {
+      job
+    } = await runJob({
+      user,
+      id: jobData.id
+    });
+    if (job) mutate({ ...jobData,
+      ...job
+    });
+  };
+
+  const onStop = async () => {
+    const {
+      job
+    } = await stopJob({
+      user,
+      id: jobData.id
+    });
+    if (job) mutate({ ...jobData,
+      ...job
+    });
+  };
+
+  const getTitle = () => {
+    if (jobData.title && jobData.title.length) return jobData.title;else return /*#__PURE__*/React__default.createElement("span", null, "New job");
+  };
+
+  const renderStatus = () => {
+    switch (jobData.status) {
+      case 'SCHEDULED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t('inProgress'), "\u2026");
+
+      case 'RUNNING':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress, {
+          className: css$L.progress,
+          data: jobData
+        }));
+
+      case 'TIMEOUT':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: cx(css$L.status, 'fail')
+        }, "\u26D4\uFE0F ", t('failedDueToTimeout'));
+
+      case 'FAILED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: cx(css$L.status, 'fail')
+        }, "\u26D4\uFE0F ", t('failed'));
+
+      case 'FINISHED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: cx(css$L.status, 'success')
+        }, "\u2705 ", t('completed'));
+
+      case 'CREATED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t('neverRun'));
+
+      default:
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t(jobData.status.toLowerCase()));
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$L.row, {
+      red: ['TIMEOUT', 'FAILED'].indexOf(jobData.status) > -1
+    }),
+    onClick: rowClick
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, getTitle()), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, t(jobData.runtime)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, moment(jobData.started).format('MM-DD-YYYY [at] HH:mm')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, getFormattedDuration(jobData.finished - jobData.started)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, renderStatus(), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$L.dropdown,
+    items: [...(['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? [{
+      title: t('stop'),
+      onClick: onStop
+    }] : [{
+      title: t('run'),
+      onClick: onRun
+    }]), {
+      title: t('edit'),
+      onClick: onEdit
+    }, {
+      title: t('delete'),
+      onClick: onDelete
+    }]
+  })));
+});
+
+var css$M = {"list":"_styles-module__list__VXs44","title":"_styles-module__title__r4zAA","button":"_styles-module__button__21dbT","search":"_styles-module__search__1mylL","mobileSearch":"_styles-module__mobileSearch__3Oub0","text":"_styles-module__text__Ra7UV","tableWrap":"_styles-module__tableWrap__2CYWc","table":"_styles-module__table__2iL6k","tableCaptions":"_styles-module__tableCaptions__2YOUS","tableCell":"_styles-module__tableCell__3tQ5e"};
+
+const dataFormat$1 = data => data.jobs;
+
+const List$2 = () => {
+  var _currentUser$data;
+
+  const {
+    createJob,
+    removeJob
+  } = useActions();
+  const [{
+    currentUser,
+    apiUrl
+  }] = useAppStore();
+  const currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
+  const {
+    t
+  } = useTranslation();
+  const [search, setSearch] = useState('');
+  const {
+    user
+  } = useParams();
+  const {
+    push
+  } = useHistory();
+  const {
+    data,
+    mutate
+  } = useSWR([apiUrl + config.JOB_LIST(user), dataFormat$1], fetcher);
+
+  const onChangeSearch = value => setSearch(value);
+
+  const getItems = () => {
+    let items = [];
+
+    if (data && data.length) {
+      if (search.length) items = data.filter(i => i.title.indexOf(search) >= 0);else items = data;
+    }
+
+    return items;
+  };
+
+  const items = getItems();
+
+  const onAdd = async () => {
+    const lastRuntime = localStorage.getItem('lastRuntime') || 'python';
+    const data = await createJob({
+      user,
+      runtime: lastRuntime
+    });
+    push(routes.jobsDetails(user, data.job.id));
+  };
+
+  const getOnRemove = job => async () => {
+    await removeJob({
+      user,
+      id: job.id
+    });
+    mutate(data.filter(j => j.id !== job.id));
+  };
+
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$5, null);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.list
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(SearchField, {
+    showEverything: true,
+    isDark: true,
+    placeholder: t('findJob'),
+    size: "small",
+    value: search,
+    className: css$M.search,
+    onChange: onChangeSearch
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.title
+  }, currentUserName === user ? t('myJobs') : t('jobsOf', {
+    name: user
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    className: css$M.button,
+    variant: "contained",
+    color: "primary",
+    size: "small",
+    onClick: onAdd
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-plus"
+  }), " ", t('newJob'))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.text
+  }, t('youHaveJobs', {
+    count: data.length
+  }), ' ', /*#__PURE__*/React__default.createElement("a", {
+    href: config.DOCS_URL + '/jobs',
+    target: "_blank"
+  }, t('documentation'), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-open-in-new"
+  })), "."), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+    placeholder: t('findJob'),
+    className: css$M.mobileSearch,
+    showEverything: true,
+    size: "small",
+    value: search,
+    onChange: onChangeSearch
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableWrap
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.table
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCaptions
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('job')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('runtime')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('lastRun')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('timeSpent')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('status'))), items.map(item => /*#__PURE__*/React__default.createElement(TableRow, {
+    data: item,
+    key: item.id,
+    onClickRow: () => push(routes.jobsDetails(user, item.id)),
+    onEdit: () => push(routes.jobsDetails(user, item.id)),
+    onDelete: getOnRemove(item)
+  })))));
+};
+
+var css$N = {"schedule":"_styles-module__schedule__YoEcM","dropdown":"_styles-module__dropdown__3RJdh","runtime":"_styles-module__runtime__2h8GE","message":"_styles-module__message__1byIj"};
+
+let timeout = null;
+
+const ScheduleSettings = ({
+  data,
+  className,
+  onChange,
+  onChangeRuntime
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const messageRef = useRef();
+  const [scheduleType, setScheduleType] = useState(data ? data.schedule.split('/')[0] : '');
+  const [scheduleTime, setScheduleTime] = useState(data ? data.schedule.split('/')[1] : null);
+  const [nextRunDelay, setNextRunDelay] = useState(0);
+  const isDidMount = useRef(true);
+
+  const runtimeChange = runtime => () => {
+    onChangeRuntime(runtime);
+    localStorage.setItem('lastRuntime', runtime);
+  };
+
+  const scheduleTypeChange = type => () => {
+    setScheduleType(type);
+    if (!scheduleTime) setScheduleTime('12:00');
+    if (type === 'daily') type += `/${scheduleTime ? scheduleTime : '12:00'}`;
+    onChange(type);
+  };
+
+  const scheduleTimeChange = time => () => {
+    setScheduleTime(time);
+    onChange(`${scheduleType}/${time}`);
+    const runTime = moment(time, 'HH:mm');
+    if (new Date().getHours() > runTime.get('hours')) runTime.add(1, 'day');
+    setNextRunDelay(runTime.toDate().getTime() - Date.now());
+  };
+
+  useEffect(() => {
+    if (nextRunDelay && !isDidMount.current && messageRef.current) {
+      messageRef.current.classList.add('show');
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        messageRef.current.classList.remove('show');
+      }, 3000);
+    }
+
+    if (isDidMount.current) isDidMount.current = false;
+  }, [nextRunDelay]);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$N.schedule, className)
+  }, t('runtime'), ":", /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: cx(css$N.dropdown, css$N.runtime),
+    items: [{
+      title: t('python'),
+      onClick: runtimeChange('python')
+    }, {
+      title: t('r'),
+      onClick: runtimeChange('r')
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$N['dropdown-button'],
+    color: "primary"
+  }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  }))), t('jobIs'), " ", scheduleType !== 'unscheduled' && t('scheduled'), /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$N.dropdown,
+    items: [{
+      title: t('unscheduled'),
+      onClick: scheduleTypeChange('unscheduled')
+    }, {
+      title: t('daily'),
+      onClick: scheduleTypeChange('daily')
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$N['dropdown-button'],
+    color: "primary"
+  }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  }))), scheduleType === 'daily' && /*#__PURE__*/React__default.createElement(Fragment, null, t('at'), /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$N.dropdown,
+    items: new Array(24).fill(0).map((i, index) => {
+      const time = `${index < 10 ? '0' + index : index}:00`;
+      return {
+        title: time,
+        onClick: scheduleTimeChange(time)
+      };
+    })
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$N['dropdown-button'],
+    color: "primary"
+  }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    ref: messageRef,
+    className: cx(css$N.message, 'green-text')
+  }, "The next run starts in ", getFormattedDuration(nextRunDelay))));
+};
+
+var css$O = {"editor":"_styles-module__editor__m0hwp","token":"_styles-module__token__281_3","atrule":"_styles-module__atrule__1M8ph","attr-value":"_styles-module__attr-value__T6_N1","keyword":"_styles-module__keyword__1gT7U","function":"_styles-module__function__2ZXkX","class-name":"_styles-module__class-name__upcGt","selector":"_styles-module__selector__3rmyW","attr-name":"_styles-module__attr-name__I3P48","string":"_styles-module__string__hoRdC","char":"_styles-module__char__1uxpB","builtin":"_styles-module__builtin__3xCwG","inserted":"_styles-module__inserted__2Lvrk","scroll":"_styles-module__scroll__1yHaS","content":"_styles-module__content__3cHiP","success":"_styles-module__success__1Z8bo","lineNumbers":"_styles-module__lineNumbers__1CW5r"};
+
+const CodeEditor = ({
+  value: _value = '',
+  onChange,
+  language,
+  className,
+  saved
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const successMessageRef = useRef();
+  const lines = (_value.match(/\n/g) || []).length + 2;
+  const lineNos = [...Array(lines).keys()].slice(1).join('\n');
+  const isDidMount = useRef(true);
+  useEffect(() => {
+    if (successMessageRef.current && !isDidMount.current) if (saved) {
+      successMessageRef.current.classList.add('show');
+      setTimeout(() => {
+        if (successMessageRef.current) successMessageRef.current.classList.remove('show');
+      }, 4000);
+    } else {
+      successMessageRef.current.classList.remove('show');
+    }
+    if (isDidMount.current) isDidMount.current = false;
+  }, [saved]);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$O.editor, className)
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.success,
+    ref: successMessageRef
+  }, t('changesSaved')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.scroll
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.content
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.lineNumbers,
+    dangerouslySetInnerHTML: {
+      __html: lineNos
+    }
+  }), /*#__PURE__*/React__default.createElement(Editor, {
+    value: _value,
+    onValueChange: onChange,
+    highlight: code => highlight(code, languages[language]),
+    padding: 6,
+    style: {
+      width: '100%',
+      fontFamily: '"Roboto Mono", monospace',
+      fontSize: 12,
+      lineHeight: '150%',
+      outline: 'none'
+    }
+  }))));
+};
+
+var css$P = {"status":"_styles-module__status__3Pfpo"};
+
+const Status = ({
+  data
+}) => {
+  const {
+    t
+  } = useTranslation();
+  if (!data.started) return null;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$P.status
+  }, t('lastRunning'), ' ', moment(data.started).format(`MM-DD-YYYY [${t('at')}] HH:mm`), /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-clock-outline"
+  }), ['RUNNING', 'SCHEDULED'].indexOf(data.status) >= 0 ? /*#__PURE__*/React__default.createElement("span", null, ' ', t('inProgress'), "\u2026") : getFormattedDuration(data.finished - data.started)), data.status === 'FAILED' && /*#__PURE__*/React__default.createElement("span", {
+    className: "red-text"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-close-octagon-outline"
+  }), t('failed')), data.status === 'TIMEOUT' && /*#__PURE__*/React__default.createElement("span", {
+    className: "red-text"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-close-octagon-outline"
+  }), t('failedDueToTimeout')));
+};
+
+var css$Q = {"logs":"_styles-module__logs__1poNo","button":"_styles-module__button__35eOC","text":"_styles-module__text__2eQos","label":"_styles-module__label__LksjJ"};
+
+const Logs = ({
+  data,
+  className
+}) => {
+  if (!data.logs) return null;
+  const {
+    t
+  } = useTranslation();
+  const [isShown, setIsShown] = useState(true);
+  const [updated] = useState(data.finished || data.started);
+
+  const toggleShow = () => setIsShown(!isShown);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$Q.logs, className)
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$Q.button,
+    onClick: toggleShow,
+    color: "primary",
+    size: "small"
+  }, t('logs')), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$Q.text, {
+      open: isShown
+    })
+  }, /*#__PURE__*/React__default.createElement("pre", null, data.logs), updated && /*#__PURE__*/React__default.createElement("div", {
+    className: css$Q.label
+  }, t('updated'), " ", moment(updated).fromNow())));
+};
+
+var css$R = {"loader":"_styles-module__loader__2nOeY","loader-pulse":"_styles-module__loader-pulse__1Aj7Q","title":"_styles-module__title__RJ2x5","text1":"_styles-module__text1__2hZDH","text2":"_styles-module__text2__1-tIa","code":"_styles-module__code__3LgqO"};
+
+const Loader$6 = ({}) => {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.title
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.text1
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.text2
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.code
+  }));
+};
+
+var css$S = {"details":"_styles-module__details__1K_mA","header":"_styles-module__header__1nmEh","dropdown":"_styles-module__dropdown__3RSoB","title":"_styles-module__title__3U50H","edit":"_styles-module__edit__bgkiC","side":"_styles-module__side__3uIQ_","progress":"_styles-module__progress__1jRHi","button":"_styles-module__button__2J0VV","schedule":"_styles-module__schedule__2YXFa","codeEditor":"_styles-module__codeEditor__1M2Sw","logs":"_styles-module__logs__ZQT6g"};
+
+const REFRESH_TIMEOUT$1 = 3000;
+
+const dataFormat$2 = data => data.job;
+
+const Details$2 = ({}) => {
+  var _currentUser$data;
+
+  const {
+    runJob,
+    stopJob,
+    updateJob,
+    removeJob
+  } = useActions();
+  const {
+    user,
+    id
+  } = useParams();
+  const [refreshInterval, setRefreshInterval] = useState(0);
+  const [{
+    currentUser,
+    apiUrl
+  }] = useAppStore();
+  const currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
+  const {
+    data: jobData,
+    error,
+    mutate
+  } = useSWR([apiUrl + config.JOB_DETAILS(user, id), dataFormat$2], fetcher, {
+    refreshInterval
+  });
+  const {
+    push
+  } = useHistory();
+  const {
+    t
+  } = useTranslation();
+  const [titleValue, setTitleValue] = useState('');
+  const [code, setCode] = useState('');
+  const [running, setRunning] = useState(false);
+  const [stopping, setStopping] = useState(false);
+  const [codeSaved, setCodeSaved] = useState(true);
+  const progressTimer = useRef(null);
+
+  const update = async params => {
+    const data = await updateJob(params);
+    mutate({ ...jobData,
+      ...data.job
+    });
+  };
+
+  const updateDebounce = useDebounce(update, 1000, []);
+  const updateLongDebounce = useDebounce(update, 2000, []);
+  const prevData = usePrevious(jobData);
+  useEffect(() => {
+    window.addEventListener('keydown', detectEnterPress);
+    return () => window.removeEventListener('keydown', detectEnterPress);
+  }, [jobData, code]);
+  useEffect(() => {
+    if (jobData) {
+      setTitleValue(jobData.title);
+      setCode(jobData.code);
+    }
+  }, []);
+
+  const detectEnterPress = event => {
+    if (event.code === 'Enter' && (event.shiftKey || event.ctrlKey)) {
+      event.preventDefault();
+      if (!running && !stopping) onClickRun();
+    }
+  };
+
+  useEffect(() => {
+    if (['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
+      clearInterval(progressTimer.current);
+      progressTimer.current = setInterval(() => {}, 50);
+    } else {
+      clearInterval(progressTimer.current);
+    }
+
+    return () => clearInterval(progressTimer.current);
+  }, [refreshInterval, jobData]);
+  useEffect(() => {
+    if ((prevData === null || prevData === void 0 ? void 0 : prevData.id) !== (jobData === null || jobData === void 0 ? void 0 : jobData.id)) {
+      setTitleValue(jobData.title);
+      setCode(jobData.code);
+    }
+
+    if (['RUNNING', 'SCHEDULED'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
+      if (!refreshInterval) setRefreshInterval(REFRESH_TIMEOUT$1);
+    } else if (refreshInterval) {
+      setRefreshInterval(0);
+    }
+
+    return () => {};
+  }, [jobData]);
+
+  const onChangeTitle = value => {
+    setTitleValue(value);
+    updateDebounce({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      title: value
+    });
+  };
+
+  const onChangeCode = value => {
+    setCode(value);
+    setCodeSaved(false);
+    updateLongDebounce({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      code: value
+    }, () => setCodeSaved(true));
+  };
+
+  const onChangeRuntime = runtime => {
+    update({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      runtime: runtime
+    });
+  };
+
+  const onChangeSchedule = schedule => {
+    update({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      schedule: schedule
+    });
+  };
+
+  const onClickRun = async () => {
+    setRunning(true);
+
+    try {
+      const data = await runJob({
+        user: user,
+        id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+        code
+      });
+      mutate({ ...jobData,
+        ...data
+      });
+      setRefreshInterval(REFRESH_TIMEOUT$1);
+    } catch (e) {
+      console.log(e);
+    }
+
+    setRunning(false);
+  };
+
+  const onClickStop = async () => {
+    setStopping(true);
+
+    try {
+      const data = await stopJob({
+        user: user,
+        id: jobData === null || jobData === void 0 ? void 0 : jobData.id
+      });
+      mutate({ ...jobData,
+        ...data
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    setStopping(false);
+  };
+
+  const onClickDelete = async () => {
+    await removeJob({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id
+    });
+    push(routes.jobs(user));
+  };
+
+  if (!jobData && !error) return /*#__PURE__*/React__default.createElement(Loader$6, null);
+  if ((error === null || error === void 0 ? void 0 : error.status) === 403) return /*#__PURE__*/React__default.createElement(AccessForbidden, null, t('youDontHaveAnAccessToThisJob'), ".", isSignedIn() && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement(Link, {
+    to: routes.dashboards(currentUserName)
+  }, t('goToMyJobs'))));
+  if ((error === null || error === void 0 ? void 0 : error.status) === 404) return /*#__PURE__*/React__default.createElement(NotFound, null, t('theJobYouAreRookingForCouldNotBeFound'), ' ', isSignedIn() && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Link, {
+    to: routes.dashboards(currentUserName)
+  }, t('goToMyJobs')), "."));
+  if (!jobData) return null;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.details
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(BackButton, {
+    Component: Link,
+    to: routes.jobs(user)
+  }, currentUserName === user ? t('backToJobs') : t('backToJobsOf', {
+    name: user
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.header
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.title
+  }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
+    className: css$S.edit,
+    value: titleValue,
+    onChange: onChangeTitle,
+    readOnly: currentUserName !== user,
+    placeholder: t('newJob')
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.side
+  }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress, {
+    onlyDuration: true,
+    className: css$S.progress,
+    data: jobData
+  }), jobData.status === 'FAILED' && /*#__PURE__*/React__default.createElement("div", {
+    className: "red-text"
+  }, t('sorryButYourCodeDoesntLookLikePythonJob')), ['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? /*#__PURE__*/React__default.createElement(Button, {
+    className: css$S.button,
+    color: "fail",
+    size: "small",
+    variant: "contained",
+    disabled: stopping,
+    onClick: onClickStop
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-pause"
+  }), t('stop')) : /*#__PURE__*/React__default.createElement(Button, {
+    className: css$S.button,
+    color: "success",
+    size: "small",
+    variant: "contained",
+    disabled: running,
+    onClick: onClickRun
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-play"
+  }), t('run'))), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$S.dropdown,
+    items: [{
+      title: t('delete'),
+      onClick: onClickDelete
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$S['dropdown-button'],
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-dots-horizontal"
+  })))), /*#__PURE__*/React__default.createElement(Status, {
+    data: jobData
+  }), /*#__PURE__*/React__default.createElement(ScheduleSettings, {
+    className: css$S.schedule,
+    data: jobData,
+    onChange: onChangeSchedule,
+    onChangeRuntime: onChangeRuntime
+  }), /*#__PURE__*/React__default.createElement(CodeEditor, {
+    className: css$S.codeEditor,
+    value: code,
+    onChange: onChangeCode,
+    language: jobData.runtime,
+    saved: codeSaved
+  }), /*#__PURE__*/React__default.createElement(Logs, {
+    className: css$S.logs,
+    data: jobData
+  }));
+};
+
+var css$T = {"jobs":"_styles-module__jobs__z2_YO"};
+
+const Jobs = ({}) => {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$T.jobs
+  }, /*#__PURE__*/React__default.createElement(Switch, null, /*#__PURE__*/React__default.createElement(Route, {
+    path: routes.jobs(),
+    exact: true,
+    component: List$2
+  }), /*#__PURE__*/React__default.createElement(Route, {
+    path: routes.jobsDetails(),
+    component: Details$2
+  })));
+};
+
 var logo = require("./logo~gyFSAwBb.svg");
 
-var css$J = {"header":"_styles-module__header__3C4T1","logo":"_styles-module__logo__1jfuS","buttons":"_styles-module__buttons__2EQYi","button":"_styles-module__button__3cb7N"};
+var css$U = {"header":"_styles-module__header__3C4T1","logo":"_styles-module__logo__1jfuS","buttons":"_styles-module__buttons__2EQYi","button":"_styles-module__button__3cb7N"};
 
 const Header = ({
   className
@@ -3623,40 +4716,40 @@ const Header = ({
     t
   } = useTranslation();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$J.header, className)
+    className: cx(css$U.header, className)
   }, /*#__PURE__*/React__default.createElement(Link, {
     to: "/",
-    className: css$J.logo
+    className: css$U.logo
   }, /*#__PURE__*/React__default.createElement("img", {
     width: "129",
     height: "35",
     src: logo,
     alt: "logo"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.buttons
+    className: css$U.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: Link,
     to: "/auth/login",
-    className: css$J.button,
+    className: css$U.button,
     color: "primary"
   }, t('logIn'))));
 };
 
-var css$K = {"layout":"_styles-module__layout__23bi3","header":"_styles-module__header__1chFa","main":"_styles-module__main__70hee"};
+var css$V = {"layout":"_styles-module__layout__23bi3","header":"_styles-module__header__1chFa","main":"_styles-module__main__70hee"};
 
 const UnAuthorizedLayout = ({
   children
 }) => {
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.layout
+    className: css$V.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$K.header
+    className: css$V.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.main
+    className: css$V.main
   }, children));
 };
 
-var css$L = {"infoButton":"_style-module__infoButton__2zmYM"};
+var css$W = {"infoButton":"_style-module__infoButton__2zmYM"};
 
 const SettingsInformation = ({
   className,
@@ -3670,7 +4763,7 @@ const SettingsInformation = ({
   const toggleModal = () => setIsShowModal(value => !value);
 
   return /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$L.infoButton, className),
+    className: cx(css$W.infoButton, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -3685,5 +4778,5 @@ const SettingsInformation = ({
   }, renderModalContent()));
 };
 
-export { AccessForbidden, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, AddStacksModal as DashboardAddStacksModal, Details$1 as DashboardDetails, List$1 as DashboardList, Item$1 as DashboardListItem, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SettingsInformation, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, apiFabric, config };
+export { AccessForbidden, AppStoreProvider, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, AddStacksModal as DashboardAddStacksModal, Details$1 as DashboardDetails, List$1 as DashboardList, Item$1 as DashboardListItem, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Jobs, Loader, MarkdownRender, Modal, NotFound, ProgressBar, SearchField, SelectField, SettingsInformation, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, apiFabric, actionsTypes as appStoreActionTypes, config, useAppStore };
 //# sourceMappingURL=index.modern.js.map

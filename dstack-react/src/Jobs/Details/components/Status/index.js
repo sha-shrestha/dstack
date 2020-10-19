@@ -2,8 +2,8 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
-import {getFormattedDuration} from '@dstackai/dstack-react/dist/utils';
-import type {Job} from 'Jobs/types';
+import {getFormattedDuration} from '../../../../utils';
+import type {Job} from '../../../types';
 import css from './styles.module.css';
 
 type Props = {

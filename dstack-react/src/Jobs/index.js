@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
 import {Switch, Route} from 'react-router-dom';
-import routes from 'routes';
+import routes from '../routes';
 import List from './List';
 import Details from './Details';
 import css from './styles.module.css';
 
 type Props = {}
 
-const Stacks = ({}: Props) => {
+const Jobs = ({}: Props) => {
     return (
         <div className={css.jobs}>
             <Switch>
@@ -19,4 +19,4 @@ const Stacks = ({}: Props) => {
     );
 };
 
-export default Stacks;
+export default Jobs;

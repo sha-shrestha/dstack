@@ -2,9 +2,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
-import {getFormattedDuration} from '@dstackai/dstack-react/dist/utils';
+import {getFormattedDuration} from '../../../../utils';
 import {calculateJobProgress} from '../../../utils';
-import type {Job} from 'Jobs/types';
+import type {Job} from '../../../types';
 import css from './styles.module.css';
 
 type Props = {

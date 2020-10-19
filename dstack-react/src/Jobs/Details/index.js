@@ -3,54 +3,53 @@ import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {useHistory, useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import useSWR from 'swr';
-import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {AccessForbidden, NotFound, StretchTitleField,
-    Dropdown, Button, BackButton, Yield} from '@dstackai/dstack-react';
-import {dataFetcher} from '@dstackai/dstack-react/dist/utils';
+import AccessForbidden from '../../AccessForbidden';
+import NotFound from '../../NotFound';
+import StretchTitleField from '../../StretchTitleField';
+import Dropdown from '../../Dropdown';
+import Button from '../../Button';
+import BackButton from '../../BackButton';
+import Yield from '../../Yield';
+import {useAppStore} from '../../AppStore';
+// import appStoreActionTypes from '../../AppStore/actionsTypes';
+import {dataFetcher, isSignedIn} from '../../utils';
+import {usePrevious, useDebounce} from '../../hooks';
 import ScheduleSettings from './components/ScheduleSettings';
 import CodeEditor from './components/CodeEditor';
 import Status from './components/Status';
 import Logs from './components/Logs';
 import Progress from './components/Progress';
 import Loader from './components/Loader';
-import {usePrevious, useDebounce} from '@dstackai/dstack-react/dist/hooks';
-import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
-import routes from 'routes';
-import config from 'config';
-import {setAppProgress, resetAppProgress} from 'App/actions';
-import {Job} from 'Jobs/types';
-import {runJob, stopJob, updateJob, removeJob, calculateJobProgress} from '../utils';
+import routes from '../../routes';
+import config from '../../config';
+// import {setAppProgress, resetAppProgress} from 'App/actions';
+import useActions from '../actions';
+// import {calculateJobProgress} from '../utils';
 import css from './styles.module.css';
 
-type Props = {
-    data?: Job,
-    fetch: Function,
-    remove: Function,
-    run: Function,
-    stop: Function,
-    update: Function,
-    setAppProgress: Function,
-    resetAppProgress: Function,
-    currentUser?: string,
-    requestStatus: ?number,
-}
+type Props = {}
 
 const REFRESH_TIMEOUT = 3000;
 
 const dataFormat = data => data.job;
 
-const Details = ({
-    currentUser,
-    setAppProgress,
-    resetAppProgress,
-}: Props) => {
+const Details = ({}: Props) => {
+    const {
+        runJob,
+        stopJob,
+        updateJob,
+        removeJob,
+    } = useActions();
+
     const {user, id} = useParams();
     const [refreshInterval, setRefreshInterval] = useState(0);
+    const [{currentUser, apiUrl}] = useAppStore();
+    const currentUserName = currentUser.data?.user;
 
     const {data: jobData, error, mutate} = useSWR(
         [
-            config.API_URL + config.JOB_DETAILS(user, id),
+            apiUrl + config.JOB_DETAILS(user, id),
             dataFormat,
         ],
         dataFetcher,
@@ -107,9 +106,9 @@ const Details = ({
             clearInterval(progressTimer.current);
 
             progressTimer.current = setInterval(() => {
-                const [progress] = calculateJobProgress(jobData);
+                // const [progress] = calculateJobProgress(jobData);
 
-                setAppProgress(progress);
+                // setAppProgress(progress);
             }, 50);
         } else {
             clearInterval(progressTimer.current);
@@ -129,11 +128,11 @@ const Details = ({
                 setRefreshInterval(REFRESH_TIMEOUT);
         } else if (refreshInterval) {
             setRefreshInterval(0);
-            resetAppProgress();
+            // resetAppProgress();
         }
 
         return () => {
-            resetAppProgress();
+            // resetAppProgress();
         };
     }, [jobData]);
 
@@ -241,7 +240,7 @@ const Details = ({
                 <Fragment>
                     <br />
 
-                    <Link to={routes.dashboards(currentUser)}>
+                    <Link to={routes.dashboards(currentUserName)}>
                         {t('goToMyJobs')}
                     </Link>
                 </Fragment>
@@ -254,7 +253,7 @@ const Details = ({
             {' '}
             {isSignedIn() && (
                 <Fragment>
-                    <Link to={routes.dashboards(currentUser)}>
+                    <Link to={routes.dashboards(currentUserName)}>
                         {t('goToMyJobs')}
                     </Link>.
                 </Fragment>
@@ -271,7 +270,7 @@ const Details = ({
                     Component={Link}
                     to={routes.jobs(user)}
                 >
-                    {(currentUser === user)
+                    {(currentUserName === user)
                         ? t('backToJobs')
                         : t('backToJobsOf', {name: user})
                     }
@@ -284,7 +283,7 @@ const Details = ({
                         className={css.edit}
                         value={titleValue}
                         onChange={onChangeTitle}
-                        readOnly={currentUser !== user}
+                        readOnly={currentUserName !== user}
                         placeholder={t('newJob')}
                     />
                 </div>
@@ -325,7 +324,7 @@ const Details = ({
                     }
                 </div>
 
-                {currentUser === user && <Dropdown
+                {currentUserName === user && <Dropdown
                     className={css.dropdown}
 
                     items={[
@@ -369,7 +368,4 @@ const Details = ({
     );
 };
 
-export default connect(
-    state => ({currentUser: state.app.userData?.user}),
-    {setAppProgress, resetAppProgress}
-)(Details);
+export default Details;

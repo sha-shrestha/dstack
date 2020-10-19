@@ -2,7 +2,7 @@ import React from 'react';
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
-import {StackAttachmentProvider, DnDGridContextProvider, DndProvider} from '@dstackai/dstack-react';
+import {StackAttachmentProvider, DnDGridContextProvider, DndProvider, AppStoreProvider} from '@dstackai/dstack-react';
 import HTML5Backend from 'react-dnd-html5-backend';
 import config from 'config';
 
@@ -23,9 +23,11 @@ if (rootElement instanceof Element) {
             <BrowserRouter>
                 <DndProvider backend={HTML5Backend}>
                     <DnDGridContextProvider>
-                        <StackAttachmentProvider apiUrl={config.API_URL}>
-                            <App/>
-                        </StackAttachmentProvider>
+                        <AppStoreProvider apiUrl={config.API_URL}>
+                            <StackAttachmentProvider apiUrl={config.API_URL}>
+                                <App/>
+                            </StackAttachmentProvider>
+                        </AppStoreProvider>
                     </DnDGridContextProvider>
                 </DndProvider>
             </BrowserRouter>

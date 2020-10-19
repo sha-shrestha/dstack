@@ -1,9 +1,9 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var axios = _interopDefault(require('axios'));
-var lodashEs = require('lodash-es');
 var React = require('react');
 var React__default = _interopDefault(React);
+var axios = _interopDefault(require('axios'));
+var lodashEs = require('lodash-es');
 var cx = _interopDefault(require('classnames'));
 var Highlight = _interopDefault(require('react-highlight.js'));
 var reactI18next = require('react-i18next');
@@ -23,6 +23,152 @@ var reactRouterDom = require('react-router-dom');
 var uuid = require('uuid');
 var reactDnd = require('react-dnd');
 var reactRouter = require('react-router');
+var useSWR = _interopDefault(require('swr'));
+var Editor = _interopDefault(require('react-simple-code-editor'));
+var prismCore = require('prismjs/components/prism-core');
+require('prismjs/components/prism-python');
+require('prismjs/components/prism-r');
+require('prismjs/themes/prism.css');
+
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+function _objectDestructuringEmpty(obj) {
+  if (obj == null) throw new TypeError("Cannot destructure undefined");
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+var actionsTypes = {
+  FETCH_CURRENT_USER: 'app/user/FETCH',
+  FETCH_CURRENT_USER_SUCCESS: 'app/user/FETCH_SUCCESS',
+  FETCH_CURRENT_USER_FAIL: 'app/user/FETCH_FAIL',
+  START_PROGRESS: 'app/START_PROGRESS',
+  SET_PROGRESS: 'app/SET_PROGRESS',
+  COMPLETE_PROGRESS: 'app/COMPLETE_PROGRESS',
+  RESET_PROGRESS: 'app/RESET_PROGRESS'
+};
+
+var initialState = {
+  currentUser: {
+    loading: false,
+    data: null
+  },
+  appProgress: {
+    active: null,
+    value: null
+  }
+};
+var reducer = function reducer(state, action) {
+  if (state === void 0) {
+    state = initialState;
+  }
+
+  switch (action.type) {
+    case actionsTypes.FETCH_CURRENT_USER:
+      return _extends({}, state, {
+        currentUser: _extends({}, state.currentUser, {
+          loading: true
+        })
+      });
+
+    case actionsTypes.FETCH_CURRENT_USER_SUCCESS:
+      return _extends({}, state, {
+        currentUser: _extends({}, state.currentUser, {
+          data: action.payload,
+          loading: false
+        })
+      });
+
+    case actionsTypes.FETCH_FAIL:
+      return _extends({}, state, {
+        currentUser: _extends({}, state.currentUser, {
+          loading: false
+        })
+      });
+
+    case actionsTypes.START_PROGRESS:
+      return _extends({}, state, {
+        appProgress: _extends({}, state.appProgress, {
+          active: true,
+          value: null
+        })
+      });
+
+    case actionsTypes.SET_PROGRESS:
+      return _extends({}, state, {
+        appProgress: _extends({}, state.appProgress, {
+          value: action.payload
+        })
+      });
+
+    case actionsTypes.COMPLETE_PROGRESS:
+      return _extends({}, state, {
+        appProgress: _extends({}, state.appProgress, {
+          active: false,
+          value: null
+        })
+      });
+
+    case actionsTypes.RESET_PROGRESS:
+      return _extends({}, state, {
+        appProgress: _extends({}, state.appProgress, {
+          active: null,
+          value: null
+        })
+      });
+
+    default:
+      return state;
+  }
+};
+var StateContext = React.createContext();
+var AppStoreProvider = function AppStoreProvider(_ref) {
+  var children = _ref.children,
+      apiUrl = _ref.apiUrl;
+  return /*#__PURE__*/React__default.createElement(StateContext.Provider, {
+    value: React.useReducer(reducer, _extends({}, initialState, {
+      apiUrl: apiUrl
+    }))
+  }, children);
+};
+var useAppStore = function useAppStore() {
+  return React.useContext(StateContext);
+};
 
 var config = {
   DOCS_URL: 'http://docs.dstack.ai',
@@ -88,8 +234,10 @@ var reportPlotPythonCode = "import matplotlib.pyplot as plt\nimport dstack as ds
 var installRPackageCode = 'install.packages("dstack")';
 var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
 
-var apiFabric = function apiFabric(_ref) {
-  var apiUrl = _ref.apiUrl;
+var apiFabric = function apiFabric(_temp) {
+  var _ref = _temp === void 0 ? {} : _temp,
+      apiUrl = _ref.apiUrl;
+
   var CancelToken = axios.CancelToken;
   var instance = axios.create({
     baseURL: apiUrl,
@@ -152,49 +300,6 @@ var Avatar = React.forwardRef(function (_ref, ref) {
     onClick: onClick
   }, name.slice(0, 2));
 });
-
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
-}
-
-function _objectDestructuringEmpty(obj) {
-  if (obj == null) throw new TypeError("Cannot destructure undefined");
-}
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
 
 var css$2 = {"back":"_styles-module__back__1MuhU"};
 
@@ -560,6 +665,19 @@ var parseStackTabs = (function (attachments) {
   return tabs;
 });
 
+var getFormattedDuration = (function (duration) {
+  if (duration < 1000) return '0sec';
+  var string = '';
+  var momentDuration = moment.duration(duration);
+  var hours = momentDuration.hours();
+  var minutes = momentDuration.minutes();
+  var seconds = momentDuration.seconds();
+  if (hours) string += moment.duration(hours, 'hours').as('hours') + "h";
+  if (minutes) string += " " + moment.duration(minutes, 'minutes').as('minutes') + "min";
+  if (seconds) string += " " + moment.duration(seconds, 'seconds').asSeconds() + "sec";
+  return string;
+});
+
 var fileToBase64 = function fileToBase64(file) {
   try {
     return Promise.resolve(new Promise(function (resolve, reject) {
@@ -597,6 +715,55 @@ function _catch(body, recover) {
 	}
 	return result;
 }
+
+var fetcher = function fetcher(url, responseDataFormat) {
+  if (responseDataFormat === void 0) {
+    responseDataFormat = function responseDataFormat(data) {
+      return data;
+    };
+  }
+
+  try {
+    var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
+    return Promise.resolve(_catch(function () {
+      return Promise.resolve(axios({
+        url: url,
+        headers: {
+          Authorization: token ? "Bearer " + token : ''
+        }
+      })).then(function (request) {
+        return responseDataFormat(request.data);
+      });
+    }, function (e) {
+      var errorBody = null;
+      var status = null;
+
+      try {
+        errorBody = JSON.parse(lodashEs.get(e, 'request.response'));
+      } catch (e) {
+        console.log(e);
+      }
+
+      try {
+        status = lodashEs.get(e, 'request.status');
+      } catch (e) {
+        console.log(e);
+      }
+
+      var error = new Error('An error occurred while fetching the data.');
+      error.info = errorBody;
+      error.status = status;
+      throw error;
+    }));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+var isSignedIn = function isSignedIn() {
+  var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
+  return Boolean(token && token.length);
+};
 
 var css$9 = {"dnd":"_style-module__dnd__3uYii","fileWrapper":"_style-module__fileWrapper__1GUx_","file":"_style-module__file__2LG6L","fileExtend":"_style-module__fileExtend__3w6--","fileSection":"_style-module__fileSection__B8y5t","fileName":"_style-module__fileName__3Juxo","fileSize":"_style-module__fileSize__3G6N8","fileRemove":"_style-module__fileRemove__16dzP","placeholder":"_style-module__placeholder__Wr_Zp","button":"_style-module__button__14ku1","loading":"_style-module__loading__2KndP","progressBar":"_style-module__progressBar__DHbC1","progress":"_style-module__progress__2-dth","animate-stripes":"_style-module__animate-stripes__1Iecq"};
 
@@ -1656,26 +1823,26 @@ var useIntersectionObserver = (function (callBack, _ref, deps) {
   return [ref];
 });
 
-var actionsTypes = {
+var actionsTypes$1 = {
   FETCH: 'stacks/attachments/FETCH',
   FETCH_SUCCESS: 'stacks/attachments/FETCH_SUCCESS',
   FETCH_FAIL: 'stacks/attachments/FETCH_FAIL'
 };
 
-var initialState = {
+var initialState$1 = {
   data: {},
   errors: {},
   requestStatus: null
 };
-var reducer = function reducer(state, action) {
+var reducer$1 = function reducer(state, action) {
   var _extends2, _extends3, _extends4, _extends5, _extends6, _extends7;
 
   if (state === void 0) {
-    state = initialState;
+    state = initialState$1;
   }
 
   switch (action.type) {
-    case actionsTypes.FETCH:
+    case actionsTypes$1.FETCH:
       return _extends({}, state, {
         data: _extends({}, state.data, (_extends3 = {}, _extends3[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends2 = {}, _extends2[action.meta.id] = _extends({}, state.data[action.meta.frameId] ? state.data[action.meta.frameId][action.meta.id] : {}, {
           loading: true,
@@ -1684,14 +1851,14 @@ var reducer = function reducer(state, action) {
         }), _extends2)), _extends3))
       });
 
-    case actionsTypes.FETCH_SUCCESS:
+    case actionsTypes$1.FETCH_SUCCESS:
       return _extends({}, state, {
         data: _extends({}, state.data, (_extends5 = {}, _extends5[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends4 = {}, _extends4[action.meta.id] = _extends({}, action.payload, {
           loading: false
         }), _extends4)), _extends5))
       });
 
-    case actionsTypes.FETCH_FAIL:
+    case actionsTypes$1.FETCH_FAIL:
       return _extends({}, state, {
         data: _extends({}, state.data, (_extends7 = {}, _extends7[action.meta.frameId] = _extends({}, state.data[action.meta.frameId], (_extends6 = {}, _extends6[action.meta.id] = {
           error: action.payload.error,
@@ -1704,18 +1871,18 @@ var reducer = function reducer(state, action) {
       return state;
   }
 };
-var StateContext = React.createContext();
+var StateContext$1 = React.createContext();
 var StateProvider = function StateProvider(_ref) {
   var children = _ref.children,
       apiUrl = _ref.apiUrl;
-  return /*#__PURE__*/React__default.createElement(StateContext.Provider, {
-    value: React.useReducer(reducer, _extends({}, initialState, {
+  return /*#__PURE__*/React__default.createElement(StateContext$1.Provider, {
+    value: React.useReducer(reducer$1, _extends({}, initialState$1, {
       apiUrl: apiUrl
     }))
   }, children);
 };
 var useStateValue = function useStateValue() {
-  return React.useContext(StateContext);
+  return React.useContext(StateContext$1);
 };
 
 var actions = (function () {
@@ -1727,7 +1894,7 @@ var actions = (function () {
     try {
       var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
       dispatch({
-        type: actionsTypes.FETCH,
+        type: actionsTypes$1.FETCH,
         meta: {
           frameId: frameId,
           id: id
@@ -1743,7 +1910,7 @@ var actions = (function () {
           }
         })).then(function (request) {
           dispatch({
-            type: actionsTypes.FETCH_SUCCESS,
+            type: actionsTypes$1.FETCH_SUCCESS,
             meta: {
               frameId: frameId,
               id: id
@@ -1762,7 +1929,7 @@ var actions = (function () {
         }
 
         dispatch({
-          type: actionsTypes.FETCH_FAIL,
+          type: actionsTypes$1.FETCH_FAIL,
           meta: {
             frameId: frameId,
             id: id
@@ -4170,9 +4337,1126 @@ var AddStacksModal = function AddStacksModal(_ref) {
   }, t('cancel')))));
 };
 
+var api = apiFabric();
+var useActions = (function () {
+  var _useAppStore = useAppStore(),
+      apiUrl = _useAppStore[0].apiUrl;
+
+  var fetchJob = function fetchJob(_ref) {
+    var user = _ref.user,
+        id = _ref.id;
+    return new Promise(function (resolve) {
+      try {
+        var _temp2 = _catch(function () {
+          return Promise.resolve(api.get(apiUrl + config.JOB_DETAILS(user, id))).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var runJob = function runJob(params) {
+    return new Promise(function (resolve) {
+      try {
+        var _temp4 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.JOB_RUN, params)).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var stopJob = function stopJob(params) {
+    return new Promise(function (resolve) {
+      try {
+        var _temp6 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.JOB_STOP, params)).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp6 && _temp6.then ? _temp6.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var createJob = function createJob(params) {
+    return new Promise(function (resolve) {
+      try {
+        var _temp8 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.JOB_CREATE, params)).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp8 && _temp8.then ? _temp8.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var updateJob = function updateJob(params) {
+    return new Promise(function (resolve) {
+      try {
+        var _temp10 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.JOB_UPDATE, params)).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp10 && _temp10.then ? _temp10.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var removeJob = function removeJob(params) {
+    return new Promise(function (resolve) {
+      try {
+        var _temp12 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.JOB_DELETE, params)).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp12 && _temp12.then ? _temp12.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  return {
+    fetchJob: fetchJob,
+    runJob: runJob,
+    stopJob: stopJob,
+    createJob: createJob,
+    updateJob: updateJob,
+    removeJob: removeJob
+  };
+});
+
+var css$J = {"loader":"_styles-module__loader__DHDDF","title":"_styles-module__title__3eHle","loader-pulsee":"_styles-module__loader-pulsee__3Q4hE","text":"_styles-module__text__2QdBi","table":"_styles-module__table__3c_Ia","item":"_styles-module__item__2_9nD"};
+
+var Loader$5 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.title
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.text
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.table
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$J.item
+  })));
+};
+
+var calculateJobProgress = function calculateJobProgress(job) {
+  var estimatedDuration = job['estimated_duration'] || JOB_DEFAULT_ESTIMATED_DURATION;
+  var currentDuration = Date.now() - job.started;
+  var leftDuration = estimatedDuration - currentDuration;
+  var progress = Math.min(currentDuration / estimatedDuration * 100, 100).toFixed();
+  return [progress, leftDuration];
+};
+
+var css$K = {"section":"_styles-module__section__3RnYw","progressBar":"_styles-module__progressBar__3xjSa","progress":"_styles-module__progress__3eEzL","time":"_styles-module__time__1q33r"};
+
+var Progress = function Progress(_ref) {
+  var data = _ref.data,
+      className = _ref.className,
+      onlyDuration = _ref.onlyDuration;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var progressTimer = React.useRef(null);
+
+  var _useState = React.useState(null),
+      set = _useState[1];
+
+  React.useEffect(function () {
+    if (data.status === 'RUNNING') {
+      clearInterval(progressTimer.current);
+      progressTimer.current = setInterval(function () {
+        set(Date.now());
+      }, 50);
+    } else {
+      clearInterval(progressTimer.current);
+    }
+
+    return function () {
+      return clearInterval(progressTimer.current);
+    };
+  }, [data]);
+  if (!data.started) return null;
+
+  var _calculateJobProgress = calculateJobProgress(data),
+      progress = _calculateJobProgress[0],
+      leftDuration = _calculateJobProgress[1];
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$K.section, className)
+  }, !onlyDuration && /*#__PURE__*/React__default.createElement("div", {
+    className: css$K.progressBar
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$K.progress,
+    style: {
+      width: progress + "%"
+    }
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$K.time
+  }, getFormattedDuration(leftDuration), " ", t('left')));
+};
+
+var css$L = {"row":"_styles-module__row__2f7FO","dropdown":"_styles-module__dropdown__2hTQP","cell":"_styles-module__cell__3ntzL","status":"_styles-module__status__2MUSr","progress":"_styles-module__progress__1J2il"};
+
+var REFRESH_TIMEOUT = 2000;
+
+var dataFormat = function dataFormat(data) {
+  return data.job;
+};
+
+var TableRow = React.memo(function (_ref) {
+  var _currentUser$data;
+
+  var data = _ref.data,
+      onClickRow = _ref.onClickRow,
+      onEdit = _ref.onEdit,
+      onDelete = _ref.onDelete;
+
+  var _useActions = useActions(),
+      runJob = _useActions.runJob,
+      stopJob = _useActions.stopJob;
+
+  var _useAppStore = useAppStore(),
+      _useAppStore$ = _useAppStore[0],
+      currentUser = _useAppStore$.currentUser,
+      apiUrl = _useAppStore$.apiUrl;
+
+  var currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useParams = reactRouter.useParams(),
+      user = _useParams.user;
+
+  var _useState = React.useState(0),
+      refreshInterval = _useState[0],
+      setRefreshInterval = _useState[1];
+
+  var _useSWR = useSWR([apiUrl + config.JOB_DETAILS(user, data.id), dataFormat], fetcher, {
+    refreshInterval: refreshInterval,
+    initialData: data,
+    revalidateOnFocus: false
+  }),
+      jobData = _useSWR.data,
+      mutate = _useSWR.mutate;
+
+  var rowClick = function rowClick() {
+    if (onClickRow) onClickRow(jobData);
+  };
+
+  React.useEffect(function () {
+    if (['RUNNING', 'SCHEDULED'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
+      if (!refreshInterval) setRefreshInterval(REFRESH_TIMEOUT);
+    } else if (refreshInterval) {
+      setRefreshInterval(0);
+    }
+  }, [jobData]);
+
+  var onRun = function onRun() {
+    try {
+      return Promise.resolve(runJob({
+        user: user,
+        id: jobData.id
+      })).then(function (_ref2) {
+        var job = _ref2.job;
+        if (job) mutate(_extends({}, jobData, job));
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  var onStop = function onStop() {
+    try {
+      return Promise.resolve(stopJob({
+        user: user,
+        id: jobData.id
+      })).then(function (_ref3) {
+        var job = _ref3.job;
+        if (job) mutate(_extends({}, jobData, job));
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  var getTitle = function getTitle() {
+    if (jobData.title && jobData.title.length) return jobData.title;else return /*#__PURE__*/React__default.createElement("span", null, "New job");
+  };
+
+  var renderStatus = function renderStatus() {
+    switch (jobData.status) {
+      case 'SCHEDULED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t('inProgress'), "\u2026");
+
+      case 'RUNNING':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress, {
+          className: css$L.progress,
+          data: jobData
+        }));
+
+      case 'TIMEOUT':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: cx(css$L.status, 'fail')
+        }, "\u26D4\uFE0F ", t('failedDueToTimeout'));
+
+      case 'FAILED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: cx(css$L.status, 'fail')
+        }, "\u26D4\uFE0F ", t('failed'));
+
+      case 'FINISHED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: cx(css$L.status, 'success')
+        }, "\u2705 ", t('completed'));
+
+      case 'CREATED':
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t('neverRun'));
+
+      default:
+        return /*#__PURE__*/React__default.createElement("div", {
+          className: css$L.status
+        }, t(jobData.status.toLowerCase()));
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$L.row, {
+      red: ['TIMEOUT', 'FAILED'].indexOf(jobData.status) > -1
+    }),
+    onClick: rowClick
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, getTitle()), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, t(jobData.runtime)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, moment(jobData.started).format('MM-DD-YYYY [at] HH:mm')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, getFormattedDuration(jobData.finished - jobData.started)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$L.cell
+  }, renderStatus(), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$L.dropdown,
+    items: [].concat(['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? [{
+      title: t('stop'),
+      onClick: onStop
+    }] : [{
+      title: t('run'),
+      onClick: onRun
+    }], [{
+      title: t('edit'),
+      onClick: onEdit
+    }, {
+      title: t('delete'),
+      onClick: onDelete
+    }])
+  })));
+});
+
+var css$M = {"list":"_styles-module__list__VXs44","title":"_styles-module__title__r4zAA","button":"_styles-module__button__21dbT","search":"_styles-module__search__1mylL","mobileSearch":"_styles-module__mobileSearch__3Oub0","text":"_styles-module__text__Ra7UV","tableWrap":"_styles-module__tableWrap__2CYWc","table":"_styles-module__table__2iL6k","tableCaptions":"_styles-module__tableCaptions__2YOUS","tableCell":"_styles-module__tableCell__3tQ5e"};
+
+var dataFormat$1 = function dataFormat(data) {
+  return data.jobs;
+};
+
+var List$2 = function List() {
+  var _currentUser$data;
+
+  var _useActions = useActions(),
+      createJob = _useActions.createJob,
+      removeJob = _useActions.removeJob;
+
+  var _useAppStore = useAppStore(),
+      _useAppStore$ = _useAppStore[0],
+      currentUser = _useAppStore$.currentUser,
+      apiUrl = _useAppStore$.apiUrl;
+
+  var currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(''),
+      search = _useState[0],
+      setSearch = _useState[1];
+
+  var _useParams = reactRouter.useParams(),
+      user = _useParams.user;
+
+  var _useHistory = reactRouter.useHistory(),
+      push = _useHistory.push;
+
+  var _useSWR = useSWR([apiUrl + config.JOB_LIST(user), dataFormat$1], fetcher),
+      data = _useSWR.data,
+      mutate = _useSWR.mutate;
+
+  var onChangeSearch = function onChangeSearch(value) {
+    return setSearch(value);
+  };
+
+  var getItems = function getItems() {
+    var items = [];
+
+    if (data && data.length) {
+      if (search.length) items = data.filter(function (i) {
+        return i.title.indexOf(search) >= 0;
+      });else items = data;
+    }
+
+    return items;
+  };
+
+  var items = getItems();
+
+  var onAdd = function onAdd() {
+    try {
+      var lastRuntime = localStorage.getItem('lastRuntime') || 'python';
+      return Promise.resolve(createJob({
+        user: user,
+        runtime: lastRuntime
+      })).then(function (data) {
+        push(routes.jobsDetails(user, data.job.id));
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  var getOnRemove = function getOnRemove(job) {
+    return function () {
+      try {
+        return Promise.resolve(removeJob({
+          user: user,
+          id: job.id
+        })).then(function () {
+          mutate(data.filter(function (j) {
+            return j.id !== job.id;
+          }));
+        });
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    };
+  };
+
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$5, null);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.list
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(SearchField, {
+    showEverything: true,
+    isDark: true,
+    placeholder: t('findJob'),
+    size: "small",
+    value: search,
+    className: css$M.search,
+    onChange: onChangeSearch
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.title
+  }, currentUserName === user ? t('myJobs') : t('jobsOf', {
+    name: user
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    className: css$M.button,
+    variant: "contained",
+    color: "primary",
+    size: "small",
+    onClick: onAdd
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-plus"
+  }), " ", t('newJob'))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.text
+  }, t('youHaveJobs', {
+    count: data.length
+  }), ' ', /*#__PURE__*/React__default.createElement("a", {
+    href: config.DOCS_URL + '/jobs',
+    target: "_blank"
+  }, t('documentation'), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-open-in-new"
+  })), "."), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
+    placeholder: t('findJob'),
+    className: css$M.mobileSearch,
+    showEverything: true,
+    size: "small",
+    value: search,
+    onChange: onChangeSearch
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableWrap
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.table
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCaptions
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('job')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('runtime')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('lastRun')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('timeSpent')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$M.tableCell
+  }, t('status'))), items.map(function (item) {
+    return /*#__PURE__*/React__default.createElement(TableRow, {
+      data: item,
+      key: item.id,
+      onClickRow: function onClickRow() {
+        return push(routes.jobsDetails(user, item.id));
+      },
+      onEdit: function onEdit() {
+        return push(routes.jobsDetails(user, item.id));
+      },
+      onDelete: getOnRemove(item)
+    });
+  }))));
+};
+
+var css$N = {"schedule":"_styles-module__schedule__YoEcM","dropdown":"_styles-module__dropdown__3RJdh","runtime":"_styles-module__runtime__2h8GE","message":"_styles-module__message__1byIj"};
+
+var timeout = null;
+
+var ScheduleSettings = function ScheduleSettings(_ref) {
+  var data = _ref.data,
+      className = _ref.className,
+      onChange = _ref.onChange,
+      onChangeRuntime = _ref.onChangeRuntime;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var messageRef = React.useRef();
+
+  var _useState = React.useState(data ? data.schedule.split('/')[0] : ''),
+      scheduleType = _useState[0],
+      setScheduleType = _useState[1];
+
+  var _useState2 = React.useState(data ? data.schedule.split('/')[1] : null),
+      scheduleTime = _useState2[0],
+      setScheduleTime = _useState2[1];
+
+  var _useState3 = React.useState(0),
+      nextRunDelay = _useState3[0],
+      setNextRunDelay = _useState3[1];
+
+  var isDidMount = React.useRef(true);
+
+  var runtimeChange = function runtimeChange(runtime) {
+    return function () {
+      onChangeRuntime(runtime);
+      localStorage.setItem('lastRuntime', runtime);
+    };
+  };
+
+  var scheduleTypeChange = function scheduleTypeChange(type) {
+    return function () {
+      setScheduleType(type);
+      if (!scheduleTime) setScheduleTime('12:00');
+      if (type === 'daily') type += "/" + (scheduleTime ? scheduleTime : '12:00');
+      onChange(type);
+    };
+  };
+
+  var scheduleTimeChange = function scheduleTimeChange(time) {
+    return function () {
+      setScheduleTime(time);
+      onChange(scheduleType + "/" + time);
+      var runTime = moment(time, 'HH:mm');
+      if (new Date().getHours() > runTime.get('hours')) runTime.add(1, 'day');
+      setNextRunDelay(runTime.toDate().getTime() - Date.now());
+    };
+  };
+
+  React.useEffect(function () {
+    if (nextRunDelay && !isDidMount.current && messageRef.current) {
+      messageRef.current.classList.add('show');
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        messageRef.current.classList.remove('show');
+      }, 3000);
+    }
+
+    if (isDidMount.current) isDidMount.current = false;
+  }, [nextRunDelay]);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$N.schedule, className)
+  }, t('runtime'), ":", /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: cx(css$N.dropdown, css$N.runtime),
+    items: [{
+      title: t('python'),
+      onClick: runtimeChange('python')
+    }, {
+      title: t('r'),
+      onClick: runtimeChange('r')
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$N['dropdown-button'],
+    color: "primary"
+  }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  }))), t('jobIs'), " ", scheduleType !== 'unscheduled' && t('scheduled'), /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$N.dropdown,
+    items: [{
+      title: t('unscheduled'),
+      onClick: scheduleTypeChange('unscheduled')
+    }, {
+      title: t('daily'),
+      onClick: scheduleTypeChange('daily')
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$N['dropdown-button'],
+    color: "primary"
+  }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  }))), scheduleType === 'daily' && /*#__PURE__*/React__default.createElement(React.Fragment, null, t('at'), /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$N.dropdown,
+    items: new Array(24).fill(0).map(function (i, index) {
+      var time = (index < 10 ? '0' + index : index) + ":00";
+      return {
+        title: time,
+        onClick: scheduleTimeChange(time)
+      };
+    })
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$N['dropdown-button'],
+    color: "primary"
+  }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    ref: messageRef,
+    className: cx(css$N.message, 'green-text')
+  }, "The next run starts in ", getFormattedDuration(nextRunDelay))));
+};
+
+var css$O = {"editor":"_styles-module__editor__m0hwp","token":"_styles-module__token__281_3","atrule":"_styles-module__atrule__1M8ph","attr-value":"_styles-module__attr-value__T6_N1","keyword":"_styles-module__keyword__1gT7U","function":"_styles-module__function__2ZXkX","class-name":"_styles-module__class-name__upcGt","selector":"_styles-module__selector__3rmyW","attr-name":"_styles-module__attr-name__I3P48","string":"_styles-module__string__hoRdC","char":"_styles-module__char__1uxpB","builtin":"_styles-module__builtin__3xCwG","inserted":"_styles-module__inserted__2Lvrk","scroll":"_styles-module__scroll__1yHaS","content":"_styles-module__content__3cHiP","success":"_styles-module__success__1Z8bo","lineNumbers":"_styles-module__lineNumbers__1CW5r"};
+
+var CodeEditor = function CodeEditor(_ref) {
+  var _ref$value = _ref.value,
+      value = _ref$value === void 0 ? '' : _ref$value,
+      onChange = _ref.onChange,
+      language = _ref.language,
+      className = _ref.className,
+      saved = _ref.saved;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var successMessageRef = React.useRef();
+  var lines = (value.match(/\n/g) || []).length + 2;
+  var lineNos = [].concat(Array(lines).keys()).slice(1).join('\n');
+  var isDidMount = React.useRef(true);
+  React.useEffect(function () {
+    if (successMessageRef.current && !isDidMount.current) if (saved) {
+      successMessageRef.current.classList.add('show');
+      setTimeout(function () {
+        if (successMessageRef.current) successMessageRef.current.classList.remove('show');
+      }, 4000);
+    } else {
+      successMessageRef.current.classList.remove('show');
+    }
+    if (isDidMount.current) isDidMount.current = false;
+  }, [saved]);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$O.editor, className)
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.success,
+    ref: successMessageRef
+  }, t('changesSaved')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.scroll
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.content
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$O.lineNumbers,
+    dangerouslySetInnerHTML: {
+      __html: lineNos
+    }
+  }), /*#__PURE__*/React__default.createElement(Editor, {
+    value: value,
+    onValueChange: onChange,
+    highlight: function highlight(code) {
+      return prismCore.highlight(code, prismCore.languages[language]);
+    },
+    padding: 6,
+    style: {
+      width: '100%',
+      fontFamily: '"Roboto Mono", monospace',
+      fontSize: 12,
+      lineHeight: '150%',
+      outline: 'none'
+    }
+  }))));
+};
+
+var css$P = {"status":"_styles-module__status__3Pfpo"};
+
+var Status = function Status(_ref) {
+  var data = _ref.data;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  if (!data.started) return null;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$P.status
+  }, t('lastRunning'), ' ', moment(data.started).format("MM-DD-YYYY [" + t('at') + "] HH:mm"), /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-clock-outline"
+  }), ['RUNNING', 'SCHEDULED'].indexOf(data.status) >= 0 ? /*#__PURE__*/React__default.createElement("span", null, ' ', t('inProgress'), "\u2026") : getFormattedDuration(data.finished - data.started)), data.status === 'FAILED' && /*#__PURE__*/React__default.createElement("span", {
+    className: "red-text"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-close-octagon-outline"
+  }), t('failed')), data.status === 'TIMEOUT' && /*#__PURE__*/React__default.createElement("span", {
+    className: "red-text"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-close-octagon-outline"
+  }), t('failedDueToTimeout')));
+};
+
+var css$Q = {"logs":"_styles-module__logs__1poNo","button":"_styles-module__button__35eOC","text":"_styles-module__text__2eQos","label":"_styles-module__label__LksjJ"};
+
+var Logs = function Logs(_ref) {
+  var data = _ref.data,
+      className = _ref.className;
+  if (!data.logs) return null;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = React.useState(true),
+      isShown = _useState[0],
+      setIsShown = _useState[1];
+
+  var _useState2 = React.useState(data.finished || data.started),
+      updated = _useState2[0];
+
+  var toggleShow = function toggleShow() {
+    return setIsShown(!isShown);
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$Q.logs, className)
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$Q.button,
+    onClick: toggleShow,
+    color: "primary",
+    size: "small"
+  }, t('logs')), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$Q.text, {
+      open: isShown
+    })
+  }, /*#__PURE__*/React__default.createElement("pre", null, data.logs), updated && /*#__PURE__*/React__default.createElement("div", {
+    className: css$Q.label
+  }, t('updated'), " ", moment(updated).fromNow())));
+};
+
+var css$R = {"loader":"_styles-module__loader__2nOeY","loader-pulse":"_styles-module__loader-pulse__1Aj7Q","title":"_styles-module__title__RJ2x5","text1":"_styles-module__text1__2hZDH","text2":"_styles-module__text2__1-tIa","code":"_styles-module__code__3LgqO"};
+
+var Loader$6 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.title
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.text1
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.text2
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$R.code
+  }));
+};
+
+var css$S = {"details":"_styles-module__details__1K_mA","header":"_styles-module__header__1nmEh","dropdown":"_styles-module__dropdown__3RSoB","title":"_styles-module__title__3U50H","edit":"_styles-module__edit__bgkiC","side":"_styles-module__side__3uIQ_","progress":"_styles-module__progress__1jRHi","button":"_styles-module__button__2J0VV","schedule":"_styles-module__schedule__2YXFa","codeEditor":"_styles-module__codeEditor__1M2Sw","logs":"_styles-module__logs__ZQT6g"};
+
+var REFRESH_TIMEOUT$1 = 3000;
+
+var dataFormat$2 = function dataFormat(data) {
+  return data.job;
+};
+
+var Details$2 = function Details(_ref) {
+  var _currentUser$data;
+
+  _objectDestructuringEmpty(_ref);
+
+  var _useActions = useActions(),
+      runJob = _useActions.runJob,
+      stopJob = _useActions.stopJob,
+      updateJob = _useActions.updateJob,
+      removeJob = _useActions.removeJob;
+
+  var _useParams = reactRouter.useParams(),
+      user = _useParams.user,
+      id = _useParams.id;
+
+  var _useState = React.useState(0),
+      refreshInterval = _useState[0],
+      setRefreshInterval = _useState[1];
+
+  var _useAppStore = useAppStore(),
+      _useAppStore$ = _useAppStore[0],
+      currentUser = _useAppStore$.currentUser,
+      apiUrl = _useAppStore$.apiUrl;
+
+  var currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
+
+  var _useSWR = useSWR([apiUrl + config.JOB_DETAILS(user, id), dataFormat$2], fetcher, {
+    refreshInterval: refreshInterval
+  }),
+      jobData = _useSWR.data,
+      error = _useSWR.error,
+      mutate = _useSWR.mutate;
+
+  var _useHistory = reactRouter.useHistory(),
+      push = _useHistory.push;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState2 = React.useState(''),
+      titleValue = _useState2[0],
+      setTitleValue = _useState2[1];
+
+  var _useState3 = React.useState(''),
+      code = _useState3[0],
+      setCode = _useState3[1];
+
+  var _useState4 = React.useState(false),
+      running = _useState4[0],
+      setRunning = _useState4[1];
+
+  var _useState5 = React.useState(false),
+      stopping = _useState5[0],
+      setStopping = _useState5[1];
+
+  var _useState6 = React.useState(true),
+      codeSaved = _useState6[0],
+      setCodeSaved = _useState6[1];
+
+  var progressTimer = React.useRef(null);
+
+  var update = function update(params) {
+    try {
+      return Promise.resolve(updateJob(params)).then(function (data) {
+        mutate(_extends({}, jobData, data.job));
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  var updateDebounce = useDebounce(update, 1000, []);
+  var updateLongDebounce = useDebounce(update, 2000, []);
+  var prevData = usePrevious(jobData);
+  React.useEffect(function () {
+    window.addEventListener('keydown', detectEnterPress);
+    return function () {
+      return window.removeEventListener('keydown', detectEnterPress);
+    };
+  }, [jobData, code]);
+  React.useEffect(function () {
+    if (jobData) {
+      setTitleValue(jobData.title);
+      setCode(jobData.code);
+    }
+  }, []);
+
+  var detectEnterPress = function detectEnterPress(event) {
+    if (event.code === 'Enter' && (event.shiftKey || event.ctrlKey)) {
+      event.preventDefault();
+      if (!running && !stopping) onClickRun();
+    }
+  };
+
+  React.useEffect(function () {
+    if (['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
+      clearInterval(progressTimer.current);
+      progressTimer.current = setInterval(function () {}, 50);
+    } else {
+      clearInterval(progressTimer.current);
+    }
+
+    return function () {
+      return clearInterval(progressTimer.current);
+    };
+  }, [refreshInterval, jobData]);
+  React.useEffect(function () {
+    if ((prevData === null || prevData === void 0 ? void 0 : prevData.id) !== (jobData === null || jobData === void 0 ? void 0 : jobData.id)) {
+      setTitleValue(jobData.title);
+      setCode(jobData.code);
+    }
+
+    if (['RUNNING', 'SCHEDULED'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
+      if (!refreshInterval) setRefreshInterval(REFRESH_TIMEOUT$1);
+    } else if (refreshInterval) {
+      setRefreshInterval(0);
+    }
+
+    return function () {};
+  }, [jobData]);
+
+  var onChangeTitle = function onChangeTitle(value) {
+    setTitleValue(value);
+    updateDebounce({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      title: value
+    });
+  };
+
+  var onChangeCode = function onChangeCode(value) {
+    setCode(value);
+    setCodeSaved(false);
+    updateLongDebounce({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      code: value
+    }, function () {
+      return setCodeSaved(true);
+    });
+  };
+
+  var onChangeRuntime = function onChangeRuntime(runtime) {
+    update({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      runtime: runtime
+    });
+  };
+
+  var onChangeSchedule = function onChangeSchedule(schedule) {
+    update({
+      user: user,
+      id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+      schedule: schedule
+    });
+  };
+
+  var onClickRun = function onClickRun() {
+    try {
+      var _temp3 = function _temp3() {
+        setRunning(false);
+      };
+
+      setRunning(true);
+
+      var _temp4 = _catch(function () {
+        return Promise.resolve(runJob({
+          user: user,
+          id: jobData === null || jobData === void 0 ? void 0 : jobData.id,
+          code: code
+        })).then(function (data) {
+          mutate(_extends({}, jobData, data));
+          setRefreshInterval(REFRESH_TIMEOUT$1);
+        });
+      }, function (e) {
+        console.log(e);
+      });
+
+      return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(_temp3) : _temp3(_temp4));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  var onClickStop = function onClickStop() {
+    try {
+      var _temp7 = function _temp7() {
+        setStopping(false);
+      };
+
+      setStopping(true);
+
+      var _temp8 = _catch(function () {
+        return Promise.resolve(stopJob({
+          user: user,
+          id: jobData === null || jobData === void 0 ? void 0 : jobData.id
+        })).then(function (data) {
+          mutate(_extends({}, jobData, data));
+        });
+      }, function (e) {
+        console.log(e);
+      });
+
+      return Promise.resolve(_temp8 && _temp8.then ? _temp8.then(_temp7) : _temp7(_temp8));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  var onClickDelete = function onClickDelete() {
+    try {
+      return Promise.resolve(removeJob({
+        user: user,
+        id: jobData === null || jobData === void 0 ? void 0 : jobData.id
+      })).then(function () {
+        push(routes.jobs(user));
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  if (!jobData && !error) return /*#__PURE__*/React__default.createElement(Loader$6, null);
+  if ((error === null || error === void 0 ? void 0 : error.status) === 403) return /*#__PURE__*/React__default.createElement(AccessForbidden, null, t('youDontHaveAnAccessToThisJob'), ".", isSignedIn() && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
+    to: routes.dashboards(currentUserName)
+  }, t('goToMyJobs'))));
+  if ((error === null || error === void 0 ? void 0 : error.status) === 404) return /*#__PURE__*/React__default.createElement(NotFound, null, t('theJobYouAreRookingForCouldNotBeFound'), ' ', isSignedIn() && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
+    to: routes.dashboards(currentUserName)
+  }, t('goToMyJobs')), "."));
+  if (!jobData) return null;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.details
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(BackButton, {
+    Component: reactRouterDom.Link,
+    to: routes.jobs(user)
+  }, currentUserName === user ? t('backToJobs') : t('backToJobsOf', {
+    name: user
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.header
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.title
+  }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
+    className: css$S.edit,
+    value: titleValue,
+    onChange: onChangeTitle,
+    readOnly: currentUserName !== user,
+    placeholder: t('newJob')
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.side
+  }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress, {
+    onlyDuration: true,
+    className: css$S.progress,
+    data: jobData
+  }), jobData.status === 'FAILED' && /*#__PURE__*/React__default.createElement("div", {
+    className: "red-text"
+  }, t('sorryButYourCodeDoesntLookLikePythonJob')), ['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? /*#__PURE__*/React__default.createElement(Button, {
+    className: css$S.button,
+    color: "fail",
+    size: "small",
+    variant: "contained",
+    disabled: stopping,
+    onClick: onClickStop
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-pause"
+  }), t('stop')) : /*#__PURE__*/React__default.createElement(Button, {
+    className: css$S.button,
+    color: "success",
+    size: "small",
+    variant: "contained",
+    disabled: running,
+    onClick: onClickRun
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-play"
+  }), t('run'))), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$S.dropdown,
+    items: [{
+      title: t('delete'),
+      onClick: onClickDelete
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$S['dropdown-button'],
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-dots-horizontal"
+  })))), /*#__PURE__*/React__default.createElement(Status, {
+    data: jobData
+  }), /*#__PURE__*/React__default.createElement(ScheduleSettings, {
+    className: css$S.schedule,
+    data: jobData,
+    onChange: onChangeSchedule,
+    onChangeRuntime: onChangeRuntime
+  }), /*#__PURE__*/React__default.createElement(CodeEditor, {
+    className: css$S.codeEditor,
+    value: code,
+    onChange: onChangeCode,
+    language: jobData.runtime,
+    saved: codeSaved
+  }), /*#__PURE__*/React__default.createElement(Logs, {
+    className: css$S.logs,
+    data: jobData
+  }));
+};
+
+var css$T = {"jobs":"_styles-module__jobs__z2_YO"};
+
+var Jobs = function Jobs(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$T.jobs
+  }, /*#__PURE__*/React__default.createElement(reactRouterDom.Switch, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Route, {
+    path: routes.jobs(),
+    exact: true,
+    component: List$2
+  }), /*#__PURE__*/React__default.createElement(reactRouterDom.Route, {
+    path: routes.jobsDetails(),
+    component: Details$2
+  })));
+};
+
 var logo = require("./logo~gyFSAwBb.svg");
 
-var css$J = {"header":"_styles-module__header__3C4T1","logo":"_styles-module__logo__1jfuS","buttons":"_styles-module__buttons__2EQYi","button":"_styles-module__button__3cb7N"};
+var css$U = {"header":"_styles-module__header__3C4T1","logo":"_styles-module__logo__1jfuS","buttons":"_styles-module__buttons__2EQYi","button":"_styles-module__button__3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -4181,39 +5465,39 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$J.header, className)
+    className: cx(css$U.header, className)
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/",
-    className: css$J.logo
+    className: css$U.logo
   }, /*#__PURE__*/React__default.createElement("img", {
     width: "129",
     height: "35",
     src: logo,
     alt: "logo"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.buttons
+    className: css$U.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: reactRouterDom.Link,
     to: "/auth/login",
-    className: css$J.button,
+    className: css$U.button,
     color: "primary"
   }, t('logIn'))));
 };
 
-var css$K = {"layout":"_styles-module__layout__23bi3","header":"_styles-module__header__1chFa","main":"_styles-module__main__70hee"};
+var css$V = {"layout":"_styles-module__layout__23bi3","header":"_styles-module__header__1chFa","main":"_styles-module__main__70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.layout
+    className: css$V.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$K.header
+    className: css$V.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.main
+    className: css$V.main
   }, children));
 };
 
-var css$L = {"infoButton":"_style-module__infoButton__2zmYM"};
+var css$W = {"infoButton":"_style-module__infoButton__2zmYM"};
 
 var SettingsInformation = function SettingsInformation(_ref) {
   var className = _ref.className,
@@ -4233,7 +5517,7 @@ var SettingsInformation = function SettingsInformation(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$L.infoButton, className),
+    className: cx(css$W.infoButton, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -4249,12 +5533,13 @@ var SettingsInformation = function SettingsInformation(_ref) {
 };
 
 Object.defineProperty(exports, 'DndProvider', {
-    enumerable: true,
-    get: function () {
-        return reactDnd.DndProvider;
-    }
+  enumerable: true,
+  get: function () {
+    return reactDnd.DndProvider;
+  }
 });
 exports.AccessForbidden = AccessForbidden;
+exports.AppStoreProvider = AppStoreProvider;
 exports.Avatar = Avatar;
 exports.BackButton = BackButton;
 exports.Button = Button;
@@ -4270,6 +5555,7 @@ exports.DnDGridContextProvider = GridProvider;
 exports.DnDItem = DnDItem;
 exports.Dropdown = Dropdown;
 exports.FileDragnDrop = FileDragnDrop$1;
+exports.Jobs = Jobs;
 exports.Loader = Loader;
 exports.MarkdownRender = MarkdownRender;
 exports.Modal = Modal;
@@ -4299,5 +5585,7 @@ exports.UploadStack = UploadStack;
 exports.ViewSwitcher = ViewSwitcher;
 exports.Yield = Yield;
 exports.apiFabric = apiFabric;
+exports.appStoreActionTypes = actionsTypes;
 exports.config = config;
+exports.useAppStore = useAppStore;
 //# sourceMappingURL=index.js.map
