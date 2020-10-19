@@ -1057,8 +1057,11 @@ var ProgressBar = function ProgressBar(_ref) {
   var step = React.useRef(0.01);
   var currentProgress = React.useRef(0);
   var requestFrame = React.useRef(null);
+  var isActiveRef = React.useRef(false);
   var ref = React.useRef(null);
   React.useEffect(function () {
+    isActiveRef.current = isActive;
+
     if (isActive) {
       setProgress(0);
       step.current = 0.01;
@@ -1067,7 +1070,6 @@ var ProgressBar = function ProgressBar(_ref) {
     }
 
     if (prevIsActive === true && isActive === false) {
-      if (requestFrame.current) cancelAnimationFrame(requestFrame.current);
       setProgress(100);
       setTimeout(function () {
         return setProgress(0);
@@ -1075,8 +1077,11 @@ var ProgressBar = function ProgressBar(_ref) {
     }
 
     if (isActive === null) {
-      if (requestFrame.current) cancelAnimationFrame(requestFrame.current);
       setProgress(0);
+    }
+
+    if (!isActive && requestFrame.current) {
+      cancelAnimationFrame(requestFrame.current);
     }
   }, [isActive]);
   React.useEffect(function () {
@@ -1092,17 +1097,17 @@ var ProgressBar = function ProgressBar(_ref) {
     };
   }, []);
 
-  var startCalculateProgress = function startCalculateProgress() {
-    requestAnimationFrame(calculateProgress);
-  };
-
   var calculateProgress = function calculateProgress() {
     currentProgress.current += step.current;
     var progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
     setProgress(progress);
     if (progress > 70) step.current = 0.005;
-    if (progress >= 100 || !isActive) cancelAnimationFrame(requestFrame.current);
-    if (isActive) requestFrame.current = requestAnimationFrame(calculateProgress);
+    if (progress >= 100 || !isActiveRef.current) cancelAnimationFrame(requestFrame.current);
+    if (isActiveRef.current) requestFrame.current = requestAnimationFrame(calculateProgress);
+  };
+
+  var startCalculateProgress = function startCalculateProgress() {
+    requestAnimationFrame(calculateProgress);
   };
 
   var onResize = function onResize() {

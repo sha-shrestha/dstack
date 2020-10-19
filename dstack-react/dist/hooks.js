@@ -1,16 +1,19 @@
-var react = require('react');
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var React = require('react');
+var React__default = _interopDefault(React);
 var lodashEs = require('lodash-es');
 
 var usePrevious = (function (value) {
-  var ref = react.useRef(value);
-  react.useEffect(function () {
+  var ref = React.useRef(value);
+  React.useEffect(function () {
     ref.current = value;
   }, [value]);
   return ref.current;
 });
 
 var useOnClickOutside = (function (ref, handler) {
-  react.useEffect(function () {
+  React.useEffect(function () {
     var listener = function listener(event) {
       if (!ref.current || ref.current.contains(event.target)) {
         return;
@@ -79,11 +82,11 @@ var useForm = (function (initialFormState, fieldsValidators) {
     fieldsValidators = {};
   }
 
-  var _useState = react.useState(initialFormState),
+  var _useState = React.useState(initialFormState),
       form = _useState[0],
       setForm = _useState[1];
 
-  var _useState2 = react.useState({}),
+  var _useState2 = React.useState({}),
       formErrors = _useState2[0],
       setFormErrors = _useState2[1];
 
@@ -156,15 +159,15 @@ var useIntersectionObserver = (function (callBack, _ref, deps) {
       threshold = _ref$threshold === void 0 ? 0.01 : _ref$threshold,
       _ref$root = _ref.root,
       root = _ref$root === void 0 ? null : _ref$root;
-  var ref = react.useRef(null);
-  var intersectionCallback = react.useCallback(function (_ref2) {
+  var ref = React.useRef(null);
+  var intersectionCallback = React.useCallback(function (_ref2) {
     var target = _ref2[0];
 
     if (target.isIntersecting) {
       callBack();
     }
   }, deps);
-  react.useEffect(function () {
+  React.useEffect(function () {
     var options = {
       root: root,
       rootMargin: rootMargin,
@@ -182,7 +185,7 @@ var useIntersectionObserver = (function (callBack, _ref, deps) {
 var useDebounce = (function (callback, depsOrDelay, deps) {
   var delay = 300;
   if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
-  return react.useCallback(lodashEs.debounce(callback, delay), deps);
+  return React.useCallback(lodashEs.debounce(callback, delay), deps);
 });
 
 var useTimeout = function useTimeout(callback, timeout) {
@@ -190,8 +193,8 @@ var useTimeout = function useTimeout(callback, timeout) {
     timeout = 0;
   }
 
-  var timeoutIdRef = react.useRef();
-  var cancel = react.useCallback(function () {
+  var timeoutIdRef = React.useRef();
+  var cancel = React.useCallback(function () {
     var timeoutId = timeoutIdRef.current;
 
     if (timeoutId) {
@@ -199,13 +202,66 @@ var useTimeout = function useTimeout(callback, timeout) {
       clearTimeout(timeoutId);
     }
   }, [timeoutIdRef]);
-  react.useEffect(function () {
+  React.useEffect(function () {
     timeoutIdRef.current = setTimeout(callback, timeout);
     return cancel;
   }, [callback, timeout, cancel]);
   return cancel;
 };
 
+var actionsTypes = {
+  FETCH_CURRENT_USER: 'app/user/FETCH',
+  FETCH_CURRENT_USER_SUCCESS: 'app/user/FETCH_SUCCESS',
+  FETCH_CURRENT_USER_FAIL: 'app/user/FETCH_FAIL',
+  START_PROGRESS: 'app/START_PROGRESS',
+  SET_PROGRESS: 'app/SET_PROGRESS',
+  COMPLETE_PROGRESS: 'app/COMPLETE_PROGRESS',
+  RESET_PROGRESS: 'app/RESET_PROGRESS'
+};
+
+var StateContext = React.createContext();
+var useAppStore = function useAppStore() {
+  return React.useContext(StateContext);
+};
+
+var useAppProgress = (function () {
+  var _useAppStore = useAppStore(),
+      dispatch = _useAppStore[1];
+
+  var startAppProgress = function startAppProgress() {
+    dispatch({
+      type: actionsTypes.START_PROGRESS
+    });
+  };
+
+  var setAppProgress = function setAppProgress(progress) {
+    dispatch({
+      type: actionsTypes.SET_PROGRESS,
+      payload: progress
+    });
+  };
+
+  var completeAppProgress = function completeAppProgress() {
+    dispatch({
+      type: actionsTypes.COMPLETE_PROGRESS
+    });
+  };
+
+  var resetAppProgress = function resetAppProgress() {
+    dispatch({
+      type: actionsTypes.RESET_PROGRESS
+    });
+  };
+
+  return {
+    startAppProgress: startAppProgress,
+    setAppProgress: setAppProgress,
+    completeAppProgress: completeAppProgress,
+    resetAppProgress: resetAppProgress
+  };
+});
+
+exports.useAppProgress = useAppProgress;
 exports.useDebounce = useDebounce;
 exports.useForm = useForm;
 exports.useIntersectionObserver = useIntersectionObserver;

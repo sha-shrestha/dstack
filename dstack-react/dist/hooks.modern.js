@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useContext, createContext } from 'react';
 import { debounce } from 'lodash-es';
 
 var usePrevious = (value => {
@@ -171,5 +171,54 @@ const useTimeout = (callback, timeout = 0) => {
   return cancel;
 };
 
-export { useDebounce, useForm, useIntersectionObserver, useOnClickOutside, usePrevious, useTimeout };
+var actionsTypes = {
+  FETCH_CURRENT_USER: 'app/user/FETCH',
+  FETCH_CURRENT_USER_SUCCESS: 'app/user/FETCH_SUCCESS',
+  FETCH_CURRENT_USER_FAIL: 'app/user/FETCH_FAIL',
+  START_PROGRESS: 'app/START_PROGRESS',
+  SET_PROGRESS: 'app/SET_PROGRESS',
+  COMPLETE_PROGRESS: 'app/COMPLETE_PROGRESS',
+  RESET_PROGRESS: 'app/RESET_PROGRESS'
+};
+
+const StateContext = createContext();
+const useAppStore = () => useContext(StateContext);
+
+var useAppProgress = (() => {
+  const [, dispatch] = useAppStore();
+
+  const startAppProgress = () => {
+    dispatch({
+      type: actionsTypes.START_PROGRESS
+    });
+  };
+
+  const setAppProgress = progress => {
+    dispatch({
+      type: actionsTypes.SET_PROGRESS,
+      payload: progress
+    });
+  };
+
+  const completeAppProgress = () => {
+    dispatch({
+      type: actionsTypes.COMPLETE_PROGRESS
+    });
+  };
+
+  const resetAppProgress = () => {
+    dispatch({
+      type: actionsTypes.RESET_PROGRESS
+    });
+  };
+
+  return {
+    startAppProgress,
+    setAppProgress,
+    completeAppProgress,
+    resetAppProgress
+  };
+});
+
+export { useAppProgress, useDebounce, useForm, useIntersectionObserver, useOnClickOutside, usePrevious, useTimeout };
 //# sourceMappingURL=hooks.modern.js.map

@@ -4,6 +4,7 @@ import useForm from './hooks/useForm';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
 import useDebounce from './hooks/useDebounce';
 import useTimeout from './hooks/useTimeout';
+import useAppProgress from './hooks/useAppProgress';
 
 export {
     usePrevious,
@@ -11,5 +12,6 @@ export {
     useForm,
     useIntersectionObserver,
     useDebounce,
-    useTimeout
+    useTimeout,
+    useAppProgress
 };

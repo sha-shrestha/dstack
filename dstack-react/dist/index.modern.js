@@ -896,8 +896,11 @@ const ProgressBar = ({
   const step = useRef(0.01);
   const currentProgress = useRef(0);
   const requestFrame = useRef(null);
+  const isActiveRef = useRef(false);
   const ref = useRef(null);
   useEffect(() => {
+    isActiveRef.current = isActive;
+
     if (isActive) {
       setProgress(0);
       step.current = 0.01;
@@ -906,14 +909,16 @@ const ProgressBar = ({
     }
 
     if (prevIsActive === true && isActive === false) {
-      if (requestFrame.current) cancelAnimationFrame(requestFrame.current);
       setProgress(100);
       setTimeout(() => setProgress(0), 800);
     }
 
     if (isActive === null) {
-      if (requestFrame.current) cancelAnimationFrame(requestFrame.current);
       setProgress(0);
+    }
+
+    if (!isActive && requestFrame.current) {
+      cancelAnimationFrame(requestFrame.current);
     }
   }, [isActive]);
   useEffect(() => {
@@ -927,17 +932,17 @@ const ProgressBar = ({
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const startCalculateProgress = () => {
-    requestAnimationFrame(calculateProgress);
-  };
-
   const calculateProgress = () => {
     currentProgress.current += step.current;
     const progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
     setProgress(progress);
     if (progress > 70) step.current = 0.005;
-    if (progress >= 100 || !isActive) cancelAnimationFrame(requestFrame.current);
-    if (isActive) requestFrame.current = requestAnimationFrame(calculateProgress);
+    if (progress >= 100 || !isActiveRef.current) cancelAnimationFrame(requestFrame.current);
+    if (isActiveRef.current) requestFrame.current = requestAnimationFrame(calculateProgress);
+  };
+
+  const startCalculateProgress = () => {
+    requestAnimationFrame(calculateProgress);
   };
 
   const onResize = () => {
