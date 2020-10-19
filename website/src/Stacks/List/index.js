@@ -24,9 +24,6 @@ type Props = {
     requestStatus: ?number,
     currentUser?: string,
     currentUserToken?: string,
-    startAppProgress: Function,
-    completeAppProgress: Function,
-    resetAppProgress: Function,
 };
 
 const List = ({

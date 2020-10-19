@@ -3,10 +3,11 @@ import {connect} from 'react-redux';
 import {Link, NavLink, useRouteMatch, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
+import {useAppStore, appStoreActionTypes} from '@dstackai/dstack-react';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
+import {useOnClickOutside} from '@dstackai/dstack-react/dist/hooks';
 import config from 'config';
 import routes from 'routes';
-import {useOnClickOutside, startAppProgress, completeAppProgress} from '@dstackai/dstack-react/dist/hooks';
 import logo from 'assets/logo.svg';
 import css from './styles.module.css';
 import {fetchList as fetchStacksList} from 'Stacks/List/actions';
@@ -29,6 +30,7 @@ const Sidebar = ({
     const {path} = useRouteMatch();
     const params = useParams();
     const {pathname} = useLocation();
+    const [, dispatch] = useAppStore();
     const sidebarRef = useRef(null);
 
     useOnClickOutside(sidebarRef, () => isShow && toggleMenu());
@@ -43,8 +45,10 @@ const Sidebar = ({
 
     const refreshStacks = () => {
         if (pathname === routes.stacks(params.user)) {
-            startAppProgress();
-            fetchStacksList(params.user, completeAppProgress);
+            dispatch({type: appStoreActionTypes.START_PROGRESS});
+            fetchStacksList(params.user, () => {
+                dispatch({type: appStoreActionTypes.COMPLETE_PROGRESS});
+            });
         }
     };
 
