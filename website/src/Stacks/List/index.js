@@ -5,9 +5,8 @@ import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import {NotFound, StackList, UploadStack} from '@dstackai/dstack-react';
+import {NotFound, StackList, UploadStack, useAppStore, appStoreActionTypes} from '@dstackai/dstack-react';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
-import {useAppProgress} from '@dstackai/dstack-react/dist/hooks';
 import {fetchList, deleteStack} from './actions';
 import {useParams} from 'react-router';
 import routes from 'routes';
@@ -39,21 +38,24 @@ const List = ({
     currentUser,
     currentUserToken,
 }: Props) => {
-    const {startAppProgress, completeAppProgress, resetAppProgress} = useAppProgress();
     const {t} = useTranslation();
     const {user} = useParams();
+    const [, dispatch] = useAppStore();
 
 
     const fetchData = () => {
-        startAppProgress();
-        fetchList(user, completeAppProgress);
+        dispatch({type: appStoreActionTypes.START_PROGRESS});
+
+        fetchList(user, () => {
+            dispatch({type: appStoreActionTypes.COMPLETE_PROGRESS});
+        });
     };
 
     useEffect(() => {
         fetchData();
 
         return () => {
-            resetAppProgress();
+            dispatch({type: appStoreActionTypes.RESET_PROGRESS});
         };
     }, [user]);
 

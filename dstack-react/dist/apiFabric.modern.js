@@ -12,24 +12,44 @@ var config = {
   USER_DATA_URL: '/users/remember',
   UPDATE_TOKEN_URL: '/users/update/token',
   UPDATE_SETTINGS_URL: '/users/update/settings',
-  CHECK_USER: userName => `/users/exists/${userName}`,
-  STACKS_LIST: userName => `/stacks/${userName}`,
-  DELETE_STACK: () => '/stacks/delete',
-  STACK_DETAILS: (userName, stack) => `/stacks/${userName}/${stack}`,
-  STACK_FRAME: (userName, stack, frameId) => `/frames/${userName}/${stack}/${frameId}`,
-  STACK_ATTACHMENT: (stack, frameId, id) => `/attachs/${stack}/${frameId}/${id}`,
+  CHECK_USER: function CHECK_USER(userName) {
+    return "/users/exists/" + userName;
+  },
+  STACKS_LIST: function STACKS_LIST(userName) {
+    return "/stacks/" + userName;
+  },
+  DELETE_STACK: function DELETE_STACK() {
+    return '/stacks/delete';
+  },
+  STACK_DETAILS: function STACK_DETAILS(userName, stack) {
+    return "/stacks/" + userName + "/" + stack;
+  },
+  STACK_FRAME: function STACK_FRAME(userName, stack, frameId) {
+    return "/frames/" + userName + "/" + stack + "/" + frameId;
+  },
+  STACK_ATTACHMENT: function STACK_ATTACHMENT(stack, frameId, id) {
+    return "/attachs/" + stack + "/" + frameId + "/" + id;
+  },
   STACK_UPDATE: '/stacks/update',
   STACK_PUSH: '/stacks/push',
-  DASHBOARD_LIST: userName => `/dashboards/${userName}`,
-  DASHBOARD_DETAILS: (userName, id) => `/dashboards/${userName}/${id}`,
+  DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
+    return "/dashboards/" + userName;
+  },
+  DASHBOARD_DETAILS: function DASHBOARD_DETAILS(userName, id) {
+    return "/dashboards/" + userName + "/" + id;
+  },
   DASHBOARD_CREATE: '/dashboards/create',
   DASHBOARD_UPDATE: '/dashboards/update',
   DASHBOARD_DELETE: '/dashboards/delete',
   DASHBOARD_CARDS_INSERT: '/dashboards/cards/insert',
   DASHBOARD_CARDS_UPDATE: '/dashboards/cards/update',
   DASHBOARD_CARDS_DELETE: '/dashboards/cards/delete',
-  JOB_LIST: userName => `/jobs/${userName}`,
-  JOB_DETAILS: (userName, id) => `/jobs/${userName}/${id}`,
+  JOB_LIST: function JOB_LIST(userName) {
+    return "/jobs/" + userName;
+  },
+  JOB_DETAILS: function JOB_DETAILS(userName, id) {
+    return "/jobs/" + userName + "/" + id;
+  },
   JOB_CREATE: '/jobs/create',
   JOB_UPDATE: '/jobs/update',
   JOB_DELETE: '/jobs/delete',
@@ -42,23 +62,24 @@ var config = {
   TOKEN_STORAGE_KEY: 'token'
 };
 
-const apiFabric = ({
-  apiUrl
-} = {}) => {
-  const CancelToken = axios.CancelToken;
-  const instance = axios.create({
+var apiFabric = function apiFabric(_temp) {
+  var _ref = _temp === void 0 ? {} : _temp,
+      apiUrl = _ref.apiUrl;
+
+  var CancelToken = axios.CancelToken;
+  var instance = axios.create({
     baseURL: apiUrl,
     crossDomain: true
   });
   instance.cancelToken = CancelToken;
-  instance.interceptors.request.use(requestConfig => {
-    const token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
-    requestConfig.headers.Authorization = token ? `Bearer ${token}` : '';
+  instance.interceptors.request.use(function (requestConfig) {
+    var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
+    requestConfig.headers.Authorization = token ? "Bearer " + token : '';
     return requestConfig;
   });
-  instance.interceptors.response.use(response => {
+  instance.interceptors.response.use(function (response) {
     return response;
-  }, error => {
+  }, function (error) {
     if (get(error, 'response.status', null) === 401) {
       return Promise.reject(error.response);
     } else if (get(error, 'response.status', null) === 400) {

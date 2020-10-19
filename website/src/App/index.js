@@ -64,10 +64,6 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
     const [, dispatch] = useAppStore();
     const isInitialMount = useRef(true);
 
-    // FETCH_CURRENT_USER
-    // FETCH_CURRENT_USER_SUCCESS
-    // FETCH_CURRENT_USER_FAIL
-
     useEffect(() => {
         if (isSignedIn()) {
             dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER});
@@ -130,7 +126,7 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                         <Switch>
                             <UnAuthorizedLayoutRoute path={routes.notFound()} component={NotFound} />
                             <UnAuthorizedLayoutRoute path={routes.dashboards()} component={Dashboards} />
-                            {/*<DefaultLayoutRoute path={routes.jobs()} component={Jobs} />*/}
+                            <UnAuthorizedLayoutRoute path={routes.jobs()} component={Jobs} />
                             <UnAuthorizedLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
                     )}

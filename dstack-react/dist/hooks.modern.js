@@ -1,17 +1,17 @@
 import { useRef, useEffect, useState, useCallback, useContext, createContext } from 'react';
 import { debounce } from 'lodash-es';
 
-var usePrevious = (value => {
-  const ref = useRef(value);
-  useEffect(() => {
+var usePrevious = (function (value) {
+  var ref = useRef(value);
+  useEffect(function () {
     ref.current = value;
   }, [value]);
   return ref.current;
 });
 
-var useOnClickOutside = ((ref, handler) => {
-  useEffect(() => {
-    const listener = event => {
+var useOnClickOutside = (function (ref, handler) {
+  useEffect(function () {
+    var listener = function listener(event) {
       if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
@@ -21,49 +21,80 @@ var useOnClickOutside = ((ref, handler) => {
 
     document.addEventListener('mousedown', listener);
     document.addEventListener('touchstart', listener);
-    return () => {
+    return function () {
       document.removeEventListener('mousedown', listener);
       document.removeEventListener('touchstart', listener);
     };
   }, [ref, handler]);
 });
 
-const isEmail = value => {
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+var isEmail = function isEmail(value) {
   return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
 };
-const isRequired = value => {
+var isRequired = function isRequired(value) {
   return !(value === null || value === undefined || value === '');
 };
-const noSpaces = value => {
+var noSpaces = function noSpaces(value) {
   return /^[\S]*$/.test(value);
 };
-const isValidStackName = value => {
+var isValidStackName = function isValidStackName(value) {
   return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
 };
 
-const validationMap = {
+var validationMap = {
   required: isRequired,
   email: isEmail,
   'no-spaces-stack': noSpaces,
   'stack-name': isValidStackName
 };
 
-const getValidationFunction = validator => {
+var getValidationFunction = function getValidationFunction(validator) {
   if (typeof validator === 'string' && validationMap[validator]) return validationMap[validator];
   if (typeof validator === 'function') return validator;
-  return () => true;
+  return function () {
+    return true;
+  };
 };
 
-var useForm = ((initialFormState, fieldsValidators = {}) => {
-  const [form, setForm] = useState(initialFormState);
-  const [formErrors, setFormErrors] = useState({});
+var useForm = (function (initialFormState, fieldsValidators) {
+  if (fieldsValidators === void 0) {
+    fieldsValidators = {};
+  }
 
-  const onChange = (eventOrName, value) => {
-    let name;
-    let fieldValue;
+  var _useState = useState(initialFormState),
+      form = _useState[0],
+      setForm = _useState[1];
+
+  var _useState2 = useState({}),
+      formErrors = _useState2[0],
+      setFormErrors = _useState2[1];
+
+  var onChange = function onChange(eventOrName, value) {
+    var _extends2, _extends3;
+
+    var name;
+    var fieldValue;
 
     if (eventOrName.target) {
-      const event = eventOrName;
+      var event = eventOrName;
       fieldValue = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
       name = event.target.name;
     } else {
@@ -71,39 +102,35 @@ var useForm = ((initialFormState, fieldsValidators = {}) => {
       fieldValue = value;
     }
 
-    setForm({ ...form,
-      [name]: fieldValue
-    });
-    setFormErrors({ ...formErrors,
-      [name]: []
-    });
+    setForm(_extends({}, form, (_extends2 = {}, _extends2[name] = fieldValue, _extends2)));
+    setFormErrors(_extends({}, formErrors, (_extends3 = {}, _extends3[name] = [], _extends3)));
   };
 
-  const resetForm = () => {
+  var resetForm = function resetForm() {
     setForm(initialFormState);
     setFormErrors({});
   };
 
-  const getFieldErrors = fieldName => {
-    const errors = [];
-    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(validator => {
-      const isValid = getValidationFunction(validator);
+  var getFieldErrors = function getFieldErrors(fieldName) {
+    var errors = [];
+    if (Array.isArray(fieldsValidators[fieldName])) fieldsValidators[fieldName].forEach(function (validator) {
+      var isValid = getValidationFunction(validator);
       if (!isValid(form[fieldName])) errors.push(validator);
     });
 
     if (typeof fieldsValidators[fieldName] === 'string') {
-      const isValid = getValidationFunction(fieldsValidators[fieldName]);
+      var isValid = getValidationFunction(fieldsValidators[fieldName]);
       if (!isValid(form[fieldName])) errors.push(fieldsValidators[fieldName]);
     }
 
     return errors;
   };
 
-  const checkValidForm = () => {
-    let isValid = true;
-    const newFormErrors = {};
-    Object.keys(fieldsValidators).forEach(fieldName => {
-      const errors = getFieldErrors(fieldName);
+  var checkValidForm = function checkValidForm() {
+    var isValid = true;
+    var newFormErrors = {};
+    Object.keys(fieldsValidators).forEach(function (fieldName) {
+      var errors = getFieldErrors(fieldName);
       newFormErrors[fieldName] = errors;
       isValid = isValid && !errors.length;
     });
@@ -112,59 +139,67 @@ var useForm = ((initialFormState, fieldsValidators = {}) => {
   };
 
   return {
-    form,
-    setForm,
-    formErrors,
-    setFormErrors,
-    resetForm,
-    onChange,
-    checkValidForm
+    form: form,
+    setForm: setForm,
+    formErrors: formErrors,
+    setFormErrors: setFormErrors,
+    resetForm: resetForm,
+    onChange: onChange,
+    checkValidForm: checkValidForm
   };
 });
 
-var useIntersectionObserver = ((callBack, {
-  rootMargin: _rootMargin = '0px',
-  threshold: _threshold = 0.01,
-  root: _root = null
-}, deps) => {
-  const ref = useRef(null);
-  const intersectionCallback = useCallback(([target]) => {
+var useIntersectionObserver = (function (callBack, _ref, deps) {
+  var _ref$rootMargin = _ref.rootMargin,
+      rootMargin = _ref$rootMargin === void 0 ? '0px' : _ref$rootMargin,
+      _ref$threshold = _ref.threshold,
+      threshold = _ref$threshold === void 0 ? 0.01 : _ref$threshold,
+      _ref$root = _ref.root,
+      root = _ref$root === void 0 ? null : _ref$root;
+  var ref = useRef(null);
+  var intersectionCallback = useCallback(function (_ref2) {
+    var target = _ref2[0];
+
     if (target.isIntersecting) {
       callBack();
     }
   }, deps);
-  useEffect(() => {
-    const options = {
-      root: _root,
-      rootMargin: _rootMargin,
-      threshold: _threshold
+  useEffect(function () {
+    var options = {
+      root: root,
+      rootMargin: rootMargin,
+      threshold: threshold
     };
-    const observer = new IntersectionObserver(intersectionCallback, options);
+    var observer = new IntersectionObserver(intersectionCallback, options);
     if (ref && ref.current) observer.observe(ref.current);
-    return () => {
+    return function () {
       if (ref.current) observer.unobserve(ref.current);
     };
   }, [ref, intersectionCallback]);
   return [ref];
 });
 
-var useDebounce = ((callback, depsOrDelay, deps) => {
-  let delay = 300;
+var useDebounce = (function (callback, depsOrDelay, deps) {
+  var delay = 300;
   if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
   return useCallback(debounce(callback, delay), deps);
 });
 
-const useTimeout = (callback, timeout = 0) => {
-  const timeoutIdRef = useRef();
-  const cancel = useCallback(() => {
-    const timeoutId = timeoutIdRef.current;
+var useTimeout = function useTimeout(callback, timeout) {
+  if (timeout === void 0) {
+    timeout = 0;
+  }
+
+  var timeoutIdRef = useRef();
+  var cancel = useCallback(function () {
+    var timeoutId = timeoutIdRef.current;
 
     if (timeoutId) {
       timeoutIdRef.current = undefined;
       clearTimeout(timeoutId);
     }
   }, [timeoutIdRef]);
-  useEffect(() => {
+  useEffect(function () {
     timeoutIdRef.current = setTimeout(callback, timeout);
     return cancel;
   }, [callback, timeout, cancel]);
@@ -181,42 +216,45 @@ var actionsTypes = {
   RESET_PROGRESS: 'app/RESET_PROGRESS'
 };
 
-const StateContext = createContext();
-const useAppStore = () => useContext(StateContext);
+var StateContext = createContext();
+var useAppStore = function useAppStore() {
+  return useContext(StateContext);
+};
 
-var useAppProgress = (() => {
-  const [, dispatch] = useAppStore();
+var useAppProgress = (function () {
+  var _useAppStore = useAppStore(),
+      dispatch = _useAppStore[1];
 
-  const startAppProgress = () => {
+  var startAppProgress = function startAppProgress() {
     dispatch({
       type: actionsTypes.START_PROGRESS
     });
   };
 
-  const setAppProgress = progress => {
+  var setAppProgress = function setAppProgress(progress) {
     dispatch({
       type: actionsTypes.SET_PROGRESS,
       payload: progress
     });
   };
 
-  const completeAppProgress = () => {
+  var completeAppProgress = function completeAppProgress() {
     dispatch({
       type: actionsTypes.COMPLETE_PROGRESS
     });
   };
 
-  const resetAppProgress = () => {
+  var resetAppProgress = function resetAppProgress() {
     dispatch({
       type: actionsTypes.RESET_PROGRESS
     });
   };
 
   return {
-    startAppProgress,
-    setAppProgress,
-    completeAppProgress,
-    resetAppProgress
+    startAppProgress: startAppProgress,
+    setAppProgress: setAppProgress,
+    completeAppProgress: completeAppProgress,
+    resetAppProgress: resetAppProgress
   };
 });
 
