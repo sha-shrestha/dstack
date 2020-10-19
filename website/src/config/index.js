@@ -2,7 +2,7 @@ import {config} from '@dstackai/dstack-react';
 
 export default {
     ...config,
-    API_URL: 'https://api.stgn.dstack.ai',
+    API_URL: '/api',
     GA_ID: '',
 
     CONFIGURE_PYTHON_COMMAND: (token = '<token>', userName = '<username>') => {
