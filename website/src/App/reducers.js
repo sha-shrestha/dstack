@@ -1,7 +1,6 @@
 import actionsTypes from './actionsTypes';
 
 const initial = {
-    progressIsActive: null,
     userData: null,
     userLoading: false,
 };
@@ -36,34 +35,6 @@ export default (state = initial, action) => {
                     ...state.userData,
                     token: action.payload,
                 },
-            };
-
-
-        case (actionsTypes.START_PROGRESS):
-            return {
-                ...state,
-                progressIsActive: true,
-                progress: null,
-            };
-
-        case (actionsTypes.SET_PROGRESS):
-            return {
-                ...state,
-                progress: action.payload,
-            };
-
-        case (actionsTypes.COMPLETE_PROGRESS):
-            return {
-                ...state,
-                progressIsActive: false,
-                progress: null,
-            };
-
-        case (actionsTypes.RESET_PROGRESS):
-            return {
-                ...state,
-                progressIsActive: null,
-                progress: null,
             };
 
         default:

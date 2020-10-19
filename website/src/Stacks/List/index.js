@@ -7,7 +7,7 @@ import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {NotFound, StackList, UploadStack} from '@dstackai/dstack-react';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
-import {startAppProgress, completeAppProgress, resetAppProgress} from 'App/actions';
+import {useAppProgress} from '@dstackai/dstack-react/dist/hooks';
 import {fetchList, deleteStack} from './actions';
 import {useParams} from 'react-router';
 import routes from 'routes';
@@ -38,10 +38,8 @@ const List = ({
     deleteStack,
     currentUser,
     currentUserToken,
-    startAppProgress,
-    completeAppProgress,
-    resetAppProgress,
 }: Props) => {
+    const {startAppProgress, completeAppProgress, resetAppProgress} = useAppProgress();
     const {t} = useTranslation();
     const {user} = useParams();
 
@@ -119,8 +117,5 @@ export default connect(
     {
         fetchList,
         deleteStack,
-        startAppProgress,
-        completeAppProgress,
-        resetAppProgress,
     },
 )(List);

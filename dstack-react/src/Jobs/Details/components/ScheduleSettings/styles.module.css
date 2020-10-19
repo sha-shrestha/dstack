@@ -12,7 +12,7 @@
         &.runtime {
             margin-right: 12px;
         }
-        &-button {
+        & .dropdownButton {
             white-space: nowrap;
             outline: none;
             font-size: 14px;

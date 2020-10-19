@@ -1,4 +1,4 @@
-// import './global.css';
+import './global.css';
 
 export {AppStoreProvider as AppStoreProvider} from './AppStore';
 export {useAppStore as useAppStore} from './AppStore';

@@ -1,6 +1,8 @@
 import React, {createContext, useReducer, useContext} from 'react';
 import actionsTypes from './actionsTypes';
 
+export {default as actionsTypes} from './actionsTypes';
+
 const initialState = {
     currentUser: {
         loading: false,

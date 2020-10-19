@@ -6,11 +6,10 @@ import cx from 'classnames';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import config from 'config';
 import routes from 'routes';
-import {useOnClickOutside} from '@dstackai/dstack-react/dist/hooks';
-import {startAppProgress, completeAppProgress} from 'App/actions';
+import {useOnClickOutside, startAppProgress, completeAppProgress} from '@dstackai/dstack-react/dist/hooks';
 import logo from 'assets/logo.svg';
 import css from './styles.module.css';
-import {fetchList} from 'Stacks/List/actions';
+import {fetchList as fetchStacksList} from 'Stacks/List/actions';
 import {useLocation} from 'react-router';
 
 
@@ -24,7 +23,7 @@ type Props = {
 
 const Sidebar = ({
     className, currentUser, isShow, toggleMenu, userLoading,
-    fetchStacksList, startAppProgress, completeAppProgress,
+    fetchStacksList,
 }: Props) => {
     const {t} = useTranslation();
     const {path} = useRouteMatch();
@@ -147,5 +146,5 @@ export default connect(
         userLoading: state.app.userLoading,
     }),
 
-    {fetchStacksList: fetchList, startAppProgress, completeAppProgress}
+    {fetchStacksList}
 )(Sidebar);

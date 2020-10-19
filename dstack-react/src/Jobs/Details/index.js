@@ -12,9 +12,10 @@ import Button from '../../Button';
 import BackButton from '../../BackButton';
 import Yield from '../../Yield';
 import {useAppStore} from '../../AppStore';
-// import appStoreActionTypes from '../../AppStore/actionsTypes';
 import {dataFetcher, isSignedIn} from '../../utils';
-import {usePrevious, useDebounce} from '../../hooks';
+import usePrevious from '../../hooks/usePrevious';
+import useDebounce from '../../hooks/useDebounce';
+import useAppProgress from '../../hooks/useAppProgress';
 import ScheduleSettings from './components/ScheduleSettings';
 import CodeEditor from './components/CodeEditor';
 import Status from './components/Status';
@@ -23,9 +24,8 @@ import Progress from './components/Progress';
 import Loader from './components/Loader';
 import routes from '../../routes';
 import config from '../../config';
-// import {setAppProgress, resetAppProgress} from 'App/actions';
 import useActions from '../actions';
-// import {calculateJobProgress} from '../utils';
+import {calculateJobProgress} from '../utils';
 import css from './styles.module.css';
 
 type Props = {}
@@ -42,6 +42,7 @@ const Details = ({}: Props) => {
         removeJob,
     } = useActions();
 
+    const {setAppProgress, resetAppProgress} = useAppProgress();
     const {user, id} = useParams();
     const [refreshInterval, setRefreshInterval] = useState(0);
     const [{currentUser, apiUrl}] = useAppStore();
@@ -106,9 +107,9 @@ const Details = ({}: Props) => {
             clearInterval(progressTimer.current);
 
             progressTimer.current = setInterval(() => {
-                // const [progress] = calculateJobProgress(jobData);
+                const [progress] = calculateJobProgress(jobData);
 
-                // setAppProgress(progress);
+                setAppProgress(progress);
             }, 50);
         } else {
             clearInterval(progressTimer.current);
@@ -128,11 +129,11 @@ const Details = ({}: Props) => {
                 setRefreshInterval(REFRESH_TIMEOUT);
         } else if (refreshInterval) {
             setRefreshInterval(0);
-            // resetAppProgress();
+            resetAppProgress();
         }
 
         return () => {
-            // resetAppProgress();
+            resetAppProgress();
         };
     }, [jobData]);
 
@@ -335,7 +336,7 @@ const Details = ({}: Props) => {
                     ]}
                 >
                     <Button
-                        className={css['dropdown-button']}
+                        className={css.dropdownButton}
                         color="secondary"
                     >
                         <span className="mdi mdi-dots-horizontal" />

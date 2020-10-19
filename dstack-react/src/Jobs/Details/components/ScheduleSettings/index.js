@@ -89,7 +89,7 @@ const ScheduleSettings = ({data, className, onChange, onChangeRuntime}: Props) =
                 ]}
             >
                 <Button
-                    className={css['dropdown-button']}
+                    className={css.dropdownButton}
                     color="primary"
                 >
                     {t(data.runtime)}
@@ -120,7 +120,7 @@ const ScheduleSettings = ({data, className, onChange, onChangeRuntime}: Props) =
                 ]}
             >
                 <Button
-                    className={css['dropdown-button']}
+                    className={css.dropdownButton}
                     color="primary"
                 >
                     {t(scheduleType)}
@@ -145,7 +145,7 @@ const ScheduleSettings = ({data, className, onChange, onChangeRuntime}: Props) =
                         })}
                     >
                         <Button
-                            className={css['dropdown-button']}
+                            className={css.dropdownButton}
                             color="primary"
                         >
                             {scheduleTime} UTC

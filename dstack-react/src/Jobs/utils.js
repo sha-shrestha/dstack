@@ -1,3 +1,5 @@
+const JOB_DEFAULT_ESTIMATED_DURATION = 600000;
+
 export const calculateJobProgress = (job: {
     'estimated_duration'?: ?number,
     started: number,

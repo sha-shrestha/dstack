@@ -21,7 +21,7 @@
     background-color: var(--color-white);
     & .dropdown {
         margin-left: 9px;
-        &-button {
+        & .dropdownButton {
             outline: none;
             height: 26px !important;
             line-height: 26px !important;

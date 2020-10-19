@@ -4490,6 +4490,7 @@ var Loader$5 = function Loader(_ref) {
   })));
 };
 
+var JOB_DEFAULT_ESTIMATED_DURATION = 600000;
 var calculateJobProgress = function calculateJobProgress(job) {
   var estimatedDuration = job['estimated_duration'] || JOB_DEFAULT_ESTIMATED_DURATION;
   var currentDuration = Date.now() - job.started;
@@ -4869,7 +4870,44 @@ var List$2 = function List() {
   }))));
 };
 
-var css$N = {"schedule":"_styles-module__schedule__YoEcM","dropdown":"_styles-module__dropdown__3RJdh","runtime":"_styles-module__runtime__2h8GE","message":"_styles-module__message__1byIj"};
+var useAppProgress = (function () {
+  var _useAppStore = useAppStore(),
+      dispatch = _useAppStore[1];
+
+  var startAppProgress = function startAppProgress() {
+    dispatch({
+      type: actionsTypes.START_PROGRESS
+    });
+  };
+
+  var setAppProgress = function setAppProgress(progress) {
+    dispatch({
+      type: actionsTypes.SET_PROGRESS,
+      payload: progress
+    });
+  };
+
+  var completeAppProgress = function completeAppProgress() {
+    dispatch({
+      type: actionsTypes.COMPLETE_PROGRESS
+    });
+  };
+
+  var resetAppProgress = function resetAppProgress() {
+    dispatch({
+      type: actionsTypes.RESET_PROGRESS
+    });
+  };
+
+  return {
+    startAppProgress: startAppProgress,
+    setAppProgress: setAppProgress,
+    completeAppProgress: completeAppProgress,
+    resetAppProgress: resetAppProgress
+  };
+});
+
+var css$N = {"schedule":"_styles-module__schedule__YoEcM","dropdown":"_styles-module__dropdown__3RJdh","runtime":"_styles-module__runtime__2h8GE","dropdownButton":"_styles-module__dropdownButton__3fdRe","message":"_styles-module__message__1byIj"};
 
 var timeout = null;
 
@@ -4947,7 +4985,7 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: runtimeChange('r')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$N['dropdown-button'],
+    className: css$N.dropdownButton,
     color: "primary"
   }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
@@ -4961,7 +4999,7 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: scheduleTypeChange('daily')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$N['dropdown-button'],
+    className: css$N.dropdownButton,
     color: "primary"
   }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
@@ -4975,7 +5013,7 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       };
     })
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$N['dropdown-button'],
+    className: css$N.dropdownButton,
     color: "primary"
   }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
@@ -5123,7 +5161,7 @@ var Loader$6 = function Loader(_ref) {
   }));
 };
 
-var css$S = {"details":"_styles-module__details__1K_mA","header":"_styles-module__header__1nmEh","dropdown":"_styles-module__dropdown__3RSoB","title":"_styles-module__title__3U50H","edit":"_styles-module__edit__bgkiC","side":"_styles-module__side__3uIQ_","progress":"_styles-module__progress__1jRHi","button":"_styles-module__button__2J0VV","schedule":"_styles-module__schedule__2YXFa","codeEditor":"_styles-module__codeEditor__1M2Sw","logs":"_styles-module__logs__ZQT6g"};
+var css$S = {"details":"_styles-module__details__1K_mA","header":"_styles-module__header__1nmEh","dropdown":"_styles-module__dropdown__3RSoB","dropdownButton":"_styles-module__dropdownButton__2dnN2","title":"_styles-module__title__3U50H","edit":"_styles-module__edit__bgkiC","side":"_styles-module__side__3uIQ_","progress":"_styles-module__progress__1jRHi","button":"_styles-module__button__2J0VV","schedule":"_styles-module__schedule__2YXFa","codeEditor":"_styles-module__codeEditor__1M2Sw","logs":"_styles-module__logs__ZQT6g"};
 
 var REFRESH_TIMEOUT$1 = 3000;
 
@@ -5141,6 +5179,10 @@ var Details$2 = function Details(_ref) {
       stopJob = _useActions.stopJob,
       updateJob = _useActions.updateJob,
       removeJob = _useActions.removeJob;
+
+  var _useAppProgress = useAppProgress(),
+      setAppProgress = _useAppProgress.setAppProgress,
+      resetAppProgress = _useAppProgress.resetAppProgress;
 
   var _useParams = reactRouter.useParams(),
       user = _useParams.user,
@@ -5228,7 +5270,12 @@ var Details$2 = function Details(_ref) {
   React.useEffect(function () {
     if (['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData === null || jobData === void 0 ? void 0 : jobData.status) >= 0) {
       clearInterval(progressTimer.current);
-      progressTimer.current = setInterval(function () {}, 50);
+      progressTimer.current = setInterval(function () {
+        var _calculateJobProgress = calculateJobProgress(jobData),
+            progress = _calculateJobProgress[0];
+
+        setAppProgress(progress);
+      }, 50);
     } else {
       clearInterval(progressTimer.current);
     }
@@ -5247,9 +5294,12 @@ var Details$2 = function Details(_ref) {
       if (!refreshInterval) setRefreshInterval(REFRESH_TIMEOUT$1);
     } else if (refreshInterval) {
       setRefreshInterval(0);
+      resetAppProgress();
     }
 
-    return function () {};
+    return function () {
+      resetAppProgress();
+    };
   }, [jobData]);
 
   var onChangeTitle = function onChangeTitle(value) {
@@ -5414,7 +5464,7 @@ var Details$2 = function Details(_ref) {
       onClick: onClickDelete
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$S['dropdown-button'],
+    className: css$S.dropdownButton,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"

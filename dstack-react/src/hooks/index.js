@@ -5,6 +5,7 @@ import useIntersectionObserver from './useIntersectionObserver';
 import useDebounce from './useDebounce';
 import useTimeout from './useTimeout';
 import useListViewSwitcher from './useListViewSwitcher';
+import useAppProgress from './useAppProgress';
 
 export {
     usePrevious,
@@ -13,5 +14,6 @@ export {
     useIntersectionObserver,
     useDebounce,
     useTimeout,
-    useListViewSwitcher
+    useListViewSwitcher,
+    useAppProgress
 };

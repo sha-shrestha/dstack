@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
-import {connect} from 'react-redux';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import {ProgressBar} from '@dstackai/dstack-react';
+import {ProgressBar, useAppStore} from '@dstackai/dstack-react';
 
 
 import css from './styles.module.css';
 
-const DefaultLayout = ({children, appProgressIsActive, appProgress}) => {
+const DefaultLayout = ({children}) => {
     const [isShowMenu, setIsShowMenu] = useState(false);
     const toggleMenu = () => setIsShowMenu(!isShowMenu);
+    const [{appProgress: {active, value}}] = useAppStore();
 
     return (
         <div className={css.layout}>
@@ -21,8 +21,8 @@ const DefaultLayout = ({children, appProgressIsActive, appProgress}) => {
 
             <ProgressBar
                 className={css.progress}
-                isActive={appProgressIsActive}
-                progress={appProgress}
+                isActive={active}
+                progress={value}
             />
 
             <Header
@@ -37,9 +37,4 @@ const DefaultLayout = ({children, appProgressIsActive, appProgress}) => {
     );
 };
 
-export default connect(
-    state => ({
-        appProgressIsActive: state.app.progressIsActive,
-        appProgress: state.app.progress,
-    })
-)(DefaultLayout);
+export default DefaultLayout;

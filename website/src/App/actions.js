@@ -60,23 +60,3 @@ export const logOut = (onSuccess: Function) => async (dispatch: Function) => {
     if (onSuccess)
         onSuccess();
 };
-
-
-export const startAppProgress = () => async (dispatch: Function) => {
-    dispatch({type: actionsTypes.START_PROGRESS});
-};
-
-export const setAppProgress = (progress: ?number) => async (dispatch: Function) => {
-    dispatch({
-        type: actionsTypes.SET_PROGRESS,
-        payload: progress,
-    });
-};
-
-export const completeAppProgress = () => async (dispatch: Function) => {
-    dispatch({type: actionsTypes.COMPLETE_PROGRESS});
-};
-
-export const resetAppProgress = () => async (dispatch: Function) => {
-    dispatch({type: actionsTypes.RESET_PROGRESS});
-};
