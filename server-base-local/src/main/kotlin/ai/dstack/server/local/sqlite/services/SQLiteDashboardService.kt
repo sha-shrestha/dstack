@@ -39,7 +39,7 @@ class SQLiteDashboardService (private val repository: DashboardRepository) : Das
 
     private fun DashboardItem.toDashboard(): Dashboard {
         return this.let { d ->
-            ai.dstack.server.model.Dashboard(d.user, d.id, d.title.orEmpty(), d.timestamp, d.private)
+            Dashboard(d.user, d.id, d.title, d.description, d.timestamp, d.private)
         }
     }
 
@@ -47,7 +47,8 @@ class SQLiteDashboardService (private val repository: DashboardRepository) : Das
         return this.let { d ->
             DashboardItem(
                 d.userName, d.id, d.private, d.timestampMillis,
-                if (d.title.isNotBlank()) d.title else null
+                if (d.title.isNullOrBlank()) null else d.title,
+                if (d.description.isNullOrBlank()) null else d.description
             )
         }
     }
