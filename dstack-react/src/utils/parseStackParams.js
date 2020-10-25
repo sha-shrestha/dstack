@@ -1,4 +1,4 @@
-export default attachments => {
+export default (attachments, tab) => {
     const fields = {};
 
     if (!attachments || !attachments.length)
@@ -6,6 +6,12 @@ export default attachments => {
 
     attachments.forEach(i => {
         Object.keys(i.params).forEach(key => {
+            if (tab
+                && i.params[tab.value]?.type !== 'tab'
+                && i.params[tab.key]?.title !== tab.value
+            )
+                return;
+
             if (i.params[key] instanceof Object)
                 return;
 
