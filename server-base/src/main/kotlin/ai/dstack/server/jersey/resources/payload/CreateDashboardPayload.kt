@@ -8,5 +8,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 data class CreateDashboardPayload(
     val user: String?,
     val title: String?,
+    val description: String?,
     val private: Boolean?
 )

@@ -61,8 +61,8 @@ class SQLiteCardService (private val repository: CardRepository) : CardService {
                 c.dashboardPath,
                 c.stackPath,
                 c.index,
-                c.title,
-                c.description,
+                if (c.title.isNullOrBlank()) null else c.title,
+                if (c.description.isNullOrBlank()) null else c.description,
                 c.columns
             )
         }

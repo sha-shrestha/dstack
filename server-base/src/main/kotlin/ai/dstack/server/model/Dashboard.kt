@@ -3,7 +3,8 @@ package ai.dstack.server.model
 data class Dashboard(
     val userName: String,
     val id: String,
-    val title: String,
+    val title: String?,
+    val description: String?,
     val timestampMillis: Long,
     val private: Boolean
 ) {

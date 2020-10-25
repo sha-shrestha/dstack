@@ -29,7 +29,7 @@ private val UpdateDashboardPayload?.isMalformed: Boolean
     get() = this == null
             || this.user.isNullOrBlank()
             || this.id.isNullOrBlank()
-            || (this.title.isNullOrBlank() && this.private == null)
+            || (this.title == null && this.private == null && this.description == null)
 
 private val DeleteDashboardPayload?.isMalformed: Boolean
     get() = this == null
@@ -125,7 +125,7 @@ class DashboardResources {
                 ok(GetDashboardsStatus(dashboards = permittedDashboards.map { dashboard ->
                     val cards = cardService.getByDashboardPath(dashboard.path)
                     DashboardBasicInfo(
-                            dashboard.userName, dashboard.id, dashboard.title, dashboard.private,
+                            dashboard.userName, dashboard.id, dashboard.title, dashboard.description, dashboard.private,
                             cards.map { c ->
                                 // TODO: This is not optimal
                                 val (u, s) = c.stackPath.parseStackPath()
@@ -203,6 +203,7 @@ class DashboardResources {
                                                 dashboard.userName,
                                                 dashboard.id,
                                                 dashboard.title,
+                                                dashboard.description,
                                                 dashboard.private,
                                                 cards.map {
                                                     // TODO: This is not optimal
@@ -269,7 +270,8 @@ class DashboardResources {
             } else {
                 val dashboard = Dashboard(
                         payload.user!!, UUID.randomUUID().toString(),
-                        payload.title.orEmpty(),
+                        payload.title?.let { if (it.isBlank()) null else it },
+                        payload.description?.let { if (it.isBlank()) null else it },
                         Instant.now().epochSecond,
                         payload.private ?: user.settings.general.defaultAccessLevel == AccessLevel.Private
                 )
@@ -280,6 +282,7 @@ class DashboardResources {
                                         dashboard.userName,
                                         dashboard.id,
                                         dashboard.title,
+                                        dashboard.description,
                                         dashboard.private,
                                         emptyList(),
                                         null
@@ -314,7 +317,8 @@ class DashboardResources {
                 } else {
                     dashboardService.update(
                             dashboard.copy(
-                                    title = payload.title ?: dashboard.title,
+                                    title = if (payload.title != null) { if (payload.title.isNotBlank()) payload.title else null } else dashboard.title,
+                                    description = if (payload.description != null) { if (payload.description.isNotBlank()) payload.description else null } else dashboard.description,
                                     private = payload.private ?: dashboard.private
                             )
                     )
@@ -419,6 +423,7 @@ class DashboardResources {
                             UpdateDashboardInfo(dashboard.userName,
                                     dashboard.id,
                                     dashboard.title,
+                                    dashboard.description,
                                     dashboard.private,
                                     cards.map { card ->
                                         val head = stackHeads[card.stackPath]?.let { frameService.get(card.stackPath, it.id) }
@@ -507,7 +512,7 @@ class DashboardResources {
                                 cards.add(
                                         index,
                                         card.chainIfNotNull(payload.title) {
-                                            this.copy(title = it)
+                                            this.copy(title = if (it.isNotBlank()) it else null)
                                         }.chainIfNotNull(payload.description) {
                                             this.copy(description = if (it.isNotBlank()) it else null)
                                         }.chainIfNotNull(payload.columns) {
@@ -521,6 +526,7 @@ class DashboardResources {
                                                 dashboard.userName,
                                                 dashboard.id,
                                                 dashboard.title,
+                                                dashboard.description,
                                                 dashboard.private,
                                                 cards.map {
                                                     CardInfo(
@@ -543,7 +549,7 @@ class DashboardResources {
                                 cardService.update(
                                         listOf(
                                                 card.chainIfNotNull(payload.title) {
-                                                    this.copy(title = it)
+                                                    this.copy(title = if (it.isNotBlank()) it else null)
                                                 }.chainIfNotNull(payload.description) {
                                                     this.copy(description = if (it.isNotBlank()) it else null)
                                                 }.chainIfNotNull(payload.columns) {
@@ -558,6 +564,7 @@ class DashboardResources {
                                                 dashboard.userName,
                                                 dashboard.id,
                                                 dashboard.title,
+                                                dashboard.description,
                                                 dashboard.private,
                                                 cards.map {
                                                     CardInfo(
@@ -622,6 +629,7 @@ class DashboardResources {
                                     UpdateDashboardInfo(dashboard.userName,
                                             dashboard.id,
                                             dashboard.title,
+                                            dashboard.description,
                                             dashboard.private,
                                             cards.map {
                                                 CardInfo(

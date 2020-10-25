@@ -45,7 +45,7 @@ data class CardItem(
     val index: Int,
 
     @Column
-    val title: String,
+    val title: String?,
 
     @Column
     val description: String?,

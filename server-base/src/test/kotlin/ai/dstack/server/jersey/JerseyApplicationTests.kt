@@ -382,13 +382,13 @@ class JerseyApplicationTests : JerseyTest() {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
                 .post(
                         Entity.json(
-                                CreateDashboardPayload("test_user", null, false)
+                                CreateDashboardPayload("test_user", null, null, false)
                         )
                 )
         Truth.assertThat(createDashboardResponse.status).isEqualTo(Response.Status.OK.statusCode)
         val createDashboardStatus = createDashboardResponse.entity<GetDashboardStatus>()
         Truth.assertThat(createDashboardStatus.dashboard.id).isNotNull()
-        Truth.assertThat(createDashboardStatus.dashboard.title).isEqualTo("")
+        Truth.assertThat(createDashboardStatus.dashboard.title).isEqualTo(null)
         Truth.assertThat(createDashboardStatus.dashboard.private).isEqualTo(false)
 
         val insertCardsResponse: Response = target("/dashboards/cards/insert").request()
@@ -425,6 +425,31 @@ class JerseyApplicationTests : JerseyTest() {
         val updateDashboardStatus2 = insertCardsResponse2.entity<UpdateDashboardStatus>()
         Truth.assertThat(updateDashboardStatus2.dashboard.id).isEqualTo(createDashboardStatus.dashboard.id)
         Truth.assertThat(updateDashboardStatus2.dashboard.cards).containsExactly(
+                CardInfo("test_user/test_stack_3", 0, "test_stack_3", "test description 3", 2, null),
+                CardInfo("test_user/test_stack_4", 1, "test_stack_4", null, 1, null),
+                CardInfo("test_user/test_stack_1", 2, "test_stack_1", "test description 1", 1, null),
+                CardInfo("test_user/test_stack_2", 3, "test_stack_2", "test description 2", 2, null)
+        )
+
+        val updateDashboardResponse: Response = target("/dashboards/update").request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
+                .post(
+                        Entity.json(
+                                UpdateDashboardPayload("test_user", createDashboardStatus.dashboard.id,
+                                        null, "new description", null)
+                        )
+                )
+        Truth.assertThat(updateDashboardResponse.status).isEqualTo(Response.Status.OK.statusCode)
+
+        val getDashboardResponse = target("/dashboards/test_user/${createDashboardStatus.dashboard.id}")
+                .request()
+                .get()
+        Truth.assertThat(getDashboardResponse.status).isEqualTo(Response.Status.OK.statusCode)
+        val getDashboardStatus = getDashboardResponse.entity<GetDashboardStatus>()
+        Truth.assertThat(getDashboardStatus.dashboard.id).isEqualTo(createDashboardStatus.dashboard.id)
+        Truth.assertThat(getDashboardStatus.dashboard.title).isEqualTo(null)
+        Truth.assertThat(getDashboardStatus.dashboard.description).isEqualTo("new description")
+        Truth.assertThat(getDashboardStatus.dashboard.cards).containsExactly(
                 CardInfo("test_user/test_stack_3", 0, "test_stack_3", "test description 3", 2, null),
                 CardInfo("test_user/test_stack_4", 1, "test_stack_4", null, 1, null),
                 CardInfo("test_user/test_stack_1", 2, "test_stack_1", "test description 1", 1, null),
