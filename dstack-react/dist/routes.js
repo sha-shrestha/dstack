@@ -34,9 +34,27 @@ var routes = {
       user = ':user';
     }
 
-    return "/" + user + "/d";
+    return "/" + user + "/old-d";
   },
   dashboardsDetails: function dashboardsDetails(user, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (id === void 0) {
+      id = ':id';
+    }
+
+    return "/" + user + "/old-d/" + id;
+  },
+  reports: function reports(user) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    return "/" + user + "/d";
+  },
+  reportsDetails: function reportsDetails(user, id) {
     if (user === void 0) {
       user = ':user';
     }

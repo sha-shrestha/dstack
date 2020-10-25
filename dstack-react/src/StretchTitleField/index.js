@@ -40,7 +40,7 @@ const StretchTitleField = ({
             />
 
             <div className={css.hidden}>
-                {value.length ? value : placeholder}
+                {value && value.length ? value : placeholder}
             </div>
         </div>
     );

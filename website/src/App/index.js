@@ -7,7 +7,8 @@ import routes from 'routes';
 import '@mdi/font/css/materialdesignicons.min.css';
 import '@dstackai/dstack-react/dist/index.css';
 
-import {NotFound, Loader, UnAuthorizedLayout, appStoreActionTypes, useAppStore, Jobs} from '@dstackai/dstack-react';
+import {NotFound, Loader, UnAuthorizedLayout,
+    appStoreActionTypes, useAppStore, Jobs, Reports} from '@dstackai/dstack-react';
 import DefaultLayout from 'layouts/Default';
 
 import Login from 'Auth/Login';
@@ -117,6 +118,7 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                             <DefaultLayoutRoute path={routes.notFound()} component={NotFound} />
                             <DefaultLayoutRoute path={routes.settings()} component={Settings} />
                             <DefaultLayoutRoute path={routes.dashboards()} component={Dashboards} />
+                            <DefaultLayoutRoute path={routes.reports()} component={Reports} />
                             <DefaultLayoutRoute path={routes.jobs()} component={Jobs} />
                             <DefaultLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
@@ -126,6 +128,7 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                         <Switch>
                             <UnAuthorizedLayoutRoute path={routes.notFound()} component={NotFound} />
                             <UnAuthorizedLayoutRoute path={routes.dashboards()} component={Dashboards} />
+                            <UnAuthorizedLayoutRoute path={routes.reports()} component={Reports} />
                             <UnAuthorizedLayoutRoute path={routes.jobs()} component={Jobs} />
                             <UnAuthorizedLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
