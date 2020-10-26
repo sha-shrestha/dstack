@@ -81,11 +81,14 @@ const downloadFile = ({
   }
 };
 
-var parseStackParams = (attachments => {
+var parseStackParams = ((attachments, tab) => {
   const fields = {};
   if (!attachments || !attachments.length) return;
   attachments.forEach(i => {
     Object.keys(i.params).forEach(key => {
+      var _i$params$tab$value, _i$params$tab$key;
+
+      if (tab && ((_i$params$tab$value = i.params[tab.value]) === null || _i$params$tab$value === void 0 ? void 0 : _i$params$tab$value.type) !== 'tab' && ((_i$params$tab$key = i.params[tab.key]) === null || _i$params$tab$key === void 0 ? void 0 : _i$params$tab$key.title) !== tab.value) return;
       if (i.params[key] instanceof Object) return;
       if (fields[key]) fields[key].options.push(i.params[key]);else fields[key] = {
         options: [i.params[key]]

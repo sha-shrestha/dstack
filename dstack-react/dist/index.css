@@ -6127,21 +6127,29 @@ body ._styles-module__select-field-dropdown__14ngc-slide-up-leavebody ._styles-m
     position: relative;
     background: rgb(255, 255, 255);
     box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid rgba(180, 184, 199, .3);
 }
 
 @media (max-width: 980px) {
 
-._styles-module__card__2USXU {
-        height: 413px
-}
+._styles-module__card__2USXU.type-list {
+            height: 413px
     }
+        }
 
 @media (min-width: 981px) {
 
-._styles-module__card__2USXU {
-        height: 453px
-}
+._styles-module__card__2USXU.type-list {
+            height: 453px
     }
+        }
+
+._styles-module__card__2USXU.type-grid::before {
+            content: "";
+            display: block;
+            padding-top: 73%;
+        }
 
 ._styles-module__inner__nCWYo {
     position: absolute;
@@ -6151,6 +6159,7 @@ body ._styles-module__select-field-dropdown__14ngc-slide-up-leavebody ._styles-m
     bottom: 0;
     display: flex;
     flex-direction: column;
+    padding: 14px 16px;
 }
 
 ._styles-module__head__3Ir7x {
@@ -6160,6 +6169,7 @@ body ._styles-module__select-field-dropdown__14ngc-slide-up-leavebody ._styles-m
 }
 
 ._styles-module__head__3Ir7x ._styles-module__name__dAh2C {
+        flex-shrink: 0;
         overflow: hidden;
         white-space: nowrap;
         position: relative;
@@ -6327,18 +6337,21 @@ body ._styles-module__select-field-dropdown__14ngc-slide-up-leavebody ._styles-m
     }
 ._styles-module__cards__3OOzf {
     display: grid;
-    grid-gap: 40px;
-    margin-top: 30px;
+    grid-gap: 20px;
+    margin-top: 18px;
 }
 @media (max-width: 980px) {
-._styles-module__cards__3OOzf {
-        grid-template-columns: 1fr
-}
+._styles-module__cards__3OOzf.grid {
+            grid-template-columns: repeat(auto-fill, minmax(370px, 1fr))
     }
+        }
 @media (min-width: 981px) {
-._styles-module__cards__3OOzf {
-        grid-template-columns: 1fr 1fr
-}
+._styles-module__cards__3OOzf.grid {
+            grid-template-columns: 1fr 1fr
+    }
+        }
+._styles-module__cards__3OOzf.list {
+        grid-template-columns: 1fr;
     }
 ._styles-module__fields__WLi30 {
     flex-grow: 1;
@@ -6388,6 +6401,9 @@ body ._styles-module__select-field-dropdown__14ngc-slide-up-leavebody ._styles-m
     font-size: 14px;
     line-height: 16px;
     transition: color .2s;
+}
+._styles-module__viewSwitcher__MFQrX {
+    margin-left: 17px;
 }
 ._styles-module__empty__13-9o {
     margin-top: 128px;

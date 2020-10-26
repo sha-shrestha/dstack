@@ -16,6 +16,7 @@ import Loader from './components/Loader';
 import Yield from '../../Yield';
 import BackButton from '../../BackButton';
 import StretchTitleField from '../../StretchTitleField';
+import ViewSwitcher from '../../ViewSwitcher';
 import Dropdown from '../../Dropdown';
 import Button from '../../Button';
 import DnDGridContext from '../../dnd/DnDGridContext';
@@ -31,6 +32,7 @@ const dataFormat = data => data.dashboard;
 
 const Details = ({renderHeader, renderSideHeader}) => {
     const {t} = useTranslation();
+    const [view, setView] = useState('grid');
     const {user, id} = useParams();
     const {push} = useHistory();
     const {items, moveItem, setItems} = useContext(DnDGridContext);
@@ -51,6 +53,11 @@ const Details = ({renderHeader, renderSideHeader}) => {
     );
 
     const prevData = usePrevious(data);
+
+    useEffect(() => {
+        if (window)
+            window.dispatchEvent(new Event('resize'));
+    }, [view]);
 
     useEffect(() => {
         if (data?.cards)
@@ -306,10 +313,16 @@ const Details = ({renderHeader, renderSideHeader}) => {
                                     {t('addStack')}
                                 </a>
                             )}
+
+                            <ViewSwitcher
+                                value={view}
+                                className={css.viewSwitcher}
+                                onChange={view => setView(view)}
+                            />
                         </div>
                     </div>
 
-                    <div className={cn(css.cards)}>
+                    <div className={cn(css.cards, view)}>
                         {items.map(item => (
                             <CardWrapComponent
                                 key={item.card.stack}
@@ -319,6 +332,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                                 } : {})}
                             >
                                 <Card
+                                    type={view}
                                     filters={form}
                                     deleteCard={isUserOwner && getDeleteCardFunc(item.card.stack)}
                                     data={item.card}

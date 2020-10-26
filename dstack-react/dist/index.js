@@ -6116,6 +6116,8 @@ var css$_ = {"card":"_styles-module__card__2USXU","inner":"_styles-module__inner
 var Card$1 = React.memo(function (_ref) {
   var data = _ref.data,
       className = _ref.className,
+      _ref$type = _ref.type,
+      type = _ref$type === void 0 ? 'grid' : _ref$type,
       deleteCard = _ref.deleteCard,
       updateCardTitle = _ref.updateCardTitle,
       filters = _ref.filters,
@@ -6182,7 +6184,7 @@ var Card$1 = React.memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$_.card, className),
+    className: cx(css$_.card, "type-" + type, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$_.inner
@@ -6233,9 +6235,7 @@ var Card$1 = React.memo(function (_ref) {
     "data-drop-pointer": true
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-cursor-move"
-  })), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$_.viewSwitcher
-  }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
+  })))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$_.attachment,
     isList: true,
     withLoader: true,
@@ -6247,7 +6247,7 @@ var Card$1 = React.memo(function (_ref) {
   }, t('emptyDashboard'))));
 });
 
-var css$$ = {"details":"_styles-module__details__1YGMH","header":"_styles-module__header__1lU-L","title":"_styles-module__title__2HPT5","edit":"_styles-module__edit__3ezYE","sideHeader":"_styles-module__sideHeader__2PqMZ","dropdown":"_styles-module__dropdown__2-VRH","section":"_styles-module__section__2_7da","cards":"_styles-module__cards__3OOzf","fields":"_styles-module__fields__WLi30","filters":"_styles-module__filters__2q551","controls":"_styles-module__controls__2wh6Y","addButton":"_styles-module__addButton__4KCh5","empty":"_styles-module__empty__13-9o"};
+var css$$ = {"details":"_styles-module__details__1YGMH","header":"_styles-module__header__1lU-L","title":"_styles-module__title__2HPT5","edit":"_styles-module__edit__3ezYE","sideHeader":"_styles-module__sideHeader__2PqMZ","dropdown":"_styles-module__dropdown__2-VRH","section":"_styles-module__section__2_7da","cards":"_styles-module__cards__3OOzf","fields":"_styles-module__fields__WLi30","filters":"_styles-module__filters__2q551","controls":"_styles-module__controls__2wh6Y","addButton":"_styles-module__addButton__4KCh5","viewSwitcher":"_styles-module__viewSwitcher__MFQrX","empty":"_styles-module__empty__13-9o"};
 
 var dataFormat$5 = function dataFormat(data) {
   return data.dashboard;
@@ -6261,6 +6261,10 @@ var Details$3 = function Details(_ref) {
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
+
+  var _useState = React.useState('grid'),
+      view = _useState[0],
+      setView = _useState[1];
 
   var _useParams = reactRouter.useParams(),
       user = _useParams.user,
@@ -6288,18 +6292,18 @@ var Details$3 = function Details(_ref) {
       reportDeleteCard = _useActions.reportDeleteCard,
       reportUpdateCard = _useActions.reportUpdateCard;
 
-  var _useState = React.useState(false),
-      isShowStacksModal = _useState[0],
-      setIsShowStacksModal = _useState[1];
+  var _useState2 = React.useState(false),
+      isShowStacksModal = _useState2[0],
+      setIsShowStacksModal = _useState2[1];
 
   var _useForm = useForm({}),
       form = _useForm.form,
       setForm = _useForm.setForm,
       onChange = _useForm.onChange;
 
-  var _useState2 = React.useState({}),
-      fields = _useState2[0],
-      setFields = _useState2[1];
+  var _useState3 = React.useState({}),
+      fields = _useState3[0],
+      setFields = _useState3[1];
 
   var setGridItems = function setGridItems(cardsItems) {
     return setItems(cardsItems.map(function (card) {
@@ -6316,6 +6320,9 @@ var Details$3 = function Details(_ref) {
       error = _useSWR.error;
 
   var prevData = usePrevious(data);
+  React.useEffect(function () {
+    if (window) window.dispatchEvent(new Event('resize'));
+  }, [view]);
   React.useEffect(function () {
     if (data === null || data === void 0 ? void 0 : data.cards) setGridItems(data === null || data === void 0 ? void 0 : data.cards);
     if (!lodashEs.isEqual(prevData, data) && (data === null || data === void 0 ? void 0 : data.cards)) parseParams();
@@ -6517,8 +6524,14 @@ var Details$3 = function Details(_ref) {
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
-  }), t('addStack')))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$$.cards)
+  }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
+    value: view,
+    className: css$$.viewSwitcher,
+    onChange: function onChange(view) {
+      return setView(view);
+    }
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$$.cards, view)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -6526,6 +6539,7 @@ var Details$3 = function Details(_ref) {
       id: item.id,
       onMoveItem: moveCard
     } : {}), /*#__PURE__*/React__default.createElement(Card$1, {
+      type: view,
       filters: form,
       deleteCard: isUserOwner && getDeleteCardFunc(item.card.stack),
       data: item.card,

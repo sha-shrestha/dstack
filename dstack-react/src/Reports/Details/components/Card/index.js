@@ -34,6 +34,7 @@ type Props = {
 const Card = memo(({
     data,
     className,
+    type = 'grid',
     deleteCard,
     updateCardTitle,
     filters,
@@ -101,7 +102,7 @@ const Card = memo(({
     };
 
     return (
-        <div className={cx(css.card, className)} ref={forwardedRef}>
+        <div className={cx(css.card, `type-${type}`, className)} ref={forwardedRef}>
             <div className={css.inner}>
                 <div className={css.head}>
                     <div className={cx(css.name, {readonly: !updateCardTitle})}>
@@ -160,9 +161,9 @@ const Card = memo(({
                             </Button>
                         )}
 
-                        <ViewSwitcher
-                            className={css.viewSwitcher}
-                        />
+                        {/*<ViewSwitcher*/}
+                        {/*    className={css.viewSwitcher}*/}
+                        {/*/>*/}
                     </div>
                 </div>
 

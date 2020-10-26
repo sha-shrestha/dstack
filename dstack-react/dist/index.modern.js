@@ -517,11 +517,14 @@ const formatBytes = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var parseStackParams = (attachments => {
+var parseStackParams = ((attachments, tab) => {
   const fields = {};
   if (!attachments || !attachments.length) return;
   attachments.forEach(i => {
     Object.keys(i.params).forEach(key => {
+      var _i$params$tab$value, _i$params$tab$key;
+
+      if (tab && ((_i$params$tab$value = i.params[tab.value]) === null || _i$params$tab$value === void 0 ? void 0 : _i$params$tab$value.type) !== 'tab' && ((_i$params$tab$key = i.params[tab.key]) === null || _i$params$tab$key === void 0 ? void 0 : _i$params$tab$key.title) !== tab.value) return;
       if (i.params[key] instanceof Object) return;
       if (fields[key]) fields[key].options.push(i.params[key]);else fields[key] = {
         options: [i.params[key]]
@@ -2458,7 +2461,7 @@ const Details = ({
     setForm,
     onChange
   } = useForm({});
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState();
   const [fields, setFields] = useState({});
   const [tabs, setTabs] = useState([]);
   const prevFrame = usePrevious(frame);
@@ -2472,7 +2475,7 @@ const Details = ({
   const hideHowToModal = () => setIsShowHowToModal(false);
 
   useEffect(() => {
-    if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseParams();
+    if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseTabs();
   }, [frame]);
   const findAttach = useCallback((form, tabName, attachmentIndex) => {
     const attachments = get(frame, 'attachments');
@@ -2493,28 +2496,45 @@ const Details = ({
         return valid;
       });
     }
-  }, [form, tabs]);
+  }, [tabs]);
   const findAttachDebounce = useCallback(debounce(findAttach, 300), [data, frame, findAttach]);
   useEffect(() => {
-    if (didMountRef.current) findAttachDebounce(form, activeTab, attachmentIndex);else didMountRef.current = true;
+    if (didMountRef.current) findAttachDebounce(form, activeTab, attachmentIndex);
   }, [form]);
+  useEffect(() => {
+    if (didMountRef.current) parseParams();
+  }, [activeTab]);
+  useEffect(() => {
+    if (!didMountRef.current) didMountRef.current = true;
+  }, []);
 
-  const parseParams = () => {
+  const getCurrentAttachment = selectedTab => {
     const attachments = get(frame, 'attachments');
-    if (!attachments || !attachments.length) return;
-    const fields = parseStackParams(attachments);
-    const tabs = parseStackTabs(attachments);
-    setTabs(tabs);
-    setFields(fields);
     let attachment;
 
-    if (attachmentIndex !== undefined) {
+    if (selectedTab) {
+      attachment = attachments.find(attach => {
+        var _attach$params$select, _attach$params$select2;
+
+        return ((_attach$params$select = attach.params[selectedTab.value]) === null || _attach$params$select === void 0 ? void 0 : _attach$params$select.type) === 'tab' || ((_attach$params$select2 = attach.params[selectedTab.key]) === null || _attach$params$select2 === void 0 ? void 0 : _attach$params$select2.title) === selectedTab.value;
+      });
+    } else if (attachmentIndex !== undefined) {
       if (attachments[attachmentIndex]) {
         attachment = attachments[attachmentIndex];
       }
     } else {
       attachment = attachments[0];
     }
+
+    return attachment;
+  };
+
+  const parseTabs = () => {
+    const attachments = get(frame, 'attachments');
+    if (!attachments || !attachments.length) return;
+    const tabs = parseStackTabs(attachments);
+    const attachment = getCurrentAttachment();
+    setTabs(tabs);
 
     if (attachment) {
       var _params$tab;
@@ -2527,7 +2547,27 @@ const Details = ({
         return ((_params$key = params[key]) === null || _params$key === void 0 ? void 0 : _params$key.type) === 'tab';
       });
       setActiveTab(((_params$tab = params[tab]) === null || _params$tab === void 0 ? void 0 : _params$tab.title) || tab || null);
-      delete params[tab];
+    }
+  };
+
+  const parseParams = () => {
+    const attachments = get(frame, 'attachments');
+    const tab = tabs.find(t => t.value === activeTab);
+    const attachment = getCurrentAttachment(tab);
+    const fields = parseStackParams(attachments, tab);
+    setFields(fields);
+
+    if (attachment) {
+      const params = { ...attachment.params
+      };
+
+      const _tab = Object.keys(params).find(key => {
+        var _params$key2;
+
+        return ((_params$key2 = params[key]) === null || _params$key2 === void 0 ? void 0 : _params$key2.type) === 'tab';
+      });
+
+      delete params[_tab];
       setForm(params);
     }
   };
@@ -5203,6 +5243,7 @@ var css$_ = {"card":"_styles-module__card__2USXU","inner":"_styles-module__inner
 const Card$1 = memo(({
   data,
   className,
+  type: _type = 'grid',
   deleteCard,
   updateCardTitle,
   filters,
@@ -5257,7 +5298,7 @@ const Card$1 = memo(({
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$_.card, className),
+    className: cx(css$_.card, `type-${_type}`, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$_.inner
@@ -5308,9 +5349,7 @@ const Card$1 = memo(({
     "data-drop-pointer": true
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-cursor-move"
-  })), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$_.viewSwitcher
-  }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
+  })))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$_.attachment,
     isList: true,
     withLoader: true,
@@ -5322,7 +5361,7 @@ const Card$1 = memo(({
   }, t('emptyDashboard'))));
 });
 
-var css$$ = {"details":"_styles-module__details__1YGMH","header":"_styles-module__header__1lU-L","title":"_styles-module__title__2HPT5","edit":"_styles-module__edit__3ezYE","sideHeader":"_styles-module__sideHeader__2PqMZ","dropdown":"_styles-module__dropdown__2-VRH","section":"_styles-module__section__2_7da","cards":"_styles-module__cards__3OOzf","fields":"_styles-module__fields__WLi30","filters":"_styles-module__filters__2q551","controls":"_styles-module__controls__2wh6Y","addButton":"_styles-module__addButton__4KCh5","empty":"_styles-module__empty__13-9o"};
+var css$$ = {"details":"_styles-module__details__1YGMH","header":"_styles-module__header__1lU-L","title":"_styles-module__title__2HPT5","edit":"_styles-module__edit__3ezYE","sideHeader":"_styles-module__sideHeader__2PqMZ","dropdown":"_styles-module__dropdown__2-VRH","section":"_styles-module__section__2_7da","cards":"_styles-module__cards__3OOzf","fields":"_styles-module__fields__WLi30","filters":"_styles-module__filters__2q551","controls":"_styles-module__controls__2wh6Y","addButton":"_styles-module__addButton__4KCh5","viewSwitcher":"_styles-module__viewSwitcher__MFQrX","empty":"_styles-module__empty__13-9o"};
 
 const dataFormat$5 = data => data.dashboard;
 
@@ -5335,6 +5374,7 @@ const Details$3 = ({
   const {
     t
   } = useTranslation();
+  const [view, setView] = useState('grid');
   const {
     user,
     id
@@ -5378,6 +5418,9 @@ const Details$3 = ({
     error
   } = useSWR([apiUrl + config.DASHBOARD_DETAILS(user, id), dataFormat$5], fetcher);
   const prevData = usePrevious(data);
+  useEffect(() => {
+    if (window) window.dispatchEvent(new Event('resize'));
+  }, [view]);
   useEffect(() => {
     if (data === null || data === void 0 ? void 0 : data.cards) setGridItems(data === null || data === void 0 ? void 0 : data.cards);
     if (!isEqual(prevData, data) && (data === null || data === void 0 ? void 0 : data.cards)) parseParams();
@@ -5547,14 +5590,19 @@ const Details$3 = ({
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
-  }), t('addStack')))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$$.cards)
+  }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
+    value: view,
+    className: css$$.viewSwitcher,
+    onChange: view => setView(view)
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$$.cards, view)
   }, items.map(item => /*#__PURE__*/React__default.createElement(CardWrapComponent, Object.assign({
     key: item.card.stack
   }, isUserOwner ? {
     id: item.id,
     onMoveItem: moveCard
   } : {}), /*#__PURE__*/React__default.createElement(Card$1, {
+    type: view,
     filters: form,
     deleteCard: isUserOwner && getDeleteCardFunc(item.card.stack),
     data: item.card,
