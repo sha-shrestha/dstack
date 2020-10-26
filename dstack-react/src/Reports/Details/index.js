@@ -129,6 +129,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
         await update({title});
     }, 300);
 
+    const onChangePrivate = async isPrivate => {
+        await update({private: isPrivate});
+    };
+
     const addStacks = async stacks => {
         const {dashboard} = await reportInsertCard(
             user,
@@ -270,10 +274,14 @@ const Details = ({renderHeader, renderSideHeader}) => {
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {renderHeader && renderHeader(data)}
+                {renderHeader && renderHeader({data})}
 
                 <div className={css.sideHeader}>
-                    {renderSideHeader && renderSideHeader(data)}
+                    {renderSideHeader && renderSideHeader({
+                        data,
+                        onChangePrivate,
+                        mutateData: mutate,
+                    })}
 
                     {isUserOwner && <Dropdown
                         className={css.dropdown}
