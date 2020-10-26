@@ -601,11 +601,14 @@ var formatBytes = function formatBytes(bytes, decimals) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-var parseStackParams = (function (attachments) {
+var parseStackParams = (function (attachments, tab) {
   var fields = {};
   if (!attachments || !attachments.length) return;
   attachments.forEach(function (i) {
     Object.keys(i.params).forEach(function (key) {
+      var _i$params$tab$value, _i$params$tab$key;
+
+      if (tab && ((_i$params$tab$value = i.params[tab.value]) === null || _i$params$tab$value === void 0 ? void 0 : _i$params$tab$value.type) !== 'tab' && ((_i$params$tab$key = i.params[tab.key]) === null || _i$params$tab$key === void 0 ? void 0 : _i$params$tab$key.title) !== tab.value) return;
       if (i.params[key] instanceof Object) return;
       if (fields[key]) fields[key].options.push(i.params[key]);else fields[key] = {
         options: [i.params[key]]
@@ -2862,7 +2865,7 @@ var Details = function Details(_ref) {
       setForm = _useForm.setForm,
       onChange = _useForm.onChange;
 
-  var _useState = React.useState(null),
+  var _useState = React.useState(),
       activeTab = _useState[0],
       setActiveTab = _useState[1];
 
@@ -2890,7 +2893,7 @@ var Details = function Details(_ref) {
   };
 
   React.useEffect(function () {
-    if ((!lodashEs.isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseParams();
+    if ((!lodashEs.isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseTabs();
   }, [frame]);
   var findAttach = React.useCallback(function (form, tabName, attachmentIndex) {
     var attachments = lodashEs.get(frame, 'attachments');
@@ -2913,28 +2916,45 @@ var Details = function Details(_ref) {
         return valid;
       });
     }
-  }, [form, tabs]);
+  }, [tabs]);
   var findAttachDebounce = React.useCallback(lodashEs.debounce(findAttach, 300), [data, frame, findAttach]);
   React.useEffect(function () {
-    if (didMountRef.current) findAttachDebounce(form, activeTab, attachmentIndex);else didMountRef.current = true;
+    if (didMountRef.current) findAttachDebounce(form, activeTab, attachmentIndex);
   }, [form]);
+  React.useEffect(function () {
+    if (didMountRef.current) parseParams();
+  }, [activeTab]);
+  React.useEffect(function () {
+    if (!didMountRef.current) didMountRef.current = true;
+  }, []);
 
-  var parseParams = function parseParams() {
+  var getCurrentAttachment = function getCurrentAttachment(selectedTab) {
     var attachments = lodashEs.get(frame, 'attachments');
-    if (!attachments || !attachments.length) return;
-    var fields = parseStackParams(attachments);
-    var tabs = parseStackTabs(attachments);
-    setTabs(tabs);
-    setFields(fields);
     var attachment;
 
-    if (attachmentIndex !== undefined) {
+    if (selectedTab) {
+      attachment = attachments.find(function (attach) {
+        var _attach$params$select, _attach$params$select2;
+
+        return ((_attach$params$select = attach.params[selectedTab.value]) === null || _attach$params$select === void 0 ? void 0 : _attach$params$select.type) === 'tab' || ((_attach$params$select2 = attach.params[selectedTab.key]) === null || _attach$params$select2 === void 0 ? void 0 : _attach$params$select2.title) === selectedTab.value;
+      });
+    } else if (attachmentIndex !== undefined) {
       if (attachments[attachmentIndex]) {
         attachment = attachments[attachmentIndex];
       }
     } else {
       attachment = attachments[0];
     }
+
+    return attachment;
+  };
+
+  var parseTabs = function parseTabs() {
+    var attachments = lodashEs.get(frame, 'attachments');
+    if (!attachments || !attachments.length) return;
+    var tabs = parseStackTabs(attachments);
+    var attachment = getCurrentAttachment();
+    setTabs(tabs);
 
     if (attachment) {
       var _params$tab;
@@ -2947,7 +2967,28 @@ var Details = function Details(_ref) {
         return ((_params$key = params[key]) === null || _params$key === void 0 ? void 0 : _params$key.type) === 'tab';
       });
       setActiveTab(((_params$tab = params[tab]) === null || _params$tab === void 0 ? void 0 : _params$tab.title) || tab || null);
-      delete params[tab];
+    }
+  };
+
+  var parseParams = function parseParams() {
+    var attachments = lodashEs.get(frame, 'attachments');
+    var tab = tabs.find(function (t) {
+      return t.value === activeTab;
+    });
+    var attachment = getCurrentAttachment(tab);
+    var fields = parseStackParams(attachments, tab);
+    setFields(fields);
+
+    if (attachment) {
+      var params = _extends({}, attachment.params);
+
+      var _tab = Object.keys(params).find(function (key) {
+        var _params$key2;
+
+        return ((_params$key2 = params[key]) === null || _params$key2 === void 0 ? void 0 : _params$key2.type) === 'tab';
+      });
+
+      delete params[_tab];
       setForm(params);
     }
   };

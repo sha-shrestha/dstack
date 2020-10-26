@@ -1686,10 +1686,10 @@
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
 
-"@dstackai/dstack-react@^1.1.16":
-  version "1.1.16"
-  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.1.16.tgz#122bb6db9f05343605987e7d11b4172f2410e7fe"
-  integrity sha512-w4rBiWJ+NxGaR+MWScO5l8yx5pfHb3lxL6IxeDv4Dv5RuXM/E/fuchov3LGoQy6RLmPVZ9mwNCF5JWPEigpnnQ==
+"@dstackai/dstack-react@1.1.18":
+  version "1.1.18"
+  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.1.18.tgz#fdc8ce688486ee29798da0aa0763f00e2d08ea00"
+  integrity sha512-SoSLQiacHyL92PqpgSDyHkAgQPcHQdyXlv/ZhjZ5SJ1THt8V6TYTWBlxETOc1aK5M1i3XZFogqtxvcVkTpZynQ==
   dependencies:
     "@mdi/font" "^5.3.45"
     axios "^0.19.2"
@@ -12283,10 +12283,10 @@ react-highlight.js@^1.0.7:
     highlight.js "^9.3.0"
     prop-types "^15.6.0"
 
-react-i18next@^11.3.2:
-  version "11.3.2"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-11.3.2.tgz#b85d0b0e4d35979f8e24ee17d1d7be5694412806"
-  integrity sha512-0nrwsoqpue6hfnXoAJwz7NgQrrYgKmotz0xPOHcXtJLwx6Qvj1lQQNb54LkBdNhr55O4R4+nv51LhhWP8A1r4w==
+react-i18next@^11.7.3:
+  version "11.7.3"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-11.7.3.tgz#256461c46baf5b3208c3c6860ca4e569fc7ed053"
+  integrity sha512-7sYZqVZgdaS9Z0ZH6nuJFErCD0zz5wK3jR4/xCrWjZcxHHF3GRu7BXdicbSPprZV4ZYz7LJzxxMHO7dg5Qb70A==
   dependencies:
     "@babel/runtime" "^7.3.1"
     html-parse-stringify2 "2.0.1"

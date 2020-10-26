@@ -9,5 +9,6 @@ data class UpdateDashboardPayload(
     val user: String?,
     val id: String?,
     val title: String?,
+    val description: String?,
     val private: Boolean?
 )

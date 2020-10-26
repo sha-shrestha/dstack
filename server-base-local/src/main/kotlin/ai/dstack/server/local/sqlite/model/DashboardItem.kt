@@ -49,5 +49,8 @@ data class DashboardItem(
     val timestamp: Long,
 
     @Column
-    val title: String?
+    val title: String?,
+
+    @Column
+    val description: String?
 )

@@ -71,7 +71,7 @@ const Details = ({
     const {t} = useTranslation();
     const didMountRef = useRef(false);
     const {form, setForm, onChange} = useForm({});
-    const [activeTab, setActiveTab] = useState(null);
+    const [activeTab, setActiveTab] = useState();
     const [fields, setFields] = useState({});
     const [tabs, setTabs] = useState([]);
     const prevFrame = usePrevious(frame);
@@ -87,7 +87,7 @@ const Details = ({
 
     useEffect(() => {
         if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame)
-            parseParams();
+            parseTabs();
     }, [frame]);
 
     const findAttach = useCallback((form, tabName, attachmentIndex) => {
@@ -119,45 +119,79 @@ const Details = ({
                 return valid;
             });
         }
-    }, [form, tabs]);
+    }, [tabs]);
 
     const findAttachDebounce = useCallback(_debounce(findAttach, 300), [data, frame, findAttach]);
 
     useEffect(() => {
         if (didMountRef.current)
             findAttachDebounce(form, activeTab, attachmentIndex);
-        else
-            didMountRef.current = true;
     }, [form]);
 
-    const parseParams = () => {
+    useEffect(() => {
+        if (didMountRef.current)
+            parseParams();
+    }, [activeTab]);
+
+    useEffect(() => {
+        if (!didMountRef.current)
+            didMountRef.current = true;
+    }, []);
+
+    const getCurrentAttachment = selectedTab => {
         const attachments = get(frame, 'attachments');
-
-        if (!attachments || !attachments.length)
-            return;
-
-        const fields = parseStackParams(attachments);
-        const tabs = parseStackTabs(attachments);
-
-        setTabs(tabs);
-        setFields(fields);
 
         let attachment;
 
-        if (attachmentIndex !== undefined) {
+        if (selectedTab) {
+            attachment = attachments.find(attach => {
+                return (attach.params[selectedTab.value]?.type === 'tab'
+                    || attach.params[selectedTab.key]?.title === selectedTab.value
+                );
+            });
+
+        } else if (attachmentIndex !== undefined) {
             if (attachments[attachmentIndex]) {
                 attachment = attachments[attachmentIndex];
-
             }
         } else {
             attachment = attachments[0];
         }
 
+        return attachment;
+    };
+
+    const parseTabs = () => {
+        const attachments = get(frame, 'attachments');
+
+        if (!attachments || !attachments.length)
+            return;
+
+        const tabs = parseStackTabs(attachments);
+        const attachment = getCurrentAttachment();
+
+        setTabs(tabs);
+
         if (attachment) {
             const params = {...attachment.params};
             const tab = Object.keys(params).find(key => params[key]?.type === 'tab');
 
-            setActiveTab(params[tab]?.title || tab || null);
+            setActiveTab((params[tab]?.title || tab || null));
+        }
+    };
+
+    const parseParams = () => {
+        const attachments = get(frame, 'attachments');
+        const tab = tabs.find(t => t.value === activeTab);
+        const attachment = getCurrentAttachment(tab);
+        const fields = parseStackParams(attachments, tab);
+
+        setFields(fields);
+
+        if (attachment) {
+            const params = {...attachment.params};
+            const tab = Object.keys(params).find(key => params[key]?.type === 'tab');
+
             delete params[tab];
             setForm(params);
         }
