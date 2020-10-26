@@ -51,6 +51,8 @@ export {default as DashboardAddStacksModal} from './dashboard/AddStacksModal';
 export {default as Jobs} from './Jobs';
 
 export {default as Reports} from './Reports';
+export {default as ReportDetails} from './Reports/Details';
+export {default as ReportList} from './Reports/List';
 
 export {DndProvider as DndProvider} from 'react-dnd';
 export {GridProvider as DnDGridContextProvider} from './dnd/DnDGridContext';

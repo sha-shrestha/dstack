@@ -270,10 +270,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {renderHeader && renderHeader()}
+                {renderHeader && renderHeader(data)}
 
                 <div className={css.sideHeader}>
-                    {renderSideHeader && renderSideHeader()}
+                    {renderSideHeader && renderSideHeader(data)}
 
                     {isUserOwner && <Dropdown
                         className={css.dropdown}
