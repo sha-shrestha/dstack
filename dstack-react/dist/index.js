@@ -6196,13 +6196,13 @@ var Card$1 = React.memo(function (_ref) {
     })
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$_.nameValue
-  }, title.length ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
+  }, (title === null || title === void 0 ? void 0 : title.length) ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
     className: cx(css$_.nameEdit, {
-      active: !title.length
+      active: !(title === null || title === void 0 ? void 0 : title.length)
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {

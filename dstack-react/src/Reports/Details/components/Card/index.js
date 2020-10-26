@@ -106,14 +106,14 @@ const Card = memo(({
             <div className={css.inner}>
                 <div className={css.head}>
                     <div className={cx(css.name, {readonly: !updateCardTitle})}>
-                        <div className={css.nameValue}>{title.length ? title : t('title')}</div>
+                        <div className={css.nameValue}>{title?.length ? title : t('title')}</div>
 
                         <input
                             value={title}
                             type="text"
                             placeholder={t('title')}
                             onChange={onChangeTitle}
-                            className={cx(css.nameEdit, {active: !title.length})}
+                            className={cx(css.nameEdit, {active: !title?.length})}
                         />
                     </div>
 

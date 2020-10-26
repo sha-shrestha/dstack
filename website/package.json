@@ -6,7 +6,7 @@
     "@babel/core": "7.12.3",
     "@babel/plugin-proposal-optional-chaining": "7.12.1",
     "@babel/preset-env": "7.12.1",
-    "@dstackai/dstack-react": "1.2.3",
+    "@dstackai/dstack-react": "1.2.4",
     "@mdi/font": "4.8.95",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "4.2.4",
