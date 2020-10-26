@@ -1686,10 +1686,10 @@
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
 
-"@dstackai/dstack-react@1.1.18":
-  version "1.1.18"
-  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.1.18.tgz#fdc8ce688486ee29798da0aa0763f00e2d08ea00"
-  integrity sha512-SoSLQiacHyL92PqpgSDyHkAgQPcHQdyXlv/ZhjZ5SJ1THt8V6TYTWBlxETOc1aK5M1i3XZFogqtxvcVkTpZynQ==
+"@dstackai/dstack-react@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@dstackai/dstack-react/-/dstack-react-1.2.0.tgz#fbe529b98128c84f5a5ab4645307081cdd8d5f4b"
+  integrity sha512-sxef7pgMZp3ykZIhXKACFeFqZV6WOyx/Hgcyid0zQkNRfaiDpc4d+DxFbO/8QORqd6ap2n1+qXh9QlWiQs2tpQ==
   dependencies:
     "@mdi/font" "^5.3.45"
     axios "^0.19.2"
@@ -3262,9 +3262,10 @@ babel-extract-comments@^1.0.0:
   dependencies:
     babylon "^6.18.0"
 
-babel-jest@^24.9.0:
+babel-jest@24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-24.9.0.tgz#3fc327cb8467b89d14d7bc70e315104a783ccd54"
+  integrity sha512-ntuddfyiN+EhMw58PTNL1ph4C9rECiQXjI4nMMBKBaNjXvqLdkXpPRcMSr4iyBrJg/+wz9brFUD6RhOAT6r4Iw==
   dependencies:
     "@jest/transform" "^24.9.0"
     "@jest/types" "^24.9.0"
@@ -3348,7 +3349,7 @@ babel-plugin-macros@2.8.0:
     cosmiconfig "^6.0.0"
     resolve "^1.12.0"
 
-babel-plugin-named-asset-import@^0.3.6:
+babel-plugin-named-asset-import@0.3.6:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/babel-plugin-named-asset-import/-/babel-plugin-named-asset-import-0.3.6.tgz#c9750a1b38d85112c9e166bf3ef7c5dbc605f4be"
   integrity sha512-1aGDUfL1qOOIoqk9QKGIo2lANk+C7ko/fqH0uIyC71x3PEGz0uVP8ISgfEsFuG+FKmjHTvFK/nNM8dowpmUxLA==
@@ -3399,7 +3400,7 @@ babel-preset-jest@^26.0.0:
     babel-plugin-jest-hoist "^26.0.0"
     babel-preset-current-node-syntax "^0.1.2"
 
-babel-preset-react-app@^9.1.1:
+babel-preset-react-app@9.1.1:
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/babel-preset-react-app/-/babel-preset-react-app-9.1.1.tgz#d1ceb47cbe48b285fdd5c562c54c432ed5a41e0e"
   integrity sha512-YkWP2UwY//TLltNlEBRngDOrYhvSLb+CA330G7T9M5UhGEMWe+JK/8IXJc5p2fDTSfSiETf+PY0+PYXFMix81Q==
