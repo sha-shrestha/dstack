@@ -8,10 +8,6 @@ export default {
     stacks: (user = ':user') => `/${user}`,
     stackDetails: (user = ':user', id = ':stack') => `/${user}/${id}` + (id === ':stack' ? '+' : ''),
 
-    // dashboard
-    dashboards: (user = ':user') => `/${user}/old-d`,
-    dashboardsDetails: (user = ':user', id = ':id') => `/${user}/old-d/${id}`,
-
     //reports
     reports: (user = ':user') => `/${user}/d`,
     reportsDetails: (user = ':user', id = ':id') => `/${user}/d/${id}`,

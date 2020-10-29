@@ -29,24 +29,6 @@ var routes = {
 
     return "/" + user + "/" + id + (id === ':stack' ? '+' : '');
   },
-  dashboards: function dashboards(user) {
-    if (user === void 0) {
-      user = ':user';
-    }
-
-    return "/" + user + "/old-d";
-  },
-  dashboardsDetails: function dashboardsDetails(user, id) {
-    if (user === void 0) {
-      user = ':user';
-    }
-
-    if (id === void 0) {
-      id = ':id';
-    }
-
-    return "/" + user + "/old-d/" + id;
-  },
   reports: function reports(user) {
     if (user === void 0) {
       user = ':user';

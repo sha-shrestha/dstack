@@ -14,7 +14,6 @@ import DefaultLayout from 'layouts/Default';
 import Login from 'Auth/Login';
 import ConfirmEmail from 'Auth/ConfirmEmail';
 
-import Dashboards from 'Dashboards';
 import Stacks from 'Stacks';
 import Settings from 'Settings';
 
@@ -117,7 +116,6 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                         <Switch>
                             <DefaultLayoutRoute path={routes.notFound()} component={NotFound} />
                             <DefaultLayoutRoute path={routes.settings()} component={Settings} />
-                            <DefaultLayoutRoute path={routes.dashboards()} component={Dashboards} />
                             <DefaultLayoutRoute path={routes.reports()} component={Reports} />
                             <DefaultLayoutRoute path={routes.jobs()} component={Jobs} />
                             <DefaultLayoutRoute path={routes.stacks()} component={Stacks} />
@@ -127,7 +125,6 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                     {!isSignedIn() && (
                         <Switch>
                             <UnAuthorizedLayoutRoute path={routes.notFound()} component={NotFound} />
-                            <UnAuthorizedLayoutRoute path={routes.dashboards()} component={Dashboards} />
                             <UnAuthorizedLayoutRoute path={routes.reports()} component={Reports} />
                             <UnAuthorizedLayoutRoute path={routes.jobs()} component={Jobs} />
                             <UnAuthorizedLayoutRoute path={routes.stacks()} component={Stacks} />

@@ -61,7 +61,7 @@ const Sidebar = ({
             isActive: () => (
                 new RegExp(path).test(routes.stacks())
                 && (!currentUser || (currentUser === params.user))
-                && !new RegExp(path + '$').test(routes.dashboards())
+                && !new RegExp(path + '$').test(routes.reports())
             ),
 
             onClick: refreshStacks,
@@ -69,7 +69,7 @@ const Sidebar = ({
 
         {
             icon: 'mdi-chart-arc',
-            to: routes.dashboards(currentUser),
+            to: routes.reports(currentUser),
             label: t('dashboards'),
         },
 

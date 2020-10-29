@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useContext, useState} from 'react';
+import React, {Fragment, useEffect, useContext, useState, useRef} from 'react';
 import useSWR from 'swr';
 import cn from 'classnames';
 import {get, isEqual, unionBy} from 'lodash-es';
@@ -16,7 +16,6 @@ import Loader from './components/Loader';
 import Yield from '../../Yield';
 import BackButton from '../../BackButton';
 import StretchTitleField from '../../StretchTitleField';
-import ViewSwitcher from '../../ViewSwitcher';
 import Dropdown from '../../Dropdown';
 import Button from '../../Button';
 import DnDGridContext from '../../dnd/DnDGridContext';
@@ -26,19 +25,21 @@ import useActions from '../actions';
 import AddStacksModal from '../AddStacksModal';
 import Card from './components/Card';
 import DnDItem from '../../dnd/DnDItem';
+import StretchTextareaField from '../../kit/StretchTextareaField';
 import css from './styles.module.css';
 
 const dataFormat = data => data.dashboard;
 
 const Details = ({renderHeader, renderSideHeader}) => {
     const {t} = useTranslation();
-    const [view, setView] = useState('grid');
     const {user, id} = useParams();
     const {push} = useHistory();
     const {items, moveItem, setItems} = useContext(DnDGridContext);
     const [{currentUser, apiUrl}] = useAppStore();
     const currentUserName = currentUser.data?.user;
     const {deleteReport, updateReport, reportInsertCard, reportDeleteCard, reportUpdateCard} = useActions();
+    const descFieldRef = useRef();
+    const isMounted = useRef(false);
     const [isShowStacksModal, setIsShowStacksModal] = useState(false);
     const {form, setForm, onChange} = useForm({});
     const [fields, setFields] = useState({});
@@ -52,12 +53,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
         dataFetcher,
     );
 
-    const prevData = usePrevious(data);
+    const [isShowDesc, setIsShowDesc] = useState(Boolean(data?.description?.length));
+    const prevIsShowDesc = usePrevious(isShowDesc);
 
-    useEffect(() => {
-        if (window)
-            window.dispatchEvent(new Event('resize'));
-    }, [view]);
+    const prevData = usePrevious(data);
 
     useEffect(() => {
         if (data?.cards)
@@ -66,8 +65,20 @@ const Details = ({renderHeader, renderSideHeader}) => {
         if (!isEqual(prevData, data) && data?.cards)
             parseParams();
 
+        if (prevData?.description !== data?.description)
+            setIsShowDesc(Boolean(data?.description?.length));
+
         return () => setGridItems([]);
     }, [data]);
+
+    useEffect(() => {
+        if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current)
+            descFieldRef.current.focus();
+    }, [isShowDesc]);
+
+    useEffect(() => {
+        isMounted.current = true;
+    }, []);
 
     const parseParams = () => {
         const fields = data.cards.reduce((result, card) => {
@@ -117,17 +128,29 @@ const Details = ({renderHeader, renderSideHeader}) => {
     };
 
     const update = async (params: {}) => {
-        const response = await updateReport(user, id, params);
-
-        mutate({
-            ...data,
-            ...response.dashboard,
-        });
+        await updateReport(user, id, params);
     };
 
-    const onChangeTitle = useDebounce(async title => {
-        await update({title});
+    const debounceUpdateTitle = useDebounce(async fields => {
+        await update(fields);
     }, 300);
+
+    const onChangeTitle = title => {
+        data.title = title;
+        mutate(data, false);
+        debounceUpdateTitle({title});
+    };
+
+    const debounceUpdateDescription = useDebounce(async fields => {
+        await update(fields);
+    }, 300);
+
+
+    const onChangeDescription = description => {
+        data.description = description;
+        mutate(data, false);
+        debounceUpdateDescription({description});
+    };
 
     const addStacks = async stacks => {
         const {dashboard} = await reportInsertCard(
@@ -137,8 +160,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
             data?.cards?.length
         );
 
-
-        mutate(dashboard);
+        mutate(dashboard, false);
     };
 
     const getDeleteCardFunc = stack => async () => {
@@ -148,21 +170,21 @@ const Details = ({renderHeader, renderSideHeader}) => {
             stack,
         );
 
-        mutate(dashboard);
+        mutate(dashboard, false);
     };
 
-    const getUpdatedCardTitleFunc = stack => async title => {
+    const getUpdatedCardFunc = stack => async fields => {
         const {cards} = await reportUpdateCard(
             user,
             id,
             stack,
-            {title}
+            fields
         );
 
         mutate({
             ...data,
             cards,
-        });
+        }, false);
     };
 
     const moveCard = (indexFrom, indexTo) => {
@@ -208,6 +230,13 @@ const Details = ({renderHeader, renderSideHeader}) => {
 
         setIsShowStacksModal(isShow => !isShow);
     };
+
+    const onBlurDescription = () => {
+        if (!data.description?.length)
+            setIsShowDesc(false);
+    };
+
+    const addDesc = () => setIsShowDesc(true);
 
     if (error?.status === 403)
         return <AccessForbidden>
@@ -261,7 +290,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 <div className={css.title}>
                     <StretchTitleField
                         className={css.edit}
-                        value={data?.title}
+                        value={data.title}
                         onChange={onChangeTitle}
                         readOnly={currentUserName !== data.user}
                         placeholder={t('newDashboard')}
@@ -273,6 +302,17 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 {renderHeader && renderHeader()}
 
                 <div className={css.sideHeader}>
+                    {isUserOwner && (
+                        <a
+                            className={css.addButton}
+                            onClick={toggleAddStackModal}
+                            href="#"
+                        >
+                            <span className="mdi mdi-plus" />
+                            {t('addStack')}
+                        </a>
+                    )}
+
                     {renderSideHeader && renderSideHeader()}
 
                     {isUserOwner && <Dropdown
@@ -295,34 +335,33 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 </div>
             </div>
 
+            <div className={css.description}>
+                {isShowDesc && <StretchTextareaField
+                    value={data.description}
+                    ref={descFieldRef}
+                    placeholder={t('description')}
+                    onChange={onChangeDescription}
+                    onBlur={onBlurDescription}
+                />}
+
+                {!isShowDesc && <Button
+                    className={css.addDesc}
+                    color="secondary"
+                    onClick={addDesc}
+                >
+                    + {t('addDescription')}
+                </Button>}
+            </div>
+
             {Boolean(items.length) && (
                 <Fragment>
                     <div className={css.section}>
                         <div className={css.fields}>
                             {renderFilters()}
                         </div>
-
-                        <div className={css.controls}>
-                            {isUserOwner && (
-                                <a
-                                    className={css.addButton}
-                                    onClick={toggleAddStackModal}
-                                    href="#"
-                                >
-                                    <span className="mdi mdi-plus" />
-                                    {t('addStack')}
-                                </a>
-                            )}
-
-                            <ViewSwitcher
-                                value={view}
-                                className={css.viewSwitcher}
-                                onChange={view => setView(view)}
-                            />
-                        </div>
                     </div>
 
-                    <div className={cn(css.cards, view)}>
+                    <div className={cn(css.cards)}>
                         {items.map(item => (
                             <CardWrapComponent
                                 key={item.card.stack}
@@ -332,11 +371,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
                                 } : {})}
                             >
                                 <Card
-                                    type={view}
                                     filters={form}
                                     deleteCard={isUserOwner && getDeleteCardFunc(item.card.stack)}
                                     data={item.card}
-                                    updateCardTitle={isUserOwner && getUpdatedCardTitleFunc(item.card.stack)}
+                                    updateCard={isUserOwner && getUpdatedCardFunc(item.card.stack)}
                                     moveAvailable={isUserOwner}
                                 />
                             </CardWrapComponent>

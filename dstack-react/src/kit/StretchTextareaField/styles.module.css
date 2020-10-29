@@ -1,0 +1,51 @@
+@import "styles/variables.css";
+@import "styles/media.css";
+
+.fieldWrap {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.field {
+    position: relative;
+    max-width: fit-content;
+    font-size: 13px;
+    line-height: 20px;
+    min-height: 20px;
+    textarea {
+        position: absolute;
+        top: -2px;
+        left: -4px;
+        bottom: -2px;
+        right: -4px;
+        min-height: inherit;
+        width: 100%;
+        font-size: inherit;
+        line-height: inherit;
+        font-family: inherit;
+        color: inherit;
+        box-shadow: none;
+        appearance: unset;
+        padding: 1px 3px;
+        margin: 0;
+        resize: none;
+        outline: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        transition: border-color .3s ease;
+        &::placeholder {
+            color: var(--color-light-gray);
+        }
+        &:hover,
+        &:focus {
+            border-color: rgba(180, 184, 199, .5);
+        }
+    }
+    .hidden {
+        pointer-events: none;
+        opacity: 0;
+        white-space: pre-wrap;
+        padding-right: 2px;
+    }
+}
+
+

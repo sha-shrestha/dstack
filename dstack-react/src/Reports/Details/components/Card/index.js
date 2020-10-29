@@ -1,8 +1,9 @@
 // @flow
-import React, {memo, Fragment, useEffect, useState} from 'react';
+import React, {memo, Fragment, useEffect, useState, useRef} from 'react';
 import moment from 'moment';
 import {get, isEqual} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
+import {usePrevious} from 'react-use';
 import {Link} from 'react-router-dom';
 import cx from 'classnames';
 import {parseStackParams} from '../../../../utils';
@@ -10,6 +11,7 @@ import useDebounce from '../../../../hooks/useDebounce';
 import Button from '../../../../Button';
 import Tooltip from '../../../../Tooltip';
 import ViewSwitcher from '../../../../ViewSwitcher';
+import StretchTextareaField from '../../../../kit/StretchTextareaField';
 import StackAttachment from '../../../../stack/Attachment';
 import css from './styles.module.css';
 
@@ -22,26 +24,34 @@ export type DashboardCard = {
 type Props = {
     data: DashboardCard,
     className?: string,
-    type?: 'list' | 'grid',
     attachment: {},
-    fetchAttachment: Function,
     deleteCard: Function,
-    updateCardTitle: Function,
+    updateCard: Function,
     filters: {},
     moveAvailable?: boolean,
 }
 
+const viewValueMap = {
+    grid: 1,
+    list: 2,
+};
+
 const Card = memo(({
     data,
     className,
-    type = 'grid',
     deleteCard,
-    updateCardTitle,
+    updateCard,
     filters,
     forwardedRef,
     moveAvailable,
 }: Props) => {
     const [title, setTitle] = useState(data.title);
+    const [columns, setColumns] = useState(data.columns);
+    const descFieldRef = useRef();
+    const isMounted = useRef(false);
+    const isHoveredMoveBtn = useRef(false);
+    const [isShowDesc, setIsShowDesc] = useState(data.description?.length);
+    const prevIsShowDesc = usePrevious(isShowDesc);
     const {t} = useTranslation();
     const headId = get(data, 'head.id');
     const stackOwner = data.stack.split('/')[0];
@@ -63,11 +73,21 @@ const Card = memo(({
     useEffect(() => {
         if (forwardedRef.current)
             forwardedRef.current.addEventListener('dragstart', event => {
-                console.log(event.target);
-                event.stopPropagation();
-                event.preventDefault();
+                if (!isHoveredMoveBtn.current) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
             });
     }, [forwardedRef]);
+
+    useEffect(() => {
+        if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current)
+            descFieldRef.current.focus();
+    }, [isShowDesc]);
+
+    useEffect(() => {
+        isMounted.current = true;
+    }, []);
 
     const findAttach = () => {
         const attachments = get(data, 'head.attachments');
@@ -94,26 +114,53 @@ const Card = memo(({
             setAttachmentIndex(0);
     };
 
-    const onUpdate = updateCardTitle ? useDebounce(updateCardTitle, []) : () => {};
+    const onUpdate = updateCard ? useDebounce(updateCard, [updateCard]) : () => {};
 
     const onChangeTitle = event => {
         setTitle(event.target.value);
-        onUpdate(event.target.value);
+        onUpdate({title: event.target.value});
     };
 
+    const onChangeView = view => {
+        const columns = viewValueMap[view];
+
+        setColumns(columns);
+        onUpdate({columns});
+    };
+
+    const onChangeDescription = description => {
+        setColumns(columns);
+        onUpdate({description});
+    };
+
+    const onEnterMove = () => {
+        isHoveredMoveBtn.current = true;
+    };
+
+    const onLeaveMove = () => {
+        isHoveredMoveBtn.current = false;
+    };
+
+    const onBlurDescription = () => {
+        if (!data.description?.length)
+            setIsShowDesc(false);
+    };
+
+    const addDesc = () => setIsShowDesc(true);
+
     return (
-        <div className={cx(css.card, `type-${type}`, className)} ref={forwardedRef}>
+        <div className={cx(css.card, `col-${columns}`, className)} ref={forwardedRef}>
             <div className={css.inner}>
                 <div className={css.head}>
-                    <div className={cx(css.name, {readonly: !updateCardTitle})}>
-                        <div className={css.nameValue}>{title.length ? title : t('title')}</div>
+                    <div className={cx(css.name, {readonly: !updateCard})}>
+                        <div className={css.nameValue}>{title?.length ? title : t('title')}</div>
 
                         <input
                             value={title}
                             type="text"
                             placeholder={t('title')}
                             onChange={onChangeTitle}
-                            className={cx(css.nameEdit, {active: !title.length})}
+                            className={cx(css.nameEdit, {active: !title?.length})}
                         />
                     </div>
 
@@ -155,16 +202,37 @@ const Card = memo(({
                             <Button
                                 className={cx(css.button, css.move)}
                                 color="secondary"
-                                data-drop-pointer={true}
+                                onMouseEnter={onEnterMove}
+                                onMouseLeave={onLeaveMove}
                             >
                                 <span className="mdi mdi-cursor-move" />
                             </Button>
                         )}
 
-                        {/*<ViewSwitcher*/}
-                        {/*    className={css.viewSwitcher}*/}
-                        {/*/>*/}
+                        <ViewSwitcher
+                            onChange={onChangeView}
+                            value={data.columns === 1 ? 'grid' : 'list'}
+                            className={css.viewSwitcher}
+                        />
                     </div>
+                </div>
+
+                <div className={css.description}>
+                    {isShowDesc && <StretchTextareaField
+                        value={data.description}
+                        ref={descFieldRef}
+                        placeholder={t('description')}
+                        onChange={onChangeDescription}
+                        onBlur={onBlurDescription}
+                    />}
+
+                    {!isShowDesc && <Button
+                        className={cx(css.addDesc)}
+                        color="secondary"
+                        onClick={addDesc}
+                    >
+                        + {t('addDescription')}
+                    </Button>}
                 </div>
 
                 {headId

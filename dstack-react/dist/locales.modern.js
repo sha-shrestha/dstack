@@ -1,5 +1,6 @@
 var en = {
   'addAComment': 'Add a comment',
+  'addDescription': 'Add description',
   'addSelectedStacks': 'Add selected stacks',
   'addStack': 'Add Stack',
   'additionalDetails': 'Additional details',
@@ -40,6 +41,7 @@ var en = {
   'dashboardsOf': 'Dashboards of {{name}}',
   'delete': 'Delete',
   'deleteStack': 'Delete stack',
+  'description': 'Description',
   'discordChat': 'Discord chat',
   'docs': 'Docs',
   'documentation': 'Documentation',
