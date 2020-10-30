@@ -104,6 +104,8 @@ var parseStackParams = (function (attachments, tab) {
     });
   });
   Object.keys(fields).forEach(function (key) {
+    fields[key].options = lodashEs.uniq(fields[key].options);
+
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
       fields[key].options = fields[key].options.filter(function (a, b) {

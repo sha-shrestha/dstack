@@ -617,6 +617,8 @@ var parseStackParams = (function (attachments, tab) {
     });
   });
   Object.keys(fields).forEach(function (key) {
+    fields[key].options = lodashEs.uniq(fields[key].options);
+
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
       fields[key].options = fields[key].options.filter(function (a, b) {
@@ -5734,25 +5736,10 @@ var Details$2 = function Details(_ref) {
   }, []);
 
   var parseParams = function parseParams() {
-    var fields = data.cards.reduce(function (result, card) {
-      var cardFields = parseStackParams(lodashEs.get(card, 'head.attachments', [])) || {};
-      Object.keys(cardFields).forEach(function (fieldName) {
-        if (result[fieldName]) {
-          if (cardFields[fieldName].type === 'select') {
-            result[fieldName].options = lodashEs.unionBy(result[fieldName].options, cardFields[fieldName].options, 'value');
-          }
-
-          if (cardFields[fieldName].type === 'slider') {
-            result[fieldName].options = _extends({}, result[fieldName].options, cardFields[fieldName].options);
-            result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
-            result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
-          }
-        } else {
-          result[fieldName] = cardFields[fieldName];
-        }
-      });
-      return result;
-    }, {});
+    var allAttachments = data.cards.reduce(function (result, card) {
+      return result.concat(lodashEs.get(card, 'head.attachments', []));
+    }, []);
+    var fields = parseStackParams(allAttachments) || {};
     var defaultFilterValues = Object.keys(fields).reduce(function (result, fieldName) {
       if (fields[fieldName].type === 'select') result[fieldName] = fields[fieldName].options[0].value;
       if (fields[fieldName].type === 'slider') result[fieldName] = fields[fieldName].options[0];

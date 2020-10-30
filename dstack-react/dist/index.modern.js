@@ -1,6 +1,6 @@
 import React__default, { createContext, useReducer, useContext, forwardRef, useState, useRef, useEffect, useImperativeHandle, useMemo, memo, useCallback, Fragment, Component } from 'react';
 import axios from 'axios';
-import { get, isEqual, isString, debounce, unionBy } from 'lodash-es';
+import { get, uniq, isEqual, isString, debounce } from 'lodash-es';
 import cx from 'classnames';
 import Highlight from 'react-highlight.js';
 import { useTranslation } from 'react-i18next';
@@ -533,6 +533,8 @@ var parseStackParams = ((attachments, tab) => {
     });
   });
   Object.keys(fields).forEach(key => {
+    fields[key].options = uniq(fields[key].options);
+
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
       fields[key].options = fields[key].options.filter((a, b) => fields[key].options.indexOf(a) === b).map(i => ({
@@ -4899,27 +4901,10 @@ const Details$2 = ({
   }, []);
 
   const parseParams = () => {
-    const fields = data.cards.reduce((result, card) => {
-      const cardFields = parseStackParams(get(card, 'head.attachments', [])) || {};
-      Object.keys(cardFields).forEach(fieldName => {
-        if (result[fieldName]) {
-          if (cardFields[fieldName].type === 'select') {
-            result[fieldName].options = unionBy(result[fieldName].options, cardFields[fieldName].options, 'value');
-          }
-
-          if (cardFields[fieldName].type === 'slider') {
-            result[fieldName].options = { ...result[fieldName].options,
-              ...cardFields[fieldName].options
-            };
-            result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
-            result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
-          }
-        } else {
-          result[fieldName] = cardFields[fieldName];
-        }
-      });
-      return result;
-    }, {});
+    const allAttachments = data.cards.reduce((result, card) => {
+      return result.concat(get(card, 'head.attachments', []));
+    }, []);
+    const fields = parseStackParams(allAttachments) || {};
     const defaultFilterValues = Object.keys(fields).reduce((result, fieldName) => {
       if (fields[fieldName].type === 'select') result[fieldName] = fields[fieldName].options[0].value;
       if (fields[fieldName].type === 'slider') result[fieldName] = fields[fieldName].options[0];

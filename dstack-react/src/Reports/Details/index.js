@@ -81,34 +81,11 @@ const Details = ({renderHeader, renderSideHeader}) => {
     }, []);
 
     const parseParams = () => {
-        const fields = data.cards.reduce((result, card) => {
-            const cardFields = parseStackParams(get(card, 'head.attachments', [])) || {};
+        const allAttachments = data.cards.reduce((result, card) => {
+            return result.concat(get(card, 'head.attachments', []));
+        }, []);
 
-            Object.keys(cardFields).forEach(fieldName => {
-                if (result[fieldName]) {
-                    if (cardFields[fieldName].type === 'select') {
-                        result[fieldName].options = unionBy(
-                            result[fieldName].options,
-                            cardFields[fieldName].options, 'value');
-                    }
-
-                    if (cardFields[fieldName].type === 'slider') {
-
-                        result[fieldName].options = {
-                            ...result[fieldName].options,
-                            ...cardFields[fieldName].options,
-                        };
-
-                        result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
-                        result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
-                    }
-                } else {
-                    result[fieldName] = cardFields[fieldName];
-                }
-            });
-
-            return result;
-        }, {});
+        const fields = parseStackParams(allAttachments) || {};
 
         const defaultFilterValues = Object.keys(fields).reduce((result, fieldName) => {
             if (fields[fieldName].type === 'select')

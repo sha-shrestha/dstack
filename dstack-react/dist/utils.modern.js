@@ -1,4 +1,4 @@
-import { get } from 'lodash-es';
+import { get, uniq } from 'lodash-es';
 import moment from 'moment';
 import axios from 'axios';
 
@@ -96,6 +96,8 @@ var parseStackParams = ((attachments, tab) => {
     });
   });
   Object.keys(fields).forEach(key => {
+    fields[key].options = uniq(fields[key].options);
+
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
       fields[key].options = fields[key].options.filter((a, b) => fields[key].options.indexOf(a) === b).map(i => ({
