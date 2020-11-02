@@ -76,7 +76,9 @@ const Details = ({renderHeader, renderSideHeader}) => {
     }, [data]);
 
     useEffect(() => {
-        if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current)
+        if (isMounted.current
+            && prevIsShowDesc !== isShowDesc
+            && descFieldRef.current && !data.description?.length)
             descFieldRef.current.focus();
     }, [isShowDesc]);
 
@@ -149,6 +151,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
         data.description = description;
         mutate(data, false);
         debounceUpdateDescription({description});
+    };
+
+    const onChangePrivate = async isPrivate => {
+        await update({private: isPrivate});
     };
 
     const addStacks = async stacks => {
@@ -304,7 +310,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {renderHeader && renderHeader()}
+                {renderHeader && renderHeader({data})}
 
                 <div className={css.sideHeader}>
                     {isUserOwner && (
@@ -318,7 +324,11 @@ const Details = ({renderHeader, renderSideHeader}) => {
                         </a>
                     )}
 
-                    {renderSideHeader && renderSideHeader()}
+                    {renderSideHeader && renderSideHeader({
+                        data,
+                        onChangePrivate,
+                        mutateData: mutate,
+                    })}
 
                     {isUserOwner && <Dropdown
                         className={css.dropdown}

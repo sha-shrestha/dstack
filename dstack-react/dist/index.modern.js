@@ -5914,7 +5914,9 @@ var Details$2 = function Details(_ref) {
     };
   }, [data]);
   useEffect(function () {
-    if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current) descFieldRef.current.focus();
+    var _data$description3;
+
+    if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current && !((_data$description3 = data.description) === null || _data$description3 === void 0 ? void 0 : _data$description3.length)) descFieldRef.current.focus();
   }, [isShowDesc]);
   useEffect(function () {
     isMounted.current = true;
@@ -5990,6 +5992,16 @@ var Details$2 = function Details(_ref) {
     debounceUpdateDescription({
       description: description
     });
+  };
+
+  var onChangePrivate = function onChangePrivate(isPrivate) {
+    try {
+      return Promise.resolve(update({
+        "private": isPrivate
+      })).then(function () {});
+    } catch (e) {
+      return Promise.reject(e);
+    }
   };
 
   var addStacks = function addStacks(stacks) {
@@ -6086,9 +6098,9 @@ var Details$2 = function Details(_ref) {
   };
 
   var onBlurDescription = function onBlurDescription() {
-    var _data$description3;
+    var _data$description4;
 
-    if (!((_data$description3 = data.description) === null || _data$description3 === void 0 ? void 0 : _data$description3.length)) setIsShowDesc(false);
+    if (!((_data$description4 = data.description) === null || _data$description4 === void 0 ? void 0 : _data$description4.length)) setIsShowDesc(false);
   };
 
   var addDesc = function addDesc() {
@@ -6125,7 +6137,9 @@ var Details$2 = function Details(_ref) {
     placeholder: t('newDashboard')
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
+  })), renderHeader && renderHeader({
+    data: data
+  }), /*#__PURE__*/React__default.createElement("div", {
     className: css$U.sideHeader
   }, isUserOwner && /*#__PURE__*/React__default.createElement("a", {
     className: css$U.addButton,
@@ -6133,7 +6147,11 @@ var Details$2 = function Details(_ref) {
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
-  }), t('addStack')), renderSideHeader && renderSideHeader(), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
+  }), t('addStack')), renderSideHeader && renderSideHeader({
+    data: data,
+    onChangePrivate: onChangePrivate,
+    mutateData: mutate
+  }), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$U.dropdown,
     items: [{
       title: t('delete'),
