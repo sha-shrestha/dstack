@@ -653,7 +653,7 @@ var parseStackParams = (function (attachments, tab) {
 
 var parseStackTabs = (function (attachments) {
   var tabs = [];
-  if (!attachments || !attachments.length) return;
+  if (!attachments || !attachments.length) return [];
   attachments.forEach(function (i) {
     Object.keys(i.params).forEach(function (key) {
       if (i.params[key] instanceof Object && i.params[key].type === 'tab') {
@@ -5404,6 +5404,7 @@ var Card = React.memo(function (_ref) {
       deleteCard = _ref.deleteCard,
       updateCard = _ref.updateCard,
       filters = _ref.filters,
+      activeTab = _ref.activeTab,
       forwardedRef = _ref.forwardedRef,
       moveAvailable = _ref.moveAvailable;
 
@@ -5445,7 +5446,7 @@ var Card = React.memo(function (_ref) {
   }, [data]);
   React.useEffect(function () {
     findAttach();
-  }, [filters]);
+  }, [filters, activeTab]);
   React.useEffect(function () {
     if (forwardedRef.current) forwardedRef.current.addEventListener('dragstart', function (event) {
       if (!isHoveredMoveBtn.current) {
@@ -5453,7 +5454,7 @@ var Card = React.memo(function (_ref) {
         event.preventDefault();
       }
     });
-  }, [forwardedRef]);
+  }, [forwardedRef.current]);
   React.useEffect(function () {
     if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current) descFieldRef.current.focus();
   }, [isShowDesc]);
@@ -5463,20 +5464,31 @@ var Card = React.memo(function (_ref) {
 
   var findAttach = function findAttach() {
     var attachments = lodashEs.get(data, 'head.attachments');
+    var tabs = parseStackTabs(attachments);
     var fields = Object.keys(filters).filter(function (f) {
       return cardParams.indexOf(f) >= 0;
     });
+    var tab = tabs.find(function (t) {
+      return t.value === activeTab;
+    });
     if (!attachments) return;
 
-    if (fields.length) {
-      attachments.some(function (attach, index) {
+    if (fields.length || tabs.length && activeTab) {
+      var hasAttach = attachments.some(function (attach, index) {
+        var _attach$params$tab$va, _attach$params$tab$ke;
+
         var valid = true;
+        if (!tab || ((_attach$params$tab$va = attach.params[tab.value]) === null || _attach$params$tab$va === void 0 ? void 0 : _attach$params$tab$va.type) !== 'tab' && ((_attach$params$tab$ke = attach.params[tab.key]) === null || _attach$params$tab$ke === void 0 ? void 0 : _attach$params$tab$ke.title) !== tab.value) return false;
         fields.forEach(function (key) {
           if (!attach.params || !lodashEs.isEqual(attach.params[key], filters[key])) valid = false;
         });
         if (valid) setAttachmentIndex(index);
         return valid;
       });
+
+      if (!hasAttach && tabs.length) {
+        setAttachmentIndex(null);
+      }
     } else setAttachmentIndex(0);
   };
 
@@ -5524,7 +5536,10 @@ var Card = React.memo(function (_ref) {
 
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$T.card, "col-" + columns, className),
-    ref: forwardedRef
+    ref: forwardedRef,
+    style: {
+      display: attachmentIndex === null ? 'none' : ''
+    }
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$T.inner
   }, /*#__PURE__*/React__default.createElement("div", {
@@ -5591,7 +5606,7 @@ var Card = React.memo(function (_ref) {
     className: cx(css$T.addDesc),
     color: "secondary",
     onClick: addDesc
-  }, "+ ", t('addDescription'))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
+  }, "+ ", t('addDescription'))), headId && attachmentIndex !== null ? /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$T.attachment,
     isList: true,
     withLoader: true,
@@ -5641,7 +5656,7 @@ var DnDItem = React.memo(function (_ref) {
   });
 });
 
-var css$U = {"details":"_styles-module__details__1YGMH","header":"_styles-module__header__1lU-L","title":"_styles-module__title__2HPT5","edit":"_styles-module__edit__3ezYE","sideHeader":"_styles-module__sideHeader__2PqMZ","addButton":"_styles-module__addButton__4KCh5","description":"_styles-module__description__1peNb","addDesc":"_styles-module__addDesc__-FjzY","dropdown":"_styles-module__dropdown__2-VRH","section":"_styles-module__section__2_7da","cards":"_styles-module__cards__3OOzf","fields":"_styles-module__fields__WLi30","filters":"_styles-module__filters__2q551","empty":"_styles-module__empty__13-9o"};
+var css$U = {"details":"_styles-module__details__1YGMH","header":"_styles-module__header__1lU-L","title":"_styles-module__title__2HPT5","edit":"_styles-module__edit__3ezYE","sideHeader":"_styles-module__sideHeader__2PqMZ","addButton":"_styles-module__addButton__4KCh5","description":"_styles-module__description__1peNb","addDesc":"_styles-module__addDesc__-FjzY","dropdown":"_styles-module__dropdown__2-VRH","tabs":"_styles-module__tabs__pJ1U-","container":"_styles-module__container__3V4ls","section":"_styles-module__section__2_7da","cards":"_styles-module__cards__3OOzf","fields":"_styles-module__fields__WLi30","filters":"_styles-module__filters__2q551","empty":"_styles-module__empty__13-9o"};
 
 var dataFormat$5 = function dataFormat(data) {
   return data.dashboard;
@@ -5689,14 +5704,22 @@ var Details$2 = function Details(_ref) {
       isShowStacksModal = _useState[0],
       setIsShowStacksModal = _useState[1];
 
+  var _useState2 = React.useState(),
+      activeTab = _useState2[0],
+      setActiveTab = _useState2[1];
+
+  var _useState3 = React.useState([]),
+      tabs = _useState3[0],
+      setTabs = _useState3[1];
+
   var _useForm = useForm({}),
       form = _useForm.form,
       setForm = _useForm.setForm,
       onChange = _useForm.onChange;
 
-  var _useState2 = React.useState({}),
-      fields = _useState2[0],
-      setFields = _useState2[1];
+  var _useState4 = React.useState({}),
+      fields = _useState4[0],
+      setFields = _useState4[1];
 
   var setGridItems = function setGridItems(cardsItems) {
     return setItems(cardsItems.map(function (card) {
@@ -5712,9 +5735,9 @@ var Details$2 = function Details(_ref) {
       mutate = _useSWR.mutate,
       error = _useSWR.error;
 
-  var _useState3 = React.useState(Boolean(data === null || data === void 0 ? void 0 : (_data$description = data.description) === null || _data$description === void 0 ? void 0 : _data$description.length)),
-      isShowDesc = _useState3[0],
-      setIsShowDesc = _useState3[1];
+  var _useState5 = React.useState(Boolean(data === null || data === void 0 ? void 0 : (_data$description = data.description) === null || _data$description === void 0 ? void 0 : _data$description.length)),
+      isShowDesc = _useState5[0],
+      setIsShowDesc = _useState5[1];
 
   var prevIsShowDesc = usePrevious(isShowDesc);
   var prevData = usePrevious(data);
@@ -5722,7 +5745,12 @@ var Details$2 = function Details(_ref) {
     var _data$description2;
 
     if (data === null || data === void 0 ? void 0 : data.cards) setGridItems(data === null || data === void 0 ? void 0 : data.cards);
-    if (!lodashEs.isEqual(prevData, data) && (data === null || data === void 0 ? void 0 : data.cards)) parseParams();
+
+    if (!lodashEs.isEqual(prevData, data) && (data === null || data === void 0 ? void 0 : data.cards)) {
+      parseParams();
+      parseTabs();
+    }
+
     if ((prevData === null || prevData === void 0 ? void 0 : prevData.description) !== (data === null || data === void 0 ? void 0 : data.description)) setIsShowDesc(Boolean(data === null || data === void 0 ? void 0 : (_data$description2 = data.description) === null || _data$description2 === void 0 ? void 0 : _data$description2.length));
     return function () {
       return setGridItems([]);
@@ -5735,11 +5763,14 @@ var Details$2 = function Details(_ref) {
     isMounted.current = true;
   }, []);
 
-  var parseParams = function parseParams() {
-    var allAttachments = data.cards.reduce(function (result, card) {
+  var getAllAttachments = function getAllAttachments() {
+    return data.cards.reduce(function (result, card) {
       return result.concat(lodashEs.get(card, 'head.attachments', []));
     }, []);
-    var fields = parseStackParams(allAttachments) || {};
+  };
+
+  var parseParams = function parseParams() {
+    var fields = parseStackParams(getAllAttachments()) || {};
     var defaultFilterValues = Object.keys(fields).reduce(function (result, fieldName) {
       if (fields[fieldName].type === 'select') result[fieldName] = fields[fieldName].options[0].value;
       if (fields[fieldName].type === 'slider') result[fieldName] = fields[fieldName].options[0];
@@ -5748,6 +5779,20 @@ var Details$2 = function Details(_ref) {
     }, {});
     setForm(defaultFilterValues);
     setFields(fields);
+  };
+
+  var parseTabs = function parseTabs() {
+    var _tabs$;
+
+    var attachments = getAllAttachments();
+    if (!attachments || !attachments.length) return;
+    var tabs = parseStackTabs(attachments);
+    setTabs(tabs);
+    setActiveTab((_tabs$ = tabs[0]) === null || _tabs$ === void 0 ? void 0 : _tabs$.value);
+  };
+
+  var onChangeTab = function onChangeTab(tabName) {
+    setActiveTab(tabName);
   };
 
   var update = function update(params) {
@@ -5947,7 +5992,14 @@ var Details$2 = function Details(_ref) {
     className: css$U.addDesc,
     color: "secondary",
     onClick: addDesc
-  }, "+ ", t('addDescription'))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
+  }, "+ ", t('addDescription'))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
+    className: css$U.tabs,
+    onChange: onChangeTab,
+    value: activeTab,
+    items: tabs
+  }), Boolean(items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$U.container
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: css$U.section
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$U.fields
@@ -5960,6 +6012,7 @@ var Details$2 = function Details(_ref) {
       id: item.id,
       onMoveItem: moveCard
     } : {}), /*#__PURE__*/React__default.createElement(Card, {
+      activeTab: activeTab,
       filters: form,
       deleteCard: isUserOwner && getDeleteCardFunc(item.card.stack),
       data: item.card,

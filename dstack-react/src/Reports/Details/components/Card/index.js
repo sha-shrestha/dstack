@@ -6,7 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {usePrevious} from 'react-use';
 import {Link} from 'react-router-dom';
 import cx from 'classnames';
-import {parseStackParams} from '../../../../utils';
+import {parseStackParams, parseStackTabs} from '../../../../utils';
 import useDebounce from '../../../../hooks/useDebounce';
 import Button from '../../../../Button';
 import Tooltip from '../../../../Tooltip';
@@ -42,6 +42,7 @@ const Card = memo(({
     deleteCard,
     updateCard,
     filters,
+    activeTab,
     forwardedRef,
     moveAvailable,
 }: Props) => {
@@ -68,7 +69,7 @@ const Card = memo(({
 
     useEffect(() => {
         findAttach();
-    }, [filters]);
+    }, [filters, activeTab]);
 
     useEffect(() => {
         if (forwardedRef.current)
@@ -78,7 +79,7 @@ const Card = memo(({
                     event.preventDefault();
                 }
             });
-    }, [forwardedRef]);
+    }, [forwardedRef.current]);
 
     useEffect(() => {
         if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current)
@@ -91,14 +92,23 @@ const Card = memo(({
 
     const findAttach = () => {
         const attachments = get(data, 'head.attachments');
+        const tabs = parseStackTabs(attachments);
         const fields = Object.keys(filters).filter(f => cardParams.indexOf(f) >= 0);
+        const tab = tabs.find(t => t.value === activeTab);
 
         if (!attachments)
             return;
 
-        if (fields.length) {
-            attachments.some((attach, index) => {
+        if (fields.length || (tabs.length && activeTab)) {
+            const hasAttach = attachments.some((attach, index) => {
                 let valid = true;
+
+                if (!tab
+                    || (attach.params[tab.value]?.type !== 'tab'
+                        && attach.params[tab.key]?.title !== tab.value
+                    )
+                )
+                    return false;
 
                 fields.forEach(key => {
                     if (!attach.params || !isEqual(attach.params[key], filters[key]))
@@ -110,6 +120,11 @@ const Card = memo(({
 
                 return valid;
             });
+
+
+            if (!hasAttach && tabs.length) {
+                setAttachmentIndex(null);
+            }
         } else
             setAttachmentIndex(0);
     };
@@ -149,7 +164,11 @@ const Card = memo(({
     const addDesc = () => setIsShowDesc(true);
 
     return (
-        <div className={cx(css.card, `col-${columns}`, className)} ref={forwardedRef}>
+        <div
+            className={cx(css.card, `col-${columns}`, className)}
+            ref={forwardedRef}
+            style={{display: attachmentIndex === null ? 'none' : ''}}
+        >
             <div className={css.inner}>
                 <div className={css.head}>
                     <div className={cx(css.name, {readonly: !updateCard})}>
@@ -235,7 +254,7 @@ const Card = memo(({
                     </Button>}
                 </div>
 
-                {headId
+                {headId && attachmentIndex !== null
                     ? <StackAttachment
                         className={css.attachment}
                         isList

@@ -140,7 +140,7 @@ var parseStackParams = (function (attachments, tab) {
 
 var parseStackTabs = (function (attachments) {
   var tabs = [];
-  if (!attachments || !attachments.length) return;
+  if (!attachments || !attachments.length) return [];
   attachments.forEach(function (i) {
     Object.keys(i.params).forEach(function (key) {
       if (i.params[key] instanceof Object && i.params[key].type === 'tab') {

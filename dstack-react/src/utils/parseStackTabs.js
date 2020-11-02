@@ -2,7 +2,7 @@ export default attachments => {
     const tabs = [];
 
     if (!attachments || !attachments.length)
-        return;
+        return [];
 
     attachments.forEach(i => {
         Object.keys(i.params).forEach(key => {

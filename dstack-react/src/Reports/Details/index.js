@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useContext, useState, useRef} from 'react';
 import useSWR from 'swr';
 import cn from 'classnames';
-import {get, isEqual, unionBy} from 'lodash-es';
+import {get, isEqual} from 'lodash-es';
 import {Link} from 'react-router-dom';
 import {useHistory, useParams} from 'react-router';
 import {useTranslation} from 'react-i18next';
@@ -10,7 +10,7 @@ import AccessForbidden from '../../AccessForbidden';
 import {useAppStore} from '../../AppStore';
 import config from '../../config';
 import routes from '../../routes';
-import {dataFetcher, isSignedIn, parseStackParams} from '../../utils';
+import {dataFetcher, isSignedIn, parseStackParams, parseStackTabs} from '../../utils';
 import {useDebounce, useForm} from '../../hooks';
 import Loader from './components/Loader';
 import Yield from '../../Yield';
@@ -24,6 +24,7 @@ import StackFilters from '../../StackFilters';
 import useActions from '../actions';
 import AddStacksModal from '../AddStacksModal';
 import Card from './components/Card';
+import StackTabs from '../../stack/Details/components/Tabs';
 import DnDItem from '../../dnd/DnDItem';
 import StretchTextareaField from '../../kit/StretchTextareaField';
 import css from './styles.module.css';
@@ -41,6 +42,8 @@ const Details = ({renderHeader, renderSideHeader}) => {
     const descFieldRef = useRef();
     const isMounted = useRef(false);
     const [isShowStacksModal, setIsShowStacksModal] = useState(false);
+    const [activeTab, setActiveTab] = useState();
+    const [tabs, setTabs] = useState([]);
     const {form, setForm, onChange} = useForm({});
     const [fields, setFields] = useState({});
     const setGridItems = cardsItems => setItems(cardsItems.map(card => ({id: card.index, card})));
@@ -62,8 +65,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
         if (data?.cards)
             setGridItems(data?.cards);
 
-        if (!isEqual(prevData, data) && data?.cards)
+        if (!isEqual(prevData, data) && data?.cards) {
             parseParams();
+            parseTabs();
+        }
 
         if (prevData?.description !== data?.description)
             setIsShowDesc(Boolean(data?.description?.length));
@@ -80,12 +85,14 @@ const Details = ({renderHeader, renderSideHeader}) => {
         isMounted.current = true;
     }, []);
 
-    const parseParams = () => {
-        const allAttachments = data.cards.reduce((result, card) => {
+    const getAllAttachments = () => {
+        return data.cards.reduce((result, card) => {
             return result.concat(get(card, 'head.attachments', []));
         }, []);
+    };
 
-        const fields = parseStackParams(allAttachments) || {};
+    const parseParams = () => {
+        const fields = parseStackParams(getAllAttachments()) || {};
 
         const defaultFilterValues = Object.keys(fields).reduce((result, fieldName) => {
             if (fields[fieldName].type === 'select')
@@ -102,6 +109,22 @@ const Details = ({renderHeader, renderSideHeader}) => {
 
         setForm(defaultFilterValues);
         setFields(fields);
+    };
+
+    const parseTabs = () => {
+        const attachments = getAllAttachments();
+
+        if (!attachments || !attachments.length)
+            return;
+
+        const tabs = parseStackTabs(attachments);
+
+        setTabs(tabs);
+        setActiveTab(tabs[0]?.value);
+    };
+
+    const onChangeTab = tabName => {
+        setActiveTab(tabName);
     };
 
     const update = async (params: {}) => {
@@ -330,8 +353,15 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 </Button>}
             </div>
 
+            {Boolean(tabs.length) && <StackTabs
+                className={css.tabs}
+                onChange={onChangeTab}
+                value={activeTab}
+                items={tabs}
+            />}
+
             {Boolean(items.length) && (
-                <Fragment>
+                <div className={css.container}>
                     <div className={css.section}>
                         <div className={css.fields}>
                             {renderFilters()}
@@ -348,6 +378,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                                 } : {})}
                             >
                                 <Card
+                                    activeTab={activeTab}
                                     filters={form}
                                     deleteCard={isUserOwner && getDeleteCardFunc(item.card.stack)}
                                     data={item.card}
@@ -357,7 +388,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                             </CardWrapComponent>
                         ))}
                     </div>
-                </Fragment>
+                </div>
             )}
 
             {!items.length && (
