@@ -1,7 +1,7 @@
 // @flow
 import React, {useEffect, useState, Fragment, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useParams} from 'react-router';
+import {useParams} from 'react-router-dom';
 import useSWR from 'swr';
 import Button from '../../Button';
 import Modal from '../../Modal';

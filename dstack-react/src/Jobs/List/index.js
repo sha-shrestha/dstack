@@ -1,7 +1,7 @@
 // @flow
 import React, {useState} from 'react';
 import useSWR from 'swr';
-import {useHistory, useParams} from 'react-router';
+import {useHistory, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Button from '../../Button';
 import SearchField from '../../SearchField';

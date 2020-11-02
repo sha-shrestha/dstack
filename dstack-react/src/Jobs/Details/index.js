@@ -1,9 +1,8 @@
 // @flow
 import React, {Fragment, useEffect, useRef, useState} from 'react';
-import {useHistory, useParams} from 'react-router';
+import {Link, useHistory, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import useSWR from 'swr';
-import {Link} from 'react-router-dom';
 import AccessForbidden from '../../AccessForbidden';
 import NotFound from '../../NotFound';
 import StretchTitleField from '../../StretchTitleField';
