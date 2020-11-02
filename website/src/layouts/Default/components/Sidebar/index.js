@@ -69,7 +69,7 @@ const Sidebar = ({
         {
             icon: 'mdi-chart-arc',
             to: routes.reports(currentUser),
-            label: t('dashboards'),
+            label: t('reports'),
         },
 
         {

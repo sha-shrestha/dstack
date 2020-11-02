@@ -4927,8 +4927,8 @@ var Jobs = function Jobs(_ref) {
 var css$N = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
 
 var Item$1 = function Item(_ref) {
-  var dashboard = _ref.dashboard,
-      deleteDashboard = _ref.deleteDashboard,
+  var data = _ref.data,
+      deleteItem = _ref.deleteItem,
       user = _ref.user,
       renderContent = _ref.renderContent;
 
@@ -4936,19 +4936,19 @@ var Item$1 = function Item(_ref) {
       t = _useTranslation.t;
 
   var ref = useRef(null);
-  var hasStacks = dashboard.cards && Boolean(dashboard.cards.length);
-  var card = dashboard.cards.find(function (c) {
+  var hasStacks = data.cards && Boolean(data.cards.length);
+  var card = data.cards.find(function (c) {
     return get(c, 'head.id');
   });
-  var isShowDropdown = Boolean(deleteDashboard);
+  var isShowDropdown = Boolean(deleteItem);
   return /*#__PURE__*/React__default.createElement(Link, {
-    to: "/" + user + "/d/" + dashboard.id,
+    to: "/" + user + "/d/" + data.id,
     className: css$N.item,
     ref: ref
-  }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
+  }, Boolean(data.cards.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$N.label
   }, t('stacksWithCount', {
-    count: dashboard.cards.length
+    count: data.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
     className: css$N.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
@@ -4966,15 +4966,15 @@ var Item$1 = function Item(_ref) {
     className: css$N.content
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$N.name
-  }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
-  })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
+  }, data.title, ' ', /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+  })), user !== data.user && /*#__PURE__*/React__default.createElement("div", {
     className: css$N.by
-  }, t('by'), " ", dashboard.user), renderContent && renderContent(dashboard)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
+  }, t('by'), " ", data.user), renderContent && renderContent(data)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
     className: css$N.dropdown,
     items: [{
       title: t('delete'),
-      onClick: deleteDashboard
+      onClick: deleteItem
     }]
   })));
 };
@@ -5253,7 +5253,7 @@ var List$2 = function List(_ref) {
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
     className: css$P.title
-  }, currentUserName === user ? t('myDashboards') : t('dashboardsOf', {
+  }, currentUserName === user ? t('myReports') : t('reportsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
@@ -5273,12 +5273,12 @@ var List$2 = function List(_ref) {
     className: css$P.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
-  }), t('newDashboard'))), items.map(function (item, index) {
+  }), t('newReport'))), items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item$1, {
       key: index,
       user: user,
-      dashboard: item,
-      deleteDashboard: currentUserName === item.user && getDeleteFunc(item.id)
+      data: item,
+      deleteItem: currentUserName === item.user && getDeleteFunc(item.id)
     });
   })));
 };
@@ -6026,10 +6026,17 @@ var Details$2 = function Details(_ref) {
     return function (fields) {
       try {
         return Promise.resolve(reportUpdateCard(user, id, stack, fields)).then(function (_ref4) {
-          var cards = _ref4.cards;
-          mutate(_extends({}, data, {
-            cards: cards
-          }), false);
+          var newCards = _ref4.cards;
+          var updatedCard = newCards.find(function (i) {
+            return i.stack === stack;
+          });
+          var index = data.cards.findIndex(function (i) {
+            return i.stack === stack;
+          });
+          if (index >= 0) Object.keys(fields).forEach(function (key) {
+            data.cards[index][key] = updatedCard[key];
+          });
+          mutate(_extends({}, data), false);
         });
       } catch (e) {
         return Promise.reject(e);

@@ -5,32 +5,31 @@ import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Dropdown from '../../Dropdown';
 import StackAttachment from '../../stack/Attachment';
-import type {Dashboard} from '../types';
 import css from './styles.module.css';
 
 type Props = {
-    dashboard: Dashboard,
-    deleteDashboard?: Function,
+    data: {},
+    delete?: Function,
     renderContent?: Function,
 }
 
-const Item = ({dashboard, deleteDashboard, user, renderContent}: Props) => {
+const Item = ({data, deleteItem, user, renderContent}: Props) => {
     const {t} = useTranslation();
     const ref = useRef(null);
 
-    const hasStacks = dashboard.cards && Boolean(dashboard.cards.length);
-    const card = dashboard.cards.find(c => get(c, 'head.id'));
-    const isShowDropdown = Boolean(deleteDashboard);
+    const hasStacks = data.cards && Boolean(data.cards.length);
+    const card = data.cards.find(c => get(c, 'head.id'));
+    const isShowDropdown = Boolean(deleteItem);
 
     return (
         <Link
-            to={`/${user}/d/${dashboard.id}`}
+            to={`/${user}/d/${data.id}`}
             className={css.item}
             ref={ref}
         >
-            {Boolean(dashboard.cards.length) && (
+            {Boolean(data.cards.length) && (
                 <div className={css.label}>
-                    {t('stacksWithCount', {count: dashboard.cards.length})}
+                    {t('stacksWithCount', {count: data.cards.length})}
                 </div>
             )}
 
@@ -52,16 +51,16 @@ const Item = ({dashboard, deleteDashboard, user, renderContent}: Props) => {
             <div className={css.section}>
                 <div className={css.content}>
                     <div className={css.name}>
-                        {dashboard.title}
+                        {data.title}
                         {' '}
-                        <span className={`mdi mdi-lock${dashboard.private ? '' : '-open'}`} />
+                        <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                     </div>
 
-                    {user !== dashboard.user && (
-                        <div className={css.by}>{t('by')} {dashboard.user}</div>
+                    {user !== data.user && (
+                        <div className={css.by}>{t('by')} {data.user}</div>
                     )}
 
-                    {renderContent && renderContent(dashboard)}
+                    {renderContent && renderContent(data)}
                 </div>
 
                 {isShowDropdown && <Dropdown
@@ -70,7 +69,7 @@ const Item = ({dashboard, deleteDashboard, user, renderContent}: Props) => {
                     items={[
                         {
                             title: t('delete'),
-                            onClick: deleteDashboard,
+                            onClick: deleteItem,
                         },
                     ]}
                 />}

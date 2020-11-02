@@ -95,8 +95,8 @@ const List = ({}) => {
 
             <div className={css.title}>
                 {currentUserName === user
-                    ? t('myDashboards')
-                    : t('dashboardsOf', {name: user})
+                    ? t('myReports')
+                    : t('reportsOf', {name: user})
                 }
 
                 {data && Boolean(data.length) && <span>{data.length}</span>}
@@ -119,7 +119,7 @@ const List = ({}) => {
                     >
                         <div className={css.caption}>
                             <span className="mdi mdi-plus" />
-                            {t('newDashboard')}
+                            {t('newReport')}
                         </div>
                     </div>
                 )}
@@ -128,8 +128,8 @@ const List = ({}) => {
                     <ListItem
                         key={index}
                         user={user}
-                        dashboard={item}
-                        deleteDashboard={currentUserName === item.user && getDeleteFunc(item.id)}
+                        data={item}
+                        deleteItem={currentUserName === item.user && getDeleteFunc(item.id)}
                     />
                 ))}
             </div>

@@ -4168,20 +4168,20 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 ._1-hdZ {
 
 }
-._282UU {
-    display: flex;
-    align-items: flex-start;
-}
 @media (max-width: 980px) {
-._282UU {
+._1-hdZ + ._282UU {
         margin-top: 20px
 }
     }
 @media (min-width: 981px) {
-._282UU {
+._1-hdZ + ._282UU {
         margin-top: 24px
 }
     }
+._282UU {
+    display: flex;
+    align-items: flex-start;
+}
 ._3IGZo {
     margin-top: 16px;
 }

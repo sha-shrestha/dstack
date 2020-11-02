@@ -173,17 +173,23 @@ const Details = ({renderHeader, renderSideHeader}) => {
     };
 
     const getUpdatedCardFunc = stack => async fields => {
-        const {cards} = await reportUpdateCard(
+        const {cards: newCards} = await reportUpdateCard(
             user,
             id,
             stack,
             fields
         );
 
-        mutate({
-            ...data,
-            cards,
-        }, false);
+        const updatedCard = newCards.find(i => i.stack === stack);
+
+        const index = data.cards.findIndex(i => i.stack === stack);
+
+        if (index >= 0)
+            Object.keys(fields).forEach(key => {
+                data.cards[index][key] = updatedCard[key];
+            });
+
+        mutate({...data}, false);
     };
 
     const moveCard = (indexFrom, indexTo) => {

@@ -162,15 +162,17 @@
 .filters {
 
 }
-.attachment-head {
-    display: flex;
-    align-items: flex-start;
+.filters + .attachment-head {
     @media (--mobile) {
         margin-top: 20px;
     }
     @media (--desktop) {
         margin-top: 24px;
     }
+}
+.attachment-head {
+    display: flex;
+    align-items: flex-start;
 }
 .attachment {
     margin-top: 16px;
