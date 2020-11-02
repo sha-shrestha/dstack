@@ -1,6 +1,6 @@
 import React__default, { createContext, useReducer, useContext, forwardRef, useState, useRef, useEffect, useImperativeHandle, useMemo, memo, useCallback, Fragment, Component } from 'react';
 import axios from 'axios';
-import { get, isEqual, isString, debounce, unionBy } from 'lodash-es';
+import { get, uniq, isEqual, isString, debounce } from 'lodash-es';
 import cx from 'classnames';
 import Highlight from 'react-highlight.js';
 import { useTranslation } from 'react-i18next';
@@ -15,17 +15,17 @@ import Select, { Option, OptGroup } from 'rc-select';
 import Slider from 'rc-slider';
 import Plot from 'react-plotly.js';
 import { parse } from 'csv-string';
-import { Link, Switch, Route } from 'react-router-dom';
+import { Link, useParams, useHistory, Switch, Route } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { useDrag, useDrop } from 'react-dnd';
-export { DndProvider } from 'react-dnd';
-import { useParams, useHistory } from 'react-router';
 import useSWR from 'swr';
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-r';
 import 'prismjs/themes/prism.css';
+import { usePrevious as usePrevious$1 } from 'react-use';
+import { useDrag, useDrop } from 'react-dnd';
+export { DndProvider } from 'react-dnd';
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -613,6 +613,8 @@ var parseStackParams = (function (attachments, tab) {
     });
   });
   Object.keys(fields).forEach(function (key) {
+    fields[key].options = uniq(fields[key].options);
+
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
       fields[key].options = fields[key].options.filter(function (a, b) {
@@ -647,7 +649,7 @@ var parseStackParams = (function (attachments, tab) {
 
 var parseStackTabs = (function (attachments) {
   var tabs = [];
-  if (!attachments || !attachments.length) return;
+  if (!attachments || !attachments.length) return [];
   attachments.forEach(function (i) {
     Object.keys(i.params).forEach(function (key) {
       if (i.params[key] instanceof Object && i.params[key].type === 'tab') {
@@ -1431,7 +1433,44 @@ var StretchTitleField = function StretchTitleField(_ref) {
   }, value && value.length ? value : placeholder));
 };
 
-var css$k = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
+var css$k = {"fieldWrap":"_vED3t","field":"_1XqN9","hidden":"_38Nis"};
+
+var StretchTextAreaField = forwardRef(function (_ref, ref) {
+  var propValue = _ref.value,
+      _ref$placeholder = _ref.placeholder,
+      placeholder = _ref$placeholder === void 0 ? '' : _ref$placeholder,
+      className = _ref.className,
+      onChangeProp = _ref.onChange,
+      props = _objectWithoutPropertiesLoose(_ref, ["value", "placeholder", "className", "onChange"]);
+
+  var _useState = useState(propValue),
+      value = _useState[0],
+      set = _useState[1];
+
+  var onChange = function onChange(event) {
+    if (onChangeProp) onChangeProp(event.target.value);
+    set(event.target.value);
+  };
+
+  useEffect(function () {
+    set(propValue);
+  }, [propValue]);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$k.fieldWrap
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$k.field, className)
+  }, /*#__PURE__*/React__default.createElement("textarea", _extends({
+    rows: 1,
+    placeholder: placeholder,
+    value: value,
+    onChange: onChange,
+    ref: ref
+  }, props)), /*#__PURE__*/React__default.createElement("div", {
+    className: css$k.hidden
+  }, value && value.length ? value : placeholder, '\n')));
+});
+
+var css$l = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
 
 var Tabs = function Tabs(_ref) {
   var className = _ref.className,
@@ -1443,23 +1482,23 @@ var Tabs = function Tabs(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$k.tabs, className)
+    className: cx(css$l.tabs, className)
   }, tabs.map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: cx(css$k.tab, {
+      className: cx(css$l.tab, {
         active: value === i.value
       }),
       onClick: function onClick() {
         return onChange(i.value);
       }
     }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
-      className: css$k.soon
+      className: css$l.soon
     }, t('soon')));
   }));
 };
 
-var css$l = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
+var css$m = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
 
 var TextAreaField = function TextAreaField(_ref) {
   var label = _ref.label,
@@ -1472,23 +1511,23 @@ var TextAreaField = function TextAreaField(_ref) {
 
   var hasErrors = Boolean(errors.length);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$l.field, className, size, {
+    className: cx(css$m.field, className, size, {
       disabled: props.disabled
     })
   }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
-    className: css$l.label
+    className: css$m.label
   }, label), /*#__PURE__*/React__default.createElement("div", {
-    className: css$l.textarea
+    className: css$m.textarea
   }, /*#__PURE__*/React__default.createElement("textarea", _extends({
     className: cx({
       error: hasErrors
     })
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
-    className: css$l.error
+    className: css$m.error
   }, errors.join(', '))));
 };
 
-var css$m = {"tooltip":"_rE8Jn"};
+var css$n = {"tooltip":"_rE8Jn"};
 
 var Tooltip = function Tooltip(_ref) {
   var children = _ref.children,
@@ -1511,12 +1550,12 @@ var Tooltip = function Tooltip(_ref) {
     placement: placement,
     trigger: trigger,
     overlay: /*#__PURE__*/React__default.createElement("div", {
-      className: css$m.tooltip
+      className: css$n.tooltip
     }, overlayContent)
   }, props), children);
 };
 
-var css$n = {"switcher":"_3NMzC"};
+var css$o = {"switcher":"_3NMzC"};
 
 var ViewSwitcher = function ViewSwitcher(_ref) {
   var _ref$value = _ref.value,
@@ -1539,7 +1578,7 @@ var ViewSwitcher = function ViewSwitcher(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$n.switcher, stateValue, className),
+    className: cx(css$o.switcher, stateValue, className),
     onClick: toggleValue
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-view-grid"
@@ -1568,14 +1607,14 @@ var Yield = function Yield(_ref) {
   });
 };
 
-var css$o = {"table":"_2TzH3"};
+var css$p = {"table":"_2TzH3"};
 
 var Table = function Table(_ref) {
   var data = _ref.data;
   var captions = data[0],
       rows = data.slice(1);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$o.table
+    className: css$p.table
   }, /*#__PURE__*/React__default.createElement("table", null, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, captions.map(function (caption) {
     return /*#__PURE__*/React__default.createElement("th", {
       key: caption
@@ -1606,7 +1645,7 @@ var base64ToJSON = function base64ToJSON(base64) {
   return parsedJSON;
 };
 
-var css$p = {"view":"_1T-AH","text":"_6S5f-","message":"_1p-0w"};
+var css$q = {"view":"_1T-AH","text":"_6S5f-","message":"_1p-0w"};
 
 var base64ImagePrefixes = {
   'image/svg+xml': 'data:image/svg+xml;charset=utf-8;',
@@ -1714,7 +1753,7 @@ var View = function View(_ref) {
     }
 
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.text
+      className: css$q.text
     }, t('notSupportedAttachment'));
   };
 
@@ -1745,13 +1784,13 @@ var View = function View(_ref) {
   var renderAttachment = function renderAttachment() {
     if (noRender) return null;
     if (requestStatus === 404 && isList) return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.message
+      className: css$q.message
     }, t('notFound'));
     if (requestStatus === 404 && !isList) return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.text
+      className: css$q.text
     }, t('noPreview'));
     if (attachment.preview && isList && isImageType(attachment['content_type'])) return /*#__PURE__*/React__default.createElement("div", {
-      className: css$p.message
+      className: css$q.message
     }, t('noPreview'));
 
     switch (true) {
@@ -1775,14 +1814,14 @@ var View = function View(_ref) {
 
       default:
         return /*#__PURE__*/React__default.createElement("div", {
-          className: isList ? css$p.message : css$p.text
+          className: isList ? css$q.message : css$q.text
         }, t('notSupportedAttachment'));
     }
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
     ref: viewRef,
-    className: cx(css$p.view, className, {
+    className: cx(css$q.view, className, {
       'table': attachment && attachment.data && attachment['content_type'] === 'text/csv',
       'bokeh': attachment && attachment.data && attachment['application'] === 'bokeh'
     }),
@@ -1956,7 +1995,7 @@ var actions = (function () {
   };
 });
 
-var css$q = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD"};
+var css$r = {"attachment":"_3NILI","loading-pulse":"_IhCO3","view":"_3UWqG","text":"_MOcaD"};
 
 var Attachment = function Attachment(_ref) {
   var id = _ref.id,
@@ -2034,13 +2073,13 @@ var Attachment = function Attachment(_ref) {
 
   return /*#__PURE__*/React__default.createElement("div", {
     ref: ref,
-    className: cx(css$q.attachment, className, {
+    className: cx(css$r.attachment, className, {
       'is-list': isList,
       loading: loading && withLoader || loadingFullAttachment
     })
   }, !loading && /*#__PURE__*/React__default.createElement(View$1, {
     requestStatus: requestStatus,
-    className: css$q.view,
+    className: css$r.view,
     isList: isList,
     fullAttachment: fullAttachment,
     attachment: attachment
@@ -2049,7 +2088,7 @@ var Attachment = function Attachment(_ref) {
 
 var chartIcon = "chart~FgFRCRzg.svg";
 
-var css$r = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","date":"_2c9og"};
+var css$s = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","date":"_2c9og"};
 
 var Item = function Item(_ref) {
   var className = _ref.className,
@@ -2072,25 +2111,25 @@ var Item = function Item(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Component, _extends({
-    className: cx(css$r.item, className),
+    className: cx(css$s.item, className),
     ref: ref
   }, rest), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.icon
+    className: css$s.icon
   }, /*#__PURE__*/React__default.createElement("img", {
     src: chartIcon,
     alt: ""
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.top
+    className: css$s.top
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.name
+    className: css$s.name
   }, data.name), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   }), renderContent && /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.additional
+    className: css$s.additional
   }, renderContent(data))), data.head && /*#__PURE__*/React__default.createElement("div", {
-    className: css$r.date
+    className: css$s.date
   }, t('updated'), " ", moment(data.head.timestamp).format('L')), deleteAction && /*#__PURE__*/React__default.createElement("span", {
-    className: css$r["delete"],
+    className: css$s["delete"],
     onClick: onClickDelete
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-close"
@@ -2127,24 +2166,6 @@ var routes = {
     }
 
     return "/" + user + "/" + id + (id === ':stack' ? '+' : '');
-  },
-  dashboards: function dashboards(user) {
-    if (user === void 0) {
-      user = ':user';
-    }
-
-    return "/" + user + "/old-d";
-  },
-  dashboardsDetails: function dashboardsDetails(user, id) {
-    if (user === void 0) {
-      user = ':user';
-    }
-
-    if (id === void 0) {
-      id = ':id';
-    }
-
-    return "/" + user + "/old-d/" + id;
   },
   reports: function reports(user) {
     if (user === void 0) {
@@ -2209,7 +2230,7 @@ var useListViewSwitcher = (function (id, defaultValue) {
   return [value, onChange];
 });
 
-var css$s = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$t = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -2312,17 +2333,17 @@ var List = function List(_ref) {
 
   var items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.list
+    className: css$t.list
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.header
+    className: css$t.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.title
+    className: css$t.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
   })), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.headerSide
+    className: css$t.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$s.search,
+    className: css$t.search,
     showEverything: true,
     isDark: true,
     placeholder: t('findStack'),
@@ -2332,33 +2353,33 @@ var List = function List(_ref) {
   }), renderUploadStack && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$s.uploadButton,
+    className: css$t.uploadButton,
     onClick: showUploadStackModal,
     color: "primary",
     variant: "contained",
     size: "small"
   }, t('uploadData'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.controls
+    className: css$t.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$s.viewSwitcher,
+    className: css$t.viewSwitcher,
     value: view,
     onChange: setView
   }), false ), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$s.itemList, view)
+    className: cx(css$t.itemList, view)
   }, new Array(view === 'grid' ? 12 : 8).fill({}).map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: css$s.loadingItem
+      className: css$t.loadingItem
     });
   })), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.message
+    className: css$t.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
   })), !loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack(), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$s.itemList, view)
+    className: cx(css$t.itemList, view)
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
-      className: css$s.item,
+      className: css$t.item,
       Component: Link,
       key: index,
       data: item,
@@ -2367,55 +2388,55 @@ var List = function List(_ref) {
       renderContent: renderItemContent
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.text
+    className: css$t.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
     title: t('deleteStack'),
-    className: css$s.modal
+    className: css$t.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('areYouSureYouWantToDelete', {
     name: deletingStack
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.buttons
+    className: css$t.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideDeleteConfirmation,
-    className: css$s.button
+    className: css$t.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: deleteItem,
-    className: css$s.button
+    className: css$t.button
   }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
     title: t('welcomeToDStack') + "\uD83D\uDC4B",
-    className: css$s.modal
+    className: css$t.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.description
+    className: css$t.description
   }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.buttons
+    className: css$t.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideWelcomeModal,
-    className: css$s.button
+    className: css$t.button
   }, t('getStarted')))), renderUploadStack && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowUploadStackModal,
     withCloseButton: true,
     onClose: hideUploadStackModal,
     size: "big",
     title: t('howToConnectYourDataWithDStack'),
-    className: css$s.modal
+    className: css$t.modal
   }, renderUploadStack()));
 };
 
-var css$t = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
+var css$u = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
 
 var pullPythonCode = function pullPythonCode(data) {
   var a = ["'/" + data.stack + "'"];
@@ -2462,11 +2483,11 @@ var HowTo = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.howto
+    className: css$u.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.title
+    className: css$u.title
   }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$t.tabs,
+    className: css$u.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
@@ -2477,9 +2498,9 @@ var HowTo = function HowTo(_ref) {
       value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$t.tabs,
+    className: css$u.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -2490,38 +2511,38 @@ var HowTo = function HowTo(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "python"
   }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "r"
   }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "r"
   }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$t.code,
+    className: css$u.code,
     language: "r"
   }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.footer,
+    className: css$u.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
         href: config.DOCS_URL
@@ -2549,7 +2570,7 @@ var useOnClickOutside = (function (ref, handler) {
   }, [ref, handler]);
 });
 
-var css$u = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+var css$v = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
 
 var getFrameName = function getFrameName(frame) {
   return moment(frame.timestamp).format('D MMM YYYY h:mm a');
@@ -2616,22 +2637,22 @@ var Frames = function Frames(_ref) {
   }
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$u.frames, className),
+    className: cx(css$v.frames, className),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$u['frames-dropdown']),
+    className: cx(css$v['frames-dropdown']),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.button,
+    className: css$v.button,
     onClick: toggleDropdown
   }, /*#__PURE__*/React__default.createElement("span", {
-    className: css$u.name
+    className: css$v.name
   }, getFrameName(activeFrame)), headId === activeFrame.id && /*#__PURE__*/React__default.createElement("span", {
-    className: css$u.label
+    className: css$v.label
   }, t('head')), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$u.dropdown, {
+    className: cx(css$v.dropdown, {
       show: isShowDropdown
     })
   }, frames.map(function (f) {
@@ -2645,19 +2666,19 @@ var Frames = function Frames(_ref) {
       onClick: onClickItem(f.id),
       overlayContent: f.description
     }, /*#__PURE__*/React__default.createElement("div", {
-      className: css$u.item
+      className: css$v.item
     }, /*#__PURE__*/React__default.createElement("span", {
-      className: css$u.name
+      className: css$v.name
     }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
-      className: css$u.label
+      className: css$v.label
     }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
-      className: css$u.mark,
+      className: css$v.mark,
       onClick: onClickMarkAsHead(f)
     }, t('markAsHead'))));
   }))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: activeFrame.description
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$u.info)
+    className: cx(css$v.info)
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-variant"
   }))), /*#__PURE__*/React__default.createElement(Modal, {
@@ -2665,45 +2686,45 @@ var Frames = function Frames(_ref) {
     onClose: hideConfirmation,
     size: "confirmation",
     title: t('changeHeadRevision'),
-    className: css$u.modal
+    className: css$v.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('areYouSureYouWantToChangeTheCurrentHeadRevisionToByName', {
     frame: frameForMarkingAsHead && getFrameName(frameForMarkingAsHead)
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.buttons
+    className: css$v.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: confirmMarkFrameAsHead,
-    className: css$u.button
+    className: css$v.button
   }, t('yesChangeHead')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: hideConfirmation,
-    className: css$u.button
+    className: css$v.button
   }, t('cancel')))));
 };
 
-var css$v = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+var css$w = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
 
 var Loader$1 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.loader
+    className: css$w.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.title
+    className: css$w.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.label
+    className: css$w.label
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
+    className: css$w.description
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.diagram
+    className: css$w.diagram
   }));
 };
 
-var css$w = {"tabs":"_gaP0O","tab":"_vQ7S6"};
+var css$x = {"tabs":"_gaP0O","tab":"_vQ7S6"};
 
 var Tabs$1 = function Tabs(_ref) {
   var className = _ref.className,
@@ -2711,11 +2732,11 @@ var Tabs$1 = function Tabs(_ref) {
       items = _ref.items,
       onChange = _ref.onChange;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$w.tabs, className)
+    className: cx(css$x.tabs, className)
   }, items.map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: cx(css$w.tab, {
+      className: cx(css$x.tab, {
         active: value === i.value
       }),
       onClick: function onClick() {
@@ -2828,7 +2849,7 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 });
 
-var css$x = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","sideHeader":"_1FUDu","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","filters":"_1-hdZ","attachment-head":"_282UU","attachment":"_3IGZo","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$y = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","sideHeader":"_1FUDu","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","filters":"_1-hdZ","attachment-head":"_282UU","attachment":"_3IGZo","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
 
 var Details = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
@@ -3003,7 +3024,7 @@ var Details = function Details(_ref) {
   var attachment = get(frame, "attachments[" + attachmentIndex + "]");
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$x.details, {
+    className: cx(css$y.details, {
       'with-sidebar': Boolean(renderSidebar)
     })
   }, /*#__PURE__*/React__default.createElement(Yield, {
@@ -3014,21 +3035,21 @@ var Details = function Details(_ref) {
   }, currentUser === user ? t('backToMyStacks') : t('backToStacksOF', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.header
+    className: css$y.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.title
+    className: css$y.title
   }, data.name, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.sideHeader
+    className: css$y.sideHeader
   }, renderSideHeader && renderSideHeader(), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$x.dropdown,
+    className: css$y.dropdown,
     items: [{
       title: t('upload'),
       onClick: toggleUpload
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$x['dropdown-button'],
+    className: css$y['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
@@ -3038,31 +3059,31 @@ var Details = function Details(_ref) {
     headId: headId,
     onMarkAsHead: onChangeHeadFrame,
     onChange: onChangeFrame,
-    className: css$x.revisions
+    className: css$y.revisions
   }), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$x.tabs,
+    className: css$y.tabs,
     onChange: onChangeTab,
     value: activeTab,
     items: tabs
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.container
+    className: css$y.container
   }, /*#__PURE__*/React__default.createElement(StackFilters, {
     fields: fields,
     form: form,
     onChange: onChange,
-    className: cx(css$x.filters)
+    className: cx(css$y.filters)
   }), attachment && /*#__PURE__*/React__default.createElement("div", {
-    className: css$x['attachment-head']
+    className: css$y['attachment-head']
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.description
+    className: css$y.description
   }, attachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
     source: attachment.description
   })), attachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.actions
+    className: css$y.actions
   }, attachment.preview && /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.label
+    className: css$y.label
   }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x['label-tooltip']
+    className: css$y['label-tooltip']
   }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
     href: "#",
     onClick: showHowToModal
@@ -3070,9 +3091,9 @@ var Details = function Details(_ref) {
     href: "#",
     onClick: onClickDownloadAttachment
   }, t('download')), attachment.length && /*#__PURE__*/React__default.createElement("span", {
-    className: css$x.size
+    className: css$y.size
   }, "(", formatBytes(attachment.length), ")"))), frame && /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$x.attachment,
+    className: css$y.attachment,
     withLoader: true,
     stack: user + "/" + stack,
     frameId: frame.id,
@@ -3083,7 +3104,7 @@ var Details = function Details(_ref) {
     onClose: hideHowToModal,
     size: "big",
     title: t('howToFetchDataUsingTheAPI'),
-    className: css$x.modal
+    className: css$y.modal
   }, /*#__PURE__*/React__default.createElement(HowTo, {
     configurePythonCommand: configurePythonCommand,
     configureRCommand: configureRCommand,
@@ -3101,7 +3122,7 @@ var useDebounce = (function (callback, depsOrDelay, deps) {
   return useCallback(debounce(callback, delay), deps);
 });
 
-var css$y = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
+var css$z = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
 
 var MB = 1048576;
 
@@ -3249,7 +3270,7 @@ var Upload = function Upload(_ref) {
   return /*#__PURE__*/React__default.createElement(Fragment, null, withButton && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$y.upload, className),
+    className: cx(css$z.upload, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -3258,12 +3279,12 @@ var Upload = function Upload(_ref) {
     isShow: isShowModal,
     size: "small"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.content
+    className: css$z.content
   }, !stack && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.subtitle
+    className: css$z.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewStack')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$y.field,
+    className: css$z.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -3273,31 +3294,31 @@ var Upload = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.subtitle
+    className: css$z.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
-    className: css$y.dragndrop,
+    className: css$z.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.buttons
+    className: css$z.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$y.button,
+    className: css$z.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: closeHandle,
-    className: css$y.button,
+    className: css$z.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel')))));
 };
 
-var css$z = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
+var css$A = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
 
 var MB$1 = 1048576;
 
@@ -3436,14 +3457,14 @@ var Upload$1 = function Upload(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$z.upload, className)
+    className: cx(css$A.upload, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.content
+    className: css$A.content
   }, !stack && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.subtitle
+    className: css$A.subtitle
   }, t('stackName')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$z.field,
+    className: css$A.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -3453,32 +3474,32 @@ var Upload$1 = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.subtitle
+    className: css$A.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
     ref: fileFieldRef,
-    className: css$z.dragndrop,
+    className: css$A.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.buttons
+    className: css$A.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$z.button,
+    className: css$A.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: clearForm,
-    className: css$z.button,
+    className: css$A.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel'))));
 };
 
-var css$A = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
+var css$B = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
 
 var UploadStack = function UploadStack(_ref) {
   var user = _ref.user,
@@ -3511,16 +3532,16 @@ var UploadStack = function UploadStack(_ref) {
     value: 3
   });
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.howto
+    className: css$B.howto
   }, /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$A.tabs,
+    className: css$B.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: tabs
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.description
+    className: css$B.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$A.tabs,
+    className: css$B.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -3531,863 +3552,48 @@ var UploadStack = function UploadStack(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.description
+    className: css$B.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.description
+    className: css$B.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "python"
   }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.description
+    className: css$B.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "r"
   }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.description
+    className: css$B.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "r"
   }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.description
+    className: css$B.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$A.code,
+    className: css$B.code,
     language: "r"
   }, reportPlotRCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {
     user: user,
     refresh: refresh,
     apiUrl: apiUrl
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.footer,
+    className: css$B.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks', {
         href: config.DOCS_URL
       })
     }
   }));
-};
-
-function move(array, oldIndex, newIndex) {
-  if (newIndex >= array.length) {
-    newIndex = array.length - 1;
-  }
-
-  array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
-  return array;
-}
-
-function moveElement(array, index, offset) {
-  var newIndex = index + offset;
-  return move(array, index, newIndex);
-}
-
-var GridContext = createContext({
-  items: []
-});
-var GridProvider = /*#__PURE__*/function (_Component) {
-  _inheritsLoose(GridProvider, _Component);
-
-  function GridProvider(props) {
-    var _this;
-
-    _this = _Component.call(this, props) || this;
-
-    _this.setItems = function (items) {
-      return _this.setState({
-        items: items
-      });
-    };
-
-    _this.moveItem = function (sourceId, destinationId) {
-      var sourceIndex = _this.state.items.findIndex(function (item) {
-        return item.id === sourceId;
-      });
-
-      var destinationIndex = _this.state.items.findIndex(function (item) {
-        return item.id === destinationId;
-      });
-
-      if (sourceId === -1 || destinationId === -1) {
-        return;
-      }
-
-      var offset = destinationIndex - sourceIndex;
-
-      _this.setState(function (state) {
-        return {
-          items: moveElement(state.items, sourceIndex, offset)
-        };
-      });
-    };
-
-    _this.state = {
-      items: [],
-      moveItem: _this.moveItem,
-      setItems: _this.setItems
-    };
-    return _this;
-  }
-
-  var _proto = GridProvider.prototype;
-
-  _proto.render = function render() {
-    return /*#__PURE__*/React__default.createElement(GridContext.Provider, {
-      value: this.state
-    }, this.props.children);
-  };
-
-  return GridProvider;
-}(Component);
-
-var DnDItem = memo(function (_ref) {
-  var id = _ref.id,
-      onMoveItem = _ref.onMoveItem,
-      children = _ref.children;
-  var ref = useRef(null);
-
-  var _useDrag = useDrag({
-    item: {
-      id: id,
-      type: 'IMG'
-    },
-    collect: function collect(monitor) {
-      return {
-        isDragging: monitor.isDragging()
-      };
-    }
-  }),
-      connectDrag = _useDrag[1];
-
-  var _useDrop = useDrop({
-    accept: 'IMG',
-    drop: function drop(hoveredOverItem) {
-      if (hoveredOverItem.id !== id) {
-        onMoveItem(hoveredOverItem.id, id);
-      }
-    }
-  }),
-      connectDrop = _useDrop[1];
-
-  connectDrag(ref);
-  connectDrop(ref);
-  return React__default.Children.map(children, function (child) {
-    return React__default.cloneElement(child, {
-      forwardedRef: ref
-    });
-  });
-});
-
-var css$B = {"loader":"_2RpBO","text":"_3gk1Z","dashboards-details-pulse":"_3HZ82","filters":"_3ZZJL","grid":"_ZafPr","item":"_LIYeR"};
-
-var Loader$2 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.loader
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.text
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.filters
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.grid
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.item
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.item
-  })));
-};
-
-var css$C = {"card":"_17jo7","inner":"_YLuSm","head":"_2dKop","name":"_1blF_","nameEdit":"_3omHN","nameValue":"_wx2sM","info":"_1Tbhc","dropdown":"_1NvWp","button":"_d6fLT","move":"_312qk","link":"_NfDp4","infoTime":"_2QMrW","emptyMessage":"_7aBhX","attachment":"_2ajkc"};
-
-var Card = memo(function (_ref) {
-  var data = _ref.data,
-      className = _ref.className,
-      _ref$type = _ref.type,
-      type = _ref$type === void 0 ? 'grid' : _ref$type,
-      deleteCard = _ref.deleteCard,
-      updateCardTitle = _ref.updateCardTitle,
-      filters = _ref.filters,
-      forwardedRef = _ref.forwardedRef,
-      moveAvailable = _ref.moveAvailable;
-
-  var _useState = useState(data.title),
-      title = _useState[0],
-      setTitle = _useState[1];
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var headId = get(data, 'head.id');
-  var stackOwner = data.stack.split('/')[0];
-
-  var _useState2 = useState(0),
-      attachmentIndex = _useState2[0],
-      setAttachmentIndex = _useState2[1];
-
-  var _useState3 = useState([]),
-      cardParams = _useState3[0],
-      setCardParams = _useState3[1];
-
-  useEffect(function () {
-    var params = parseStackParams(get(data, 'head.attachments', []));
-    if (params) setCardParams(Object.keys(params));
-  }, [data]);
-  useEffect(function () {
-    findAttach();
-  }, [filters]);
-
-  var findAttach = function findAttach() {
-    var attachments = get(data, 'head.attachments');
-    var fields = Object.keys(filters).filter(function (f) {
-      return cardParams.indexOf(f) >= 0;
-    });
-    if (!attachments) return;
-
-    if (fields.length) {
-      attachments.some(function (attach, index) {
-        var valid = true;
-        fields.forEach(function (key) {
-          if (!attach.params || !isEqual(attach.params[key], filters[key])) valid = false;
-        });
-        if (valid) setAttachmentIndex(index);
-        return valid;
-      });
-    } else setAttachmentIndex(0);
-  };
-
-  var onUpdate = updateCardTitle ? useDebounce(updateCardTitle, []) : function () {};
-
-  var onChangeTitle = function onChangeTitle(event) {
-    setTitle(event.target.value);
-    onUpdate(event.target.value);
-  };
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$C.card, "type-" + type, className),
-    ref: forwardedRef
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.inner
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.head
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$C.name, {
-      readonly: !updateCardTitle
-    })
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.nameValue
-  }, title.length ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
-    value: title,
-    type: "text",
-    placeholder: t('title'),
-    onChange: onChangeTitle,
-    className: cx(css$C.nameEdit, {
-      active: !title.length
-    })
-  })), /*#__PURE__*/React__default.createElement(Tooltip, {
-    overlayContent: /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
-      name: stackOwner
-    })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$C.infoTime
-    }, moment(data.head.timestamp).format('D MMM YYYY')))
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.info
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-information-outline"
-  }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$C.button, css$C.link),
-    color: "secondary",
-    Component: Link,
-    to: "/" + data.stack
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-open-in-new"
-  })), Boolean(deleteCard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$C.dropdown,
-    items: [].concat(deleteCard ? [{
-      title: t('delete'),
-      onClick: deleteCard
-    }] : [])
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$C.button,
-    color: "secondary"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-dots-horizontal"
-  }))), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$C.button, css$C.move),
-    color: "secondary"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-cursor-move"
-  }))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$C.attachment,
-    isList: true,
-    withLoader: true,
-    stack: data.stack,
-    frameId: headId,
-    id: attachmentIndex
-  }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.emptyMessage
-  }, t('emptyDashboard'))));
-});
-
-var css$D = {"details":"_2U9YD","header":"_2Lioj","title":"_353_b","edit":"_14H-Y","sideHeader":"_3zX4a","dropdown":"_1OYBD","section":"_3ZM3A","cards":"_2idlU","fields":"_3zxn3","filters":"_QjWiF","controls":"_9DqNJ","addButton":"_ezy69","viewSwitcher":"_2LheQ","empty":"_j9SPi"};
-
-var Details$1 = function Details(_ref) {
-  var addCards = _ref.addCards,
-      backUrl = _ref.backUrl,
-      cards = _ref.cards,
-      currentUser = _ref.currentUser,
-      data = _ref.data,
-      deleteCard = _ref.deleteCard,
-      deleteDashboard = _ref.deleteDashboard,
-      loading = _ref.loading,
-      _ref$onChangeTitle = _ref.onChangeTitle,
-      onChangeTitle = _ref$onChangeTitle === void 0 ? function () {} : _ref$onChangeTitle,
-      updateCard = _ref.updateCard,
-      user = _ref.user,
-      withSorting = _ref.withSorting,
-      renderHeader = _ref.renderHeader,
-      renderSideHeader = _ref.renderSideHeader;
-
-  var _useContext = useContext(GridContext),
-      items = _useContext.items,
-      moveItem = _useContext.moveItem,
-      setItems = _useContext.setItems;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var _useState = useState('grid'),
-      view = _useState[0],
-      setView = _useState[1];
-
-  var _useForm = useForm({}),
-      form = _useForm.form,
-      setForm = _useForm.setForm,
-      onChange = _useForm.onChange;
-
-  var _useState2 = useState({}),
-      fields = _useState2[0],
-      setFields = _useState2[1];
-
-  var prevData = usePrevious(data);
-  var isDidMount = useRef(true);
-  var onChangeTitleDebounce = useCallback(debounce(onChangeTitle, 300), []);
-
-  var setGridItems = function setGridItems(cardsItems) {
-    return setItems(cardsItems.map(function (card) {
-      return {
-        id: card.index,
-        card: card
-      };
-    }));
-  };
-
-  useEffect(function () {
-    if (window) window.dispatchEvent(new Event('resize'));
-  }, [view]);
-  useEffect(function () {
-    if (cards) setGridItems(cards);
-    return function () {
-      return setGridItems([]);
-    };
-  }, [cards]);
-  useEffect(function () {
-    if ((!isEqual(prevData, data) || isDidMount.current) && data) parseParams();
-    if (isDidMount.current) isDidMount.current = false;
-  }, [data]);
-
-  var moveCard = function moveCard(indexFrom, indexTo) {
-    if (indexTo < 0 || indexFrom < 0) return;
-    var stack = items[indexFrom].card.stack;
-    if (updateCard) updateCard({
-      stack: stack,
-      index: indexTo
-    });
-    moveItem(indexFrom, indexTo);
-  };
-
-  var getDeleteCardAction = function getDeleteCardAction(stack) {
-    if (deleteCard) {
-      return function () {
-        deleteCard(stack);
-      };
-    }
-  };
-
-  var getUpdateCardTitleAction = function getUpdateCardTitleAction(stack) {
-    if (updateCard) return function (title) {
-      updateCard({
-        stack: stack,
-        title: title
-      });
-    };
-  };
-
-  var parseParams = function parseParams() {
-    if (!cards) return;
-    var fields = cards.reduce(function (result, card) {
-      var cardFields = parseStackParams(get(card, 'head.attachments', [])) || {};
-      Object.keys(cardFields).forEach(function (fieldName) {
-        if (result[fieldName]) {
-          if (cardFields[fieldName].type === 'select') {
-            result[fieldName].options = unionBy(result[fieldName].options, cardFields[fieldName].options, 'value');
-          }
-
-          if (cardFields[fieldName].type === 'slider') {
-            result[fieldName].options = _extends({}, result[fieldName].options, cardFields[fieldName].options);
-            result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
-            result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
-          }
-        } else {
-          result[fieldName] = cardFields[fieldName];
-        }
-      });
-      return result;
-    }, {});
-    var defaultFilterValues = Object.keys(fields).reduce(function (result, fieldName) {
-      if (fields[fieldName].type === 'select') result[fieldName] = fields[fieldName].options[0].value;
-      if (fields[fieldName].type === 'slider') result[fieldName] = fields[fieldName].options[0];
-      if (fields[fieldName].type === 'checkbox') result[fieldName] = false;
-      return result;
-    }, {});
-    setForm(defaultFilterValues);
-    setFields(fields);
-  };
-
-  var renderFilters = function renderFilters() {
-    if (!Object.keys(fields).length) return null;
-    var hasSelectField = Object.keys(fields).some(function (key) {
-      return fields[key].type === 'select';
-    });
-    return /*#__PURE__*/React__default.createElement(StackFilters, {
-      fields: fields,
-      form: form,
-      onChange: onChange,
-      className: cx(css$D.filters, {
-        'with-select': hasSelectField
-      })
-    });
-  };
-
-  var getAddClickAction = function getAddClickAction() {
-    if (addCards) return function (event) {
-      event.preventDefault();
-      addCards();
-    };
-  };
-
-  if (loading) return /*#__PURE__*/React__default.createElement(Loader$2, null);
-  if (!data) return null;
-  var CardWrapComponent = withSorting ? DnDItem : Fragment;
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.details
-  }, /*#__PURE__*/React__default.createElement(Yield, {
-    name: "header-yield"
-  }, /*#__PURE__*/React__default.createElement(BackButton, {
-    Component: Link,
-    to: backUrl
-  }, currentUser === user ? t('backToDashboards') : t('backToDashboardsOf', {
-    name: user
-  }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.header
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.title
-  }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$D.edit,
-    value: data === null || data === void 0 ? void 0 : data.title,
-    onChange: onChangeTitleDebounce,
-    readOnly: currentUser !== data.user,
-    placeholder: t('newDashboard')
-  }), /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.sideHeader
-  }, renderSideHeader && renderSideHeader(), Boolean(deleteDashboard) && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$D.dropdown,
-    items: [].concat(Boolean(deleteDashboard) ? [{
-      title: t('delete'),
-      onClick: deleteDashboard
-    }] : [])
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$D['dropdown-button'],
-    color: "secondary"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-dots-horizontal"
-  }))))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.section
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.fields
-  }, renderFilters()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.controls
-  }, getAddClickAction() && /*#__PURE__*/React__default.createElement("a", {
-    className: css$D.addButton,
-    onClick: getAddClickAction(),
-    href: "#"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-plus"
-  }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    value: view,
-    className: css$D.viewSwitcher,
-    onChange: function onChange(view) {
-      return setView(view);
-    }
-  }))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$D.cards, view)
-  }, items.map(function (item) {
-    return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
-      key: item.card.stack
-    }, withSorting ? {
-      id: item.id,
-      onMoveItem: moveCard
-    } : {}), /*#__PURE__*/React__default.createElement(Card, {
-      filters: form,
-      deleteCard: getDeleteCardAction(item.card.stack),
-      data: item.card,
-      type: view,
-      updateCardTitle: getUpdateCardTitleAction(item.card.stack),
-      moveAvailable: withSorting
-    }));
-  }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.empty
-  }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), getAddClickAction() && /*#__PURE__*/React__default.createElement(Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$D.addButton,
-    onClick: getAddClickAction(),
-    href: "#"
-  }, t('addStack')), ".")));
-};
-
-var css$E = {"item":"_3urCL","preview":"_cxR4e","label":"_tCzQe","previewWrap":"_15fuU","emptyMessage":"_2pDKf","attachment":"_35KB8","section":"_LeHWu","content":"_Bgbe4","name":"_2PrtI","by":"_1_qsJ","permissions":"_3ZdE1","dropdown":"_vK4SD","preview-stack-pulse":"_3NFJT"};
-
-var Item$1 = function Item(_ref) {
-  var dashboard = _ref.dashboard,
-      deleteDashboard = _ref.deleteDashboard,
-      user = _ref.user,
-      renderContent = _ref.renderContent;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var ref = useRef(null);
-  var hasStacks = dashboard.cards && Boolean(dashboard.cards.length);
-  var card = dashboard.cards.find(function (c) {
-    return get(c, 'head.id');
-  });
-  var isShowDropdown = Boolean(deleteDashboard);
-  return /*#__PURE__*/React__default.createElement(Link, {
-    to: "/" + user + "/d/" + dashboard.id,
-    className: css$E.item,
-    ref: ref
-  }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.label
-  }, t('stacksWithCount', {
-    count: dashboard.cards.length
-  })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.previewWrap
-  }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$E.attachment,
-    isList: true,
-    withLoader: true,
-    frameId: card.head.id,
-    stack: card.stack,
-    id: 0
-  }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.emptyMessage
-  }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.section
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.content
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.name
-  }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
-  })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.by
-  }, t('by'), " ", dashboard.user), renderContent && renderContent(dashboard)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$E.dropdown,
-    items: [{
-      title: t('delete'),
-      onClick: deleteDashboard
-    }]
-  })));
-};
-
-var css$F = {"loader":"_PK0JP","text":"_1F-rx","dashboards-pulse":"_29IbF","grid":"_ef-jq","item":"_1HBd8","pic":"_1z0LR","section":"_14O5G"};
-
-var Loader$3 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.loader
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.text
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.grid
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.pic
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.section
-  })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.pic
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.section
-  }))));
-};
-
-var css$G = {"list":"_2tGd9","title":"_lNufF","search":"_3Vnt-","mobileSearch":"_28J_R","text":"_2QiEZ","grid":"_31LQw","add":"_1VMC5","caption":"_pTzl3"};
-
-var List$1 = function List(_ref) {
-  var addDashboard = _ref.addDashboard,
-      addDashboardDisable = _ref.addDashboardDisable,
-      currentUser = _ref.currentUser,
-      data = _ref.data,
-      deleteDashboard = _ref.deleteDashboard,
-      loading = _ref.loading,
-      user = _ref.user,
-      renderItemContent = _ref.renderItemContent;
-
-  var _useState = useState(''),
-      search = _useState[0],
-      setSearch = _useState[1];
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var onChangeSearch = function onChangeSearch(value) {
-    return setSearch(value);
-  };
-
-  var getItems = function getItems() {
-    var items = [];
-
-    if (data && data.length) {
-      if (search.length) items = data.filter(function (i) {
-        return i.title.indexOf(search) >= 0;
-      });else items = data;
-    }
-
-    return items;
-  };
-
-  var items = getItems();
-  if (loading) return /*#__PURE__*/React__default.createElement(Loader$3, null);
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.list
-  }, /*#__PURE__*/React__default.createElement(Yield, {
-    name: "header-yield"
-  }, /*#__PURE__*/React__default.createElement(SearchField, {
-    showEverything: true,
-    isDark: true,
-    className: css$G.search,
-    placeholder: t('findDashboard'),
-    size: "small",
-    value: search,
-    onChange: onChangeSearch
-  })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.title
-  }, currentUser === user ? t('myDashboards') : t('dashboardsOf', {
-    name: user
-  }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    placeholder: t('search'),
-    className: css$G.mobileSearch,
-    showEverything: true,
-    size: "small",
-    value: search,
-    onChange: onChangeSearch
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.grid
-  }, currentUser === user && /*#__PURE__*/React__default.createElement("div", {
-    onClick: addDashboard,
-    className: cx(css$G.add, {
-      disabled: addDashboardDisable
-    })
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.caption
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-plus"
-  }), t('newDashboard'))), items.map(function (item, index) {
-    return /*#__PURE__*/React__default.createElement(Item$1, {
-      key: index,
-      user: user,
-      dashboard: item,
-      deleteDashboard: currentUser === item.user && deleteDashboard,
-      renderContent: renderItemContent
-    });
-  })));
-};
-
-var css$H = {"loader":"_FMgKh","text":"_3kMB4","stacks-pulse":"_2uZ4b","grid":"_1i-Vy","item":"_3Q6le","pic":"_2gd5L","section":"_BzTYi"};
-
-var Loader$4 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.loader
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.text
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.grid
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.pic
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.section
-  })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.pic
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.section
-  })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.pic
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.section
-  }))));
-};
-
-var css$I = {"stacks":"_1YlOe","grid":"_2Xblj","search":"_2JDJR","message":"_30aty","text":"_1qJHA","item":"_1AIvq","checkbox":"_I8MzQ","buttons":"_3uEfC","button":"_22J0P"};
-
-var AddStacksModal = function AddStacksModal(_ref) {
-  var _ref$stacks = _ref.stacks,
-      stacks = _ref$stacks === void 0 ? [] : _ref$stacks,
-      loading = _ref.loading,
-      isShow = _ref.isShow,
-      onClose = _ref.onClose,
-      onAddStacks = _ref.onAddStacks,
-      currentUser = _ref.currentUser,
-      user = _ref.user;
-
-  var _useTranslation = useTranslation(),
-      t = _useTranslation.t;
-
-  var params = useParams();
-
-  var _useState = useState(''),
-      searchQuery = _useState[0],
-      setSearchQuery = _useState[1];
-
-  var _useState2 = useState([]),
-      selected = _useState2[0],
-      setSelected = _useState2[1];
-
-  useEffect(function () {
-    if (!isShow) {
-      setSelected([]);
-      setSearchQuery('');
-    }
-  }, [isShow]);
-
-  var getItems = function getItems() {
-    var items = [];
-
-    if (stacks && stacks.length) {
-      if (searchQuery.length) items = stacks.filter(function (i) {
-        return i.name.indexOf(searchQuery) >= 0;
-      });else items = stacks;
-    }
-
-    return items;
-  };
-
-  var items = getItems();
-
-  var onChangeSearch = function onChangeSearch(value) {
-    return setSearchQuery(value);
-  };
-
-  var getFullStackName = function getFullStackName(stack) {
-    return stack.user + "/" + stack.name;
-  };
-
-  var isChecked = function isChecked(stack) {
-    var stackName = getFullStackName(stack);
-    return selected.findIndex(function (i) {
-      return i === stackName;
-    }) >= 0;
-  };
-
-  var getOnClickStack = function getOnClickStack(stack) {
-    return function () {
-      var stackName = getFullStackName(stack);
-
-      if (isChecked(stack)) {
-        var filtered = selected.filter(function (i) {
-          return i !== stackName;
-        });
-        setSelected(filtered);
-      } else {
-        setSelected([].concat(selected, [stackName]));
-      }
-    };
-  };
-
-  var submit = function submit() {
-    if (onAddStacks) onAddStacks(selected);
-    onClose();
-  };
-
-  return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$I.stacks,
-    isShow: isShow,
-    title: t('selectStacks'),
-    onClose: onClose,
-    withCloseButton: true
-  }, !loading && Boolean(stacks.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$I.search,
-    isDark: true,
-    size: "middle",
-    showEverything: true,
-    placeholder: t('findStack'),
-    value: searchQuery,
-    onChange: onChangeSearch
-  }), loading && /*#__PURE__*/React__default.createElement(Loader$4, null), !loading && !stacks.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.message
-  }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
-    name: params.user
-  })), !loading && Boolean(stacks.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.text
-  }, t('noStacksAreFoundedMatchedTheSearchCriteria')), !loading && Boolean(stacks.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.grid
-  }, items.map(function (item, index) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      className: css$I.item,
-      key: index,
-      onClick: getOnClickStack(item)
-    }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$I.checkbox,
-      value: isChecked(item),
-      readOnly: true
-    }), /*#__PURE__*/React__default.createElement(Item, {
-      data: item,
-      otherOwner: params.user !== item.user
-    }));
-  })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.buttons
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$I.button,
-    color: "primary",
-    variant: "contained",
-    disabled: !selected.length,
-    onClick: submit
-  }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$I.button,
-    color: "secondary",
-    variant: "contained",
-    onClick: onClose
-  }, t('cancel')))));
 };
 
 var api = apiFabric();
@@ -4515,31 +3721,31 @@ var useActions = (function () {
   };
 });
 
-var css$J = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
+var css$C = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
 
-var Loader$5 = function Loader(_ref) {
+var Loader$2 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.loader
+    className: css$C.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.title
+    className: css$C.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.text
+    className: css$C.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.table
+    className: css$C.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.item
+    className: css$C.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.item
+    className: css$C.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.item
+    className: css$C.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.item
+    className: css$C.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.item
+    className: css$C.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.item
+    className: css$C.item
   })));
 };
 
@@ -4552,7 +3758,7 @@ var calculateJobProgress = function calculateJobProgress(job) {
   return [progress, leftDuration];
 };
 
-var css$K = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
+var css$D = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
 
 var Progress = function Progress(_ref) {
   var data = _ref.data,
@@ -4588,20 +3794,20 @@ var Progress = function Progress(_ref) {
       leftDuration = _calculateJobProgress[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$K.section, className)
+    className: cx(css$D.section, className)
   }, !onlyDuration && /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.progressBar
+    className: css$D.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.progress,
+    className: css$D.progress,
     style: {
       width: progress + "%"
     }
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.time
+    className: css$D.time
   }, getFormattedDuration(leftDuration), " ", t('left')));
 };
 
-var css$L = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
+var css$E = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
 
 var REFRESH_TIMEOUT = 2000;
 
@@ -4694,61 +3900,61 @@ var TableRow = memo(function (_ref) {
     switch (jobData.status) {
       case 'SCHEDULED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$L.status
+          className: css$E.status
         }, t('inProgress'), "\u2026");
 
       case 'RUNNING':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$L.status
+          className: css$E.status
         }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress, {
-          className: css$L.progress,
+          className: css$E.progress,
           data: jobData
         }));
 
       case 'TIMEOUT':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$L.status, 'fail')
+          className: cx(css$E.status, 'fail')
         }, "\u26D4\uFE0F ", t('failedDueToTimeout'));
 
       case 'FAILED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$L.status, 'fail')
+          className: cx(css$E.status, 'fail')
         }, "\u26D4\uFE0F ", t('failed'));
 
       case 'FINISHED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$L.status, 'success')
+          className: cx(css$E.status, 'success')
         }, "\u2705 ", t('completed'));
 
       case 'CREATED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$L.status
+          className: css$E.status
         }, t('neverRun'));
 
       default:
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$L.status
+          className: css$E.status
         }, t(jobData.status.toLowerCase()));
     }
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$L.row, {
+    className: cx(css$E.row, {
       red: ['TIMEOUT', 'FAILED'].indexOf(jobData.status) > -1
     }),
     onClick: rowClick
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.cell
+    className: css$E.cell
   }, getTitle()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.cell
+    className: css$E.cell
   }, t(jobData.runtime)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.cell
+    className: css$E.cell
   }, moment(jobData.started).format('MM-DD-YYYY [at] HH:mm')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.cell
+    className: css$E.cell
   }, getFormattedDuration(jobData.finished - jobData.started)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.cell
+    className: css$E.cell
   }, renderStatus(), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$L.dropdown,
+    className: css$E.dropdown,
     items: [].concat(['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? [{
       title: t('stop'),
       onClick: onStop
@@ -4765,13 +3971,13 @@ var TableRow = memo(function (_ref) {
   })));
 });
 
-var css$M = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
+var css$F = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
 
 var dataFormat$1 = function dataFormat(data) {
   return data.jobs;
 };
 
-var List$2 = function List() {
+var List$1 = function List() {
   var _currentUser$data;
 
   var _useActions = useActions(),
@@ -4851,9 +4057,9 @@ var List$2 = function List() {
     };
   };
 
-  if (!data) return /*#__PURE__*/React__default.createElement(Loader$5, null);
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$2, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.list
+    className: css$F.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
@@ -4862,14 +4068,14 @@ var List$2 = function List() {
     placeholder: t('findJob'),
     size: "small",
     value: search,
-    className: css$M.search,
+    className: css$F.search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.title
+    className: css$F.title
   }, currentUserName === user ? t('myJobs') : t('jobsOf', {
     name: user
   }), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$M.button,
+    className: css$F.button,
     variant: "contained",
     color: "primary",
     size: "small",
@@ -4877,7 +4083,7 @@ var List$2 = function List() {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), " ", t('newJob'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.text
+    className: css$F.text
   }, t('youHaveJobs', {
     count: data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
@@ -4887,27 +4093,27 @@ var List$2 = function List() {
     className: "mdi mdi-open-in-new"
   })), "."), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('findJob'),
-    className: css$M.mobileSearch,
+    className: css$F.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableWrap
+    className: css$F.tableWrap
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.table
+    className: css$F.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableCaptions
+    className: css$F.tableCaptions
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableCell
+    className: css$F.tableCell
   }, t('job')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableCell
+    className: css$F.tableCell
   }, t('runtime')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableCell
+    className: css$F.tableCell
   }, t('lastRun')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableCell
+    className: css$F.tableCell
   }, t('timeSpent')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.tableCell
+    className: css$F.tableCell
   }, t('status'))), items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(TableRow, {
       data: item,
@@ -4960,7 +4166,7 @@ var useAppProgress = (function () {
   };
 });
 
-var css$N = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
+var css$G = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
 
 var timeout = null;
 
@@ -5027,9 +4233,9 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [nextRunDelay]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$N.schedule, className)
+    className: cx(css$G.schedule, className)
   }, t('runtime'), ":", /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: cx(css$N.dropdown, css$N.runtime),
+    className: cx(css$G.dropdown, css$G.runtime),
     items: [{
       title: t('python'),
       onClick: runtimeChange('python')
@@ -5038,12 +4244,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: runtimeChange('r')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$N.dropdownButton,
+    className: css$G.dropdownButton,
     color: "primary"
   }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), t('jobIs'), " ", scheduleType !== 'unscheduled' && t('scheduled'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$N.dropdown,
+    className: css$G.dropdown,
     items: [{
       title: t('unscheduled'),
       onClick: scheduleTypeChange('unscheduled')
@@ -5052,12 +4258,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: scheduleTypeChange('daily')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$N.dropdownButton,
+    className: css$G.dropdownButton,
     color: "primary"
   }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), scheduleType === 'daily' && /*#__PURE__*/React__default.createElement(Fragment, null, t('at'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$N.dropdown,
+    className: css$G.dropdown,
     items: new Array(24).fill(0).map(function (i, index) {
       var time = (index < 10 ? '0' + index : index) + ":00";
       return {
@@ -5066,17 +4272,17 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       };
     })
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$N.dropdownButton,
+    className: css$G.dropdownButton,
     color: "primary"
   }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), /*#__PURE__*/React__default.createElement("div", {
     ref: messageRef,
-    className: cx(css$N.message, 'green-text')
+    className: cx(css$G.message, 'green-text')
   }, "The next run starts in ", getFormattedDuration(nextRunDelay))));
 };
 
-var css$O = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
+var css$H = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
 
 var CodeEditor = function CodeEditor(_ref) {
   var _ref$value = _ref.value,
@@ -5105,16 +4311,16 @@ var CodeEditor = function CodeEditor(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [saved]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$O.editor, className)
+    className: cx(css$H.editor, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.success,
+    className: css$H.success,
     ref: successMessageRef
   }, t('changesSaved')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.scroll
+    className: css$H.scroll
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.content
+    className: css$H.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.lineNumbers,
+    className: css$H.lineNumbers,
     dangerouslySetInnerHTML: {
       __html: lineNos
     }
@@ -5135,7 +4341,7 @@ var CodeEditor = function CodeEditor(_ref) {
   }))));
 };
 
-var css$P = {"status":"_3Pfpo"};
+var css$I = {"status":"_3Pfpo"};
 
 var Status = function Status(_ref) {
   var data = _ref.data;
@@ -5145,7 +4351,7 @@ var Status = function Status(_ref) {
 
   if (!data.started) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.status
+    className: css$I.status
   }, t('lastRunning'), ' ', moment(data.started).format("MM-DD-YYYY [" + t('at') + "] HH:mm"), /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-clock-outline"
   }), ['RUNNING', 'SCHEDULED'].indexOf(data.status) >= 0 ? /*#__PURE__*/React__default.createElement("span", null, ' ', t('inProgress'), "\u2026") : getFormattedDuration(data.finished - data.started)), data.status === 'FAILED' && /*#__PURE__*/React__default.createElement("span", {
@@ -5159,7 +4365,7 @@ var Status = function Status(_ref) {
   }), t('failedDueToTimeout')));
 };
 
-var css$Q = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
+var css$J = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
 
 var Logs = function Logs(_ref) {
   var data = _ref.data,
@@ -5181,40 +4387,40 @@ var Logs = function Logs(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$Q.logs, className)
+    className: cx(css$J.logs, className)
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Q.button,
+    className: css$J.button,
     onClick: toggleShow,
     color: "primary",
     size: "small"
   }, t('logs')), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$Q.text, {
+    className: cx(css$J.text, {
       open: isShown
     })
   }, /*#__PURE__*/React__default.createElement("pre", null, data.logs), updated && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.label
+    className: css$J.label
   }, t('updated'), " ", moment(updated).fromNow())));
 };
 
-var css$R = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
+var css$K = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
 
-var Loader$6 = function Loader(_ref) {
+var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.loader
+    className: css$K.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.title
+    className: css$K.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.text1
+    className: css$K.text1
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.text2
+    className: css$K.text2
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.code
+    className: css$K.code
   }));
 };
 
-var css$S = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
+var css$L = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
 
 var REFRESH_TIMEOUT$1 = 3000;
 
@@ -5222,7 +4428,7 @@ var dataFormat$2 = function dataFormat(data) {
   return data.job;
 };
 
-var Details$2 = function Details(_ref) {
+var Details$1 = function Details(_ref) {
   var _currentUser$data;
 
   _objectDestructuringEmpty(_ref);
@@ -5457,7 +4663,7 @@ var Details$2 = function Details(_ref) {
     }
   };
 
-  if (!jobData && !error) return /*#__PURE__*/React__default.createElement(Loader$6, null);
+  if (!jobData && !error) return /*#__PURE__*/React__default.createElement(Loader$3, null);
   if ((error === null || error === void 0 ? void 0 : error.status) === 403) return /*#__PURE__*/React__default.createElement(AccessForbidden, null, t('youDontHaveAnAccessToThisJob'), ".", isSignedIn() && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement(Link, {
     to: routes.dashboards(currentUserName)
   }, t('goToMyJobs'))));
@@ -5466,7 +4672,7 @@ var Details$2 = function Details(_ref) {
   }, t('goToMyJobs')), "."));
   if (!jobData) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.details
+    className: css$L.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -5475,25 +4681,25 @@ var Details$2 = function Details(_ref) {
   }, currentUserName === user ? t('backToJobs') : t('backToJobsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.header
+    className: css$L.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.title
+    className: css$L.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$S.edit,
+    className: css$L.edit,
     value: titleValue,
     onChange: onChangeTitle,
     readOnly: currentUserName !== user,
     placeholder: t('newJob')
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.side
+    className: css$L.side
   }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress, {
     onlyDuration: true,
-    className: css$S.progress,
+    className: css$L.progress,
     data: jobData
   }), jobData.status === 'FAILED' && /*#__PURE__*/React__default.createElement("div", {
     className: "red-text"
   }, t('sorryButYourCodeDoesntLookLikePythonJob')), ['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? /*#__PURE__*/React__default.createElement(Button, {
-    className: css$S.button,
+    className: css$L.button,
     color: "fail",
     size: "small",
     variant: "contained",
@@ -5502,7 +4708,7 @@ var Details$2 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-pause"
   }), t('stop')) : /*#__PURE__*/React__default.createElement(Button, {
-    className: css$S.button,
+    className: css$L.button,
     color: "success",
     size: "small",
     variant: "contained",
@@ -5511,55 +4717,55 @@ var Details$2 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-play"
   }), t('run'))), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$S.dropdown,
+    className: css$L.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$S.dropdownButton,
+    className: css$L.dropdownButton,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   })))), /*#__PURE__*/React__default.createElement(Status, {
     data: jobData
   }), /*#__PURE__*/React__default.createElement(ScheduleSettings, {
-    className: css$S.schedule,
+    className: css$L.schedule,
     data: jobData,
     onChange: onChangeSchedule,
     onChangeRuntime: onChangeRuntime
   }), /*#__PURE__*/React__default.createElement(CodeEditor, {
-    className: css$S.codeEditor,
+    className: css$L.codeEditor,
     value: code,
     onChange: onChangeCode,
     language: jobData.runtime,
     saved: codeSaved
   }), /*#__PURE__*/React__default.createElement(Logs, {
-    className: css$S.logs,
+    className: css$L.logs,
     data: jobData
   }));
 };
 
-var css$T = {"jobs":"_z2_YO"};
+var css$M = {"jobs":"_z2_YO"};
 
 var Jobs = function Jobs(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.jobs
+    className: css$M.jobs
   }, /*#__PURE__*/React__default.createElement(Switch, null, /*#__PURE__*/React__default.createElement(Route, {
     path: routes.jobs(),
     exact: true,
-    component: List$2
+    component: List$1
   }), /*#__PURE__*/React__default.createElement(Route, {
     path: routes.jobsDetails(),
-    component: Details$2
+    component: Details$1
   })));
 };
 
-var css$U = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
+var css$N = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
 
-var Item$2 = function Item(_ref) {
+var Item$1 = function Item(_ref) {
   var dashboard = _ref.dashboard,
       deleteDashboard = _ref.deleteDashboard,
       user = _ref.user,
@@ -5576,35 +4782,35 @@ var Item$2 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteDashboard);
   return /*#__PURE__*/React__default.createElement(Link, {
     to: "/" + user + "/d/" + dashboard.id,
-    className: css$U.item,
+    className: css$N.item,
     ref: ref
   }, Boolean(dashboard.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.label
+    className: css$N.label
   }, t('stacksWithCount', {
     count: dashboard.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.previewWrap
+    className: css$N.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$U.attachment,
+    className: css$N.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.emptyMessage
+    className: css$N.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.section
+    className: css$N.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.content
+    className: css$N.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.name
+    className: css$N.name
   }, dashboard.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (dashboard["private"] ? '' : '-open')
   })), user !== dashboard.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.by
+    className: css$N.by
   }, t('by'), " ", dashboard.user), renderContent && renderContent(dashboard)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$U.dropdown,
+    className: css$N.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteDashboard
@@ -5612,29 +4818,29 @@ var Item$2 = function Item(_ref) {
   })));
 };
 
-var css$V = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
+var css$O = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
 
-var Loader$7 = function Loader(_ref) {
+var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.loader
+    className: css$O.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.text
+    className: css$O.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.grid
+    className: css$O.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.item
+    className: css$O.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.pic
+    className: css$O.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.section
+    className: css$O.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.item
+    className: css$O.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.pic
+    className: css$O.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.section
+    className: css$O.section
   }))));
 };
 
@@ -5782,13 +4988,13 @@ var useActions$1 = (function () {
   };
 });
 
-var css$W = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
+var css$P = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
 
 var dataFormat$3 = function dataFormat(data) {
   return data.dashboards;
 };
 
-var List$3 = function List(_ref) {
+var List$2 = function List(_ref) {
   var _currentUser$data;
 
   _objectDestructuringEmpty(_ref);
@@ -5871,43 +5077,43 @@ var List$3 = function List(_ref) {
   if ((error === null || error === void 0 ? void 0 : error.status) === 404) return /*#__PURE__*/React__default.createElement(NotFound, null, t('theDashboardYouAreRookingForCouldNotBeFound'), ' ', isSignedIn() && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Link, {
     to: routes.reportsDetails(currentUserName)
   }, t('goToMyDashboards')), "."));
-  if (!data) return /*#__PURE__*/React__default.createElement(Loader$7, null);
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$4, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.list
+    className: css$P.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$W.search,
+    className: css$P.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.title
+    className: css$P.title
   }, currentUserName === user ? t('myDashboards') : t('dashboardsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$W.mobileSearch,
+    className: css$P.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.grid
+    className: css$P.grid
   }, currentUserName === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: create,
-    className: cx(css$W.add, {
+    className: cx(css$P.add, {
       disabled: creating
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.caption
+    className: css$P.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newDashboard'))), items.map(function (item, index) {
-    return /*#__PURE__*/React__default.createElement(Item$2, {
+    return /*#__PURE__*/React__default.createElement(Item$1, {
       key: index,
       user: user,
       dashboard: item,
@@ -5916,65 +5122,137 @@ var List$3 = function List(_ref) {
   })));
 };
 
-var css$X = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
+var css$Q = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
 
-var Loader$8 = function Loader(_ref) {
+var Loader$5 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.loader
+    className: css$Q.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.text
+    className: css$Q.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.filters
+    className: css$Q.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.grid
+    className: css$Q.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.item
+    className: css$Q.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.item
+    className: css$Q.item
   })));
 };
 
-var css$Y = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
+function move(array, oldIndex, newIndex) {
+  if (newIndex >= array.length) {
+    newIndex = array.length - 1;
+  }
 
-var Loader$9 = function Loader(_ref) {
+  array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+  return array;
+}
+
+function moveElement(array, index, offset) {
+  var newIndex = index + offset;
+  return move(array, index, newIndex);
+}
+
+var GridContext = createContext({
+  items: []
+});
+var GridProvider = /*#__PURE__*/function (_Component) {
+  _inheritsLoose(GridProvider, _Component);
+
+  function GridProvider(props) {
+    var _this;
+
+    _this = _Component.call(this, props) || this;
+
+    _this.setItems = function (items) {
+      return _this.setState({
+        items: items
+      });
+    };
+
+    _this.moveItem = function (sourceId, destinationId) {
+      var sourceIndex = _this.state.items.findIndex(function (item) {
+        return item.id === sourceId;
+      });
+
+      var destinationIndex = _this.state.items.findIndex(function (item) {
+        return item.id === destinationId;
+      });
+
+      if (sourceId === -1 || destinationId === -1) {
+        return;
+      }
+
+      var offset = destinationIndex - sourceIndex;
+
+      _this.setState(function (state) {
+        return {
+          items: moveElement(state.items, sourceIndex, offset)
+        };
+      });
+    };
+
+    _this.state = {
+      items: [],
+      moveItem: _this.moveItem,
+      setItems: _this.setItems
+    };
+    return _this;
+  }
+
+  var _proto = GridProvider.prototype;
+
+  _proto.render = function render() {
+    return /*#__PURE__*/React__default.createElement(GridContext.Provider, {
+      value: this.state
+    }, this.props.children);
+  };
+
+  return GridProvider;
+}(Component);
+
+var css$R = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
+
+var Loader$6 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.loader
+    className: css$R.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.text
+    className: css$R.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.grid
+    className: css$R.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.item
+    className: css$R.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.pic
+    className: css$R.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.section
+    className: css$R.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.item
+    className: css$R.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.pic
+    className: css$R.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.section
+    className: css$R.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.item
+    className: css$R.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.pic
+    className: css$R.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.section
+    className: css$R.section
   }))));
 };
 
-var css$Z = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
+var css$S = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
 
 var dataFormat$4 = function dataFormat(data) {
   return data.stacks;
 };
 
-var AddStacksModal$1 = function AddStacksModal(_ref) {
+var AddStacksModal = function AddStacksModal(_ref) {
   var _currentUser$data;
 
   var isShow = _ref.isShow,
@@ -6059,65 +5337,70 @@ var AddStacksModal$1 = function AddStacksModal(_ref) {
 
   var isUserOwner = currentUserName === params.user;
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$Z.stacks,
+    dialogClassName: css$S.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$Z.search,
+    className: css$S.search,
     isDark: true,
     size: "middle",
     showEverything: true,
     placeholder: t('findStack'),
     value: searchQuery,
     onChange: onChangeSearch
-  }), !data && /*#__PURE__*/React__default.createElement(Loader$9, null), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.message
+  }), !data && /*#__PURE__*/React__default.createElement(Loader$6, null), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$S.message
   }, isUserOwner ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), data && Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.text
+    className: css$S.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), data && Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.grid
+    className: css$S.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$Z.item,
+      className: css$S.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$Z.checkbox,
+      className: css$S.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
       data: item
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.buttons
+    className: css$S.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Z.button,
+    className: css$S.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Z.button,
+    className: css$S.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
   }, t('cancel')))));
 };
 
-var css$_ = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
+var css$T = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
 
-var Card$1 = memo(function (_ref) {
+var viewValueMap = {
+  grid: 1,
+  list: 2
+};
+var Card = memo(function (_ref) {
+  var _data$description;
+
   var data = _ref.data,
       className = _ref.className,
-      _ref$type = _ref.type,
-      type = _ref$type === void 0 ? 'grid' : _ref$type,
       deleteCard = _ref.deleteCard,
-      updateCardTitle = _ref.updateCardTitle,
+      updateCard = _ref.updateCard,
       filters = _ref.filters,
+      activeTab = _ref.activeTab,
       forwardedRef = _ref.forwardedRef,
       moveAvailable = _ref.moveAvailable;
 
@@ -6125,19 +5408,33 @@ var Card$1 = memo(function (_ref) {
       title = _useState[0],
       setTitle = _useState[1];
 
+  var _useState2 = useState(data.columns),
+      columns = _useState2[0],
+      setColumns = _useState2[1];
+
+  var descFieldRef = useRef();
+  var isMounted = useRef(false);
+  var isHoveredMoveBtn = useRef(false);
+
+  var _useState3 = useState((_data$description = data.description) === null || _data$description === void 0 ? void 0 : _data$description.length),
+      isShowDesc = _useState3[0],
+      setIsShowDesc = _useState3[1];
+
+  var prevIsShowDesc = usePrevious$1(isShowDesc);
+
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
 
   var headId = get(data, 'head.id');
   var stackOwner = data.stack.split('/')[0];
 
-  var _useState2 = useState(0),
-      attachmentIndex = _useState2[0],
-      setAttachmentIndex = _useState2[1];
+  var _useState4 = useState(0),
+      attachmentIndex = _useState4[0],
+      setAttachmentIndex = _useState4[1];
 
-  var _useState3 = useState([]),
-      cardParams = _useState3[0],
-      setCardParams = _useState3[1];
+  var _useState5 = useState([]),
+      cardParams = _useState5[0],
+      setCardParams = _useState5[1];
 
   useEffect(function () {
     var params = parseStackParams(get(data, 'head.attachments', []));
@@ -6145,123 +5442,230 @@ var Card$1 = memo(function (_ref) {
   }, [data]);
   useEffect(function () {
     findAttach();
-  }, [filters]);
+  }, [filters, activeTab]);
   useEffect(function () {
     if (forwardedRef.current) forwardedRef.current.addEventListener('dragstart', function (event) {
-      console.log(event.target);
-      event.stopPropagation();
-      event.preventDefault();
+      if (!isHoveredMoveBtn.current) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
     });
-  }, [forwardedRef]);
+  }, [forwardedRef.current]);
+  useEffect(function () {
+    if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current) descFieldRef.current.focus();
+  }, [isShowDesc]);
+  useEffect(function () {
+    isMounted.current = true;
+  }, []);
 
   var findAttach = function findAttach() {
     var attachments = get(data, 'head.attachments');
+    var tabs = parseStackTabs(attachments);
     var fields = Object.keys(filters).filter(function (f) {
       return cardParams.indexOf(f) >= 0;
     });
+    var tab = tabs.find(function (t) {
+      return t.value === activeTab;
+    });
     if (!attachments) return;
 
-    if (fields.length) {
-      attachments.some(function (attach, index) {
+    if (fields.length || tabs.length && activeTab) {
+      var hasAttach = attachments.some(function (attach, index) {
+        var _attach$params$tab$va, _attach$params$tab$ke;
+
         var valid = true;
+        if (!tab || ((_attach$params$tab$va = attach.params[tab.value]) === null || _attach$params$tab$va === void 0 ? void 0 : _attach$params$tab$va.type) !== 'tab' && ((_attach$params$tab$ke = attach.params[tab.key]) === null || _attach$params$tab$ke === void 0 ? void 0 : _attach$params$tab$ke.title) !== tab.value) return false;
         fields.forEach(function (key) {
           if (!attach.params || !isEqual(attach.params[key], filters[key])) valid = false;
         });
         if (valid) setAttachmentIndex(index);
         return valid;
       });
+
+      if (!hasAttach && tabs.length) {
+        setAttachmentIndex(null);
+      }
     } else setAttachmentIndex(0);
   };
 
-  var onUpdate = updateCardTitle ? useDebounce(updateCardTitle, []) : function () {};
+  var onUpdate = updateCard ? useDebounce(updateCard, [updateCard]) : function () {};
 
   var onChangeTitle = function onChangeTitle(event) {
     setTitle(event.target.value);
-    onUpdate(event.target.value);
+    onUpdate({
+      title: event.target.value
+    });
+  };
+
+  var onChangeView = function onChangeView(view) {
+    var columns = viewValueMap[view];
+    setColumns(columns);
+    onUpdate({
+      columns: columns
+    });
+  };
+
+  var onChangeDescription = function onChangeDescription(description) {
+    setColumns(columns);
+    onUpdate({
+      description: description
+    });
+  };
+
+  var onEnterMove = function onEnterMove() {
+    isHoveredMoveBtn.current = true;
+  };
+
+  var onLeaveMove = function onLeaveMove() {
+    isHoveredMoveBtn.current = false;
+  };
+
+  var onBlurDescription = function onBlurDescription() {
+    var _data$description2;
+
+    if (!((_data$description2 = data.description) === null || _data$description2 === void 0 ? void 0 : _data$description2.length)) setIsShowDesc(false);
+  };
+
+  var addDesc = function addDesc() {
+    return setIsShowDesc(true);
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$_.card, "type-" + type, className),
-    ref: forwardedRef
+    className: cx(css$T.card, "col-" + columns, className),
+    ref: forwardedRef,
+    style: {
+      display: attachmentIndex === null ? 'none' : ''
+    }
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.inner
+    className: css$T.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.head
+    className: css$T.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$_.name, {
-      readonly: !updateCardTitle
+    className: cx(css$T.name, {
+      readonly: !updateCard
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.nameValue
+    className: css$T.nameValue
   }, (title === null || title === void 0 ? void 0 : title.length) ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$_.nameEdit, {
+    className: cx(css$T.nameEdit, {
       active: !(title === null || title === void 0 ? void 0 : title.length)
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$_.infoTime
+      className: css$T.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.info
+    className: css$T.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$_.button, css$_.link),
+    className: cx(css$T.button, css$T.link),
     color: "secondary",
     Component: Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.cardControls
+    className: css$T.cardControls
   }, deleteCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$_.button),
+    className: cx(css$T.button),
     color: "secondary",
     onClick: deleteCard
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-trash-can-outline"
   })), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$_.button, css$_.move),
+    className: cx(css$T.button, css$T.move),
     color: "secondary",
-    "data-drop-pointer": true
+    onMouseEnter: onEnterMove,
+    onMouseLeave: onLeaveMove
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-cursor-move"
-  })))), headId ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$_.attachment,
+  })), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
+    onChange: onChangeView,
+    value: data.columns === 1 ? 'grid' : 'list',
+    className: css$T.viewSwitcher
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$T.description
+  }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
+    value: data.description,
+    ref: descFieldRef,
+    placeholder: t('description'),
+    onChange: onChangeDescription,
+    onBlur: onBlurDescription
+  }), !isShowDesc && /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$T.addDesc),
+    color: "secondary",
+    onClick: addDesc
+  }, "+ ", t('addDescription'))), headId && attachmentIndex !== null ? /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$T.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.emptyMessage
+    className: css$T.emptyMessage
   }, t('emptyDashboard'))));
 });
 
-var css$$ = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","sideHeader":"_2PqMZ","dropdown":"_2-VRH","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","controls":"_2wh6Y","addButton":"_4KCh5","viewSwitcher":"_MFQrX","empty":"_13-9o"};
+var DnDItem = memo(function (_ref) {
+  var id = _ref.id,
+      onMoveItem = _ref.onMoveItem,
+      children = _ref.children;
+  var ref = useRef(null);
+
+  var _useDrag = useDrag({
+    item: {
+      id: id,
+      type: 'IMG'
+    },
+    collect: function collect(monitor) {
+      return {
+        isDragging: monitor.isDragging()
+      };
+    }
+  }),
+      connectDrag = _useDrag[1];
+
+  var _useDrop = useDrop({
+    accept: 'IMG',
+    drop: function drop(hoveredOverItem) {
+      if (hoveredOverItem.id !== id) {
+        onMoveItem(hoveredOverItem.id, id);
+      }
+    }
+  }),
+      connectDrop = _useDrop[1];
+
+  connectDrag(ref);
+  connectDrop(ref);
+  return React__default.Children.map(children, function (child) {
+    return React__default.cloneElement(child, {
+      forwardedRef: ref
+    });
+  });
+});
+
+var css$U = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
 
 var dataFormat$5 = function dataFormat(data) {
   return data.dashboard;
 };
 
-var Details$3 = function Details(_ref) {
-  var _currentUser$data;
+var Details$2 = function Details(_ref) {
+  var _currentUser$data, _data$description;
 
   var renderHeader = _ref.renderHeader,
       renderSideHeader = _ref.renderSideHeader;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
-
-  var _useState = useState('grid'),
-      view = _useState[0],
-      setView = _useState[1];
 
   var _useParams = useParams(),
       user = _useParams.user,
@@ -6289,18 +5693,29 @@ var Details$3 = function Details(_ref) {
       reportDeleteCard = _useActions.reportDeleteCard,
       reportUpdateCard = _useActions.reportUpdateCard;
 
-  var _useState2 = useState(false),
-      isShowStacksModal = _useState2[0],
-      setIsShowStacksModal = _useState2[1];
+  var descFieldRef = useRef();
+  var isMounted = useRef(false);
+
+  var _useState = useState(false),
+      isShowStacksModal = _useState[0],
+      setIsShowStacksModal = _useState[1];
+
+  var _useState2 = useState(),
+      activeTab = _useState2[0],
+      setActiveTab = _useState2[1];
+
+  var _useState3 = useState([]),
+      tabs = _useState3[0],
+      setTabs = _useState3[1];
 
   var _useForm = useForm({}),
       form = _useForm.form,
       setForm = _useForm.setForm,
       onChange = _useForm.onChange;
 
-  var _useState3 = useState({}),
-      fields = _useState3[0],
-      setFields = _useState3[1];
+  var _useState4 = useState({}),
+      fields = _useState4[0],
+      setFields = _useState4[1];
 
   var setGridItems = function setGridItems(cardsItems) {
     return setItems(cardsItems.map(function (card) {
@@ -6316,38 +5731,42 @@ var Details$3 = function Details(_ref) {
       mutate = _useSWR.mutate,
       error = _useSWR.error;
 
+  var _useState5 = useState(Boolean(data === null || data === void 0 ? void 0 : (_data$description = data.description) === null || _data$description === void 0 ? void 0 : _data$description.length)),
+      isShowDesc = _useState5[0],
+      setIsShowDesc = _useState5[1];
+
+  var prevIsShowDesc = usePrevious(isShowDesc);
   var prevData = usePrevious(data);
   useEffect(function () {
-    if (window) window.dispatchEvent(new Event('resize'));
-  }, [view]);
-  useEffect(function () {
+    var _data$description2;
+
     if (data === null || data === void 0 ? void 0 : data.cards) setGridItems(data === null || data === void 0 ? void 0 : data.cards);
-    if (!isEqual(prevData, data) && (data === null || data === void 0 ? void 0 : data.cards)) parseParams();
+
+    if (!isEqual(prevData, data) && (data === null || data === void 0 ? void 0 : data.cards)) {
+      parseParams();
+      parseTabs();
+    }
+
+    if ((prevData === null || prevData === void 0 ? void 0 : prevData.description) !== (data === null || data === void 0 ? void 0 : data.description)) setIsShowDesc(Boolean(data === null || data === void 0 ? void 0 : (_data$description2 = data.description) === null || _data$description2 === void 0 ? void 0 : _data$description2.length));
     return function () {
       return setGridItems([]);
     };
   }, [data]);
+  useEffect(function () {
+    if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current) descFieldRef.current.focus();
+  }, [isShowDesc]);
+  useEffect(function () {
+    isMounted.current = true;
+  }, []);
+
+  var getAllAttachments = function getAllAttachments() {
+    return data.cards.reduce(function (result, card) {
+      return result.concat(get(card, 'head.attachments', []));
+    }, []);
+  };
 
   var parseParams = function parseParams() {
-    var fields = data.cards.reduce(function (result, card) {
-      var cardFields = parseStackParams(get(card, 'head.attachments', [])) || {};
-      Object.keys(cardFields).forEach(function (fieldName) {
-        if (result[fieldName]) {
-          if (cardFields[fieldName].type === 'select') {
-            result[fieldName].options = unionBy(result[fieldName].options, cardFields[fieldName].options, 'value');
-          }
-
-          if (cardFields[fieldName].type === 'slider') {
-            result[fieldName].options = _extends({}, result[fieldName].options, cardFields[fieldName].options);
-            result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
-            result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
-          }
-        } else {
-          result[fieldName] = cardFields[fieldName];
-        }
-      });
-      return result;
-    }, {});
+    var fields = parseStackParams(getAllAttachments()) || {};
     var defaultFilterValues = Object.keys(fields).reduce(function (result, fieldName) {
       if (fields[fieldName].type === 'select') result[fieldName] = fields[fieldName].options[0].value;
       if (fields[fieldName].type === 'slider') result[fieldName] = fields[fieldName].options[0];
@@ -6358,34 +5777,58 @@ var Details$3 = function Details(_ref) {
     setFields(fields);
   };
 
+  var parseTabs = function parseTabs() {
+    var _tabs$;
+
+    var attachments = getAllAttachments();
+    if (!attachments || !attachments.length) return;
+    var tabs = parseStackTabs(attachments);
+    setTabs(tabs);
+    setActiveTab((_tabs$ = tabs[0]) === null || _tabs$ === void 0 ? void 0 : _tabs$.value);
+  };
+
+  var onChangeTab = function onChangeTab(tabName) {
+    setActiveTab(tabName);
+  };
+
   var update = function update(params) {
     try {
-      return Promise.resolve(updateReport(user, id, params)).then(function (response) {
-        mutate(_extends({}, data, response.dashboard));
-      });
+      return Promise.resolve(updateReport(user, id, params)).then(function () {});
     } catch (e) {
       return Promise.reject(e);
     }
   };
 
-  var onChangeTitle = useDebounce(function (title) {
+  var debounceUpdateTitle = useDebounce(function (fields) {
     try {
-      return Promise.resolve(update({
-        title: title
-      })).then(function () {});
+      return Promise.resolve(update(fields)).then(function () {});
     } catch (e) {
       return Promise.reject(e);
     }
   }, 300);
 
-  var onChangePrivate = function onChangePrivate(isPrivate) {
+  var onChangeTitle = function onChangeTitle(title) {
+    data.title = title;
+    mutate(data, false);
+    debounceUpdateTitle({
+      title: title
+    });
+  };
+
+  var debounceUpdateDescription = useDebounce(function (fields) {
     try {
-      return Promise.resolve(update({
-        "private": isPrivate
-      })).then(function () {});
+      return Promise.resolve(update(fields)).then(function () {});
     } catch (e) {
       return Promise.reject(e);
     }
+  }, 300);
+
+  var onChangeDescription = function onChangeDescription(description) {
+    data.description = description;
+    mutate(data, false);
+    debounceUpdateDescription({
+      description: description
+    });
   };
 
   var addStacks = function addStacks(stacks) {
@@ -6398,7 +5841,7 @@ var Details$3 = function Details(_ref) {
         };
       }), data === null || data === void 0 ? void 0 : (_data$cards = data.cards) === null || _data$cards === void 0 ? void 0 : _data$cards.length)).then(function (_ref2) {
         var dashboard = _ref2.dashboard;
-        mutate(dashboard);
+        mutate(dashboard, false);
       });
     } catch (e) {
       return Promise.reject(e);
@@ -6410,7 +5853,7 @@ var Details$3 = function Details(_ref) {
       try {
         return Promise.resolve(reportDeleteCard(user, id, stack)).then(function (_ref3) {
           var dashboard = _ref3.dashboard;
-          mutate(dashboard);
+          mutate(dashboard, false);
         });
       } catch (e) {
         return Promise.reject(e);
@@ -6418,16 +5861,14 @@ var Details$3 = function Details(_ref) {
     };
   };
 
-  var getUpdatedCardTitleFunc = function getUpdatedCardTitleFunc(stack) {
-    return function (title) {
+  var getUpdatedCardFunc = function getUpdatedCardFunc(stack) {
+    return function (fields) {
       try {
-        return Promise.resolve(reportUpdateCard(user, id, stack, {
-          title: title
-        })).then(function (_ref4) {
+        return Promise.resolve(reportUpdateCard(user, id, stack, fields)).then(function (_ref4) {
           var cards = _ref4.cards;
           mutate(_extends({}, data, {
             cards: cards
-          }));
+          }), false);
         });
       } catch (e) {
         return Promise.reject(e);
@@ -6463,7 +5904,7 @@ var Details$3 = function Details(_ref) {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$$.filters, {
+      className: cx(css$U.filters, {
         'with-select': hasSelectField
       })
     });
@@ -6476,17 +5917,27 @@ var Details$3 = function Details(_ref) {
     });
   };
 
+  var onBlurDescription = function onBlurDescription() {
+    var _data$description3;
+
+    if (!((_data$description3 = data.description) === null || _data$description3 === void 0 ? void 0 : _data$description3.length)) setIsShowDesc(false);
+  };
+
+  var addDesc = function addDesc() {
+    return setIsShowDesc(true);
+  };
+
   if ((error === null || error === void 0 ? void 0 : error.status) === 403) return /*#__PURE__*/React__default.createElement(AccessForbidden, null, t('youDontHaveAnAccessToThisDashboard'), ".", isSignedIn() && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement(Link, {
     to: routes.reports(currentUserName)
   }, t('goToMyDashboards'))));
   if ((error === null || error === void 0 ? void 0 : error.status) === 404) return /*#__PURE__*/React__default.createElement(NotFound, null, t('theDashboardYouAreRookingForCouldNotBeFound'), ' ', isSignedIn() && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Link, {
     to: routes.reports(currentUserName)
   }, t('goToMyDashboards')), "."));
-  if (!data) return /*#__PURE__*/React__default.createElement(Loader$8, null);
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$5, null);
   var isUserOwner = currentUserName === user;
   var CardWrapComponent = isUserOwner ? DnDItem : Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.details
+    className: css$U.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -6495,103 +5946,108 @@ var Details$3 = function Details(_ref) {
   }, currentUserName === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.header
+    className: css$U.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.title
+    className: css$U.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$$.edit,
-    value: data === null || data === void 0 ? void 0 : data.title,
+    className: css$U.edit,
+    value: data.title,
     onChange: onChangeTitle,
     readOnly: currentUserName !== data.user,
     placeholder: t('newDashboard')
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), renderHeader && renderHeader({
-    data: data
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.sideHeader
-  }, renderSideHeader && renderSideHeader({
-    data: data,
-    onChangePrivate: onChangePrivate,
-    mutateData: mutate
-  }), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$$.dropdown,
+  })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
+    className: css$U.sideHeader
+  }, isUserOwner && /*#__PURE__*/React__default.createElement("a", {
+    className: css$U.addButton,
+    onClick: toggleAddStackModal,
+    href: "#"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-plus"
+  }), t('addStack')), renderSideHeader && renderSideHeader(), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$U.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteDashboard
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$$['dropdown-button'],
+    className: css$U['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
-  }))))), Boolean(items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.section
+  }))))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$U.description
+  }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
+    value: data.description,
+    ref: descFieldRef,
+    placeholder: t('description'),
+    onChange: onChangeDescription,
+    onBlur: onBlurDescription
+  }), !isShowDesc && /*#__PURE__*/React__default.createElement(Button, {
+    className: css$U.addDesc,
+    color: "secondary",
+    onClick: addDesc
+  }, "+ ", t('addDescription'))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
+    className: css$U.tabs,
+    onChange: onChangeTab,
+    value: activeTab,
+    items: tabs
+  }), Boolean(items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$U.container
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.fields
-  }, renderFilters()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.controls
-  }, isUserOwner && /*#__PURE__*/React__default.createElement("a", {
-    className: css$$.addButton,
-    onClick: toggleAddStackModal,
-    href: "#"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-plus"
-  }), t('addStack')), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    value: view,
-    className: css$$.viewSwitcher,
-    onChange: function onChange(view) {
-      return setView(view);
-    }
-  }))), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$$.cards, view)
+    className: css$U.section
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$U.fields
+  }, renderFilters())), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$U.cards)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
     }, isUserOwner ? {
       id: item.id,
       onMoveItem: moveCard
-    } : {}), /*#__PURE__*/React__default.createElement(Card$1, {
-      type: view,
+    } : {}), /*#__PURE__*/React__default.createElement(Card, {
+      activeTab: activeTab,
       filters: form,
       deleteCard: isUserOwner && getDeleteCardFunc(item.card.stack),
       data: item.card,
-      updateCardTitle: isUserOwner && getUpdatedCardTitleFunc(item.card.stack),
+      updateCard: isUserOwner && getUpdatedCardFunc(item.card.stack),
       moveAvailable: isUserOwner
     }));
   }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.empty
+    className: css$U.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), isUserOwner && /*#__PURE__*/React__default.createElement(Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$$.addButton,
+    className: css$U.addButton,
     onClick: toggleAddStackModal,
     href: "#"
-  }, t('addStack')), ".")), /*#__PURE__*/React__default.createElement(AddStacksModal$1, {
+  }, t('addStack')), ".")), /*#__PURE__*/React__default.createElement(AddStacksModal, {
     isShow: isShowStacksModal,
     onClose: toggleAddStackModal,
     onAddStacks: addStacks
   }));
 };
 
-var css$10 = {"reports":"_30ROl"};
+var css$V = {"reports":"_30ROl"};
 
 var Reports = function Reports(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$10.reports
+    className: css$V.reports
   }, /*#__PURE__*/React__default.createElement(Switch, null, /*#__PURE__*/React__default.createElement(Route, {
     path: routes.reports(),
     exact: true,
-    component: List$3
+    component: List$2
   }), /*#__PURE__*/React__default.createElement(Route, {
     path: routes.reportsDetails(),
-    component: Details$3
+    component: Details$2
   })));
 };
 
 var logo = "logo~gyFSAwBb.svg";
 
-var css$11 = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
+var css$W = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -6600,39 +6056,39 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$11.header, className)
+    className: cx(css$W.header, className)
   }, /*#__PURE__*/React__default.createElement(Link, {
     to: "/",
-    className: css$11.logo
+    className: css$W.logo
   }, /*#__PURE__*/React__default.createElement("img", {
     width: "129",
     height: "35",
     src: logo,
     alt: "logo"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$11.buttons
+    className: css$W.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: Link,
     to: "/auth/login",
-    className: css$11.button,
+    className: css$W.button,
     color: "primary"
   }, t('logIn'))));
 };
 
-var css$12 = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
+var css$X = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$12.layout
+    className: css$X.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$12.header
+    className: css$X.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$12.main
+    className: css$X.main
   }, children));
 };
 
-var css$13 = {"infoButton":"_2zmYM"};
+var css$Y = {"infoButton":"_2zmYM"};
 
 var SettingsInformation = function SettingsInformation(_ref) {
   var className = _ref.className,
@@ -6652,7 +6108,7 @@ var SettingsInformation = function SettingsInformation(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$13.infoButton, className),
+    className: cx(css$Y.infoButton, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -6667,5 +6123,5 @@ var SettingsInformation = function SettingsInformation(_ref) {
   }, renderModalContent()));
 };
 
-export { AccessForbidden, AppStoreProvider, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, AddStacksModal as DashboardAddStacksModal, Details$1 as DashboardDetails, List$1 as DashboardList, Item$1 as DashboardListItem, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Jobs, Loader, MarkdownRender, Modal, NotFound, ProgressBar, Details$3 as ReportDetails, List$3 as ReportList, Reports, SearchField, SelectField, SettingsInformation, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, apiFabric, actionsTypes as appStoreActionTypes, config, useAppStore };
+export { AccessForbidden, AppStoreProvider, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Jobs, Loader, MarkdownRender, Modal, NotFound, ProgressBar, Reports, SearchField, SelectField, SettingsInformation, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTextAreaField as StretchTextareaField, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, apiFabric, actionsTypes as appStoreActionTypes, config, useAppStore };
 //# sourceMappingURL=index.modern.js.map

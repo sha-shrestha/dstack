@@ -1,4 +1,4 @@
-import { get } from 'lodash-es';
+import { get, uniq } from 'lodash-es';
 import moment from 'moment';
 import axios from 'axios';
 
@@ -102,6 +102,8 @@ var parseStackParams = (function (attachments, tab) {
     });
   });
   Object.keys(fields).forEach(function (key) {
+    fields[key].options = uniq(fields[key].options);
+
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
       fields[key].options = fields[key].options.filter(function (a, b) {
@@ -136,7 +138,7 @@ var parseStackParams = (function (attachments, tab) {
 
 var parseStackTabs = (function (attachments) {
   var tabs = [];
-  if (!attachments || !attachments.length) return;
+  if (!attachments || !attachments.length) return [];
   attachments.forEach(function (i) {
     Object.keys(i.params).forEach(function (key) {
       if (i.params[key] instanceof Object && i.params[key].type === 'tab') {

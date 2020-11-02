@@ -59,7 +59,9 @@ const Item = ({
             </div>
 
             {data.head && (
-                <div className={css.date}>{t('updated')} {moment(data.head.timestamp).format('L')}</div>
+                <div className={css.date}>
+                    {t('updated')} {moment(data.head.timestamp).format('L')}
+                </div>
             )}
 
             {deleteAction && (

@@ -2,13 +2,13 @@
 
 import React, {useEffect, Fragment} from 'react';
 import {connect} from 'react-redux';
+import {useParams} from 'react-router-dom';
 import Helmet from 'react-helmet';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {NotFound, StackList, UploadStack, useAppStore, appStoreActionTypes} from '@dstackai/dstack-react';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {fetchList, deleteStack} from './actions';
-import {useParams} from 'react-router';
 import routes from 'routes';
 import config from 'config';
 

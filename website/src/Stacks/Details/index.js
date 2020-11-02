@@ -3,8 +3,7 @@
 import React, {useEffect, useState, useRef, Fragment} from 'react';
 import {get} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
-import {Link} from 'react-router-dom';
-import {useHistory, useLocation, useParams} from 'react-router';
+import {Link, useHistory, useLocation, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
 import {AccessForbidden, NotFound, StackDetails, StackUpload} from '@dstackai/dstack-react';

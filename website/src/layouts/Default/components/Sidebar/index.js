@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import {connect} from 'react-redux';
-import {Link, NavLink, useRouteMatch, useParams} from 'react-router-dom';
+import {Link, NavLink, useRouteMatch, useParams, useLocation} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
 import {useAppStore, appStoreActionTypes} from '@dstackai/dstack-react';
@@ -11,7 +11,6 @@ import routes from 'routes';
 import logo from 'assets/logo.svg';
 import css from './styles.module.css';
 import {fetchList as fetchStacksList} from 'Stacks/List/actions';
-import {useLocation} from 'react-router';
 
 
 type Props = {

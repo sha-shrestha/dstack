@@ -1,7 +1,6 @@
 import React, {useState, useMemo, Fragment} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useHistory, useParams} from 'react-router';
-import {Link} from 'react-router-dom';
+import {useHistory, useParams, Link} from 'react-router-dom';
 import cn from 'classnames';
 import useSWR from 'swr';
 import {useAppStore} from '../../AppStore';

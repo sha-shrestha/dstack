@@ -1,3 +1,5 @@
+import {uniq} from 'lodash-es';
+
 export default (attachments, tab) => {
     const fields = {};
 
@@ -23,6 +25,8 @@ export default (attachments, tab) => {
     });
 
     Object.keys(fields).forEach(key => {
+        fields[key].options = uniq(fields[key].options);
+
         if (typeof fields[key].options[0] === 'string') {
             fields[key].type = 'select';
 

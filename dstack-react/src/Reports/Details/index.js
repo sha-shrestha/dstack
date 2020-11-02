@@ -1,22 +1,20 @@
-import React, {Fragment, useEffect, useContext, useState} from 'react';
+import React, {Fragment, useEffect, useContext, useState, useRef} from 'react';
 import useSWR from 'swr';
 import cn from 'classnames';
-import {get, isEqual, unionBy} from 'lodash-es';
-import {Link} from 'react-router-dom';
-import {useHistory, useParams} from 'react-router';
+import {get, isEqual} from 'lodash-es';
+import {Link, useHistory, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import NotFound from '../../NotFound';
 import AccessForbidden from '../../AccessForbidden';
 import {useAppStore} from '../../AppStore';
 import config from '../../config';
 import routes from '../../routes';
-import {dataFetcher, isSignedIn, parseStackParams} from '../../utils';
+import {dataFetcher, isSignedIn, parseStackParams, parseStackTabs} from '../../utils';
 import {useDebounce, useForm} from '../../hooks';
 import Loader from './components/Loader';
 import Yield from '../../Yield';
 import BackButton from '../../BackButton';
 import StretchTitleField from '../../StretchTitleField';
-import ViewSwitcher from '../../ViewSwitcher';
 import Dropdown from '../../Dropdown';
 import Button from '../../Button';
 import DnDGridContext from '../../dnd/DnDGridContext';
@@ -25,21 +23,26 @@ import StackFilters from '../../StackFilters';
 import useActions from '../actions';
 import AddStacksModal from '../AddStacksModal';
 import Card from './components/Card';
+import StackTabs from '../../stack/Details/components/Tabs';
 import DnDItem from '../../dnd/DnDItem';
+import StretchTextareaField from '../../kit/StretchTextareaField';
 import css from './styles.module.css';
 
 const dataFormat = data => data.dashboard;
 
 const Details = ({renderHeader, renderSideHeader}) => {
     const {t} = useTranslation();
-    const [view, setView] = useState('grid');
     const {user, id} = useParams();
     const {push} = useHistory();
     const {items, moveItem, setItems} = useContext(DnDGridContext);
     const [{currentUser, apiUrl}] = useAppStore();
     const currentUserName = currentUser.data?.user;
     const {deleteReport, updateReport, reportInsertCard, reportDeleteCard, reportUpdateCard} = useActions();
+    const descFieldRef = useRef();
+    const isMounted = useRef(false);
     const [isShowStacksModal, setIsShowStacksModal] = useState(false);
+    const [activeTab, setActiveTab] = useState();
+    const [tabs, setTabs] = useState([]);
     const {form, setForm, onChange} = useForm({});
     const [fields, setFields] = useState({});
     const setGridItems = cardsItems => setItems(cardsItems.map(card => ({id: card.index, card})));
@@ -52,52 +55,43 @@ const Details = ({renderHeader, renderSideHeader}) => {
         dataFetcher,
     );
 
-    const prevData = usePrevious(data);
+    const [isShowDesc, setIsShowDesc] = useState(Boolean(data?.description?.length));
+    const prevIsShowDesc = usePrevious(isShowDesc);
 
-    useEffect(() => {
-        if (window)
-            window.dispatchEvent(new Event('resize'));
-    }, [view]);
+    const prevData = usePrevious(data);
 
     useEffect(() => {
         if (data?.cards)
             setGridItems(data?.cards);
 
-        if (!isEqual(prevData, data) && data?.cards)
+        if (!isEqual(prevData, data) && data?.cards) {
             parseParams();
+            parseTabs();
+        }
+
+        if (prevData?.description !== data?.description)
+            setIsShowDesc(Boolean(data?.description?.length));
 
         return () => setGridItems([]);
     }, [data]);
 
+    useEffect(() => {
+        if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current)
+            descFieldRef.current.focus();
+    }, [isShowDesc]);
+
+    useEffect(() => {
+        isMounted.current = true;
+    }, []);
+
+    const getAllAttachments = () => {
+        return data.cards.reduce((result, card) => {
+            return result.concat(get(card, 'head.attachments', []));
+        }, []);
+    };
+
     const parseParams = () => {
-        const fields = data.cards.reduce((result, card) => {
-            const cardFields = parseStackParams(get(card, 'head.attachments', [])) || {};
-
-            Object.keys(cardFields).forEach(fieldName => {
-                if (result[fieldName]) {
-                    if (cardFields[fieldName].type === 'select') {
-                        result[fieldName].options = unionBy(
-                            result[fieldName].options,
-                            cardFields[fieldName].options, 'value');
-                    }
-
-                    if (cardFields[fieldName].type === 'slider') {
-
-                        result[fieldName].options = {
-                            ...result[fieldName].options,
-                            ...cardFields[fieldName].options,
-                        };
-
-                        result[fieldName].min = Math.min(result[fieldName].min, cardFields[fieldName].min);
-                        result[fieldName].max = Math.max(result[fieldName].max, cardFields[fieldName].max);
-                    }
-                } else {
-                    result[fieldName] = cardFields[fieldName];
-                }
-            });
-
-            return result;
-        }, {});
+        const fields = parseStackParams(getAllAttachments()) || {};
 
         const defaultFilterValues = Object.keys(fields).reduce((result, fieldName) => {
             if (fields[fieldName].type === 'select')
@@ -116,21 +110,45 @@ const Details = ({renderHeader, renderSideHeader}) => {
         setFields(fields);
     };
 
-    const update = async (params: {}) => {
-        const response = await updateReport(user, id, params);
+    const parseTabs = () => {
+        const attachments = getAllAttachments();
 
-        mutate({
-            ...data,
-            ...response.dashboard,
-        });
+        if (!attachments || !attachments.length)
+            return;
+
+        const tabs = parseStackTabs(attachments);
+
+        setTabs(tabs);
+        setActiveTab(tabs[0]?.value);
     };
 
-    const onChangeTitle = useDebounce(async title => {
-        await update({title});
+    const onChangeTab = tabName => {
+        setActiveTab(tabName);
+    };
+
+    const update = async (params: {}) => {
+        await updateReport(user, id, params);
+    };
+
+    const debounceUpdateTitle = useDebounce(async fields => {
+        await update(fields);
     }, 300);
 
-    const onChangePrivate = async isPrivate => {
-        await update({private: isPrivate});
+    const onChangeTitle = title => {
+        data.title = title;
+        mutate(data, false);
+        debounceUpdateTitle({title});
+    };
+
+    const debounceUpdateDescription = useDebounce(async fields => {
+        await update(fields);
+    }, 300);
+
+
+    const onChangeDescription = description => {
+        data.description = description;
+        mutate(data, false);
+        debounceUpdateDescription({description});
     };
 
     const addStacks = async stacks => {
@@ -141,8 +159,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
             data?.cards?.length
         );
 
-
-        mutate(dashboard);
+        mutate(dashboard, false);
     };
 
     const getDeleteCardFunc = stack => async () => {
@@ -152,21 +169,21 @@ const Details = ({renderHeader, renderSideHeader}) => {
             stack,
         );
 
-        mutate(dashboard);
+        mutate(dashboard, false);
     };
 
-    const getUpdatedCardTitleFunc = stack => async title => {
+    const getUpdatedCardFunc = stack => async fields => {
         const {cards} = await reportUpdateCard(
             user,
             id,
             stack,
-            {title}
+            fields
         );
 
         mutate({
             ...data,
             cards,
-        });
+        }, false);
     };
 
     const moveCard = (indexFrom, indexTo) => {
@@ -212,6 +229,13 @@ const Details = ({renderHeader, renderSideHeader}) => {
 
         setIsShowStacksModal(isShow => !isShow);
     };
+
+    const onBlurDescription = () => {
+        if (!data.description?.length)
+            setIsShowDesc(false);
+    };
+
+    const addDesc = () => setIsShowDesc(true);
 
     if (error?.status === 403)
         return <AccessForbidden>
@@ -265,7 +289,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 <div className={css.title}>
                     <StretchTitleField
                         className={css.edit}
-                        value={data?.title}
+                        value={data.title}
                         onChange={onChangeTitle}
                         readOnly={currentUserName !== data.user}
                         placeholder={t('newDashboard')}
@@ -274,14 +298,21 @@ const Details = ({renderHeader, renderSideHeader}) => {
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {renderHeader && renderHeader({data})}
+                {renderHeader && renderHeader()}
 
                 <div className={css.sideHeader}>
-                    {renderSideHeader && renderSideHeader({
-                        data,
-                        onChangePrivate,
-                        mutateData: mutate,
-                    })}
+                    {isUserOwner && (
+                        <a
+                            className={css.addButton}
+                            onClick={toggleAddStackModal}
+                            href="#"
+                        >
+                            <span className="mdi mdi-plus" />
+                            {t('addStack')}
+                        </a>
+                    )}
+
+                    {renderSideHeader && renderSideHeader()}
 
                     {isUserOwner && <Dropdown
                         className={css.dropdown}
@@ -303,34 +334,40 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 </div>
             </div>
 
+            <div className={css.description}>
+                {isShowDesc && <StretchTextareaField
+                    value={data.description}
+                    ref={descFieldRef}
+                    placeholder={t('description')}
+                    onChange={onChangeDescription}
+                    onBlur={onBlurDescription}
+                />}
+
+                {!isShowDesc && <Button
+                    className={css.addDesc}
+                    color="secondary"
+                    onClick={addDesc}
+                >
+                    + {t('addDescription')}
+                </Button>}
+            </div>
+
+            {Boolean(tabs.length) && <StackTabs
+                className={css.tabs}
+                onChange={onChangeTab}
+                value={activeTab}
+                items={tabs}
+            />}
+
             {Boolean(items.length) && (
-                <Fragment>
+                <div className={css.container}>
                     <div className={css.section}>
                         <div className={css.fields}>
                             {renderFilters()}
                         </div>
-
-                        <div className={css.controls}>
-                            {isUserOwner && (
-                                <a
-                                    className={css.addButton}
-                                    onClick={toggleAddStackModal}
-                                    href="#"
-                                >
-                                    <span className="mdi mdi-plus" />
-                                    {t('addStack')}
-                                </a>
-                            )}
-
-                            <ViewSwitcher
-                                value={view}
-                                className={css.viewSwitcher}
-                                onChange={view => setView(view)}
-                            />
-                        </div>
                     </div>
 
-                    <div className={cn(css.cards, view)}>
+                    <div className={cn(css.cards)}>
                         {items.map(item => (
                             <CardWrapComponent
                                 key={item.card.stack}
@@ -340,17 +377,17 @@ const Details = ({renderHeader, renderSideHeader}) => {
                                 } : {})}
                             >
                                 <Card
-                                    type={view}
+                                    activeTab={activeTab}
                                     filters={form}
                                     deleteCard={isUserOwner && getDeleteCardFunc(item.card.stack)}
                                     data={item.card}
-                                    updateCardTitle={isUserOwner && getUpdatedCardTitleFunc(item.card.stack)}
+                                    updateCard={isUserOwner && getUpdatedCardFunc(item.card.stack)}
                                     moveAvailable={isUserOwner}
                                 />
                             </CardWrapComponent>
                         ))}
                     </div>
-                </Fragment>
+                </div>
             )}
 
             {!items.length && (
