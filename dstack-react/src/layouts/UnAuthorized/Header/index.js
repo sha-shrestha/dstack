@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
 import Button from '../../../Button';
-import logo from '../assets/logo.svg';
+import {ReactComponent as Logo} from '../assets/logo.svg';
 import css from './styles.module.css';
 
 type Props = {
@@ -15,7 +15,7 @@ const Header = ({className}: Props) => {
 
     return <div className={cx(css.header, className)}>
         <Link to="/" className={css.logo}>
-            <img width="129" height="35" src={logo} alt="logo"/>
+            <Logo width="129" height="35" />
         </Link>
 
         <div className={css.buttons}>

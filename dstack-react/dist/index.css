@@ -270,7 +270,7 @@
         padding-top: 180px
 }
     }
-._3PN84 img {
+._3PN84 svg {
         flex-shrink: 0;
         margin-bottom: 30px;
     }
@@ -1292,7 +1292,7 @@ button._2lKoS {
         padding-top: 180px
 }
     }
-._tAZyq img {
+._tAZyq svg {
         flex-shrink: 0;
         margin-bottom: 40px;
     }
@@ -5712,7 +5712,7 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     flex-shrink: 0;
 }
 @media (max-width: 980px) {
-._1jfuS > img {
+._1jfuS > svg {
             max-width: 85px;
             height: auto
     }

@@ -15,7 +15,7 @@
 }
 .logo {
     flex-shrink: 0;
-    & > img {
+    & > svg {
         @media (--mobile) {
             max-width: 85px;
             height: auto;

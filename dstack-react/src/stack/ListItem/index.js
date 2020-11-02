@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
 import cn from 'classnames';
-import chartIcon from './assets/chart.svg';
+import {ReactComponent as Chart} from './assets/chart.svg';
 // import tableIcon from './assets/table.svg';
 import css from './styles.module.css';
 
@@ -44,7 +44,7 @@ const Item = ({
             {...rest}
         >
             <div className={css.icon}>
-                <img src={chartIcon} alt="" />
+                <Chart />
             </div>
 
             <div className={css.top}>

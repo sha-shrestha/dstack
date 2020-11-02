@@ -12,7 +12,7 @@
     @media (--desktop) {
         padding-top: 180px;
     }
-    img {
+    svg {
         flex-shrink: 0;
         margin-bottom: 30px;
     }

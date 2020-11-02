@@ -1,12 +1,13 @@
 // @flow
 import React from 'react';
-import image from './lock.svg';
+import {ReactComponent as Lock} from './lock.svg';
+
 import css from './style.module.css';
 
 const AccessForbidden = ({children}) => {
     return (
         <div className={css.forbidden}>
-            <img src={image} alt="" width="85" height="104" />
+            <Lock alt="" width="85" height="104" />
 
             {children && (
                 <div className={css.message}>

@@ -2,7 +2,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import config from '../config';
-import image from './404.svg';
+import {ReactComponent as NotFoundIcon} from './404.svg';
 import css from './style.module.css';
 
 const NotFound = ({children}) => {
@@ -10,7 +10,7 @@ const NotFound = ({children}) => {
 
     return (
         <div className={css['not-found']}>
-            <img src={image} alt="" width="224" height="77" />
+            <NotFoundIcon width="224" height="77" />
 
             {children && (
                 <div className={css.message}>

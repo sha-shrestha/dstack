@@ -263,7 +263,67 @@ var apiFabric = function apiFabric(_temp) {
   return instance;
 };
 
-var image = "lock~ZBorChcU.svg";
+function _extends$1() {
+  _extends$1 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$1.apply(this, arguments);
+}
+
+var _ref = /*#__PURE__*/React.createElement("rect", {
+  x: 17.023,
+  y: 5.294,
+  width: 51.377,
+  height: 70.558,
+  rx: 25.689,
+  stroke: "#CFAEE1",
+  strokeWidth: 10
+});
+
+var _ref2 = /*#__PURE__*/React.createElement("rect", {
+  x: 0.516,
+  y: 42.057,
+  width: 84.394,
+  height: 61.377,
+  rx: 10,
+  fill: "#E9CAFA"
+});
+
+var _ref3 = /*#__PURE__*/React.createElement("g", {
+  opacity: 0.3,
+  fill: "#BB77DF"
+}, /*#__PURE__*/React.createElement("rect", {
+  x: 38.877,
+  y: 63.206,
+  width: 7.672,
+  height: 16.879,
+  rx: 3.836
+}), /*#__PURE__*/React.createElement("rect", {
+  x: 35.808,
+  y: 72.412,
+  width: 13.81,
+  height: 13.81,
+  rx: 6.905
+}));
+
+function SvgLock(props) {
+  return /*#__PURE__*/React.createElement("svg", _extends$1({
+    width: 85,
+    height: 104,
+    fill: "none"
+  }, props), _ref, _ref2, _ref3);
+}
 
 var css = {"forbidden":"_3PN84","message":"_2i8KH"};
 
@@ -271,8 +331,7 @@ var AccessForbidden = function AccessForbidden(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
     className: css.forbidden
-  }, /*#__PURE__*/React__default.createElement("img", {
-    src: image,
+  }, /*#__PURE__*/React__default.createElement(SvgLock, {
     alt: "",
     width: "85",
     height: "104"
@@ -996,7 +1055,52 @@ var Modal = function Modal(_ref) {
   }, title), children)));
 };
 
-var image$1 = "404~FXFqzVOe.svg";
+function _extends$2() {
+  _extends$2 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$2.apply(this, arguments);
+}
+
+var _ref$1 = /*#__PURE__*/React.createElement("path", {
+  d: "M36.888 47.532V21.244L20.14 47.532h16.748zM35.616 77V63.22H0V48.592L33.496.68h20.246v46.852h8.692V63.22h-8.692V77H35.616zM197.773 47.532V21.244l-16.748 26.288h16.748zM196.501 77V63.22h-35.616V48.592L194.381.68h20.246v46.852h8.692V63.22h-8.692V77h-18.126z",
+  fill: "#B4B8C7",
+  fillOpacity: 0.6
+});
+
+var _ref2$1 = /*#__PURE__*/React.createElement("path", {
+  d: "M150.806 39c0 20.987-17.014 38-38 38-20.987 0-38-17.013-38-38s17.013-38 38-38c20.986 0 38 17.013 38 38zm-60.048 0c0 12.177 9.871 22.048 22.048 22.048 12.176 0 22.047-9.871 22.047-22.048 0-12.177-9.871-22.048-22.047-22.048-12.177 0-22.048 9.871-22.048 22.048z",
+  fill: "#89C6FF"
+});
+
+var _ref3$1 = /*#__PURE__*/React.createElement("path", {
+  d: "M150.806 39a37.997 37.997 0 01-30.186 37.188l-3.28-15.612A22.047 22.047 0 00134.853 39h15.953z",
+  fill: "#D294F2"
+});
+
+var _ref4 = /*#__PURE__*/React.createElement("path", {
+  d: "M122.552 75.729a38.002 38.002 0 01-45.98-48.183l15.219 4.81a22.041 22.041 0 0026.667 27.947l4.094 15.426z",
+  fill: "#CDF27E"
+});
+
+function Svg404(props) {
+  return /*#__PURE__*/React.createElement("svg", _extends$2({
+    width: 224,
+    height: 77,
+    fill: "none"
+  }, props), _ref$1, _ref2$1, _ref3$1, _ref4);
+}
 
 var css$c = {"not-found":"_tAZyq","message":"_3Ok1U","help":"_Aa8x8"};
 
@@ -1008,9 +1112,7 @@ var NotFound = function NotFound(_ref) {
 
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$c['not-found']
-  }, /*#__PURE__*/React__default.createElement("img", {
-    src: image$1,
-    alt: "",
+  }, /*#__PURE__*/React__default.createElement(Svg404, {
     width: "224",
     height: "77"
   }), children && /*#__PURE__*/React__default.createElement("div", {
@@ -2089,7 +2191,69 @@ var Attachment = function Attachment(_ref) {
   }));
 };
 
-var chartIcon = "chart~FgFRCRzg.svg";
+function _extends$3() {
+  _extends$3 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$3.apply(this, arguments);
+}
+
+var _ref$2 = /*#__PURE__*/React.createElement("g", {
+  fill: "#86A6DD"
+}, /*#__PURE__*/React.createElement("rect", {
+  width: 2,
+  height: 19,
+  rx: 1
+}), /*#__PURE__*/React.createElement("rect", {
+  x: 4,
+  y: 5.846,
+  width: 2,
+  height: 13.154,
+  rx: 1
+}), /*#__PURE__*/React.createElement("rect", {
+  x: 8,
+  y: 9.5,
+  width: 2,
+  height: 9.5,
+  rx: 1
+}), /*#__PURE__*/React.createElement("rect", {
+  x: 12,
+  y: 7.308,
+  width: 2,
+  height: 11.692,
+  rx: 1
+}), /*#__PURE__*/React.createElement("rect", {
+  x: 16,
+  y: 12.971,
+  width: 2,
+  height: 6.029,
+  rx: 1
+}), /*#__PURE__*/React.createElement("rect", {
+  x: 20,
+  y: 9.5,
+  width: 2,
+  height: 9.5,
+  rx: 1
+}));
+
+function SvgChart(props) {
+  return /*#__PURE__*/React.createElement("svg", _extends$3({
+    width: 22,
+    height: 19,
+    fill: "none"
+  }, props), _ref$2);
+}
 
 var css$s = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","date":"_2c9og"};
 
@@ -2118,10 +2282,7 @@ var Item = function Item(_ref) {
     ref: ref
   }, rest), /*#__PURE__*/React__default.createElement("div", {
     className: css$s.icon
-  }, /*#__PURE__*/React__default.createElement("img", {
-    src: chartIcon,
-    alt: ""
-  })), /*#__PURE__*/React__default.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement(SvgChart, null)), /*#__PURE__*/React__default.createElement("div", {
     className: css$s.top
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$s.name
@@ -6048,7 +6209,100 @@ var Reports = function Reports(_ref) {
   })));
 };
 
-var logo = "logo~gyFSAwBb.svg";
+function _extends$4() {
+  _extends$4 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$4.apply(this, arguments);
+}
+
+var _ref$3 = /*#__PURE__*/React.createElement("path", {
+  d: "M72.388 28.36c.867-.884 1.3-2.063 1.3-3.536 0-1.473-.433-2.643-1.3-3.51-.85-.867-1.863-1.3-3.042-1.3-1.179 0-2.201.425-3.068 1.274-.85.85-1.274 2.01-1.274 3.484 0 1.473.425 2.66 1.274 3.562.867.884 1.89 1.326 3.068 1.326 1.179 0 2.193-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.127 0 2.115.26 2.964.78.867.503 1.534 1.17 2.002 2.002V12.76h2.99V32h-2.99v-2.678a5.766 5.766 0 01-2.002 2.132c-.85.52-1.837.78-2.964.78zM79.921 21.782c0-1.213.511-2.236 1.534-3.068 1.023-.85 2.366-1.274 4.03-1.274 1.664 0 2.981.416 3.952 1.248.988.815 1.517 1.933 1.586 3.354h-3.042c-.052-.71-.303-1.265-.754-1.664-.433-.399-1.049-.598-1.846-.598-.797 0-1.421.182-1.872.546-.45.347-.676.815-.676 1.404 0 .572.286 1.023.858 1.352.572.33 1.265.572 2.08.728.832.156 1.655.347 2.47.572a4.422 4.422 0 012.106 1.248c.572.59.858 1.387.858 2.392 0 1.248-.529 2.262-1.586 3.042-1.04.78-2.383 1.17-4.03 1.17-1.647 0-2.981-.399-4.004-1.196-1.023-.797-1.586-1.933-1.69-3.406h3.068c.052.71.312 1.265.78 1.664s1.1.598 1.898.598c.815 0 1.456-.173 1.924-.52.485-.364.728-.84.728-1.43s-.286-1.049-.858-1.378c-.572-.33-1.274-.572-2.106-.728a71.892 71.892 0 01-2.47-.572 4.632 4.632 0 01-2.08-1.196c-.572-.572-.858-1.335-.858-2.288zM101.402 20.092h-3.484v7.93c0 .537.121.927.364 1.17.26.225.693.338 1.3.338h1.82V32h-2.34c-2.756 0-4.134-1.326-4.134-3.978v-7.93h-1.69v-2.418h1.69v-3.562h2.99v3.562h3.484v2.418zM113.572 28.36c.866-.884 1.3-2.063 1.3-3.536 0-1.473-.434-2.643-1.3-3.51-.85-.867-1.864-1.3-3.042-1.3-1.179 0-2.202.425-3.068 1.274-.85.85-1.274 2.01-1.274 3.484 0 1.473.424 2.66 1.274 3.562.866.884 1.889 1.326 3.068 1.326 1.178 0 2.192-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.126 0 2.114.26 2.964.78.866.503 1.534 1.17 2.002 2.002v-2.548h2.99V32h-2.99v-2.678a5.774 5.774 0 01-2.002 2.132c-.85.52-1.838.78-2.964.78zM127.787 32.234c-2.08 0-3.77-.676-5.07-2.028-1.3-1.352-1.95-3.137-1.95-5.356 0-2.236.65-4.03 1.95-5.382 1.317-1.352 3.007-2.028 5.07-2.028 1.733 0 3.163.416 4.29 1.248 1.144.815 1.915 1.985 2.314 3.51h-3.198c-.538-1.508-1.673-2.262-3.406-2.262-1.214 0-2.184.433-2.912 1.3-.711.85-1.066 2.045-1.066 3.588 0 1.543.355 2.747 1.066 3.614.728.867 1.698 1.3 2.912 1.3 1.716 0 2.851-.754 3.406-2.262h3.198c-.416 1.456-1.196 2.617-2.34 3.484-1.144.85-2.566 1.274-4.264 1.274zM140.308 32h-2.964V12.76h2.964v11.18l5.2-6.266h4.108l-6.604 7.176 6.604 7.15h-4.004l-5.304-6.162V32zM154.107 31.506a1.78 1.78 0 01-1.274.494c-.503 0-.927-.173-1.274-.52a1.75 1.75 0 01-.494-1.248c0-.503.165-.927.494-1.274.347-.347.771-.52 1.274-.52s.927.173 1.274.52c.347.347.52.771.52 1.274s-.173.927-.52 1.274zM167.298 28.36c.867-.884 1.3-2.063 1.3-3.536 0-1.473-.433-2.643-1.3-3.51-.849-.867-1.863-1.3-3.042-1.3-1.179 0-2.201.425-3.068 1.274-.849.85-1.274 2.01-1.274 3.484 0 1.473.425 2.66 1.274 3.562.867.884 1.889 1.326 3.068 1.326s2.193-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.127 0 2.115.26 2.964.78a5.284 5.284 0 012.002 2.002v-2.548h2.99V32h-2.99v-2.678a5.766 5.766 0 01-2.002 2.132c-.849.52-1.837.78-2.964.78zM178.861 13.878c0 .537-.182.988-.546 1.352-.364.364-.815.546-1.352.546-.52 0-.962-.182-1.326-.546-.364-.364-.546-.815-.546-1.352 0-.537.182-.988.546-1.352a1.805 1.805 0 011.326-.546c.537 0 .988.182 1.352.546.364.364.546.815.546 1.352zM175.481 32V17.674h2.964V32h-2.964z",
+  fill: "#303340"
+});
+
+var _ref2$2 = /*#__PURE__*/React.createElement("rect", {
+  width: 31.284,
+  height: 29.645,
+  rx: 3,
+  transform: "scale(1.1958 .755) rotate(-45 51.44 21.307)",
+  fill: "url(#logo_svg__paint0_linear)"
+});
+
+var _ref3$2 = /*#__PURE__*/React.createElement("rect", {
+  width: 31.284,
+  height: 29.645,
+  rx: 3,
+  transform: "scale(1.1958 .755) rotate(-45 39.314 16.284)",
+  fill: "url(#logo_svg__paint1_linear)",
+  fillOpacity: 0.9
+});
+
+var _ref4$1 = /*#__PURE__*/React.createElement("rect", {
+  width: 31.284,
+  height: 29.645,
+  rx: 3,
+  transform: "scale(1.1958 .755) rotate(-45 26.73 10.993)",
+  fill: "url(#logo_svg__paint2_linear)",
+  fillOpacity: 0.9
+});
+
+var _ref5 = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+  id: "logo_svg__paint0_linear",
+  x1: 24.978,
+  y1: -2.508,
+  x2: 2.623,
+  y2: 27.352,
+  gradientUnits: "userSpaceOnUse"
+}, /*#__PURE__*/React.createElement("stop", {
+  stopColor: "#372191"
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: 1,
+  stopColor: "#9D8EF8"
+})), /*#__PURE__*/React.createElement("linearGradient", {
+  id: "logo_svg__paint1_linear",
+  x1: 24.899,
+  y1: -2.429,
+  x2: -1.348,
+  y2: 22.377,
+  gradientUnits: "userSpaceOnUse"
+}, /*#__PURE__*/React.createElement("stop", {
+  stopColor: "#7B369F"
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: 1,
+  stopColor: "#DCAFF3"
+})), /*#__PURE__*/React.createElement("linearGradient", {
+  id: "logo_svg__paint2_linear",
+  x1: 18.113,
+  y1: 3.687,
+  x2: -8.564,
+  y2: 16.952,
+  gradientUnits: "userSpaceOnUse"
+}, /*#__PURE__*/React.createElement("stop", {
+  stopColor: "#84D1EA"
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: 1,
+  stopColor: "#DAF7FE"
+})));
+
+function SvgLogo(props) {
+  return /*#__PURE__*/React.createElement("svg", _extends$4({
+    width: 179,
+    height: 48,
+    fill: "none"
+  }, props), _ref$3, _ref2$2, _ref3$2, _ref4$1, _ref5);
+}
 
 var css$W = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
@@ -6063,11 +6317,9 @@ var Header = function Header(_ref) {
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/",
     className: css$W.logo
-  }, /*#__PURE__*/React__default.createElement("img", {
+  }, /*#__PURE__*/React__default.createElement(SvgLogo, {
     width: "129",
-    height: "35",
-    src: logo,
-    alt: "logo"
+    height: "35"
   })), /*#__PURE__*/React__default.createElement("div", {
     className: css$W.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
@@ -6151,6 +6403,8 @@ exports.MarkdownRender = MarkdownRender;
 exports.Modal = Modal;
 exports.NotFound = NotFound;
 exports.ProgressBar = ProgressBar;
+exports.ReportDetails = Details$2;
+exports.ReportList = List$2;
 exports.Reports = Reports;
 exports.SearchField = SearchField;
 exports.SelectField = SelectField;
