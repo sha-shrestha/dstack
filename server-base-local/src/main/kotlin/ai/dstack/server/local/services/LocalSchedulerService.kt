@@ -194,6 +194,7 @@ class LocalSchedulerService @Autowired constructor(
                     "--runtime", job.runtime, "--job", job.id)
             val extension = if (job.runtime == "python") ".py" else ".R"
             val file = File(config.jobDirectory + "/executions/" + user.token + "/" + job.id + extension)
+            file.parentFile.mkdirs()
             file.writeText(job.code)
             file.deleteOnExit()
             if (config.rscriptExecutable != null) {

@@ -42,7 +42,6 @@ def exec_code(job_user_token, job_runtime, job_id, rscript_executable):
 def run_job(server_url, job_user_name, job_user_token, job_id, job_runtime, rscript_executable):
     job_path = "executions/" + job_user_token
     shutil.rmtree(os.path.join(job_path, ".dstack"), ignore_errors=True)
-    Path(job_path).mkdir(parents=True, exist_ok=True)
     p = subprocess.Popen(["dstack", "config", "add", "--server", server_url, "--token", job_user_token,
                           "--user", job_user_name, "--force", "--file",
                           "./config.yaml" if job_runtime == "python" else "./.dstack/config.yaml"],
