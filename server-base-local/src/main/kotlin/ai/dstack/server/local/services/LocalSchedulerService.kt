@@ -12,14 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
+
 
 @Component
 class LocalSchedulerService @Autowired constructor(
-    private val jobService: JobService,
-    private val userService: UserService,
-    private val config: AppConfig
+        private val jobService: JobService,
+        private val userService: UserService,
+        private val config: AppConfig
 ) : SchedulerService {
     companion object : KLogging()
 
@@ -187,15 +187,37 @@ class LocalSchedulerService @Autowired constructor(
     }
 
     override fun schedule(job: Job, user: User) {
-        jobService.update(job.copy(status = JobStatus.Scheduled))
-        val commands = mutableListOf(config.pythonExecutable ?: "python3", runnerFile.name,
-                "--server", "http://127.0.0.1:8080/api", "--user", user.name, "--token", user.token,
-                "--runtime", job.runtime, "--job", job.id, "--code", job.code)
-        if (config.rscriptExecutable != null) {
-            commands.addAll(listOf("--rscript", config.rscriptExecutable!!))
+        if (config.pythonExecutable != null) {
+            jobService.update(job.copy(status = JobStatus.Scheduled))
+            val commands = mutableListOf(config.pythonExecutable, runnerFile.name,
+                    "--server", "http://127.0.0.1:8080/api", "--user", user.name, "--token", user.token,
+                    "--runtime", job.runtime, "--job", job.id)
+            val extension = if (job.runtime == "python") ".py" else ".R"
+            val file = File(config.jobDirectory + "/executions/" + user.token + "/" + job.id + extension)
+            file.writeText(job.code)
+            file.deleteOnExit()
+            if (config.rscriptExecutable != null) {
+                commands.addAll(listOf("--rscript", config.rscriptExecutable!!))
+            }
+            val p = ProcessBuilder(commands)
+                    .directory(File(config.jobDirectory))
+                    .start()
+            ErrorLogger(p.errorStream).start()
+        } else {
+            jobService.update(job.copy(status = JobStatus.Failed, logs = "The Python executable is not configured."))
         }
-        ProcessBuilder(commands)
-                .directory(File(config.jobDirectory))
-                .start()
+    }
+
+    class ErrorLogger(var inputStream: InputStream) : Thread() {
+        override fun run() {
+            try {
+                val isr = InputStreamReader(inputStream)
+                val br = BufferedReader(isr)
+                var line: String?
+                while (br.readLine().also { line = it } != null) logger.error { line }
+            } catch (ex: IOException) {
+                logger.error { ex }
+            }
+        }
     }
 }
