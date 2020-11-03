@@ -5887,7 +5887,9 @@ var Details$2 = function Details(_ref) {
     }));
   };
 
-  var _useSWR = useSWR([apiUrl + config.DASHBOARD_DETAILS(user, id), dataFormat$5], fetcher),
+  var _useSWR = useSWR([apiUrl + config.DASHBOARD_DETAILS(user, id), dataFormat$5], fetcher, {
+    revalidateOnFocus: false
+  }),
       data = _useSWR.data,
       mutate = _useSWR.mutate,
       error = _useSWR.error;
@@ -5901,7 +5903,7 @@ var Details$2 = function Details(_ref) {
   React.useEffect(function () {
     var _data$description2;
 
-    if (!lodashEs.isEqual(prevData === null || prevData === void 0 ? void 0 : prevData.cards, data === null || data === void 0 ? void 0 : data.cards)) {
+    if (!lodashEs.isEqual(prevData === null || prevData === void 0 ? void 0 : prevData.cards, data === null || data === void 0 ? void 0 : data.cards) || (data === null || data === void 0 ? void 0 : data.cards) && !isMounted.current) {
       parseTabs();
     }
 
@@ -5958,17 +5960,20 @@ var Details$2 = function Details(_ref) {
   var parseTabs = function parseTabs() {
     var _tabs$;
 
-    setActiveTab(undefined);
     var attachments = getAllAttachments();
     if (!attachments || !attachments.length) return;
     var tabs = parseStackTabs(attachments);
-    var activeTab = ((_tabs$ = tabs[0]) === null || _tabs$ === void 0 ? void 0 : _tabs$.value) || null;
+    var hasOldTab = tabs.some(function (t) {
+      return activeTab && t.value === activeTab;
+    });
+    var newActiveTab = hasOldTab ? activeTab : ((_tabs$ = tabs[0]) === null || _tabs$ === void 0 ? void 0 : _tabs$.value) || null;
     setTabs(tabs);
-    setActiveTab(activeTab);
+    setActiveTab(newActiveTab);
+    if (newActiveTab === activeTab) filterCards();
   };
 
   var filterCards = function filterCards() {
-    if (tabs.length) {
+    if (tabs.length && activeTab) {
       var _filteredCards = data.cards.filter(function (card) {
         var attachments = lodashEs.get(card, 'head.attachments', []);
         if (!attachments || !attachments.length) return true;
@@ -6053,8 +6058,13 @@ var Details$2 = function Details(_ref) {
           stack: stack
         };
       }), data === null || data === void 0 ? void 0 : (_data$cards = data.cards) === null || _data$cards === void 0 ? void 0 : _data$cards.length)).then(function (_ref2) {
-        var dashboard = _ref2.dashboard;
-        mutate(dashboard, false);
+        var cards = _ref2.dashboard.cards;
+        var newCards = cards.filter(function (c) {
+          return stacks.indexOf(c.stack) >= 0;
+        });
+        mutate(_extends({}, data, {
+          cards: data.cards.concat(newCards)
+        }), false);
       });
     } catch (e) {
       return Promise.reject(e);
@@ -6064,9 +6074,12 @@ var Details$2 = function Details(_ref) {
   var getDeleteCardFunc = function getDeleteCardFunc(stack) {
     return function () {
       try {
-        return Promise.resolve(reportDeleteCard(user, id, stack)).then(function (_ref3) {
-          var dashboard = _ref3.dashboard;
-          mutate(dashboard, false);
+        return Promise.resolve(reportDeleteCard(user, id, stack)).then(function () {
+          mutate(_extends({}, data, {
+            cards: data.cards.filter(function (c) {
+              return c.stack !== stack;
+            })
+          }), false);
         });
       } catch (e) {
         return Promise.reject(e);
@@ -6077,8 +6090,8 @@ var Details$2 = function Details(_ref) {
   var getUpdatedCardFunc = function getUpdatedCardFunc(stack) {
     return function (fields) {
       try {
-        return Promise.resolve(reportUpdateCard(user, id, stack, fields)).then(function (_ref4) {
-          var newCards = _ref4.cards;
+        return Promise.resolve(reportUpdateCard(user, id, stack, fields)).then(function (_ref3) {
+          var newCards = _ref3.cards;
           var updatedCard = newCards.find(function (i) {
             return i.stack === stack;
           });
@@ -6241,7 +6254,7 @@ var Details$2 = function Details(_ref) {
       updateCard: isUserOwner && getUpdatedCardFunc(item.card.stack),
       moveAvailable: isUserOwner
     }));
-  }))), !items.length && /*#__PURE__*/React__default.createElement("div", {
+  }))), !items.length && !(data === null || data === void 0 ? void 0 : data.cards) && /*#__PURE__*/React__default.createElement("div", {
     className: css$U.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), isUserOwner && /*#__PURE__*/React__default.createElement(React.Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
     className: css$U.addButton,

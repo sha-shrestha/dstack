@@ -54,6 +54,8 @@ const Details = ({renderHeader, renderSideHeader}) => {
             dataFormat,
         ],
         dataFetcher,
+
+        {revalidateOnFocus: false}
     );
 
     const [isShowDesc, setIsShowDesc] = useState(Boolean(data?.description?.length));
@@ -62,7 +64,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
     const prevData = usePrevious(data);
 
     useEffect(() => {
-        if (!isEqual(prevData?.cards, data?.cards)) {
+        if (!isEqual(prevData?.cards, data?.cards) || (data?.cards && !isMounted.current)) {
             parseTabs();
         }
 
@@ -131,21 +133,26 @@ const Details = ({renderHeader, renderSideHeader}) => {
     };
 
     const parseTabs = () => {
-        setActiveTab(undefined);
         const attachments = getAllAttachments();
 
         if (!attachments || !attachments.length)
             return;
 
         const tabs = parseStackTabs(attachments);
-        const activeTab = tabs[0]?.value || null;
+        const hasOldTab = tabs.some(t => activeTab && t.value === activeTab);
+
+        const newActiveTab = hasOldTab ? activeTab : (tabs[0]?.value || null);
+
 
         setTabs(tabs);
-        setActiveTab(activeTab);
+        setActiveTab(newActiveTab);
+
+        if (newActiveTab === activeTab)
+            filterCards();
     };
 
     const filterCards = () => {
-        if (tabs.length) {
+        if (tabs.length && activeTab) {
             const filteredCards = data.cards.filter(card => {
                 const attachments = get(card, 'head.attachments', []);
 
@@ -208,24 +215,32 @@ const Details = ({renderHeader, renderSideHeader}) => {
     };
 
     const addStacks = async stacks => {
-        const {dashboard} = await reportInsertCard(
+        const {dashboard: {cards}} = await reportInsertCard(
             user,
             id,
             stacks.map(stack => ({stack})),
             data?.cards?.length
         );
 
-        mutate(dashboard, false);
+        const newCards = cards.filter(c => stacks.indexOf(c.stack) >= 0);
+
+        mutate({
+            ...data,
+            cards: data.cards.concat(newCards),
+        }, false);
     };
 
     const getDeleteCardFunc = stack => async () => {
-        const {dashboard} = await reportDeleteCard(
+        await reportDeleteCard(
             user,
             id,
             stack,
         );
 
-        mutate(dashboard, false);
+        mutate({
+            ...data,
+            cards: data.cards.filter(c => c.stack !== stack),
+        }, false);
     };
 
     const getUpdatedCardFunc = stack => async fields => {
@@ -456,7 +471,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 </div>
             )}
 
-            {!items.length && (
+            {!items.length && !data?.cards && (
                 <div className={css.empty}>
                     {t('thereAreNoStacksYet')} <br/>
                     {t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow')}
