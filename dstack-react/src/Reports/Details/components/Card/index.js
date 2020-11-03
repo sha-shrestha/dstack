@@ -70,7 +70,7 @@ const Card = memo(({
 
     useEffect(() => {
         findAttach();
-    }, [filters, activeTab]);
+    }, [filters]);
 
     useEffect(() => {
         if (forwardedRef.current)
@@ -101,7 +101,7 @@ const Card = memo(({
             return;
 
         if (fields.length || (tabs.length && activeTab)) {
-            const hasAttach = attachments.some((attach, index) => {
+            attachments.some((attach, index) => {
                 let valid = true;
 
                 if (!tab
@@ -121,11 +121,6 @@ const Card = memo(({
 
                 return valid;
             });
-
-
-            if (!hasAttach && tabs.length) {
-                setAttachmentIndex(null);
-            }
         } else
             setAttachmentIndex(0);
     };
@@ -168,7 +163,6 @@ const Card = memo(({
         <div
             className={cx(css.card, `col-${columns}`, className)}
             ref={forwardedRef}
-            style={{display: attachmentIndex === null ? 'none' : ''}}
         >
             <div className={css.inner}>
                 <div className={css.head}>

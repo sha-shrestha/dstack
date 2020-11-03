@@ -45,6 +45,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
     const [tabs, setTabs] = useState([]);
     const {form, setForm, onChange} = useForm({});
     const [fields, setFields] = useState({});
+    const [filteredCards, setFilteredCards] = useState([]);
     const setGridItems = cardsItems => setItems(cardsItems.map(card => ({id: card.index, card})));
 
     const {data, mutate, error} = useSWR(
@@ -61,11 +62,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
     const prevData = usePrevious(data);
 
     useEffect(() => {
-        if (data?.cards)
-            setGridItems(data?.cards);
-
-        if (!isEqual(prevData, data) && data?.cards) {
-            parseParams();
+        if (!isEqual(prevData?.cards, data?.cards)) {
             parseTabs();
         }
 
@@ -74,6 +71,18 @@ const Details = ({renderHeader, renderSideHeader}) => {
 
         return () => setGridItems([]);
     }, [data]);
+
+    useEffect(() => {
+        if (filteredCards.length) {
+            setGridItems(filteredCards);
+            parseParams();
+        }
+    }, [filteredCards]);
+
+    useEffect(() => {
+        if (activeTab !== undefined)
+            filterCards();
+    }, [activeTab]);
 
     useEffect(() => {
         if (isMounted.current
@@ -86,21 +95,30 @@ const Details = ({renderHeader, renderSideHeader}) => {
         isMounted.current = true;
     }, []);
 
-    const getAllAttachments = () => {
-        return data.cards.reduce((result, card) => {
+    const getAllAttachments = cards => {
+        if (!cards)
+            cards = data?.cards;
+
+        if (!cards?.length)
+            return [];
+
+        return cards.reduce((result, card) => {
             return result.concat(get(card, 'head.attachments', []));
         }, []);
     };
 
     const parseParams = () => {
-        const fields = parseStackParams(getAllAttachments()) || {};
+        const fields = parseStackParams(getAllAttachments(filteredCards)) || {};
 
         const defaultFilterValues = Object.keys(fields).reduce((result, fieldName) => {
             if (fields[fieldName].type === 'select')
                 result[fieldName] = fields[fieldName].options[0].value;
 
-            if (fields[fieldName].type === 'slider')
-                result[fieldName] = fields[fieldName].options[0];
+            if (fields[fieldName].type === 'slider') {
+                const key = Object.keys(fields[fieldName].options)[0];
+
+                result[fieldName] = fields[fieldName].options[key];
+            }
 
             if (fields[fieldName].type === 'checkbox')
                 result[fieldName] = false;
@@ -113,15 +131,47 @@ const Details = ({renderHeader, renderSideHeader}) => {
     };
 
     const parseTabs = () => {
+        setActiveTab(undefined);
         const attachments = getAllAttachments();
 
         if (!attachments || !attachments.length)
             return;
 
         const tabs = parseStackTabs(attachments);
+        const activeTab = tabs[0]?.value || null;
 
         setTabs(tabs);
-        setActiveTab(tabs[0]?.value);
+        setActiveTab(activeTab);
+    };
+
+    const filterCards = () => {
+        if (tabs.length) {
+            const filteredCards = data.cards.filter(card => {
+                const attachments = get(card, 'head.attachments', []);
+
+                if (!attachments || !attachments.length)
+                    return true;
+
+                const tabs = parseStackTabs(attachments);
+                const tab = tabs.find(t => t.value === activeTab);
+
+                if (!tabs.length)
+                    return true;
+
+                return attachments.some(attach => {
+                    return (tab
+                        && (
+                            attach.params[tab.value]?.type === 'tab'
+                            || attach.params[tab.key]?.title === tab.value
+                        )
+                    );
+                });
+            });
+
+            setFilteredCards(filteredCards);
+        } else {
+            setFilteredCards(data.cards);
+        }
     };
 
     const onChangeTab = tabName => {
