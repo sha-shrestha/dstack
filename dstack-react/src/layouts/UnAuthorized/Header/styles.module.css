@@ -16,9 +16,10 @@
 .logo {
     flex-shrink: 0;
     & > svg {
+        max-width: 129px;
+        height: auto;
         @media (--mobile) {
             max-width: 85px;
-            height: auto;
         }
     }
 }

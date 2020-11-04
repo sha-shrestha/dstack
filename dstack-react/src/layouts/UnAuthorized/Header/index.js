@@ -15,7 +15,7 @@ const Header = ({className}: Props) => {
 
     return <div className={cx(css.header, className)}>
         <Link to="/" className={css.logo}>
-            <Logo width="129" height="35" />
+            <Logo />
         </Link>
 
         <div className={css.buttons}>

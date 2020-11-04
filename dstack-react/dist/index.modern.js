@@ -318,6 +318,7 @@ function SvgLock(props) {
   return /*#__PURE__*/createElement("svg", _extends$1({
     width: 85,
     height: 104,
+    viewBox: "0 0 85 104",
     fill: "none"
   }, props), _ref, _ref2, _ref3);
 }
@@ -1095,6 +1096,7 @@ function Svg404(props) {
   return /*#__PURE__*/createElement("svg", _extends$2({
     width: 224,
     height: 77,
+    viewBox: "0 0 224 77",
     fill: "none"
   }, props), _ref$1, _ref2$1, _ref3$1, _ref4);
 }
@@ -2248,6 +2250,7 @@ function SvgChart(props) {
   return /*#__PURE__*/createElement("svg", _extends$3({
     width: 22,
     height: 19,
+    viewBox: "0 0 22 19",
     fill: "none"
   }, props), _ref$2);
 }
@@ -5605,13 +5608,13 @@ var Card = memo(function (_ref) {
     findAttach();
   }, [filters]);
   useEffect(function () {
-    if (forwardedRef.current) forwardedRef.current.addEventListener('dragstart', function (event) {
+    if (forwardedRef && forwardedRef.current) forwardedRef.current.addEventListener('dragstart', function (event) {
       if (!isHoveredMoveBtn.current) {
         event.stopPropagation();
         event.preventDefault();
       }
     });
-  }, [forwardedRef.current]);
+  }, [forwardedRef]);
   useEffect(function () {
     if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current) descFieldRef.current.focus();
   }, [isShowDesc]);
@@ -5751,8 +5754,9 @@ var Card = memo(function (_ref) {
     ref: descFieldRef,
     placeholder: t('description'),
     onChange: onChangeDescription,
-    onBlur: onBlurDescription
-  }), !isShowDesc && /*#__PURE__*/React__default.createElement(Button, {
+    onBlur: onBlurDescription,
+    readOnly: !updateCard
+  }), !isShowDesc && updateCard && /*#__PURE__*/React__default.createElement(Button, {
     className: cx(css$T.addDesc),
     color: "secondary",
     onClick: addDesc
@@ -6219,8 +6223,9 @@ var Details$2 = function Details(_ref) {
     ref: descFieldRef,
     placeholder: t('description'),
     onChange: onChangeDescription,
-    onBlur: onBlurDescription
-  }), !isShowDesc && /*#__PURE__*/React__default.createElement(Button, {
+    onBlur: onBlurDescription,
+    readOnly: currentUserName !== data.user
+  }), !isShowDesc && currentUserName === data.user && /*#__PURE__*/React__default.createElement(Button, {
     className: css$U.addDesc,
     color: "secondary",
     onClick: addDesc
@@ -6372,6 +6377,7 @@ function SvgLogo(props) {
   return /*#__PURE__*/createElement("svg", _extends$4({
     width: 179,
     height: 48,
+    viewBox: "0 0 179 48",
     fill: "none"
   }, props), _ref$3, _ref2$2, _ref3$2, _ref4$1, _ref5);
 }
@@ -6389,10 +6395,7 @@ var Header = function Header(_ref) {
   }, /*#__PURE__*/React__default.createElement(Link, {
     to: "/",
     className: css$W.logo
-  }, /*#__PURE__*/React__default.createElement(SvgLogo, {
-    width: "129",
-    height: "35"
-  })), /*#__PURE__*/React__default.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement(SvgLogo, null)), /*#__PURE__*/React__default.createElement("div", {
     className: css$W.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: Link,

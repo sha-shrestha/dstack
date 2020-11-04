@@ -422,9 +422,10 @@ const Details = ({renderHeader, renderSideHeader}) => {
                     placeholder={t('description')}
                     onChange={onChangeDescription}
                     onBlur={onBlurDescription}
+                    readOnly={currentUserName !== data.user}
                 />}
 
-                {!isShowDesc && <Button
+                {!isShowDesc && currentUserName === data.user && <Button
                     className={css.addDesc}
                     color="secondary"
                     onClick={addDesc}

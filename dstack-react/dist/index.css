@@ -3128,8 +3128,8 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 ._1XqN9 textarea::placeholder {
             color: rgb(180, 184, 199);
         }
-._1XqN9 textarea:hover,
-        ._1XqN9 textarea:focus {
+._1XqN9 textarea:hover:not([readonly]),
+        ._1XqN9 textarea:focus:not([readonly]) {
             border-color: rgba(180, 184, 199, .5);
         }
 ._1XqN9 ._38Nis {
@@ -5711,10 +5711,13 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 ._1jfuS {
     flex-shrink: 0;
 }
+._1jfuS > svg {
+        max-width: 129px;
+        height: auto;
+    }
 @media (max-width: 980px) {
 ._1jfuS > svg {
-            max-width: 85px;
-            height: auto
+            max-width: 85px
     }
         }
 ._2EQYi {

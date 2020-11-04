@@ -73,14 +73,14 @@ const Card = memo(({
     }, [filters]);
 
     useEffect(() => {
-        if (forwardedRef.current)
+        if (forwardedRef && forwardedRef.current)
             forwardedRef.current.addEventListener('dragstart', event => {
                 if (!isHoveredMoveBtn.current) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
             });
-    }, [forwardedRef.current]);
+    }, [forwardedRef]);
 
     useEffect(() => {
         if (isMounted.current && prevIsShowDesc !== isShowDesc && descFieldRef.current)
@@ -238,9 +238,10 @@ const Card = memo(({
                         placeholder={t('description')}
                         onChange={onChangeDescription}
                         onBlur={onBlurDescription}
+                        readOnly={!updateCard}
                     />}
 
-                    {!isShowDesc && <Button
+                    {!isShowDesc && updateCard && <Button
                         className={cx(css.addDesc)}
                         color="secondary"
                         onClick={addDesc}
