@@ -13,6 +13,8 @@ import StackListItem from '../ListItem';
 import routes from '../../routes';
 import Tooltip from '../../Tooltip';
 import useListViewSwitcher from '../../hooks/useListViewSwitcher';
+import Tabs from '../Details/components/Tabs';
+import getStackCategory from '../../utils/getStackCategory';
 import css from './styles.module.css';
 
 type Stack = {
@@ -39,7 +41,27 @@ const List = ({
 }: Props) => {
     const {t} = useTranslation();
 
+    const tabsMap = {
+        chart: {
+            label: t('chart_plural'),
+            value: 'chart',
+        },
+
+        table: {
+            label: t('dataSet_plural'),
+            value: 'table',
+        },
+
+        mlModel: {
+            label: t('mlModel_plural'),
+            value: 'mlModel',
+        },
+    };
+
     const [view, setView] = useListViewSwitcher('stack-list');
+    const [tabs, setTabs] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
+    const [stacksByCategories, setStacksByCategories] = useState({});
     const [deletingStack, setDeletingStack] = useState(null);
     const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
     const [isShowUploadStackModal, setIsShowUploadStackModal] = useState(false);
@@ -64,6 +86,32 @@ const List = ({
             if (!localStorage.getItem('welcome-modal-is-showing') && !loading && !data.length)
                 showWelcomeModal();
         }
+
+        if (data && data.length) {
+            const stacksByCategories = {};
+            const tabs = [];
+
+            data.forEach(stack => {
+                const category = getStackCategory({
+                    application: stack.head?.preview?.application,
+                    contentType: stack.head?.preview?.content_type,
+                });
+
+                if (category && !tabs.find(i => i.value === tabsMap[category].value))
+                    tabs.push(tabsMap[category]);
+
+                if (Array.isArray(stacksByCategories[category]))
+                    stacksByCategories[category].push(stack);
+                else
+                    stacksByCategories[category] = [stack];
+            });
+
+            setTabs(tabs);
+            setStacksByCategories(stacksByCategories);
+
+            if (!activeTab || !tabs.find(i => i.value === tabsMap[activeTab].value))
+                setActiveTab(tabs[0].value);
+        }
     }, [data]);
 
 
@@ -85,16 +133,23 @@ const List = ({
     const hideDeleteConfirmation = () => setDeletingStack(null);
 
     const getItems = () => {
+        let filteredItems = [];
+
         let items = [];
 
-        if (data && data.length) {
+        if (activeTab && stacksByCategories[activeTab])
+            items = stacksByCategories[activeTab];
+        else
+            items = data;
+
+        if (items && items.length) {
             if (search.length)
-                items = data.filter(i => i.name.indexOf(search) >= 0);
+                filteredItems = items.filter(i => i.name.indexOf(search) >= 0);
             else
-                items = data;
+                filteredItems = items;
         }
 
-        return items;
+        return filteredItems;
     };
 
     const items = getItems();
@@ -189,6 +244,15 @@ const List = ({
             )}
 
             {!loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack()}
+
+            {!!tabs.length && (
+                <Tabs
+                    className={css.tabs}
+                    items={tabs}
+                    value={activeTab}
+                    onChange={tab => setActiveTab(tab)}
+                />
+            )}
 
             {Boolean(data.length && items.length) && (
                 <div className={cn(css.itemList, view)}>

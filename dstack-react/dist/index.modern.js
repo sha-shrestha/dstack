@@ -2190,6 +2190,34 @@ var Attachment = function Attachment(_ref) {
   }));
 };
 
+var getStackCategory = (function (_ref) {
+  var application = _ref.application,
+      contentType = _ref.contentType;
+
+  switch (true) {
+    case contentType === 'image/svg+xml':
+    case contentType === 'image/png':
+    case contentType === 'image/jpeg':
+    case application === 'plotly':
+    case application === 'bokeh':
+      return 'chart';
+
+    case contentType === 'text/csv':
+      return 'table';
+
+    case application === 'sklearn':
+    case /^tensorflow\/*/.test(application):
+    case /^torch\/*/.test(application):
+      return 'mlModel';
+
+    case false:
+      return 'app';
+
+    default:
+      return null;
+  }
+});
+
 function _extends$3() {
   _extends$3 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -2255,6 +2283,110 @@ function SvgChart(props) {
   }, props), _ref$2);
 }
 
+function _extends$4() {
+  _extends$4 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$4.apply(this, arguments);
+}
+
+var _ref$3 = /*#__PURE__*/createElement("path", {
+  fill: "#86A6DD",
+  d: "M18.797 6.34a3.38 3.38 0 00-2.944-4.026C14.835-.088 11.55-.492 10 1.671 8.45-.49 5.167-.089 4.149 2.314A3.38 3.38 0 001.204 6.34a3.375 3.375 0 00-.381 4.79c-2.022 2.721-.1 6.69 3.387 6.69 1.114 2.322 4.293 2.598 5.79.508 1.5 2.092 4.678 1.812 5.791-.509 3.479.008 5.41-3.967 3.387-6.69a3.375 3.375 0 00-.38-4.789zM7.177 18.461c-1.763 0-2.78-2.07-1.631-3.46a.63.63 0 10-.972-.802 3.378 3.378 0 00-.768 2.323c-2.39-.255-3.455-3.113-1.875-4.875.017.02.61-.828 1.875-.963-.021.409.032.822.163 1.222a.63.63 0 001.199-.392A2.116 2.116 0 016.52 8.848a.63.63 0 10-.392-1.198 3.42 3.42 0 00-.418.168 1.649 1.649 0 01.482-1.867.63.63 0 00-.804-.97 2.907 2.907 0 00-.71 3.608c-.425.47-.524.818-.56.818-.925 0-1.781.301-2.476.81a2.113 2.113 0 01.539-3.11.63.63 0 00.26-.746c-.463-1.297.41-2.823 2.083-2.823a.63.63 0 00.609-.47 2.115 2.115 0 014.157.544v12.735a2.116 2.116 0 01-2.114 2.114zm11.022-8.244a4.168 4.168 0 00-2.489-.81c-.142-.3-.319-.566-.547-.818a2.906 2.906 0 00-.71-3.609.63.63 0 10-.804.971c.56.464.733 1.224.482 1.867a3.423 3.423 0 00-.418-.168.63.63 0 10-.392 1.198 2.116 2.116 0 011.352 2.666.63.63 0 101.199.392c.13-.4.184-.813.163-1.222a2.941 2.941 0 012.623 2.919 2.94 2.94 0 01-2.623 2.918 3.377 3.377 0 00-.768-2.323.63.63 0 00-.972.804c1.146 1.386.133 3.46-1.63 3.46a2.116 2.116 0 01-2.114-2.115V3.612a2.115 2.115 0 014.157-.543.63.63 0 00.63.469c1.477-.055 2.566 1.413 2.062 2.823-.1.279.009.59.26.747a2.113 2.113 0 01.539 3.11z"
+});
+
+function SvgMl(props) {
+  return /*#__PURE__*/createElement("svg", _extends$4({
+    width: 20,
+    height: 20,
+    viewBox: "0 0 20 20",
+    fill: "none"
+  }, props), _ref$3);
+}
+
+function _extends$5() {
+  _extends$5 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$5.apply(this, arguments);
+}
+
+var _ref$4 = /*#__PURE__*/createElement("g", {
+  fill: "#86A6DD"
+}, /*#__PURE__*/createElement("rect", {
+  y: 1,
+  width: 1.5,
+  height: 20,
+  rx: 0.75
+}), /*#__PURE__*/createElement("rect", {
+  x: 6,
+  y: 1,
+  width: 1.5,
+  height: 20,
+  rx: 0.75
+}), /*#__PURE__*/createElement("rect", {
+  y: 21,
+  width: 1.5,
+  height: 20,
+  rx: 0.75,
+  transform: "rotate(-90 0 21)"
+}), /*#__PURE__*/createElement("rect", {
+  y: 15,
+  width: 1.5,
+  height: 20,
+  rx: 0.75,
+  transform: "rotate(-90 0 15)"
+}), /*#__PURE__*/createElement("rect", {
+  y: 9,
+  width: 1.5,
+  height: 20,
+  rx: 0.75,
+  transform: "rotate(-90 0 9)"
+}), /*#__PURE__*/createElement("rect", {
+  y: 2.4,
+  width: 1.5,
+  height: 20,
+  rx: 0.75,
+  transform: "rotate(-90 0 2.4)"
+}), /*#__PURE__*/createElement("rect", {
+  x: 18.5,
+  y: 1,
+  width: 1.5,
+  height: 20,
+  rx: 0.75
+}));
+
+function SvgTable(props) {
+  return /*#__PURE__*/createElement("svg", _extends$5({
+    width: 20,
+    height: 21,
+    viewBox: "0 0 20 21",
+    fill: "none"
+  }, props), _ref$4);
+}
+
 var css$s = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","date":"_2c9og"};
 
 var Item = function Item(_ref) {
@@ -2277,15 +2409,41 @@ var Item = function Item(_ref) {
     deleteAction(data.name);
   };
 
+  var renderIcon = function renderIcon() {
+    var _data$head, _data$head$preview, _data$head2, _data$head2$preview;
+
+    var contentType = (_data$head = data.head) === null || _data$head === void 0 ? void 0 : (_data$head$preview = _data$head.preview) === null || _data$head$preview === void 0 ? void 0 : _data$head$preview.content_type;
+    var application = (_data$head2 = data.head) === null || _data$head2 === void 0 ? void 0 : (_data$head2$preview = _data$head2.preview) === null || _data$head2$preview === void 0 ? void 0 : _data$head2$preview.application;
+    var category = getStackCategory({
+      application: application,
+      contentType: contentType
+    });
+
+    switch (category) {
+      case 'chart':
+        return /*#__PURE__*/React__default.createElement(SvgChart, null);
+
+      case 'table':
+        return /*#__PURE__*/React__default.createElement(SvgTable, null);
+
+      case 'mlModel':
+        return /*#__PURE__*/React__default.createElement(SvgMl, null);
+
+      default:
+        return null;
+    }
+  };
+
   return /*#__PURE__*/React__default.createElement(Component, _extends({
     className: cx(css$s.item, className),
     ref: ref
   }, rest), /*#__PURE__*/React__default.createElement("div", {
     className: css$s.icon
-  }, /*#__PURE__*/React__default.createElement(SvgChart, null)), /*#__PURE__*/React__default.createElement("div", {
+  }, renderIcon()), /*#__PURE__*/React__default.createElement("div", {
     className: css$s.top
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.name
+    className: css$s.name,
+    title: data.name
   }, data.name), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   }), renderContent && /*#__PURE__*/React__default.createElement("div", {
@@ -2394,7 +2552,29 @@ var useListViewSwitcher = (function (id, defaultValue) {
   return [value, onChange];
 });
 
-var css$t = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$t = {"tabs":"_gaP0O","tab":"_vQ7S6"};
+
+var Tabs$1 = function Tabs(_ref) {
+  var className = _ref.className,
+      value = _ref.value,
+      items = _ref.items,
+      onChange = _ref.onChange;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$t.tabs, className)
+  }, items.map(function (i, index) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: index,
+      className: cx(css$t.tab, {
+        active: value === i.value
+      }),
+      onClick: function onClick() {
+        return onChange(i.value);
+      }
+    }, i.label);
+  }));
+};
+
+var css$u = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","tabs":"_DBGuk","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -2410,29 +2590,56 @@ var List = function List(_ref) {
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
 
+  var tabsMap = {
+    chart: {
+      label: t('chart_plural'),
+      value: 'chart'
+    },
+    table: {
+      label: t('dataSet_plural'),
+      value: 'table'
+    },
+    mlModel: {
+      label: t('mlModel_plural'),
+      value: 'mlModel'
+    }
+  };
+
   var _useListViewSwitcher = useListViewSwitcher('stack-list'),
       view = _useListViewSwitcher[0],
       setView = _useListViewSwitcher[1];
 
-  var _useState = useState(null),
-      deletingStack = _useState[0],
-      setDeletingStack = _useState[1];
+  var _useState = useState([]),
+      tabs = _useState[0],
+      setTabs = _useState[1];
 
-  var _useState2 = useState(false),
-      isShowWelcomeModal = _useState2[0],
-      setIsShowWelcomeModal = _useState2[1];
+  var _useState2 = useState(null),
+      activeTab = _useState2[0],
+      setActiveTab = _useState2[1];
 
-  var _useState3 = useState(false),
-      isShowUploadStackModal = _useState3[0],
-      setIsShowUploadStackModal = _useState3[1];
+  var _useState3 = useState({}),
+      stacksByCategories = _useState3[0],
+      setStacksByCategories = _useState3[1];
 
-  var _useState4 = useState(''),
-      search = _useState4[0],
-      setSearch = _useState4[1];
+  var _useState4 = useState(null),
+      deletingStack = _useState4[0],
+      setDeletingStack = _useState4[1];
+
+  var _useState5 = useState(false),
+      isShowWelcomeModal = _useState5[0],
+      setIsShowWelcomeModal = _useState5[1];
+
+  var _useState6 = useState(false),
+      isShowUploadStackModal = _useState6[0],
+      setIsShowUploadStackModal = _useState6[1];
+
+  var _useState7 = useState(''),
+      search = _useState7[0],
+      setSearch = _useState7[1];
 
   var isInitialMount = useRef(true);
 
-  var _useState5 = useState(null);
+  var _useState8 = useState(null);
 
   var sortingItems = {
     lastSource: {
@@ -2459,6 +2666,28 @@ var List = function List(_ref) {
     } else {
       if (!localStorage.getItem('welcome-modal-is-showing') && !loading && !data.length) showWelcomeModal();
     }
+
+    if (data && data.length) {
+      var _stacksByCategories = {};
+      var _tabs = [];
+      data.forEach(function (stack) {
+        var _stack$head, _stack$head$preview, _stack$head2, _stack$head2$preview;
+
+        var category = getStackCategory({
+          application: (_stack$head = stack.head) === null || _stack$head === void 0 ? void 0 : (_stack$head$preview = _stack$head.preview) === null || _stack$head$preview === void 0 ? void 0 : _stack$head$preview.application,
+          contentType: (_stack$head2 = stack.head) === null || _stack$head2 === void 0 ? void 0 : (_stack$head2$preview = _stack$head2.preview) === null || _stack$head2$preview === void 0 ? void 0 : _stack$head2$preview.content_type
+        });
+        if (category && !_tabs.find(function (i) {
+          return i.value === tabsMap[category].value;
+        })) _tabs.push(tabsMap[category]);
+        if (Array.isArray(_stacksByCategories[category])) _stacksByCategories[category].push(stack);else _stacksByCategories[category] = [stack];
+      });
+      setTabs(_tabs);
+      setStacksByCategories(_stacksByCategories);
+      if (!activeTab || !_tabs.find(function (i) {
+        return i.value === tabsMap[activeTab].value;
+      })) setActiveTab(_tabs[0].value);
+    }
   }, [data]);
 
   var showUploadStackModal = function showUploadStackModal(event) {
@@ -2484,30 +2713,32 @@ var List = function List(_ref) {
   };
 
   var getItems = function getItems() {
+    var filteredItems = [];
     var items = [];
+    if (activeTab && stacksByCategories[activeTab]) items = stacksByCategories[activeTab];else items = data;
 
-    if (data && data.length) {
-      if (search.length) items = data.filter(function (i) {
+    if (items && items.length) {
+      if (search.length) filteredItems = items.filter(function (i) {
         return i.name.indexOf(search) >= 0;
-      });else items = data;
+      });else filteredItems = items;
     }
 
-    return items;
+    return filteredItems;
   };
 
   var items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.list
+    className: css$u.list
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.header
+    className: css$u.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.title
+    className: css$u.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
   })), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.headerSide
+    className: css$u.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$t.search,
+    className: css$u.search,
     showEverything: true,
     isDark: true,
     placeholder: t('findStack'),
@@ -2517,33 +2748,40 @@ var List = function List(_ref) {
   }), renderUploadStack && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$t.uploadButton,
+    className: css$u.uploadButton,
     onClick: showUploadStackModal,
     color: "primary",
     variant: "contained",
     size: "small"
   }, t('uploadData'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.controls
+    className: css$u.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$t.viewSwitcher,
+    className: css$u.viewSwitcher,
     value: view,
     onChange: setView
   }), false ), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.itemList, view)
+    className: cx(css$u.itemList, view)
   }, new Array(view === 'grid' ? 12 : 8).fill({}).map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: css$t.loadingItem
+      className: css$u.loadingItem
     });
   })), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.message
+    className: css$u.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
-  })), !loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack(), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.itemList, view)
+  })), !loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack(), !!tabs.length && /*#__PURE__*/React__default.createElement(Tabs$1, {
+    className: css$u.tabs,
+    items: tabs,
+    value: activeTab,
+    onChange: function onChange(tab) {
+      return setActiveTab(tab);
+    }
+  }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$u.itemList, view)
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
-      className: css$t.item,
+      className: css$u.item,
       Component: Link,
       key: index,
       data: item,
@@ -2552,55 +2790,55 @@ var List = function List(_ref) {
       renderContent: renderItemContent
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.text
+    className: css$u.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
     title: t('deleteStack'),
-    className: css$t.modal
+    className: css$u.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('areYouSureYouWantToDelete', {
     name: deletingStack
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.buttons
+    className: css$u.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideDeleteConfirmation,
-    className: css$t.button
+    className: css$u.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: deleteItem,
-    className: css$t.button
+    className: css$u.button
   }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
     title: t('welcomeToDStack') + "\uD83D\uDC4B",
-    className: css$t.modal
+    className: css$u.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.description
+    className: css$u.description
   }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$t.buttons
+    className: css$u.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideWelcomeModal,
-    className: css$t.button
+    className: css$u.button
   }, t('getStarted')))), renderUploadStack && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowUploadStackModal,
     withCloseButton: true,
     onClose: hideUploadStackModal,
     size: "big",
     title: t('howToConnectYourDataWithDStack'),
-    className: css$t.modal
+    className: css$u.modal
   }, renderUploadStack()));
 };
 
-var css$u = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
+var css$v = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
 
 var pullPythonCode = function pullPythonCode(data) {
   var a = ["'/" + data.stack + "'"];
@@ -2647,11 +2885,11 @@ var HowTo = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.howto
+    className: css$v.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.title
+    className: css$v.title
   }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$u.tabs,
+    className: css$v.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
@@ -2662,9 +2900,9 @@ var HowTo = function HowTo(_ref) {
       value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$u.tabs,
+    className: css$v.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
@@ -2675,38 +2913,38 @@ var HowTo = function HowTo(_ref) {
       value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "bash"
   }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "bash"
   }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "python"
   }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "r"
   }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "r"
   }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$u.code,
+    className: css$v.code,
     language: "r"
   }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.footer,
+    className: css$v.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
         href: config.DOCS_URL
@@ -2734,7 +2972,7 @@ var useOnClickOutside = (function (ref, handler) {
   }, [ref, handler]);
 });
 
-var css$v = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+var css$w = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
 
 var getFrameName = function getFrameName(frame) {
   return moment(frame.timestamp).format('D MMM YYYY h:mm a');
@@ -2801,22 +3039,22 @@ var Frames = function Frames(_ref) {
   }
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v.frames, className),
+    className: cx(css$w.frames, className),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v['frames-dropdown']),
+    className: cx(css$w['frames-dropdown']),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.button,
+    className: css$w.button,
     onClick: toggleDropdown
   }, /*#__PURE__*/React__default.createElement("span", {
-    className: css$v.name
+    className: css$w.name
   }, getFrameName(activeFrame)), headId === activeFrame.id && /*#__PURE__*/React__default.createElement("span", {
-    className: css$v.label
+    className: css$w.label
   }, t('head')), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v.dropdown, {
+    className: cx(css$w.dropdown, {
       show: isShowDropdown
     })
   }, frames.map(function (f) {
@@ -2830,19 +3068,19 @@ var Frames = function Frames(_ref) {
       onClick: onClickItem(f.id),
       overlayContent: f.description
     }, /*#__PURE__*/React__default.createElement("div", {
-      className: css$v.item
+      className: css$w.item
     }, /*#__PURE__*/React__default.createElement("span", {
-      className: css$v.name
+      className: css$w.name
     }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
-      className: css$v.label
+      className: css$w.label
     }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
-      className: css$v.mark,
+      className: css$w.mark,
       onClick: onClickMarkAsHead(f)
     }, t('markAsHead'))));
   }))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: activeFrame.description
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v.info)
+    className: cx(css$w.info)
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-variant"
   }))), /*#__PURE__*/React__default.createElement(Modal, {
@@ -2850,63 +3088,41 @@ var Frames = function Frames(_ref) {
     onClose: hideConfirmation,
     size: "confirmation",
     title: t('changeHeadRevision'),
-    className: css$v.modal
+    className: css$w.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
+    className: css$w.description
   }, t('areYouSureYouWantToChangeTheCurrentHeadRevisionToByName', {
     frame: frameForMarkingAsHead && getFrameName(frameForMarkingAsHead)
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.buttons
+    className: css$w.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: confirmMarkFrameAsHead,
-    className: css$v.button
+    className: css$w.button
   }, t('yesChangeHead')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: hideConfirmation,
-    className: css$v.button
+    className: css$w.button
   }, t('cancel')))));
 };
 
-var css$w = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+var css$x = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
 
 var Loader$1 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.loader
+    className: css$x.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.title
+    className: css$x.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.label
+    className: css$x.label
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.description
+    className: css$x.description
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.diagram
-  }));
-};
-
-var css$x = {"tabs":"_gaP0O","tab":"_vQ7S6"};
-
-var Tabs$1 = function Tabs(_ref) {
-  var className = _ref.className,
-      value = _ref.value,
-      items = _ref.items,
-      onChange = _ref.onChange;
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$x.tabs, className)
-  }, items.map(function (i, index) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      key: index,
-      className: cx(css$x.tab, {
-        active: value === i.value
-      }),
-      onClick: function onClick() {
-        return onChange(i.value);
-      }
-    }, i.label);
+    className: css$x.diagram
   }));
 };
 
@@ -6286,8 +6502,8 @@ var Reports = function Reports(_ref) {
   })));
 };
 
-function _extends$4() {
-  _extends$4 = Object.assign || function (target) {
+function _extends$6() {
+  _extends$6 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -6301,10 +6517,10 @@ function _extends$4() {
     return target;
   };
 
-  return _extends$4.apply(this, arguments);
+  return _extends$6.apply(this, arguments);
 }
 
-var _ref$3 = /*#__PURE__*/createElement("path", {
+var _ref$5 = /*#__PURE__*/createElement("path", {
   d: "M72.388 28.36c.867-.884 1.3-2.063 1.3-3.536 0-1.473-.433-2.643-1.3-3.51-.85-.867-1.863-1.3-3.042-1.3-1.179 0-2.201.425-3.068 1.274-.85.85-1.274 2.01-1.274 3.484 0 1.473.425 2.66 1.274 3.562.867.884 1.89 1.326 3.068 1.326 1.179 0 2.193-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.127 0 2.115.26 2.964.78.867.503 1.534 1.17 2.002 2.002V12.76h2.99V32h-2.99v-2.678a5.766 5.766 0 01-2.002 2.132c-.85.52-1.837.78-2.964.78zM79.921 21.782c0-1.213.511-2.236 1.534-3.068 1.023-.85 2.366-1.274 4.03-1.274 1.664 0 2.981.416 3.952 1.248.988.815 1.517 1.933 1.586 3.354h-3.042c-.052-.71-.303-1.265-.754-1.664-.433-.399-1.049-.598-1.846-.598-.797 0-1.421.182-1.872.546-.45.347-.676.815-.676 1.404 0 .572.286 1.023.858 1.352.572.33 1.265.572 2.08.728.832.156 1.655.347 2.47.572a4.422 4.422 0 012.106 1.248c.572.59.858 1.387.858 2.392 0 1.248-.529 2.262-1.586 3.042-1.04.78-2.383 1.17-4.03 1.17-1.647 0-2.981-.399-4.004-1.196-1.023-.797-1.586-1.933-1.69-3.406h3.068c.052.71.312 1.265.78 1.664s1.1.598 1.898.598c.815 0 1.456-.173 1.924-.52.485-.364.728-.84.728-1.43s-.286-1.049-.858-1.378c-.572-.33-1.274-.572-2.106-.728a71.892 71.892 0 01-2.47-.572 4.632 4.632 0 01-2.08-1.196c-.572-.572-.858-1.335-.858-2.288zM101.402 20.092h-3.484v7.93c0 .537.121.927.364 1.17.26.225.693.338 1.3.338h1.82V32h-2.34c-2.756 0-4.134-1.326-4.134-3.978v-7.93h-1.69v-2.418h1.69v-3.562h2.99v3.562h3.484v2.418zM113.572 28.36c.866-.884 1.3-2.063 1.3-3.536 0-1.473-.434-2.643-1.3-3.51-.85-.867-1.864-1.3-3.042-1.3-1.179 0-2.202.425-3.068 1.274-.85.85-1.274 2.01-1.274 3.484 0 1.473.424 2.66 1.274 3.562.866.884 1.889 1.326 3.068 1.326 1.178 0 2.192-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.126 0 2.114.26 2.964.78.866.503 1.534 1.17 2.002 2.002v-2.548h2.99V32h-2.99v-2.678a5.774 5.774 0 01-2.002 2.132c-.85.52-1.838.78-2.964.78zM127.787 32.234c-2.08 0-3.77-.676-5.07-2.028-1.3-1.352-1.95-3.137-1.95-5.356 0-2.236.65-4.03 1.95-5.382 1.317-1.352 3.007-2.028 5.07-2.028 1.733 0 3.163.416 4.29 1.248 1.144.815 1.915 1.985 2.314 3.51h-3.198c-.538-1.508-1.673-2.262-3.406-2.262-1.214 0-2.184.433-2.912 1.3-.711.85-1.066 2.045-1.066 3.588 0 1.543.355 2.747 1.066 3.614.728.867 1.698 1.3 2.912 1.3 1.716 0 2.851-.754 3.406-2.262h3.198c-.416 1.456-1.196 2.617-2.34 3.484-1.144.85-2.566 1.274-4.264 1.274zM140.308 32h-2.964V12.76h2.964v11.18l5.2-6.266h4.108l-6.604 7.176 6.604 7.15h-4.004l-5.304-6.162V32zM154.107 31.506a1.78 1.78 0 01-1.274.494c-.503 0-.927-.173-1.274-.52a1.75 1.75 0 01-.494-1.248c0-.503.165-.927.494-1.274.347-.347.771-.52 1.274-.52s.927.173 1.274.52c.347.347.52.771.52 1.274s-.173.927-.52 1.274zM167.298 28.36c.867-.884 1.3-2.063 1.3-3.536 0-1.473-.433-2.643-1.3-3.51-.849-.867-1.863-1.3-3.042-1.3-1.179 0-2.201.425-3.068 1.274-.849.85-1.274 2.01-1.274 3.484 0 1.473.425 2.66 1.274 3.562.867.884 1.889 1.326 3.068 1.326s2.193-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.127 0 2.115.26 2.964.78a5.284 5.284 0 012.002 2.002v-2.548h2.99V32h-2.99v-2.678a5.766 5.766 0 01-2.002 2.132c-.849.52-1.837.78-2.964.78zM178.861 13.878c0 .537-.182.988-.546 1.352-.364.364-.815.546-1.352.546-.52 0-.962-.182-1.326-.546-.364-.364-.546-.815-.546-1.352 0-.537.182-.988.546-1.352a1.805 1.805 0 011.326-.546c.537 0 .988.182 1.352.546.364.364.546.815.546 1.352zM175.481 32V17.674h2.964V32h-2.964z",
   fill: "#303340"
 });
@@ -6374,12 +6590,12 @@ var _ref5 = /*#__PURE__*/createElement("defs", null, /*#__PURE__*/createElement(
 })));
 
 function SvgLogo(props) {
-  return /*#__PURE__*/createElement("svg", _extends$4({
+  return /*#__PURE__*/createElement("svg", _extends$6({
     width: 179,
     height: 48,
     viewBox: "0 0 179 48",
     fill: "none"
-  }, props), _ref$3, _ref2$2, _ref3$2, _ref4$1, _ref5);
+  }, props), _ref$5, _ref2$2, _ref3$2, _ref4$1, _ref5);
 }
 
 var css$W = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};

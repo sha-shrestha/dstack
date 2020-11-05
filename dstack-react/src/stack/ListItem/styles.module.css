@@ -46,6 +46,7 @@
     grid-area: top-line;
     display: flex;
     align-items: center;
+    min-width: 0;
     & :global(.mdi) {
         flex-shrink: 0;
         margin-left: 4px;
@@ -54,6 +55,9 @@
     }
 }
 .name {
+    flex-grow: 1;
+    min-width: 0;
+    flex-basis: 0;
     font-size: 14px;
     line-height: var(--top-line-height);
     color: var(--color-dark-gray);

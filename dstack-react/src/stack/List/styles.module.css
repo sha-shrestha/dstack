@@ -101,9 +101,26 @@
 
     }
 }
+.tabs {
+    margin-top: 20px;
+    flex-shrink: 0;
+}
+.tabs + .itemList {
+    margin-top: -1px !important;
+    border-top-left-radius: 0;
+}
+
 .itemList {
     margin-top: 20px;
     display: grid;
+    padding: 30px;
+    border-radius: 4px;
+    border: 1px solid rgb(233, 234, 238);
+    min-height: 270px;
+    @media (--mobile) {
+        padding: 20px;
+        min-height: 0;
+    }
     &:global(.list) {
         row-gap: 18px;
         @media (--mobile) {
