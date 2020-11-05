@@ -209,9 +209,15 @@ class StackResources {
                     sessionService.renew(session)
                 }
                 ok(GetStacksStatus(permittedStacks.map { stack ->
+                    // TODO: Store preview in frame and not load attachments each time
+                    val attachments = stack.head?.id?.let { attachmentService.findByFrame(stack.path + "/" + it) }
                     BasicStackInfo(
                             stack.userName, stack.name, stack.private,
-                            stack.head?.let { HeadInfo(it.id, it.timestampMillis) },
+                            stack.head?.let { h ->
+                                HeadInfo(h.id, h.timestampMillis,
+                                    attachments?.firstOrNull()?.let { a ->
+                                        PreviewInfo(a.application, a.contentType)
+                                    }) },
                             if (owner) permissionService.findByPath(stack.path)
                                     .map {
                                         PermissionInfo(
