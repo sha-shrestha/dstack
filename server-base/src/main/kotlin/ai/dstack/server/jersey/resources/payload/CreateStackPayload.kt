@@ -9,5 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 data class CreateStackPayload(
     val user: String?,
     val name: String?,
-    val private: Boolean?
+    val private: Boolean?,
+    val readme: String?
 )

@@ -362,19 +362,19 @@ class JerseyApplicationTests : JerseyTest() {
         sessionService.create(testSession)
         // TODO: Submit stacks via push
         val testStack1 = Stack(
-                "test_user", "test_stack_1", false, null
+                "test_user", "test_stack_1", false, null, null
         )
         stackService.create(testStack1)
         val testStack2 = Stack(
-                "test_user", "test_stack_2", false, null
+                "test_user", "test_stack_2", false, null, null
         )
         stackService.create(testStack2)
         val testStack3 = Stack(
-                "test_user", "test_stack_3", false, null
+                "test_user", "test_stack_3", false, null, null
         )
         stackService.create(testStack3)
         val testStack4 = Stack(
-                "test_user", "test_stack_4", false, null
+                "test_user", "test_stack_4", false, null, null
         )
         stackService.create(testStack4)
 
@@ -466,6 +466,11 @@ class JerseyApplicationTests : JerseyTest() {
         )
         userService.create(testUser)
 
+        val testSession = Session(
+                "test_session", "test_user", LocalDateTime.now(ZoneOffset.UTC).plusMinutes(60).toEpochSecond(ZoneOffset.UTC)
+        )
+        sessionService.create(testSession)
+
         val accessResponse: Response = target("/stacks/access").request()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + testUser.token)
                 .post(
@@ -534,6 +539,48 @@ class JerseyApplicationTests : JerseyTest() {
                         pushPayload.params!!,
                         pushPayload.message))
                 )
+
+        val updateStackPayload = UpdateStackPayload("test_user/test_stack",
+                null,
+                null,
+                "Some readme"
+        )
+        val updateStackResponse: Response = target("/stacks/update").request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
+                .post(
+                        updateStackPayload.json
+                )
+        Truth.assertThat(updateStackResponse.status).isEqualTo(Response.Status.OK.statusCode)
+
+        // TODO: Fix issues
+        /*val getStackResponse = target("/stacks/test_user/test_stack").request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + testSession.id)
+                .get()
+        Truth.assertThat(getStackResponse.status).isEqualTo(Response.Status.OK.statusCode)
+        Truth.assertThat(getStackResponse.entity<GetStackStatus>())
+                .isEqualTo(GetStackStatus(StackInfo(
+                        "test_user",
+                        "test_stack",
+                        false,
+                        FrameInfo(frameId,
+                                pushPayload.timestamp!!,
+                                listOf(AttachmentInfo(pushPayloadAttach.description,
+                                        "unknown",
+                                        pushPayloadAttach.application,
+                                        pushPayloadAttach.contentType!!,
+                                        pushPayloadAttach.params!!,
+                                        pushPayloadAttach.settings!!,
+                                        pushPayloadAttach.length!!,
+                                        data = null, downloadUrl = null, preview = null,
+                                        index = null)),
+                                pushPayload.params!!,
+                                pushPayload.message),
+                        "Some readme",
+                        null,
+                        emptyList(),
+                        listOf(BasicFrameInfo(frameId, pushPayload.timestamp!!, pushPayloadAttach.params!!, null))
+                ))
+                )*/
     }
 
     /**

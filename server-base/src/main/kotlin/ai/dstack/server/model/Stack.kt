@@ -9,7 +9,8 @@ data class Stack(
     val userName: String,
     val name: String,
     val private: Boolean,
-    val head: Head?
+    val head: Head?,
+    val readme: String?
 ) {
     val path: String
         get() = "$userName/$name"

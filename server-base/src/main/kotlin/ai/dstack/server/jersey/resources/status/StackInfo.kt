@@ -33,6 +33,7 @@ data class StackInfo(
     val name: String,
     val private: Boolean,
     val head: FrameInfo?,
+    val readme: String?,
     val permissions: List<PermissionInfo>?,
     @Deprecated("Gonna be removed in October")
     val comments: List<CommentInfo>,
