@@ -1,29 +1,36 @@
-**dstack is an open-source framework for building data science applications using Python and R.**
+**dstack is an open-source framework for building ML applications using Python and R.**
 
-![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![CRAN status](https://www.r-pkg.org/badges/version/dstack)](https://CRAN.R-project.org/package=dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)  
+![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![CRAN status](https://www.r-pkg.org/badges/version/dstack)](https://CRAN.R-project.org/package=dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)
 
-How is dstack different from other frameworks:
- - It is designed for data scientists and doesn't require development skills to build applications.   
- - It simplifies the process of creating applications by leveraging a) a declarative approach to defining application components; b) a tight integration with data science frameworks and tools.
+Push ML models, visualizations, and code to dstack.ai to build beautiful applications in minutes.
+No development or deployment skills are required.
+
+How is dstack different from other frameworks (Plotly, Streamlit, Shiny, etc):
+ - It simplifies the process of creating applications by 
+    a) decoupling ML development and application development (by introducing an ML Registry) 
+    b) leveraging a declarative approach to defining application components (ML models, datasets, reports, jobs, etc) 
+- It is designed for data scientists and doesn't require development skills to build applications.
+
+![Example of a dstack application|840x520](https://github.com/dstackai/dstack/raw/master/dstack_example.gif)
 
 ## How dstack works
 
 The framework consists of the following parts:
 - Client packages for Python ([dstack-py](https://github.com/dstackai/dstack-py)) an R ([dstack-r](https://github.com/dstackai/dstack-r)). These packages can be used from either notebooks or scripts to push data to dstack.
-- A server application ([dstack-server](https://github.com/dstackai/dstack-server)). It handles the requests from the Client packages, and serve data applications. The application can run locally or in Docker.  
+- A server application ([dstack-server](https://github.com/dstackai/dstack-server)). It handles the requests from the Client packages, and offers a registry for ML models, hosts jobs, reports, and data applications. The server can run locally or in Docker.  
 
-A data science application is a specific kind of applications that solves domain-specific problems using data and data-science methods.
- These data science methods may include data-wrangling, data visualizations, statistical modeling, machine learning, etc.  
+An ML application is a specific kind of applications that solves domain-specific problems using ML and data-science libraries.
 
 There are several general use-cases for such data science applications:
 
-1. *Interactive reports* – a set data visualizations and interactive widgets, combined using a certain layout 
-2. *Live dashboards* – applications that fetch data from various data sources, turn it into visualizations and combine using a certain layout (not supported yet)
-3. *Machine learning applications* – applications that let users to interact with ML models (not supported yet)
+1. *Reports* – interactive visualizations with different layouts  
+2. *Model registry* - Once, you've trained an ML model, you can push it to dstack.ai using the Python's push function. Later, you can pull this model to use anywhere: in a notebook, script, job, or application.
+3. *Jobs* – Automate the routine of processing datasets or updating dashboards, by running regular Python or R jobs and monitoring their progress.
+3. *Applications* – Interactive applications that run on the server and let users to interact with ML models and data sources (not supported yet)
 
-Currently, dstack supports only *Interactive reports*. The support for *Live dashboards* and *Machine learning applications* is coming soon.
+Currently, dstack supports *Reports*, *Model registry*, and *Jobs*. The support for *Applications* is coming soon.
     
-#### Interactive reports
+#### Reports
 
 An interactive report can be currently built via the user interface of the `dstack-server` application.
     In order to create a report, one must first create *Stacks* by pushing data via the `dstack` packages from Python or R.
@@ -55,11 +62,8 @@ The package comes with a command line tool called `dstack`. This command line to
 
 If you're using R and don't need the command line tool, you can install the `dstack` package for R via the following command:
 
-Note, the R CRAN package is still under review. In order to install it, please use the following commands:
-
 ```R
-install.packages(c('uuid', 'bit64', 'rjson', 'rlist'), repos = 'http://cran.us.r-project.org')
-install.packages('https://drive.google.com/uc?export=download&id=1RREfEk_rZFvZN-
+install.packages('dstack')
 ```
 
 ## Quick start
@@ -77,7 +81,6 @@ You'll see the following output:
 ```
 To access the dstack server, open one of these URLs in the browser:
 		http://localhost:8080/auth/verify?user=dstack&code=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&next=/
-	or	http://127.0.0.1:8080/auth/verify?user=dstack&code=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&next=/
 
 If you're using Python, use the following command line command to configure your dstack profile:
 	pip install dstack
@@ -114,157 +117,13 @@ dstack config add --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --s
 
 ### Push artifacts
 
-Uploading datasets and visualization to the server is done via the `dstack` packages available for both Python and R. 
-    These packages can be used from Jupyter notebooks, RMarkdown, Python and R scripts and applications.
+Pushing ML models, datasets and visualization to the server is done via the `dstack` packages available for both Python and R. 
+    These packages can be used from dstack's *Jobs*, or from Jupyter notebooks, RMarkdown, Python and R scripts and applications.
     
 Once data is pushed to the server, it can be accessed via the URL returned in the response, 
     for example `http://localhost:8080/<username>/<stackname>` or via the web application's interface.
-    
-The pushed *Stacks* can be combined into interactive *Dashboards* via the web application's interface.
-    
-The `dstack` packages can be used with `pandas`, `tidyverse`, `matplotlib`, `ggplot2`, `bokeh` and `plotly`.  
-    The `commit` and `push_frame` methods accept `pandas.core.frame.DataFrame`, `data.frame`, `data.table`, `tibble`, 
-    `plotly.graph_objs._figure.Figure`, `bokeh.plotting.figure.Figure`, etc.
 
-#### Push a static visualization 
-
-Here's a simple example of the code that pushes a static visualization:
-
-**Python**
-```python
-import matplotlib.pyplot as plt
-from dstack import push_frame
-
-fig = plt.figure()
-plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
-
-push_frame("simple", fig, "My first plot")
-```
-
-**R**
-```R
-library(ggplot2)
-library(dstack)
-
-df <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))
-image <- ggplot(data = df, aes(x = x, y = y)) + geom_line()
-
-push_frame("simple", image, "My first plot")
-```
-
-#### Push an interactive visualization 
-
-In some cases, you want to have plots that are interactive and that can change when the user change its parameters. 
-    Suppose you want to publish a line plot that depends on the value of the parameter `Coefficient`
-
-**Python**
-```python
-import matplotlib.pyplot as plt
-from dstack import create_frame
-
-def line_plot(a):
-    xs = range(0, 21)
-    ys = [a * x for x in xs]
-    fig = plt.figure()
-    plt.axis([0, 20, 0, 20])
-    plt.plot(xs, ys)
-    return fig
-
-
-frame = create_frame("line_plot")
-coeff = [0.5, 1.0, 1.5, 2.0]
-
-for c in coeff:
-    frame.commit(line_plot(c), 
-    f"Line plot with the coefficient of {c}", {"Coefficient": c})
-
-frame.push()
-```
-
-**R**
-```R
-library(ggplot2)
-library(dstack)
-
-line_plot <- function(a) {
-    x <- c(0:20)
-    y <- sapply(x, function(x) { return(a * x) })
-  
-    df <- data.frame(x = x, y = y)
-    plot <- ggplot(data = df, aes(x = x, y = y)) + 
-        geom_line() + xlim(0, 20) + ylim(0, 20)
-    return(plot)
-
-}
-
-coeff <- c(0.5, 1.0, 1.5, 2.0)
-frame <- create_frame(stack = "line_plot")
-
-for(c in coeff) {
-    frame <- commit(frame, line_plot(c), 
-        paste0("Line plot with the coefficient of ", c), 
-        Coefficient = c)
-}
-
-push(frame)
-```
-
-#### Push a single dataset
-
-Here's an example of the code that pushes a single dataset:
- 
-**Python**
-```python
-import pandas as pd
-import numpy as np
-import dstack as ds
-
-dates = pd.date_range('20130101', periods=6)
-df = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list('ABCD'))
-
-ds.push_frame("static_dataset_example", df, "static dataset")
-```
-
-**R**
-```R
-library(ggplot2)
-library(dstack)
-
-data("midwest", package = "ggplot2")
-push_frame("simple", midwest, "My first dataset")
-```
-
-### Pull artifacts
-
-#### Pull a single dataset
-
-Here's an example of the code that pulls a dataset from the server:
-
-**Python**
-```python
-import pandas as pd
-import dstack as ds
-
-df = ds.pull("/<username>/<stackname>")
-df.head()
-```
-
-**R**
-```R
-library(dstack)
-
-df <- read.csv(pull("/<username>/<stackname>"))
-head(df)
-```
-
-Currently, the `dstack` packages are compatible with `pandas.core.frame.DataFrame`, `data.frame`, `data.table`, and `tibble`.
-
-## Roadmap
-
-Here's a list of things not implemented yet but considered for the nearest time:
-
-- Stacks that can run user code (aka Callbacks) – using these stacks it will be possible to implement Live Dashboards
-- User interfaces for published Machine Learning models (so users may interface with ML models from the web application)
+The pushed *Stacks* can be combined into interactive *Reports* via the web application's interface.
 
 ## Contribution
 
