@@ -1604,7 +1604,7 @@ var Tabs = function Tabs(_ref) {
 
 var css$m = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
 
-var TextAreaField = function TextAreaField(_ref) {
+var TextAreaField = forwardRef(function (_ref, ref) {
   var label = _ref.label,
       className = _ref.className,
       _ref$size = _ref.size,
@@ -1627,11 +1627,12 @@ var TextAreaField = function TextAreaField(_ref) {
     className: cx({
       error: hasErrors
     }),
-    value: value
+    value: value,
+    ref: ref
   }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
     className: css$m.error
   }, errors.join(', '))));
-};
+});
 
 var css$n = {"tooltip":"_rE8Jn"};
 
@@ -2793,7 +2794,7 @@ var List = function List(_ref) {
     color: "primary",
     variant: "contained",
     size: "small"
-  }, t('uploadData'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
+  }, t('createStack'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
     className: css$u.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     className: css$u.viewSwitcher,
@@ -3197,6 +3198,8 @@ var Readme = function Readme(_ref2) {
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
 
+  var textareaRef = useRef(null);
+
   var _useState = useState(data.readme),
       value = _useState[0],
       setValue = _useState[1];
@@ -3204,6 +3207,18 @@ var Readme = function Readme(_ref2) {
   var _useState2 = useState(false),
       isEdit = _useState2[0],
       setIsEdit = _useState2[1];
+
+  useEffect(function () {
+    if (isEdit && (textareaRef === null || textareaRef === void 0 ? void 0 : textareaRef.current)) {
+      textareaRef.current.focus();
+      if (textareaRef.current.setSelectionRange) textareaRef.current.setSelectionRange(textareaRef.current.value.length, textareaRef.current.value.length);
+      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+    }
+  }, [isEdit]);
+
+  var edit = function edit() {
+    return setIsEdit(true);
+  };
 
   var cancel = function cancel() {
     setIsEdit(false);
@@ -3217,7 +3232,7 @@ var Readme = function Readme(_ref2) {
 
   var onAddReadme = function onAddReadme(event) {
     event.preventDefault();
-    setIsEdit(true);
+    edit();
   };
 
   var onChange = function onChange(event) {
@@ -3236,11 +3251,7 @@ var Readme = function Readme(_ref2) {
   }, t('readme')), data.user === currentUserName && !isEdit && /*#__PURE__*/React__default.createElement(Button, {
     color: 'secondary',
     className: css$y.edit,
-    onClick: function onClick() {
-      return setIsEdit(function (state) {
-        return !state;
-      });
-    }
+    onClick: edit
   }, /*#__PURE__*/React__default.createElement("span", {
     className: 'mdi mdi-pencil'
   }))), /*#__PURE__*/React__default.createElement("div", {
@@ -3250,6 +3261,7 @@ var Readme = function Readme(_ref2) {
   }, /*#__PURE__*/React__default.createElement(EmptyMessage, {
     onAdd: onAddReadme
   })), isEdit && /*#__PURE__*/React__default.createElement(TextAreaField, {
+    ref: textareaRef,
     onChange: onChange,
     className: css$y.field,
     value: value
@@ -6770,7 +6782,8 @@ var Header = function Header(_ref) {
     Component: Link,
     to: "/auth/login",
     className: css$X.button,
-    color: "primary"
+    color: "primary",
+    variant: "contained"
   }, t('logIn'))));
 };
 

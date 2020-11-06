@@ -37,6 +37,7 @@ var en = {
   'createAnAccount': 'Create an account',
   'createANewPasswordAndReLoginInYourAccount': 'Create a new password and re-login in your account',
   'createdByName': 'Created by {{name}}',
+  'createStack': 'Create stack',
   'updatedByName': 'Updated by {{name}}',
   'daily': 'Daily',
   'dashboards': 'Dashboards',

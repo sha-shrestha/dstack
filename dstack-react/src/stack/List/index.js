@@ -189,7 +189,7 @@ const List = ({
                                     variant="contained"
                                     size="small"
                                 >
-                                    {t('uploadData')}
+                                    {t('createStack')}
                                 </Button>
                             </Tooltip>
                         )}

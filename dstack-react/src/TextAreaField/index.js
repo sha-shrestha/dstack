@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, {forwardRef} from 'react';
 import cx from 'classnames';
 import css from './styles.module.css';
 
@@ -10,7 +10,7 @@ type Props = {
     errors?: Array<string>,
 }
 
-const TextAreaField = ({label, className, size = 'normal', errors = [], value, ...props}: Props) => {
+const TextAreaField = forwardRef(({label, className, size = 'normal', errors = [], value, ...props}: Props, ref) => {
     const hasErrors = Boolean(errors.length);
 
     return (
@@ -23,6 +23,7 @@ const TextAreaField = ({label, className, size = 'normal', errors = [], value, .
                     <textarea
                         className={cx({error: hasErrors})}
                         value={value}
+                        ref={ref}
                         {...props}
                     />
                 </div>
@@ -31,6 +32,6 @@ const TextAreaField = ({label, className, size = 'normal', errors = [], value, .
             </label>
         </div>
     );
-};
+});
 
 export default TextAreaField;

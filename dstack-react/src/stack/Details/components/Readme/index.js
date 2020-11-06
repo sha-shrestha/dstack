@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useTranslation, Trans} from 'react-i18next';
 import {get} from 'lodash-es';
 import ReactMarkdown from 'react-markdown';
@@ -30,8 +30,25 @@ const Readme = ({className, data, onUpdate}) => {
     });
 
     const {t} = useTranslation();
+    const textareaRef = useRef(null);
     const [value, setValue] = useState(data.readme);
     const [isEdit, setIsEdit] = useState(false);
+
+    useEffect(() => {
+        if (isEdit && textareaRef?.current) {
+            textareaRef.current.focus();
+
+            if (textareaRef.current.setSelectionRange)
+                textareaRef.current.setSelectionRange(
+                    textareaRef.current.value.length,
+                    textareaRef.current.value.length
+                );
+
+            textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+        }
+    }, [isEdit]);
+
+    const edit = () => setIsEdit(true);
 
     const cancel = () => {
         setIsEdit(false);
@@ -45,7 +62,7 @@ const Readme = ({className, data, onUpdate}) => {
 
     const onAddReadme = event => {
         event.preventDefault();
-        setIsEdit(true);
+        edit();
     };
 
     const onChange = event => {
@@ -68,7 +85,7 @@ const Readme = ({className, data, onUpdate}) => {
                             <Button
                                 color={'secondary'}
                                 className={css.edit}
-                                onClick={() => setIsEdit(state => !state)}
+                                onClick={edit}
                             >
                                 <span className={'mdi mdi-pencil'} />
                             </Button>
@@ -84,6 +101,7 @@ const Readme = ({className, data, onUpdate}) => {
 
                         {isEdit && (
                             <TextAreaField
+                                ref={textareaRef}
                                 onChange={onChange}
                                 className={css.field}
                                 value={value}

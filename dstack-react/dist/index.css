@@ -4286,7 +4286,7 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     border-top-left-radius: 0;
 }
 ._3_I7R {
-    flex: 1 1;
+    flex-shrink: 0;
     margin-top: 20px;
     padding: 20px;
     border-radius: 4px;

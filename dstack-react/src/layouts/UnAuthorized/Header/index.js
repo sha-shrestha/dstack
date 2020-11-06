@@ -24,6 +24,7 @@ const Header = ({className}: Props) => {
                 to="/auth/login"
                 className={css.button}
                 color="primary"
+                variant="contained"
             >{t('logIn')}</Button>
         </div>
     </div>;
