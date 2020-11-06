@@ -25,8 +25,7 @@ export const pullPythonCode = data => {
         a.push('params={' + p.join(', ') + '}');
     }
 
-    return `import pandas as pd
-import dstack as ds
+    return `import dstack as ds
 
 df = ds.pull(${a.join(', ')})`;
 };
