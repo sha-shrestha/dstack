@@ -1896,7 +1896,7 @@ var View = function View(_ref) {
         a.push('params={' + p.join(', ') + '}');
       }
 
-      return "import pandas as pd\nimport dstack as ds\n\ndf = ds.pull(" + a.join(', ') + ")";
+      return "import dstack as ds\n\nmodel = ds.pull(" + a.join(', ') + ")";
     };
 
     return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
@@ -2893,7 +2893,7 @@ var pullPythonCode = function pullPythonCode(data) {
     a.push('params={' + p.join(', ') + '}');
   }
 
-  return "import pandas as pd\nimport dstack as ds\n\ndf = ds.pull(" + a.join(', ') + ")";
+  return "import dstack as ds\n\ndf = ds.pull(" + a.join(', ') + ")";
 };
 var pullRCode = function pullRCode(data) {
   var a = ["\"/" + data.stack + "\""];
