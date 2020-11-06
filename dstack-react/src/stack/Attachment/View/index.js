@@ -2,12 +2,14 @@ import React, {memo, useEffect, useState, useRef} from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import Plot from 'react-plotly.js';
-import {isEqual, get} from 'lodash-es';
+import {isEqual, get, isString} from 'lodash-es';
 import {unicodeBase64Decode} from '../../../utils';
 import Table from './Table';
+import CodeViewer from '../../../CodeViewer';
 import {isImageType, base64ToJSON} from '../utils';
 import * as CSV from 'csv-string';
 import css from './styles.module.css';
+import config from '../../../config';
 
 const base64ImagePrefixes = {
     'image/svg+xml': 'data:image/svg+xml;charset=utf-8;',
@@ -16,7 +18,7 @@ const base64ImagePrefixes = {
 };
 
 
-const View = ({frameId, attachment, fullAttachment, isList, className, requestStatus}) => {
+const View = ({frameId, attachment, fullAttachment, isList, className, requestStatus, stack}) => {
     const {t} = useTranslation();
     const viewRef = useRef();
     const [tableScale, setTableScale] = useState(1);
@@ -148,6 +150,47 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
         );
     };
 
+    const renderMl = () => {
+        const pullPythonCode = data => {
+            let a = [`\'/${stack}\'`];
+
+            let params = Object.keys(data.params);
+
+            if (params.length > 0) {
+                let p = [];
+
+                params.forEach(key => {
+                    if (isString(data.params[key]))
+                        p.push(`\'${key}\': \'${data.params[key]}\'`);
+                    else
+                        p.push(`\'${key}\': ${data.params[key]}`);
+                });
+                a.push('params={' + p.join(', ') + '}');
+            }
+
+            return `import pandas as pd
+import dstack as ds
+
+df = ds.pull(${a.join(', ')})`;
+        };
+
+        return <div>
+            <div className={css.description}>{t('pullDatasetIntro')}</div>
+
+            <CodeViewer
+                className={css.code}
+                language="python"
+            >
+                {pullPythonCode(attachment)}
+            </CodeViewer>
+
+            <div
+                className={css.footer}
+                dangerouslySetInnerHTML={{__html: t('notClearCheckTheDocks_2', {href: config.DOCS_URL})}}
+            />
+        </div>;
+    };
+
     const renderBokeh = () => <div id={`bokeh-${frameId}`} />;
 
     const renderAttachment = () => {
@@ -177,6 +220,11 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
 
             case (attachment['application'] === 'bokeh'):
                 return renderBokeh();
+
+            case (attachment['application'] === 'sklearn'):
+            case (/^tensorflow\/*/.test(attachment['application'])):
+            case (/^torch\/*/.test(attachment['application'])):
+                return renderMl();
 
             case undefined:
             case isEqual(attachment, {}):

@@ -113,6 +113,7 @@
 .itemList {
     margin-top: 20px;
     display: grid;
+    grid-auto-rows: max-content;
     padding: 30px;
     border-radius: 4px;
     border: 1px solid rgb(233, 234, 238);

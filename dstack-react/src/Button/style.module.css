@@ -12,7 +12,7 @@ button.button {
     justify-content: center;
     height: 50px;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 13px;
     line-height: 18px;
     color: var(--color-white);
     cursor: pointer;

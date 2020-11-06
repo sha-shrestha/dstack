@@ -123,6 +123,13 @@ const Details = ({
         }, () => setHeadId(frameId));
     };
 
+    const onUpdateReadme = readme => {
+        update({
+            stack: `${data.user}/${data.name}`,
+            readme,
+        });
+    };
+
     useEffect(() => {
         if (selectedFrame)
             fetchFrame(params.user, params.stack, selectedFrame);
@@ -189,6 +196,7 @@ const Details = ({
                 backUrl={routes.stacks(params.user)}
                 user={params.user}
                 stack={params.stack}
+                onUpdateReadme={onUpdateReadme}
                 onChangeFrame={onChangeFrame}
                 onChangeHeadFrame={setHeadFrame}
                 onChangeAttachmentIndex={setAttachmentIndex}

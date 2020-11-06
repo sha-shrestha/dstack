@@ -1,0 +1,84 @@
+@import "styles/variables.css";
+@import "styles/media.css";
+
+.readme {
+
+}
+
+.container {
+    border: 1px solid #E1E3E9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.header {
+    height: 32px;
+    padding-left: 20px;
+    padding-right: 14px;
+    display: flex;
+    align-items: center;
+    background: rgba(180, 184, 199, 0.1);
+    border-bottom: 1px solid #E9EAEE;
+}
+.title {
+    flex-grow: 1;
+    min-width: 0;
+    flex-basis: 0;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #696F86;
+}
+.edit {
+    width: 18px !important;
+    height: 18px !important;
+    padding: 0 !important;
+    flex-shrink: 0;
+    margin-left: 16px;
+    outline: none;
+}
+.content {
+    padding: 8px 20px 34px;
+    & .field {
+        & textarea {
+            min-height: 220px;
+            border: none;
+            padding: 0 !important;
+            outline: none;
+        }
+    }
+}
+.emptyMessage {
+    padding-top: 12px;
+    padding-bottom: 16px;
+    font-size: 14px;
+    line-height: 170%;
+    color: #696F86;
+    text-align: center;
+    & a {
+        transition: .3s ease color;
+    }
+}
+.preview {
+    font-size: 13px;
+    line-height: 160%;
+    p {
+        text-align: left;
+    }
+}
+.help {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 14px;
+    color: #B4B8C7;
+}
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+.button {
+    margin-left: 10px;
+}

@@ -95,6 +95,7 @@ const Attachment = ({
                     isList={isList}
                     fullAttachment={fullAttachment}
                     attachment={attachment}
+                    stack={stack}
                 />
             )}
         </div>

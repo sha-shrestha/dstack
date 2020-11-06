@@ -61,4 +61,23 @@
             }
         }
     }
+    .description {
+        max-width: 538px;
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .code {
+        max-width: 710px;
+        margin-top: 18px;
+    }
+    .footer {
+        font-size: 14px;
+        line-height: 20px;
+        @media (--mobile) {
+            margin-top: 16px;
+        }
+        @media (--desktop) {
+            margin-top: 20px;
+        }
+    }
 }

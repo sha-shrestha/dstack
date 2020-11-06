@@ -178,6 +178,11 @@
     margin-top: 16px;
 }
 
+.readme {
+    margin-top: 20px;
+    flex-shrink: 0;
+}
+
 .modal {
     & .description {
         font-size: 14px;

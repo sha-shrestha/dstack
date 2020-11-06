@@ -19,6 +19,7 @@ import StackAttachment from '../Attachment';
 import StackFrames from '../Frames';
 import Loader from './components/Loader';
 import Tabs from './components/Tabs';
+import Readme from './components/Readme';
 import useForm from '../../hooks/useForm';
 import {formatBytes, parseStackParams, parseStackTabs} from '../../utils';
 import css from './styles.module.css';
@@ -37,6 +38,7 @@ type Props = {
     stack: string,
     headId: number,
     onChangeHeadFrame: Function,
+    onUpdateReadme: Function,
     onChangeAttachmentIndex: Function,
     onChangeFrame: Function,
     renderHeader?: Function,
@@ -54,6 +56,7 @@ const Details = ({
     onChangeAttachmentIndex,
     downloadAttachment,
     onChangeFrame,
+    onUpdateReadme,
     data,
     frame,
     loading,
@@ -322,6 +325,14 @@ const Details = ({
                     />
                 )}
             </div>
+
+            {data && (
+                <Readme
+                    className={css.readme}
+                    data={data}
+                    onUpdate={onUpdateReadme}
+                />
+            )}
 
             <Modal
                 isShow={isShowHowToModal}

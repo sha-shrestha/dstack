@@ -163,6 +163,8 @@ export default {
     'productNews': 'Product news',
     'public': 'Public',
     'r': 'R',
+    'readme': 'Readme',
+    'readmeEmptyMessage': 'Sure your ML model is easy to understand without README? IF no, please, <1>add some helpful information</1> about how to use the model.',
     'reLogIn': 'Re-log in',
     'reLoggingIn': 'Re-logging in',
     'rename': 'Rename',

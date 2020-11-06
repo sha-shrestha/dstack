@@ -10,7 +10,7 @@ type Props = {
     errors?: Array<string>,
 }
 
-const TextAreaField = ({label, className, size = 'normal', errors = [], ...props}: Props) => {
+const TextAreaField = ({label, className, size = 'normal', errors = [], value, ...props}: Props) => {
     const hasErrors = Boolean(errors.length);
 
     return (
@@ -22,6 +22,7 @@ const TextAreaField = ({label, className, size = 'normal', errors = [], ...props
                     {/*$FlowFixMe*/}
                     <textarea
                         className={cx({error: hasErrors})}
+                        value={value}
                         {...props}
                     />
                 </div>
