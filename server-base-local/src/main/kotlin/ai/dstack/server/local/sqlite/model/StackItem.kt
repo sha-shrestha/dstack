@@ -54,5 +54,8 @@ data class StackItem(
     val private: Boolean,
 
     @Embedded
-    val head: StackItemHead?
+    val head: StackItemHead?,
+
+    @Column()
+    val readme: String?
 )

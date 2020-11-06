@@ -27,12 +27,12 @@ data class BasicFrameInfo(
     val message: String?
 )
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 data class StackInfo(
     val user: String,
     val name: String,
     val private: Boolean,
     val head: FrameInfo?,
+    val readme: String?,
     val permissions: List<PermissionInfo>?,
     @Deprecated("Gonna be removed in October")
     val comments: List<CommentInfo>,

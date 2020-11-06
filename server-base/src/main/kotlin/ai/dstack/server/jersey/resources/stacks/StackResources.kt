@@ -143,6 +143,7 @@ class StackResources {
                                                 }, it.params, it.message
                                         )
                                     },
+                                    stack.readme,
                                     if (owner) permissionService.findByPath(stack.path)
                                             .map {
                                                 PermissionInfo(
@@ -255,7 +256,7 @@ class StackResources {
             } else {
                 if (stack == null) {
                     val isPrivate = user.settings.general.defaultAccessLevel == AccessLevel.Private
-                    stack = Stack(user.name, s, isPrivate, null)
+                    stack = Stack(user.name, s, isPrivate, null, null)
                     stackService.create(stack)
                 }
                 if (frame == null) {
@@ -358,7 +359,7 @@ class StackResources {
                 } else {
                     val isPrivate =
                             !payload.private!! || user.settings.general.defaultAccessLevel == AccessLevel.Private
-                    val stack = Stack(user.name, payload.name!!, isPrivate, null)
+                    val stack = Stack(user.name, payload.name!!, isPrivate, null, payload.readme)
                     try {
                         sessionService.renew(session)
                         stackService.create(stack)
@@ -542,14 +543,18 @@ class StackResources {
                                 stackService.update(
                                         stack.copy(
                                                 private = payload.private ?: stack.private,
-                                                head = Head(head.id, head.timestampMillis)
+                                                head = Head(head.id, head.timestampMillis),
+                                                readme = payload.readme
+                                                        ?: (if (payload.readme?.isEmpty() == true) null else payload.readme)
                                         )
                                 )
                                 ok()
                             }
                         } else {
-                            if (payload.private != null) {
-                                stackService.update(stack.copy(private = payload.private))
+                            if (payload.private != null || payload.readme != null) {
+                                stackService.update(stack.copy(private = payload.private ?: stack.private,
+                                        readme = payload.readme
+                                                ?: (if (payload.readme?.isEmpty() == true) null else payload.readme)))
                             }
                             ok()
                         }
@@ -587,7 +592,7 @@ private val DeleteStackPayload?.isMalformed
 private val UpdateStackPayload?.isMalformed
     get() = this == null
             || stack.isMalformedStackPath
-            || (private == null && head == null)
+            || (private == null && head == null && readme == null)
 
 private val DeleteCommentPayload?.isMalformed
     get() = this?.id.isNullOrBlank()

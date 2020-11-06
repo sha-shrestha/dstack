@@ -8,5 +8,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 data class UpdateStackPayload(
     val stack: String?,
     val private: Boolean?,
-    val head: String?
+    val head: String?,
+    val readme: String?
 )

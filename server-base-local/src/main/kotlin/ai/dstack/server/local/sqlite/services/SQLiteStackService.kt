@@ -40,9 +40,9 @@ class SQLiteStackService(private val repository: StackRepository) : StackService
 
     private fun StackItem.toStack(): Stack {
         return this.let { s ->
-            ai.dstack.server.model.Stack(s.user, s.name, s.private, s.head?.let { h ->
+            Stack(s.user, s.name, s.private, s.head?.let { h ->
                 ai.dstack.server.model.Head(h.id, h.timestampMillis)
-            })
+            }, s.readme)
         }
     }
 
@@ -57,7 +57,8 @@ class SQLiteStackService(private val repository: StackRepository) : StackService
                         h.id,
                         h.timestampMillis
                     )
-                })
+                },
+                s.readme)
         }
     }
 }
