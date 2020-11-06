@@ -27,7 +27,6 @@ data class BasicFrameInfo(
     val message: String?
 )
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 data class StackInfo(
     val user: String,
     val name: String,
