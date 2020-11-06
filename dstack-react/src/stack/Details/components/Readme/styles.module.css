@@ -39,7 +39,7 @@
     outline: none;
 }
 .content {
-    padding: 8px 20px 34px;
+    padding: 10px 20px;
     & .field {
         & textarea {
             min-height: 220px;
@@ -51,7 +51,7 @@
 }
 .emptyMessage {
     padding-top: 12px;
-    padding-bottom: 16px;
+    padding-bottom: 12px;
     font-size: 14px;
     line-height: 170%;
     color: #696F86;

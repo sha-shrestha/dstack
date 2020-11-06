@@ -3616,7 +3616,7 @@ var Details = function Details(_ref) {
     form: form,
     onChange: onChange,
     className: cx(css$z.filters)
-  }), attachment && /*#__PURE__*/React__default.createElement("div", {
+  }), attachment && (attachment.description || attachment['content_type'] === 'text/csv') && /*#__PURE__*/React__default.createElement("div", {
     className: css$z['attachment-head']
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$z.description

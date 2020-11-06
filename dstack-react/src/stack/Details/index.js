@@ -286,7 +286,9 @@ const Details = ({
                     className={cx(css.filters)}
                 />
 
-                {attachment && (
+                {attachment
+                && (attachment.description || attachment['content_type'] === 'text/csv')
+                && (
                     <div className={css['attachment-head']}>
                         <div className={css.description}>
                             {attachment.description && (<MarkdownRender source={attachment.description} />)}
