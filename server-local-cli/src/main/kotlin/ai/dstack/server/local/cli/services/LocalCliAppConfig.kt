@@ -52,17 +52,17 @@ class LocalCliAppConfig : AppConfig {
             return "${homeDirectory}/jobs"
         }
 
-    override val supportEmail: String
+    override val adminEmail: String
         get() {
-            return System.getenv("dstack_support_email")
+            return System.getenv("dstack_admin_email")
         }
 
-    override val smtpHost: String
+    override val smtpHost: String?
         get() {
             return System.getenv("dstack_smtp_host")
         }
 
-    override val smtpPort: Int
+    override val smtpPort: Int?
         get() {
             return System.getenv("dstack_smtp_port").toInt()
         }

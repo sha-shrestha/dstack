@@ -23,6 +23,5 @@ data class SessionStatus(
     val token: String,
     val email: String,
     val verified: Boolean,
-    val settings: SettingsInfo,
-    val runtimes: List<RuntimeInfo>
+    val settings: SettingsInfo
 )

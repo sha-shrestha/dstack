@@ -50,17 +50,6 @@ class UserResources {
 
     companion object : KLogging()
 
-    val runtimes: List<String> by lazy {
-            val runtimes = mutableListOf<String>()
-            if (config.pythonExecutable != null) {
-                runtimes.add("python")
-            }
-            if (config.rscriptExecutable != null) {
-                runtimes.add("r")
-            }
-            runtimes
-        }
-
     @POST
     @Path("/info")
     @Produces(JSON_UTF8)
@@ -84,8 +73,7 @@ class UserResources {
                         )
                     ),
                     user.createdDate.toString(),
-                    user.plan.code,
-                    runtimes.map { RuntimeInfo(it) }
+                    user.plan.code
                 ))
             }
         }
@@ -289,8 +277,7 @@ class UserResources {
                             user.settings.notifications.comments,
                             user.settings.notifications.newsletter
                         )
-                    ),
-                    runtimes.map { RuntimeInfo(it) }
+                    )
                 )
             )
         }

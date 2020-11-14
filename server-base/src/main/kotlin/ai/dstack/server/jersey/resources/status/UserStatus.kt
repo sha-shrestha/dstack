@@ -10,6 +10,5 @@ data class UserStatus(
     val settings: SettingsInfo,
     @JsonProperty("created_date")
     val createdDate: String,
-    val plan: String,
-    val runtimes: List<RuntimeInfo>
+    val plan: String
 )
