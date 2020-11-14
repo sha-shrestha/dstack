@@ -41,6 +41,6 @@ class ConfigResources {
         logger.debug { "info" }
         return ok(ConfigStatus(
                 runtimes.map { RuntimeInfo(it) },
-                config.smtpHost != null))
+                config.emailEnabled))
     }
 }

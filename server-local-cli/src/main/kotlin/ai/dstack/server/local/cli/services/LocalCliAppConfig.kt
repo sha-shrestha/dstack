@@ -97,6 +97,11 @@ class LocalCliAppConfig : AppConfig {
             return System.getenv("dstack_rscript_executable") ?: defaultRscriptExecutable
         }
 
+    override val emailEnabled: Boolean
+        get() {
+            return smtpHost != null
+        }
+
     companion object {
         var defaultInternalPort: String = "8080"
         var defaultHomeDirectory: String? = System.getProperty("user.home")

@@ -19,4 +19,5 @@ interface AppConfig {
     val smtpFrom: String?
     val pythonExecutable: String?
     val rscriptExecutable: String?
+    val emailEnabled: Boolean
 }
