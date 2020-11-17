@@ -10,13 +10,14 @@ interface AppConfig {
     val dataDirectory: String
     val fileDirectory: String
     val jobDirectory: String
-    val supportEmail: String
-    val smtpHost: String
-    val smtpPort: Int
+    val adminEmail: String?
+    val smtpHost: String?
+    val smtpPort: Int?
     val smtpUser: String?
     val smtpPassword: String?
-    val smtpStartTLS: Boolean
-    val smtpFrom: String
+    val smtpStartTLS: Boolean?
+    val smtpFrom: String?
     val pythonExecutable: String?
     val rscriptExecutable: String?
+    val emailEnabled: Boolean
 }

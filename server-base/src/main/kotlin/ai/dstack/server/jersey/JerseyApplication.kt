@@ -4,6 +4,7 @@ import ai.dstack.server.jersey.filters.CorsAllowAllRestResponseFilter
 import ai.dstack.server.jersey.filters.UriInfoFilter
 import ai.dstack.server.jersey.jackson.ObjectMapperContextResolver
 import ai.dstack.server.jersey.resources.SupportResources
+import ai.dstack.server.jersey.resources.config.ConfigResources
 import ai.dstack.server.jersey.resources.jobs.JobResources
 import ai.dstack.server.jersey.resources.stacks.*
 import ai.dstack.server.jersey.resources.users.UserResources
@@ -31,7 +32,8 @@ class JerseyApplication {
                     AttachResources::class.java,
                     DashboardResources::class.java,
                     UserResources::class.java,
-                    SupportResources::class.java
+                    SupportResources::class.java,
+                    ConfigResources::class.java
                 )
                 .register(JacksonFeature::class.java)
     }

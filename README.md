@@ -1,50 +1,33 @@
-**dstack is an open-source framework for building ML applications using Python and R.**
+**dstack is an open-source platform for rapid development of data applications using Python.**
 
-![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![CRAN status](https://www.r-pkg.org/badges/version/dstack)](https://CRAN.R-project.org/package=dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)
+![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)
 
-Push ML models, visualizations, and code to dstack.ai to build beautiful applications in minutes.
+Push ML models, visualizations, and code to dstack.ai to build data applications in minutes.
 No development or deployment skills are required.
 
-How is dstack different from other frameworks (Plotly, Streamlit, Shiny, etc):
+How is `dstack` different from other frameworks (Plotly, Streamlit, Shiny, etc):
  - It simplifies the process of creating applications by 
     a) decoupling ML development and application development (by introducing an ML Registry) 
     b) leveraging a declarative approach to defining application components (ML models, datasets, reports, jobs, etc) 
 - It is designed for data scientists and doesn't require development skills to build applications.
 
-![Example of a dstack application|840x520](https://github.com/dstackai/dstack/raw/master/dstack_example.gif)
-
 ## How dstack works
 
 The framework consists of the following parts:
-- Client packages for Python ([dstack-py](https://github.com/dstackai/dstack-py)) an R ([dstack-r](https://github.com/dstackai/dstack-r)). These packages can be used from either notebooks or scripts to push data to dstack.
-- A server application ([dstack-server](https://github.com/dstackai/dstack-server)). It handles the requests from the Client packages, and offers a registry for ML models, hosts jobs, reports, and data applications. The server can run locally or in Docker.  
+- Client packages for Python ([dstack-py](https://github.com/dstackai/dstack-py)). These packages can be used from either notebooks or scripts to push data to dstack.
+- A server application ([dstack](https://github.com/dstackai/dstack)). It handles the requests from the Client packages, and offers a registry for ML models, hosts jobs, reports, and data applications. The server can run locally or in Docker.  
 
-An ML application is a specific kind of applications that solves domain-specific problems using ML and data-science libraries.
+A data application is a specific kind of applications that solves domain-specific problems using machine learning, data wrangling, and visualization.
 
 There are several general use-cases for such data science applications:
 
 1. *Reports* – interactive visualizations with different layouts  
 2. *Model registry* - Once, you've trained an ML model, you can push it to dstack.ai using the Python's push function. Later, you can pull this model to use anywhere: in a notebook, script, job, or application.
-3. *Jobs* – Automate the routine of processing datasets or updating dashboards, by running regular Python or R jobs and monitoring their progress.
+3. *Jobs* – Automate the routine of processing datasets or updating dashboards, by running regular Python and monitoring their progress.
 3. *Applications* – Interactive applications that run on the server and let users to interact with ML models and data sources (not supported yet)
 
 Currently, dstack supports *Reports*, *Model registry*, and *Jobs*. The support for *Applications* is coming soon.
     
-#### Reports
-
-An interactive report can be currently built via the user interface of the `dstack-server` application.
-    In order to create a report, one must first create *Stacks* by pushing data via the `dstack` packages from Python or R.
-    The data can be dataframes (pandas, tidyverse, etc) or plots (matplotlib, plotly, ggplot, etc). 
-    Once the *Stacks* are pushed, the user must open the `dstack-server` application in a browser, go to *Dashboards*,
-    click *New dashboard*, and then select the *Stacks*. The `dstack-server` will automatically generate a dashboard
-    out of the chosen *Stacks*.
-    
-It's important, that if any of the *Stacks* has multiple *Attachments* with parameters, the `dstack-server` application
-    will automatically generate interactive widgets to select these parameters and update the dashboard accordingly.
-    
-The information on how to push artifacts to a dstack server, can be found in the [dstack-py](https://github.com/dstackai/dstack-py) an [dstack-r](https://github.com/dstackai/dstack-r) repositories correspondingly.
-    
-An example of such an interactive report can be seen [here](https://dstack.ai/cheptsov/d/505d2087-9adc-49e3-88de-6b46079c394f).
 
 ## Installation
 
@@ -54,17 +37,9 @@ The `dstack` package can be easily installed via either pip or conda:
 pip install dstack
 ```
 
-```bash
-conda install dstack -c dstack.ai
-```
+The package comes with a command line tool called `dstack`. This command line tool can be used to configure local profiles, credentials, and to run a local server.
 
-The package comes with a command line tool called `dstack`. This command line tool can be used to configure local profiles, credentials, and to run a local server. 
-
-If you're using R and don't need the command line tool, you can install the `dstack` package for R via the following command:
-
-```R
-install.packages('dstack')
-```
+The full documentation on how to use dstack, you can find at [docs.dstack.ai](https://docs.dstack.ai).
 
 ## Quick start
 
@@ -85,10 +60,6 @@ To access the dstack server, open one of these URLs in the browser:
 If you're using Python, use the following command line command to configure your dstack profile:
 	pip install dstack
 	dstack config add --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --server http://localhost:8080/api
-
-If you're using R, use the following R command to configure your dstack profile:
-	install.packages("dstack")
-	dstack::configure(user = "dstack", token = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", persist = "global", server = "http://localhost:8080/api")
 ```
 
 Note, in your case instead of `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` you'll see your personal code.
@@ -117,8 +88,8 @@ dstack config add --token xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --user dstack --s
 
 ### Push artifacts
 
-Pushing ML models, datasets and visualization to the server is done via the `dstack` packages available for both Python and R. 
-    These packages can be used from dstack's *Jobs*, or from Jupyter notebooks, RMarkdown, Python and R scripts and applications.
+Pushing ML models, datasets and visualization to the `dstacl` server is done via the `dstack` packages available for both Python and R. 
+    These packages can be used from dstack's *Jobs*, or from Jupyter notebooks, as well as Python scripts and applications.
     
 Once data is pushed to the server, it can be accessed via the URL returned in the response, 
     for example `http://localhost:8080/<username>/<stackname>` or via the web application's interface.
