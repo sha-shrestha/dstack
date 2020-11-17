@@ -10,11 +10,11 @@ import Dropdown from '../../Dropdown';
 import ViewSwitcher from '../../ViewSwitcher';
 import SearchField from '../../SearchField';
 import StackListItem from '../ListItem';
-import routes from '../../routes';
 import Tooltip from '../../Tooltip';
 import useListViewSwitcher from '../../hooks/useListViewSwitcher';
 import Tabs from '../Details/components/Tabs';
 import getStackCategory from '../../utils/getStackCategory';
+import routes from '../../routes';
 import css from './styles.module.css';
 
 type Stack = {
@@ -27,7 +27,6 @@ type Props = {
     data: Array<Stack>,
     loading: boolean,
     currentUser?: string,
-    renderItemContent: Function,
 };
 
 const List = ({
@@ -37,7 +36,6 @@ const List = ({
     currentUser,
     user,
     renderUploadStack = () => {},
-    renderItemContent,
 }: Props) => {
     const {t} = useTranslation();
 
@@ -263,7 +261,6 @@ const List = ({
                         data={item}
                         to={routes.stackDetails(item.user, item.name)}
                         deleteAction={currentUser === item.user && showDeleteConfirmation}
-                        renderContent={renderItemContent}
                     />)}
                 </div>
             )}

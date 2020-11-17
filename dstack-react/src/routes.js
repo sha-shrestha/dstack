@@ -3,6 +3,10 @@ export default {
     auth: () => '/auth',
     authLogin: () => '/auth/login',
     verifyUser: () => '/auth/verify',
+    authSignUp: () => '/auth/signup',
+    authForgetPassword: () => '/auth/forget-password',
+    authResetPassword: () => '/auth/reset-password',
+    confirmEmailMessage: () => '/auth/confirm-message',
 
     // stacks
     stacks: (user = ':user') => `/${user}`,

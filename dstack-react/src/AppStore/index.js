@@ -8,6 +8,10 @@ const initialState = {
         loading: false,
         data: null,
     },
+    configInfo: {
+        loading: false,
+        data: null,
+    },
     appProgress: {
         active: null,
         value: null,
@@ -35,7 +39,7 @@ export const reducer = (state = initialState, action) => {
                 },
             };
 
-        case (actionsTypes.FETCH_FAIL):
+        case (actionsTypes.FETCH_CURRENT_USER_FAIL):
             return {
                 ...state,
                 currentUser: {
@@ -43,6 +47,36 @@ export const reducer = (state = initialState, action) => {
                     loading: false,
                 },
             };
+
+
+        case (actionsTypes.FETCH_CONFIG_INFO):
+            return {
+                ...state,
+                configInfo: {
+                    ...state.configInfo,
+                    loading: true,
+                },
+            };
+
+        case (actionsTypes.FETCH_CONFIG_INFO_SUCCESS):
+            return {
+                ...state,
+                configInfo: {
+                    ...state.configInfo,
+                    data: action.payload,
+                    loading: false,
+                },
+            };
+
+        case (actionsTypes.FETCH_CONFIG_INFO_FAIL):
+            return {
+                ...state,
+                configInfo: {
+                    ...state.configInfo,
+                    loading: false,
+                },
+            };
+
 
         case (actionsTypes.START_PROGRESS):
             return {

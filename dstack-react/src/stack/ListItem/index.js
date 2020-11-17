@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import moment from 'moment';
 import cn from 'classnames';
 import getStackCategory from '../../utils/getStackCategory';
+import PermissionUsers from '../../PermissionUsers';
 import {ReactComponent as ChartIcon} from './assets/chart.svg';
 import {ReactComponent as MLIcon} from './assets/ml.svg';
 import {ReactComponent as TableIcon} from './assets/table.svg';
@@ -20,7 +21,6 @@ type Props = {
     },
 
     deleteAction?: Function,
-    renderContent?: Function,
 };
 
 const Item = ({
@@ -28,7 +28,6 @@ const Item = ({
     Component = 'div',
     data,
     deleteAction,
-    renderContent,
     ...rest
 }: Props) => {
     const {t} = useTranslation();
@@ -78,10 +77,14 @@ const Item = ({
                 <div className={css.name} title={data.name}>{data.name}</div>
                 <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
 
-                {renderContent && (
-                    <div className={css.additional}>
-                        {renderContent(data)}
-                    </div>
+                {data.private && (
+                    <PermissionUsers
+                        variant="list"
+                        owner={data.user}
+                        className={css.permissions}
+                        permissions={data.permissions}
+                        maxLength={3}
+                    />
                 )}
             </div>
 

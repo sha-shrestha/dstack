@@ -33,11 +33,6 @@ const UploadStack = ({
             label: t('python'),
             value: 1,
         },
-
-        {
-            label: t('r'),
-            value: 2,
-        },
     ];
 
     if (withFileUpload)
@@ -56,7 +51,7 @@ const UploadStack = ({
             />
 
             {activeCodeTab === 1 && <div>
-                <div className={css.description}>{t('installPipOrCondaPackage')}</div>
+                <div className={css.description}>{t('installPipPackage')}</div>
 
                 <Tabs
                     className={css.tabs}
@@ -68,11 +63,6 @@ const UploadStack = ({
                             label: t('pip'),
                             value: 1,
                         },
-
-                        {
-                            label: t('conda'),
-                            value: 2,
-                        },
                     ]}
                 />
 
@@ -81,13 +71,6 @@ const UploadStack = ({
                     language="bash"
                 >
                     pip install dstack
-                </CodeViewer>}
-
-                {activePlatformTab === 2 && <CodeViewer
-                    className={css.code}
-                    language="bash"
-                >
-                    conda install dstack -c dstack.ai
                 </CodeViewer>}
 
                 <div className={css.description}>{t('configureDStack')}</div>
@@ -106,35 +89,6 @@ const UploadStack = ({
                     language="python"
                 >
                     {reportPlotPythonCode}
-                </CodeViewer>
-            </div>}
-
-            {activeCodeTab === 2 && <div>
-                <div className={css.description}>{t('installRPackage')}</div>
-
-                <CodeViewer
-                    className={css.code}
-                    language="r"
-                >
-                    {installRPackageCode}
-                </CodeViewer>
-
-                <div className={css.description}>{t('configureDStack')}</div>
-
-                <CodeViewer
-                    className={css.code}
-                    language="r"
-                >
-                    {configureRCommand}
-                </CodeViewer>
-
-                <div className={css.description}>{t('reportPlotIntro')}</div>
-
-                <CodeViewer
-                    className={css.code}
-                    language="r"
-                >
-                    {reportPlotRCode}
                 </CodeViewer>
             </div>}
 

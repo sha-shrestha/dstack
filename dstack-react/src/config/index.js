@@ -9,6 +9,7 @@ export default {
     UPDATE_PASSWORD_URL: '/users/update/password',
 
     USER_DATA_URL: '/users/remember',
+    CONFIG_INFO_URL: '/config/info',
     UPDATE_TOKEN_URL: '/users/update/token',
     UPDATE_SETTINGS_URL: '/users/update/settings',
     CHECK_USER: userName => `/users/exists/${userName}`,
@@ -37,6 +38,9 @@ export default {
     JOB_DELETE: '/jobs/delete',
     JOB_RUN: '/jobs/run',
     JOB_STOP: '/jobs/stop',
+
+    PERMISSIONS_ADD: '/permissions/add',
+    PERMISSIONS_DELETE: '/permissions/delete',
 
     DISCORD_URL: 'https://discord.gg/8xfhEYa',
     TWITTER_URL: 'https://twitter.com/dstackai',

@@ -4,25 +4,42 @@ import actionsTypes from './actionsTypes';
 import config from 'config';
 
 export const fetchUser = (onSuccess: Function, onFail: Function) => async (dispatch: Function) => {
-    dispatch({type: actionsTypes.FETCH_USER});
+    return new Promise(async (resolve, reject) => {
+        dispatch({type: actionsTypes.FETCH_USER});
 
-    try {
-        const request = await api.get(config.USER_DATA_URL);
+        try {
+            const request = await api.get(config.USER_DATA_URL);
 
-        dispatch({
-            type: actionsTypes.FETCH_USER_SUCCESS,
-            payload: request.data,
-        });
+            resolve(request.data);
 
-        if (onSuccess)
-            onSuccess(request.data);
-    } catch (e) {
-        localStorage.removeItem(config.TOKEN_STORAGE_KEY);
-        dispatch({type: actionsTypes.FETCH_USER_FAIL});
+            dispatch({
+                type: actionsTypes.FETCH_USER_SUCCESS,
+                payload: request.data,
+            });
 
-        if (onFail)
-            onFail();
-    }
+            if (onSuccess)
+                onSuccess(request.data);
+        } catch (e) {
+            reject(e);
+            localStorage.removeItem(config.TOKEN_STORAGE_KEY);
+            dispatch({type: actionsTypes.FETCH_USER_FAIL});
+
+            if (onFail)
+                onFail();
+        }
+    });
+};
+
+export const fetchConfigInfo = () => async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const request = await api.get(config.CONFIG_INFO_URL);
+
+            resolve(request.data);
+        } catch (e) {
+            reject(e);
+        }
+    });
 };
 
 export const updateToken = (onSuccess: Function) => async (dispatch: Function, getState: Function) => {

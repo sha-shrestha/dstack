@@ -3,8 +3,8 @@ import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
+import {appStoreActionTypes, Loader, useAppStore} from '@dstackai/dstack-react';
 import routes from 'routes';
-import {Loader} from '@dstackai/dstack-react';
 import {verifyUser} from './actions';
 import {fetchUser} from 'App/actions';
 import {parseSearch} from '@dstackai/dstack-react/dist/utils';
@@ -21,17 +21,25 @@ type Props = {
 
 const ConfirmEmail = ({fetchUser, loading, error, history, verifyUser, location}: Props) => {
     const {t} = useTranslation();
+    const [, dispatch] = useAppStore();
 
     useEffect(() => {
         const {user, code, next} = parseSearch(location.search);
 
         verifyUser({user, code}, () => {
-            fetchUser(() => {
-                if (next)
-                    history.push(next);
-                else
-                    history.push('/');
-            });
+            fetchUser().then(
+                data => {
+                    dispatch({
+                        type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
+                        payload: data,
+                    });
+
+                    if (next)
+                        history.push(next);
+                    else
+                        history.push('/');
+                },
+            );
         });
     }, []);
 
@@ -39,7 +47,7 @@ const ConfirmEmail = ({fetchUser, loading, error, history, verifyUser, location}
         <div className={css.confirm}>
             {error && !loading && <div className={css.message}>
                 <div className={css.text}>{error}</div>
-                <Link to={routes.authLogin()}>{t('signIn')}</Link>
+                <Link to={routes.authSignUp()}>{t('signUp')}</Link>
             </div>}
 
             {loading && <Loader />}

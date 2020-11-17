@@ -3513,6 +3513,27 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     }
 }
 
+._FL7ja {
+    display: flex;
+    align-items: center;
+}
+._FL7ja.details ._37Kcf:nth-child(n+2) {
+                margin-left: -10px;
+            }
+._FL7ja.list ._37Kcf:nth-child(n+2) {
+                margin-left: -7px;
+            }
+._FL7ja ._11i1Z {
+        margin-left: 2px;
+        font-size: 12px;
+        line-height: 16px;
+        font-style: italic;
+        color: rgb(80, 124, 208);
+    }
+._37Kcf.owner {
+        box-shadow: 0 0 0 1px #F54097 inset;
+    }
+
 ._fLtf5 {
     position: relative;
     display: grid;
@@ -3567,6 +3588,9 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     white-space: nowrap;
     text-overflow: ellipsis;
     transition: color .2s;
+}
+._2SUP0 {
+    margin-left: 6px;
 }
 ._2c9og {
     font-size: 12px;
@@ -3984,6 +4008,140 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 
 
 
+@media (max-width: 980px) {
+._2X9G0 {
+        display: none
+}
+    }
+._3s7Ow {
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 16px;
+}
+@media (min-width: 981px) {
+._3s7Ow {
+        display: none
+}
+    }
+._I7l_L {
+
+}
+._2ieJ1 {
+
+}
+._2kfzG {
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 22px;
+}
+._3zGyt {
+    margin-top: 24px;
+    min-height: 38px;
+}
+._RKqmw {
+
+}
+._2_DXM {
+    padding-bottom: 0;
+}
+._2_DXM input {
+        height: 36px !important;
+        padding: 9px 10px !important;
+    }
+._2NvuS {
+    position: relative;
+    margin-top: 16px;
+}
+._2NvuS ._2_DXM input {
+            padding-right: 70px !important;
+        }
+._2rv__ {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(calc(-50% + 1px));
+}
+._2UalE {
+    position: relative;
+    margin-top: 12px;
+}
+._1jlEB {
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    padding: 10px;
+    font-size: 14px;
+    line-height: 16px;
+    transition: color .2s, opacity .2s;
+    pointer-events: none;
+}
+._1jlEB.success {
+        opacity: 1;
+        color: rgb(57, 213, 147);
+    }
+._1jlEB.fail {
+        opacity: 1;
+        color: rgb(235, 87, 87);
+    }
+._1jlEB.secondary {
+        opacity: 1;
+        color: rgb(180, 184, 199);
+    }
+._2gjKq {
+    margin-top: 12px;
+    min-height: 80px;
+}
+._3VlxR {
+    display: flex;
+    align-items: center;
+}
+._3VlxR:nth-child(n+2) {
+        margin-top: 8px;
+    }
+._3VlxR.disabled ._2PGqr,
+        ._3VlxR.disabled ._-pvaS {
+            opacity: .4;
+        }
+._IWEUU {
+    flex-shrink: 0;
+}
+._2xAc9 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: 6px;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgb(48, 52, 64);
+}
+._3QkG0 {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    color: rgb(180, 184, 199);
+    cursor: pointer;
+    transition: color .2s;
+}
+._3QkG0:hover {
+        color: rgb(48, 52, 64);
+    }
+._1Bvl_ {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgb(180, 184, 199);
+}
+._1PzgS {
+    color: rgb(57, 213, 147);
+}
+
+
 ._2wNmt {
     background-color: rgb(255, 255, 255);
 }
@@ -4160,11 +4318,19 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
         margin-left: 5px;
         opacity: .3;
     }
+._3ydGO {
+    margin-left: 10px;
+}
 ._1FUDu {
     display: flex;
     align-items: center;
     margin-left: auto;
     padding-left: 10px;
+}
+._2kaMN {
+    position: relative;
+    top: 3px;
+    margin-left: auto;
 }
 ._3axDI-button {
         outline: none;
@@ -5727,6 +5893,17 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 ._2HPT5 .mdi {
         margin-left: 5px;
         opacity: .3;
+    }
+._3OGBJ {
+    margin-left: 10px;
+}
+._198zx {
+    margin-left: 16px;
+}
+@media (min-width: 981px) {
+._198zx {
+        margin-right: 12px
+}
     }
 ._2PqMZ {
     display: flex;

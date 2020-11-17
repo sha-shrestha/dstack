@@ -1,9 +1,11 @@
 // @flow
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Auth from 'Auth';
-import {Button, TextField} from '@dstackai/dstack-react';
+import {TextField, Button, appStoreActionTypes, useAppStore} from '@dstackai/dstack-react';
+import routes from 'routes';
 import {login} from './actions';
 import {fetchUser} from 'App/actions';
 
@@ -18,6 +20,7 @@ type Props = {
 
 const Login = ({login, loading, errors, history: {push}, fetchUser}: Props) => {
     const {t} = useTranslation();
+    const [, dispatch] = useAppStore();
 
     const [form, setForm] = useState({
         user: '',
@@ -28,7 +31,16 @@ const Login = ({login, loading, errors, history: {push}, fetchUser}: Props) => {
         event.preventDefault();
 
         login(form, () => {
-            fetchUser(() => push('/'));
+            fetchUser().then(
+                data => {
+                    dispatch({
+                        type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
+                        payload: data,
+                    });
+
+                    push('/');
+                },
+            );
         });
     };
 
@@ -76,6 +88,14 @@ const Login = ({login, loading, errors, history: {push}, fetchUser}: Props) => {
                 >
                     {loading ? t('loggingIn') :  t('logIn')}
                 </Button>
+
+                <p>
+                    <Link to={routes.authForgetPassword()}>{t('forgotPassword')}</Link>
+                </p>
+
+                <p>
+                    {t('dontHaveAnAccount')} <Link to={routes.authSignUp()}>{t('signUp')}</Link>
+                </p>
             </form>
         </Auth>
     );

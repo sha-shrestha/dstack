@@ -1,0 +1,8 @@
+@import "styles/variables.css";
+
+.text {
+    color: var(--color-dark-gray);
+    font-size: 14px;
+    line-height: 20px;
+}
+

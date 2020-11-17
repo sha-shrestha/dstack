@@ -45,20 +45,6 @@
         }
     }
 }
-.plan {
-    padding-bottom: 20px;
-    position: relative;
-    &-label {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        font-size: 12px;
-        line-height: 24px;
-        text-align: right;
-        color: var(--color-green);
-    }
-}
 .button {
     @media (--mobile) {
 

@@ -22,6 +22,15 @@
         opacity: .3;
     }
 }
+.permissions {
+    margin-left: 10px;
+}
+.share {
+    margin-left: 16px;
+    @media (--desktop) {
+        margin-right: 12px;
+    }
+}
 .sideHeader {
     display: flex;
     align-items: center;

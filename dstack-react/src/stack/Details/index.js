@@ -13,6 +13,8 @@ import Modal from '../../Modal';
 import Dropdown from '../../Dropdown';
 import Yield from '../../Yield';
 import BackButton from '../../BackButton';
+import Share from '../../Share';
+import PermissionUsers from '../../PermissionUsers';
 import StackFilters from '../../StackFilters';
 import StackHowToFetchData from '../HowToFetchData';
 import StackAttachment from '../Attachment';
@@ -41,11 +43,10 @@ type Props = {
     onUpdateReadme: Function,
     onChangeAttachmentIndex: Function,
     onChangeFrame: Function,
-    renderHeader?: Function,
-    renderSideHeader?: Function,
-    renderSidebar?: Function,
     configurePythonCommand: string,
     configureRCommand: string,
+    setPrivate: Function,
+    updatePermissions: Function,
 }
 
 const Details = ({
@@ -65,11 +66,10 @@ const Details = ({
     backUrl,
     user,
     stack,
-    renderHeader,
-    renderSideHeader,
-    renderSidebar,
     configurePythonCommand,
     configureRCommand,
+    setPrivate,
+    updatePermissions,
 }: Props) => {
     const {t} = useTranslation();
     const didMountRef = useRef(false);
@@ -216,7 +216,7 @@ const Details = ({
         return <Loader />;
 
     return (
-        <div className={cx(css.details, {'with-sidebar': Boolean(renderSidebar)})}>
+        <div className={cx(css.details)}>
             <Yield name="header-yield">
                 <BackButton
                     Component={Link}
@@ -235,10 +235,27 @@ const Details = ({
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {renderHeader && renderHeader()}
+                {data.private && (
+                    <PermissionUsers
+                        className={css.permissions}
+                        permissions={data.permissions}
+                    />
+                )}
 
                 <div className={css.sideHeader}>
-                    {renderSideHeader && renderSideHeader()}
+                    {data && data.user === currentUser && (
+                        <Share
+                            instancePath={`${user}/${stack}`}
+                            onUpdatePrivate={setPrivate}
+                            className={css.share}
+                            defaultIsPrivate={data.private}
+                            defaultPermissions={data.permissions}
+
+                            onUpdatePermissions={
+                                permissions => updatePermissions(`${user}/${stack}`, permissions)
+                            }
+                        />
+                    )}
 
                     {data && data.user === currentUser && (
                         <Dropdown

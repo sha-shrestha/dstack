@@ -13,8 +13,10 @@ import {dataFetcher, isSignedIn, parseStackParams, parseStackTabs} from '../../u
 import {useDebounce, useForm} from '../../hooks';
 import Loader from './components/Loader';
 import Yield from '../../Yield';
+import PermissionUsers from '../../PermissionUsers';
 import BackButton from '../../BackButton';
 import StretchTitleField from '../../StretchTitleField';
+import Share from '../../Share';
 import Dropdown from '../../Dropdown';
 import Button from '../../Button';
 import DnDGridContext from '../../dnd/DnDGridContext';
@@ -30,7 +32,7 @@ import css from './styles.module.css';
 
 const dataFormat = data => data.dashboard;
 
-const Details = ({renderHeader, renderSideHeader}) => {
+const Details = () => {
     const {t} = useTranslation();
     const {user, id} = useParams();
     const {push} = useHistory();
@@ -70,9 +72,13 @@ const Details = ({renderHeader, renderSideHeader}) => {
 
         if (prevData?.description !== data?.description)
             setIsShowDesc(Boolean(data?.description?.length));
-
-        return () => setGridItems([]);
     }, [data]);
+
+    useEffect(() => {
+        return () => {
+            setGridItems([]);
+        };
+    }, []);
 
     useEffect(() => {
         if (filteredCards.length) {
@@ -211,7 +217,13 @@ const Details = ({renderHeader, renderSideHeader}) => {
     };
 
     const onChangePrivate = async isPrivate => {
-        await update({private: isPrivate});
+        update({private: isPrivate})
+            .then(() => {
+                mutate({
+                    ...data,
+                    private: isPrivate,
+                }, false);
+            });
     };
 
     const addStacks = async stacks => {
@@ -240,6 +252,13 @@ const Details = ({renderHeader, renderSideHeader}) => {
         mutate({
             ...data,
             cards: data.cards.filter(c => c.stack !== stack),
+        }, false);
+    };
+
+    const updatePermissions = permissions => {
+        mutate({
+            ...data,
+            permissions,
         }, false);
     };
 
@@ -366,7 +385,7 @@ const Details = ({renderHeader, renderSideHeader}) => {
                 <div className={css.title}>
                     <StretchTitleField
                         className={css.edit}
-                        value={data.title}
+                        value={data.title || ''}
                         onChange={onChangeTitle}
                         readOnly={currentUserName !== data.user}
                         placeholder={t('newDashboard')}
@@ -375,7 +394,12 @@ const Details = ({renderHeader, renderSideHeader}) => {
                     <span className={`mdi mdi-lock${data.private ? '' : '-open'}`} />
                 </div>
 
-                {renderHeader && renderHeader({data})}
+                {data.private && (
+                    <PermissionUsers
+                        className={css.permissions}
+                        permissions={data.permissions}
+                    />
+                )}
 
                 <div className={css.sideHeader}>
                     {isUserOwner && (
@@ -389,35 +413,42 @@ const Details = ({renderHeader, renderSideHeader}) => {
                         </a>
                     )}
 
-                    {renderSideHeader && renderSideHeader({
-                        data,
-                        onChangePrivate,
-                        mutateData: mutate,
-                    })}
+                    {isUserOwner && (
+                        <Share
+                            instancePath={`${user}/d/${data.id}`}
+                            onUpdatePrivate={onChangePrivate}
+                            className={css.share}
+                            defaultIsPrivate={data.private}
+                            defaultPermissions={data.permissions}
+                            onUpdatePermissions={updatePermissions}
+                        />
+                    )}
 
-                    {isUserOwner && <Dropdown
-                        className={css.dropdown}
+                    {isUserOwner && (
+                        <Dropdown
+                            className={css.dropdown}
 
-                        items={[
-                            {
-                                title: t('delete'),
-                                onClick: deleteDashboard,
-                            },
-                        ]}
-                    >
-                        <Button
-                            className={css['dropdown-button']}
-                            color="secondary"
+                            items={[
+                                {
+                                    title: t('delete'),
+                                    onClick: deleteDashboard,
+                                },
+                            ]}
                         >
-                            <span className="mdi mdi-dots-horizontal" />
-                        </Button>
-                    </Dropdown>}
+                            <Button
+                                className={css['dropdown-button']}
+                                color="secondary"
+                            >
+                                <span className="mdi mdi-dots-horizontal" />
+                            </Button>
+                        </Dropdown>
+                    )}
                 </div>
             </div>
 
             <div className={css.description}>
                 {isShowDesc && <StretchTextareaField
-                    value={data.description}
+                    value={data.description || ''}
                     ref={descFieldRef}
                     placeholder={t('description')}
                     onChange={onChangeDescription}

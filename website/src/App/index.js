@@ -12,13 +12,17 @@ import {NotFound, Loader, UnAuthorizedLayout,
 import DefaultLayout from 'layouts/Default';
 
 import Login from 'Auth/Login';
+import SignUp from 'Auth/SignUp';
+import ForgetPassword from 'Auth/ForgetPassword';
+import SetPassword from 'Auth/SetPassword';
 import ConfirmEmail from 'Auth/ConfirmEmail';
+import ConfirmMessage from 'Auth/ConfirmMessage';
 
 import Stacks from 'Stacks';
 import Settings from 'Settings';
 
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
-import {fetchUser} from './actions';
+import {fetchUser, fetchConfigInfo} from './actions';
 import css from './styles.module.css';
 
 const DefaultLayoutRoute = ({component: Component, ...rest}) => {
@@ -55,11 +59,12 @@ type Props = {
     },
 
     fetchUser: Function,
+    fetchConfigInfo: Function,
     userLoading: boolean,
     userData: ?{user: string},
 }
 
-const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
+const App = ({fetchUser, fetchConfigInfo, userData, userLoading, history: {push}}: Props) => {
     const [loading, setLoading] = useState(true);
     const [, dispatch] = useAppStore();
     const isInitialMount = useRef(true);
@@ -68,17 +73,26 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
         if (isSignedIn()) {
             dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER});
 
-            fetchUser(
-                data => dispatch({
-                    type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
-                    payload: data,
-                }),
-                () => {
+            Promise.all([
+                fetchUser().then(
+                    data => dispatch({
+                        type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
+                        payload: data,
+                    }),
+                ),
+
+                fetchConfigInfo().then(
+                    data => dispatch({
+                        type: appStoreActionTypes.FETCH_CONFIG_INFO_SUCCESS,
+                        payload: data,
+                    }),
+                ),
+            ])
+                .catch(() => {
                     setLoading(false);
                     dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER_FAIL});
                     push(routes.authLogin());
-                }
-            );
+                });
         } else
             setLoading(false);
     }, []);
@@ -110,7 +124,11 @@ const App = ({fetchUser, userData, userLoading, history: {push}}: Props) => {
                     />
 
                     <Route path={routes.authLogin()} component={Login}/>
+                    <Route path={routes.authSignUp()} component={SignUp}/>
+                    <Route path={routes.authForgetPassword()} component={ForgetPassword}/>
+                    <Route path={routes.authResetPassword()} component={SetPassword}/>
                     <DefaultLayoutRoute path={routes.verifyUser()} component={ConfirmEmail}/>
+                    <DefaultLayoutRoute path={routes.confirmEmailMessage()} component={ConfirmMessage}/>
 
                     {isSignedIn() && (
                         <Switch>
@@ -149,5 +167,5 @@ export default connect(
         userLoading: state.app.userLoading,
         userData: state.app.userData,
     }),
-    {fetchUser},
+    {fetchUser, fetchConfigInfo},
 )(withRouter(App));

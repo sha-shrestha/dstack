@@ -66,6 +66,9 @@
     text-overflow: ellipsis;
     transition: color .2s;
 }
+.permissions {
+    margin-left: 6px;
+}
 .date {
     font-size: 12px;
     grid-area: date-line;

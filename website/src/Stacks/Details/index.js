@@ -9,7 +9,7 @@ import Helmet from 'react-helmet';
 import {AccessForbidden, NotFound, StackDetails, StackUpload} from '@dstackai/dstack-react';
 import {isSignedIn, parseSearch} from '@dstackai/dstack-react/dist/utils';
 import {deleteStack} from 'Stacks/List/actions';
-import {fetchDetails, clearDetails, fetchFrame, downloadAttachment, update} from './actions';
+import {fetchDetails, clearDetails, fetchFrame, downloadAttachment, update, updatePermissions} from './actions';
 import routes from 'routes';
 import config from 'config';
 
@@ -28,6 +28,7 @@ type Props = {
     loadingFrame?: boolean,
     currentUser?: string,
     currentUserToken?: string,
+    updatePermissions: Function,
 }
 
 const Details = ({
@@ -44,6 +45,7 @@ const Details = ({
     requestStatus,
     currentUser,
     currentUserToken,
+    updatePermissions,
 }: Props) => {
     let parsedAttachmentIndex;
 
@@ -147,6 +149,13 @@ const Details = ({
 
     const toggleUploadModal = () => setIsShowUploadModal(!isShowUploadModal);
 
+    const setPrivate = isPrivate => {
+        update({
+            stack: `${data.user}/${data.name}`,
+            private: isPrivate,
+        });
+    };
+
     if (!loading && requestStatus === 403)
         return <AccessForbidden>
             {t('youDontHaveAnAccessToThisStack')}.
@@ -194,6 +203,8 @@ const Details = ({
                 currentUserToken={currentUserToken}
                 toggleUpload={toggleUploadModal}
                 backUrl={routes.stacks(params.user)}
+                setPrivate={setPrivate}
+                updatePermissions={updatePermissions}
                 user={params.user}
                 stack={params.stack}
                 onUpdateReadme={onUpdateReadme}
@@ -243,5 +254,6 @@ export default connect(
         fetchFrame,
         update,
         downloadAttachment,
+        updatePermissions,
     },
 )(Details);

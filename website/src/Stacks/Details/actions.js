@@ -109,3 +109,11 @@ export const update = ({stack, noUpdateStore, ...params}, onSuccess?: Function) 
 export const clearDetails = () => (dispatch: Function) => {
     dispatch({type: actionsTypes.CLEAR_DETAILS});
 };
+
+export const updatePermissions = (stack, permissions) => (dispatch: Function) => {
+    dispatch({
+        type: actionsTypes.UPDATE_PERMISSIONS,
+        payload: permissions,
+        meta: {stack},
+    });
+};

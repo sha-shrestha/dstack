@@ -51,11 +51,10 @@ df <- read.csv(pull(${a.join(', ')}))`;
 
 type Props = {
     configurePythonCommand: string,
-    configureRCommand: string,
     modalMode?: boolean,
 }
 
-const HowTo = ({modalMode, data, configurePythonCommand, configureRCommand}: Props) => {
+const HowTo = ({modalMode, data, configurePythonCommand}: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
     const [activePlatformTab, setActivePlatformTab] = useState(1);
@@ -76,16 +75,11 @@ const HowTo = ({modalMode, data, configurePythonCommand, configureRCommand}: Pro
                         label: t('python'),
                         value: 1,
                     },
-
-                    {
-                        label: t('r'),
-                        value: 2,
-                    },
                 ]}
             />
 
             {activeCodeTab === 1 && <div>
-                <div className={css.description}>{t('installPipOrCondaPackage')}</div>
+                <div className={css.description}>{t('installPipPackage')}</div>
 
                 <Tabs
                     className={css.tabs}
@@ -97,11 +91,6 @@ const HowTo = ({modalMode, data, configurePythonCommand, configureRCommand}: Pro
                             label: t('pip'),
                             value: 1,
                         },
-
-                        {
-                            label: t('conda'),
-                            value: 2,
-                        },
                     ]}
                 />
 
@@ -110,13 +99,6 @@ const HowTo = ({modalMode, data, configurePythonCommand, configureRCommand}: Pro
                     language="bash"
                 >
                     pip install dstack
-                </CodeViewer>}
-
-                {activePlatformTab === 2 && <CodeViewer
-                    className={css.code}
-                    language="bash"
-                >
-                    conda install dstack -c dstack.ai
                 </CodeViewer>}
 
                 <div className={css.description}>{t('configureDStack')}</div>
@@ -135,35 +117,6 @@ const HowTo = ({modalMode, data, configurePythonCommand, configureRCommand}: Pro
                     language="python"
                 >
                     {pullPythonCode(data)}
-                </CodeViewer>
-            </div>}
-
-            {activeCodeTab === 2 && <div>
-                <div className={css.description}>{t('installRPackage')}</div>
-
-                <CodeViewer
-                    className={css.code}
-                    language="r"
-                >
-                    install.packages("dstack")
-                </CodeViewer>
-
-                <div className={css.description}>{t('configureDStack')}</div>
-
-                <CodeViewer
-                    className={css.code}
-                    language="r"
-                >
-                    {configureRCommand}
-                </CodeViewer>
-
-                <div className={css.description}>{t('pullDatasetIntro')}</div>
-
-                <CodeViewer
-                    className={css.code}
-                    language="r"
-                >
-                    {pullRCode(data)}
                 </CodeViewer>
             </div>}
 

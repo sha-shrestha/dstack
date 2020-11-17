@@ -77,6 +77,9 @@ var actionsTypes = {
   FETCH_CURRENT_USER: 'app/user/FETCH',
   FETCH_CURRENT_USER_SUCCESS: 'app/user/FETCH_SUCCESS',
   FETCH_CURRENT_USER_FAIL: 'app/user/FETCH_FAIL',
+  FETCH_CONFIG_INFO: 'app/config/FETCH',
+  FETCH_CONFIG_INFO_SUCCESS: 'app/config/FETCH_SUCCESS',
+  FETCH_CONFIG_INFO_FAIL: 'app/config/FETCH_FAIL',
   START_PROGRESS: 'app/START_PROGRESS',
   SET_PROGRESS: 'app/SET_PROGRESS',
   COMPLETE_PROGRESS: 'app/COMPLETE_PROGRESS',
@@ -85,6 +88,10 @@ var actionsTypes = {
 
 var initialState = {
   currentUser: {
+    loading: false,
+    data: null
+  },
+  configInfo: {
     loading: false,
     data: null
   },
@@ -114,9 +121,31 @@ var reducer = function reducer(state, action) {
         })
       });
 
-    case actionsTypes.FETCH_FAIL:
+    case actionsTypes.FETCH_CURRENT_USER_FAIL:
       return _extends({}, state, {
         currentUser: _extends({}, state.currentUser, {
+          loading: false
+        })
+      });
+
+    case actionsTypes.FETCH_CONFIG_INFO:
+      return _extends({}, state, {
+        configInfo: _extends({}, state.configInfo, {
+          loading: true
+        })
+      });
+
+    case actionsTypes.FETCH_CONFIG_INFO_SUCCESS:
+      return _extends({}, state, {
+        configInfo: _extends({}, state.configInfo, {
+          data: action.payload,
+          loading: false
+        })
+      });
+
+    case actionsTypes.FETCH_CONFIG_INFO_FAIL:
+      return _extends({}, state, {
+        configInfo: _extends({}, state.configInfo, {
           loading: false
         })
       });
@@ -179,6 +208,7 @@ var config = {
   RESET_PASSWORD_URL: '/users/reset',
   UPDATE_PASSWORD_URL: '/users/update/password',
   USER_DATA_URL: '/users/remember',
+  CONFIG_INFO_URL: '/config/info',
   UPDATE_TOKEN_URL: '/users/update/token',
   UPDATE_SETTINGS_URL: '/users/update/settings',
   CHECK_USER: function CHECK_USER(userName) {
@@ -224,6 +254,8 @@ var config = {
   JOB_DELETE: '/jobs/delete',
   JOB_RUN: '/jobs/run',
   JOB_STOP: '/jobs/stop',
+  PERMISSIONS_ADD: '/permissions/add',
+  PERMISSIONS_DELETE: '/permissions/delete',
   DISCORD_URL: 'https://discord.gg/8xfhEYa',
   TWITTER_URL: 'https://twitter.com/dstackai',
   GITHUB_URL: 'https://github.com/dstackai',
@@ -231,8 +263,6 @@ var config = {
   TOKEN_STORAGE_KEY: 'token'
 };
 var reportPlotPythonCode = "import matplotlib.pyplot as plt\nimport dstack as ds\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\nds.push_frame(\"simple\", fig, \"My first plot\")";
-var installRPackageCode = 'install.packages("dstack")';
-var reportPlotRCode = "library(ggplot2)\nlibrary(dstack)\n\ndf <- data.frame(x = c(1, 2, 3, 4), y = c(1, 4, 9, 16))\nimage <- ggplot(data = df, aes(x = x, y = y)) + geom_line()\n\npush_frame(\"simple\", image, \"My first plot\")";
 
 var apiFabric = function apiFabric(_temp) {
   var _ref = _temp === void 0 ? {} : _temp,
@@ -2262,6 +2292,33 @@ var getStackCategory = (function (_ref) {
   }
 });
 
+var css$s = {"list":"_FL7ja","avatar":"_37Kcf","count":"_11i1Z"};
+
+var PermissionUsers = function PermissionUsers(_ref) {
+  var permissions = _ref.permissions,
+      className = _ref.className,
+      _ref$variant = _ref.variant,
+      variant = _ref$variant === void 0 ? 'details' : _ref$variant,
+      maxLength = _ref.maxLength,
+      owner = _ref.owner;
+  if (!permissions || !permissions.length) return null;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$s.list, className, variant)
+  }, permissions.slice(0, maxLength).map(function (i, index) {
+    return /*#__PURE__*/React__default.createElement(Avatar, {
+      withBorder: true,
+      size: variant === 'list' ? 'list' : 'small',
+      key: index,
+      className: cx(css$s.avatar, {
+        owner: owner === i.user
+      }),
+      name: i.user || i.email
+    });
+  }), maxLength && maxLength < permissions.length && /*#__PURE__*/React__default.createElement("span", {
+    className: css$s.count
+  }, "+", permissions.length - maxLength));
+};
+
 function _extends$3() {
   _extends$3 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -2431,7 +2488,7 @@ function SvgTable(props) {
   }, props), _ref$4);
 }
 
-var css$s = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","date":"_2c9og"};
+var css$t = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","permissions":"_2SUP0","date":"_2c9og"};
 
 var Item = function Item(_ref) {
   var className = _ref.className,
@@ -2439,8 +2496,7 @@ var Item = function Item(_ref) {
       Component = _ref$Component === void 0 ? 'div' : _ref$Component,
       data = _ref.data,
       deleteAction = _ref.deleteAction,
-      renderContent = _ref.renderContent,
-      rest = _objectWithoutPropertiesLoose(_ref, ["className", "Component", "data", "deleteAction", "renderContent"]);
+      rest = _objectWithoutPropertiesLoose(_ref, ["className", "Component", "data", "deleteAction"]);
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -2479,27 +2535,75 @@ var Item = function Item(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Component, _extends({
-    className: cx(css$s.item, className),
+    className: cx(css$t.item, className),
     ref: ref
   }, rest), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.icon
+    className: css$t.icon
   }, renderIcon()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.top
+    className: css$t.top
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.name,
+    className: css$t.name,
     title: data.name
   }, data.name), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  }), renderContent && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.additional
-  }, renderContent(data))), data.head && /*#__PURE__*/React__default.createElement("div", {
-    className: css$s.date
+  }), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
+    variant: "list",
+    owner: data.user,
+    className: css$t.permissions,
+    permissions: data.permissions,
+    maxLength: 3
+  })), data.head && /*#__PURE__*/React__default.createElement("div", {
+    className: css$t.date
   }, t('updated'), " ", moment(data.head.timestamp).format('L')), deleteAction && /*#__PURE__*/React__default.createElement("span", {
-    className: css$s["delete"],
+    className: css$t["delete"],
     onClick: onClickDelete
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-close"
   })));
+};
+
+var useListViewSwitcher = (function (id, defaultValue) {
+  if (defaultValue === void 0) {
+    defaultValue = 'list';
+  }
+
+  var _useState = React.useState(null),
+      value = _useState[0],
+      setValue = _useState[1];
+
+  React.useEffect(function () {
+    var savedValue = localStorage.getItem("list-view-value-" + id);
+    if (savedValue) setValue(savedValue);else setValue(defaultValue);
+  }, []);
+
+  var onChange = function onChange(value) {
+    setValue(value);
+    localStorage.setItem("list-view-value-" + id, value);
+  };
+
+  return [value, onChange];
+});
+
+var css$u = {"tabs":"_gaP0O","tab":"_vQ7S6"};
+
+var Tabs$1 = function Tabs(_ref) {
+  var className = _ref.className,
+      value = _ref.value,
+      items = _ref.items,
+      onChange = _ref.onChange;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$u.tabs, className)
+  }, items.map(function (i, index) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: index,
+      className: cx(css$u.tab, {
+        active: value === i.value
+      }),
+      onClick: function onClick() {
+        return onChange(i.value);
+      }
+    }, i.label);
+  }));
 };
 
 var routes = {
@@ -2514,6 +2618,18 @@ var routes = {
   },
   verifyUser: function verifyUser() {
     return '/auth/verify';
+  },
+  authSignUp: function authSignUp() {
+    return '/auth/signup';
+  },
+  authForgetPassword: function authForgetPassword() {
+    return '/auth/forget-password';
+  },
+  authResetPassword: function authResetPassword() {
+    return '/auth/reset-password';
+  },
+  confirmEmailMessage: function confirmEmailMessage() {
+    return '/auth/confirm-message';
   },
   stacks: function stacks(user) {
     if (user === void 0) {
@@ -2574,51 +2690,7 @@ var routes = {
   }
 };
 
-var useListViewSwitcher = (function (id, defaultValue) {
-  if (defaultValue === void 0) {
-    defaultValue = 'list';
-  }
-
-  var _useState = React.useState(null),
-      value = _useState[0],
-      setValue = _useState[1];
-
-  React.useEffect(function () {
-    var savedValue = localStorage.getItem("list-view-value-" + id);
-    if (savedValue) setValue(savedValue);else setValue(defaultValue);
-  }, []);
-
-  var onChange = function onChange(value) {
-    setValue(value);
-    localStorage.setItem("list-view-value-" + id, value);
-  };
-
-  return [value, onChange];
-});
-
-var css$t = {"tabs":"_gaP0O","tab":"_vQ7S6"};
-
-var Tabs$1 = function Tabs(_ref) {
-  var className = _ref.className,
-      value = _ref.value,
-      items = _ref.items,
-      onChange = _ref.onChange;
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$t.tabs, className)
-  }, items.map(function (i, index) {
-    return /*#__PURE__*/React__default.createElement("div", {
-      key: index,
-      className: cx(css$t.tab, {
-        active: value === i.value
-      }),
-      onClick: function onClick() {
-        return onChange(i.value);
-      }
-    }, i.label);
-  }));
-};
-
-var css$u = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","tabs":"_DBGuk","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
+var css$v = {"list":"_3CcWo","header":"_3MHvB","title":"_2HbVV","headerSide":"_TN8Ts","search":"_3VlZv","uploadButton":"_35PkI","controls":"_ee5au","viewSwitcher":"_1boU7","sorting":"_1S_L9","sortingButton":"_1c0ym","message":"_3XJKG","text":"_1_wO5","tabs":"_DBGuk","itemList":"_1fksy","item":"_1RHsG","loadingItem":"_1uHPv","stacks-pulse":"_1qO_N","modal":"_1BJIQ","description":"_1U-iN","buttons":"_19NkE","button":"_3jLaw"};
 
 var List = function List(_ref) {
   var _ref$data = _ref.data,
@@ -2628,8 +2700,7 @@ var List = function List(_ref) {
       currentUser = _ref.currentUser,
       user = _ref.user,
       _ref$renderUploadStac = _ref.renderUploadStack,
-      renderUploadStack = _ref$renderUploadStac === void 0 ? function () {} : _ref$renderUploadStac,
-      renderItemContent = _ref.renderItemContent;
+      renderUploadStack = _ref$renderUploadStac === void 0 ? function () {} : _ref$renderUploadStac;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -2772,17 +2843,17 @@ var List = function List(_ref) {
 
   var items = getItems();
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.list
+    className: css$v.list
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.header
+    className: css$v.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.title
+    className: css$v.title
   }, currentUser === user ? t('stacks') : t('stacksOf', {
     name: user
   })), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.headerSide
+    className: css$v.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$u.search,
+    className: css$v.search,
     showEverything: true,
     isDark: true,
     placeholder: t('findStack'),
@@ -2792,97 +2863,96 @@ var List = function List(_ref) {
   }), renderUploadStack && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$u.uploadButton,
+    className: css$v.uploadButton,
     onClick: showUploadStackModal,
     color: "primary",
     variant: "contained",
     size: "small"
   }, t('createStack'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.controls
+    className: css$v.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$u.viewSwitcher,
+    className: css$v.viewSwitcher,
     value: view,
     onChange: setView
   }), false ), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$u.itemList, view)
+    className: cx(css$v.itemList, view)
   }, new Array(view === 'grid' ? 12 : 8).fill({}).map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: css$u.loadingItem
+      className: css$v.loadingItem
     });
   })), !loading && !data.length && /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.message
+    className: css$v.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
   })), !loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack(), !!tabs.length && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$u.tabs,
+    className: css$v.tabs,
     items: tabs,
     value: activeTab,
     onChange: function onChange(tab) {
       return setActiveTab(tab);
     }
   }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$u.itemList, view)
+    className: cx(css$v.itemList, view)
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
-      className: css$u.item,
+      className: css$v.item,
       Component: reactRouterDom.Link,
       key: index,
       data: item,
       to: routes.stackDetails(item.user, item.name),
-      deleteAction: currentUser === item.user && showDeleteConfirmation,
-      renderContent: renderItemContent
+      deleteAction: currentUser === item.user && showDeleteConfirmation
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.text
+    className: css$v.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
     title: t('deleteStack'),
-    className: css$u.modal
+    className: css$v.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('areYouSureYouWantToDelete', {
     name: deletingStack
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.buttons
+    className: css$v.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideDeleteConfirmation,
-    className: css$u.button
+    className: css$v.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: deleteItem,
-    className: css$u.button
+    className: css$v.button
   }, t('deleteStack')))), currentUser === user && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowWelcomeModal,
     onClose: hideWelcomeModal,
     size: "small",
     title: t('welcomeToDStack') + "\uD83D\uDC4B",
-    className: css$u.modal
+    className: css$v.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.description
+    className: css$v.description
   }, t('yourEmailWasSuccessfullyConfirmed')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$u.buttons
+    className: css$v.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: hideWelcomeModal,
-    className: css$u.button
+    className: css$v.button
   }, t('getStarted')))), renderUploadStack && /*#__PURE__*/React__default.createElement(Modal, {
     isShow: isShowUploadStackModal,
     withCloseButton: true,
     onClose: hideUploadStackModal,
     size: "big",
     title: t('howToConnectYourDataWithDStack'),
-    className: css$u.modal
+    className: css$v.modal
   }, renderUploadStack()));
 };
 
-var css$v = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
+var css$w = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
 
 var pullPythonCode = function pullPythonCode(data) {
   var a = ["'/" + data.stack + "'"];
@@ -2898,24 +2968,11 @@ var pullPythonCode = function pullPythonCode(data) {
 
   return "import dstack as ds\n\ndf = ds.pull(" + a.join(', ') + ")";
 };
-var pullRCode = function pullRCode(data) {
-  var a = ["\"/" + data.stack + "\""];
-  var params = Object.keys(data.params);
-
-  if (params.length > 0) {
-    params.forEach(function (key) {
-      if (lodashEs.isString(data.params[key])) a.push("\"" + key + "\" = \"" + data.params[key] + "\"");else a.push("\"" + key + "\" = " + data.params[key]);
-    });
-  }
-
-  return "library(dstack)\n\ndf <- read.csv(pull(" + a.join(', ') + "))";
-};
 
 var HowTo = function HowTo(_ref) {
   var modalMode = _ref.modalMode,
       data = _ref.data,
-      configurePythonCommand = _ref.configurePythonCommand,
-      configureRCommand = _ref.configureRCommand;
+      configurePythonCommand = _ref.configurePythonCommand;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -2929,66 +2986,42 @@ var HowTo = function HowTo(_ref) {
       setActivePlatformTab = _useState2[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.howto
+    className: css$w.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.title
+    className: css$w.title
   }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$v.tabs,
+    className: css$w.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: [{
       label: t('python'),
       value: 1
-    }, {
-      label: t('r'),
-      value: 2
     }]
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
-  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$v.tabs,
+    className: css$w.description
+  }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$w.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
       label: t('pip'),
       value: 1
-    }, {
-      label: t('conda'),
-      value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
+    className: css$w.code,
     language: "bash"
-  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
-    language: "bash"
-  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
+  }, "pip install dstack"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
+    className: css$w.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
+    className: css$w.description
   }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
+    className: css$w.code,
     language: "python"
-  }, pullPythonCode(data))), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
-  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
-    language: "r"
-  }, "install.packages(\"dstack\")"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
-  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
-    language: "r"
-  }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.description
-  }, t('pullDatasetIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$v.code,
-    language: "r"
-  }, pullRCode(data))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$v.footer,
+  }, pullPythonCode(data))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$w.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks_2', {
         href: config.DOCS_URL
@@ -3016,7 +3049,7 @@ var useOnClickOutside = (function (ref, handler) {
   }, [ref, handler]);
 });
 
-var css$w = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
+var css$x = {"frames":"_3D3R4","frames-dropdown":"_3hapH","button":"_Tn4o_","name":"_YzOn7","label":"_Hg7hs","dropdown":"_16pcp","item":"_1q46l","mark":"_1h8Eq","info":"_2BnTD","modal":"_pk61B","description":"_2GOOp","buttons":"_3Ml-A"};
 
 var getFrameName = function getFrameName(frame) {
   return moment(frame.timestamp).format('D MMM YYYY h:mm a');
@@ -3083,22 +3116,22 @@ var Frames = function Frames(_ref) {
   }
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$w.frames, className),
+    className: cx(css$x.frames, className),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$w['frames-dropdown']),
+    className: cx(css$x['frames-dropdown']),
     ref: dropdownRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.button,
+    className: css$x.button,
     onClick: toggleDropdown
   }, /*#__PURE__*/React__default.createElement("span", {
-    className: css$w.name
+    className: css$x.name
   }, getFrameName(activeFrame)), headId === activeFrame.id && /*#__PURE__*/React__default.createElement("span", {
-    className: css$w.label
+    className: css$x.label
   }, t('head')), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$w.dropdown, {
+    className: cx(css$x.dropdown, {
       show: isShowDropdown
     })
   }, frames.map(function (f) {
@@ -3112,19 +3145,19 @@ var Frames = function Frames(_ref) {
       onClick: onClickItem(f.id),
       overlayContent: f.description
     }, /*#__PURE__*/React__default.createElement("div", {
-      className: css$w.item
+      className: css$x.item
     }, /*#__PURE__*/React__default.createElement("span", {
-      className: css$w.name
+      className: css$x.name
     }, getFrameName(f)), headId === f.id && /*#__PURE__*/React__default.createElement("span", {
-      className: css$w.label
+      className: css$x.label
     }, t('head')), headId !== f.id && /*#__PURE__*/React__default.createElement("div", {
-      className: css$w.mark,
+      className: css$x.mark,
       onClick: onClickMarkAsHead(f)
     }, t('markAsHead'))));
   }))), activeFrame && activeFrame.description && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: activeFrame.description
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$w.info)
+    className: cx(css$x.info)
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-variant"
   }))), /*#__PURE__*/React__default.createElement(Modal, {
@@ -3132,45 +3165,374 @@ var Frames = function Frames(_ref) {
     onClose: hideConfirmation,
     size: "confirmation",
     title: t('changeHeadRevision'),
-    className: css$w.modal
+    className: css$x.modal
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.description
+    className: css$x.description
   }, t('areYouSureYouWantToChangeTheCurrentHeadRevisionToByName', {
     frame: frameForMarkingAsHead && getFrameName(frameForMarkingAsHead)
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$w.buttons
+    className: css$x.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     variant: "contained",
     color: "primary",
     onClick: confirmMarkFrameAsHead,
-    className: css$w.button
+    className: css$x.button
   }, t('yesChangeHead')), /*#__PURE__*/React__default.createElement(Button, {
     color: "secondary",
     variant: "contained",
     onClick: hideConfirmation,
-    className: css$w.button
+    className: css$x.button
   }, t('cancel')))));
 };
 
-var css$x = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
+var useDebounce = (function (callback, depsOrDelay, deps) {
+  var delay = 300;
+  if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
+  return React.useCallback(lodashEs.debounce(callback, delay), deps);
+});
+
+var isEmail = function isEmail(value) {
+  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
+};
+var isRequired = function isRequired(value) {
+  return !(value === null || value === undefined || value === '');
+};
+var noSpaces = function noSpaces(value) {
+  return /^[\S]*$/.test(value);
+};
+var isValidStackName = function isValidStackName(value) {
+  return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
+};
+var isValidEmail = function isValidEmail(mail) {
+  var errors = {
+    invalidEmailAddress: 'invalidEmailAddress'
+  };
+  if (!isEmail(mail)) return {
+    isValid: false,
+    error: errors.invalidEmailAddress
+  };
+  return {
+    isValid: true
+  };
+};
+
+var api = apiFabric();
+var useActions = (function () {
+  var _useAppStore = useAppStore(),
+      apiUrl = _useAppStore[0].apiUrl;
+
+  var checkUser = function checkUser(userName) {
+    return new Promise(function (resolve, reject) {
+      try {
+        var _temp2 = _catch(function () {
+          return Promise.resolve(api.get(apiUrl + config.CHECK_USER(userName))).then(function (request) {
+            resolve(request.data);
+          });
+        }, function (e) {
+          reject(e);
+        });
+
+        return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var addPermissions = function addPermissions(_ref) {
+    var userName = _ref.userName,
+        instancePath = _ref.instancePath;
+    var params = {
+      path: instancePath
+    };
+    if (isValidEmail(userName).isValid) params.email = userName;else params.user = userName;
+    return new Promise(function (resolve, reject) {
+      try {
+        var _temp4 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.PERMISSIONS_ADD, params)).then(function () {
+            resolve(params);
+          });
+        }, function (e) {
+          reject(e);
+        });
+
+        return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var removePermissions = function removePermissions(_ref2) {
+    var user = _ref2.user,
+        instancePath = _ref2.instancePath;
+
+    var params = _extends({
+      path: instancePath
+    }, user);
+
+    return new Promise(function (resolve, reject) {
+      try {
+        var _temp6 = _catch(function () {
+          return Promise.resolve(api.post(apiUrl + config.PERMISSIONS_DELETE, params)).then(function () {
+            resolve();
+          });
+        }, function () {
+          reject();
+        });
+
+        return Promise.resolve(_temp6 && _temp6.then ? _temp6.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  return {
+    checkUser: checkUser,
+    addPermissions: addPermissions,
+    removePermissions: removePermissions
+  };
+});
+
+var css$y = {"desktopButton":"_2X9G0","mobileButton":"_3s7Ow","modal":"_I7l_L","dialog":"_2ieJ1","description":"_2kfzG","content":"_3zGyt","switcher":"_RKqmw","text-input":"_2_DXM","copylink":"_2NvuS","copy":"_2rv__","checkUserName":"_2UalE","checkUserMessage":"_1jlEB","users":"_2gjKq","user":"_3VlxR","user-pic":"_2PGqr","user-name":"_-pvaS","userPic":"_IWEUU","userName":"_2xAc9","userDelete":"_3QkG0","userMessage":"_1Bvl_","userMessageSuccess":"_1PzgS"};
+
+var Share = function Share(_ref) {
+  var className = _ref.className,
+      instancePath = _ref.instancePath,
+      _ref$defaultIsPrivate = _ref.defaultIsPrivate,
+      defaultIsPrivate = _ref$defaultIsPrivate === void 0 ? false : _ref$defaultIsPrivate,
+      _ref$defaultPermissio = _ref.defaultPermissions,
+      defaultPermissions = _ref$defaultPermissio === void 0 ? [] : _ref$defaultPermissio,
+      onUpdatePrivate = _ref.onUpdatePrivate,
+      onUpdatePermissions = _ref.onUpdatePermissions;
+
+  var _useState = React.useState(null),
+      userExists = _useState[0],
+      setUserExists = _useState[1];
+
+  var _useState2 = React.useState(false),
+      isEmail = _useState2[0],
+      setIsEmail = _useState2[1];
+
+  var _useState3 = React.useState(defaultIsPrivate),
+      isPrivate = _useState3[0],
+      setIsPrivate = _useState3[1];
+
+  var _useState4 = React.useState(defaultPermissions),
+      permissions = _useState4[0],
+      setPermissions = _useState4[1];
+
+  var _useState5 = React.useState(false),
+      loading = _useState5[0],
+      setLoading = _useState5[1];
+
+  var _useState6 = React.useState(false),
+      isShowModal = _useState6[0],
+      setIsShowModal = _useState6[1];
+
+  var _useState7 = React.useState(''),
+      userName = _useState7[0],
+      setUserName = _useState7[1];
+
+  var _useActions = useActions(),
+      checkUser = _useActions.checkUser,
+      addPermissions = _useActions.addPermissions,
+      removePermissions = _useActions.removePermissions;
+
+  var _useTranslation = reactI18next.useTranslation(),
+      t = _useTranslation.t;
+
+  var toggleModal = function toggleModal() {
+    return setIsShowModal(!isShowModal);
+  };
+
+  React.useEffect(function () {
+    setPermissions(defaultPermissions);
+    setIsPrivate(defaultIsPrivate);
+  }, [instancePath]);
+  var updatePrivate = useDebounce(function (isPrivate) {
+    if (onUpdatePrivate) onUpdatePrivate(isPrivate);
+  }, []);
+  var checkUserName = useDebounce(function (userName) {
+    setUserExists(null);
+
+    if (userName.length) {
+      checkUser(userName).then(function (data) {
+        return setUserExists(data.exists);
+      })["catch"](function () {
+        return setUserExists(null);
+      });
+    }
+  }, []);
+
+  var onChangeIsPrivate = function onChangeIsPrivate(event) {
+    setIsPrivate(event.target.checked);
+    updatePrivate(event.target.checked);
+  };
+
+  var onChangeUserName = function onChangeUserName(event) {
+    setUserName(event.target.value);
+
+    if (isValidEmail(event.target.value).isValid) {
+      setUserExists(null);
+      setIsEmail(true);
+    } else {
+      checkUserName(event.target.value);
+      if (isEmail) setIsEmail(false);
+    }
+  };
+
+  var onKeyPressUserName = function onKeyPressUserName(event) {
+    if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter') {
+      if (userName.length) {
+        var userHasPermission = permissions.some(function (i) {
+          return i.user === userName;
+        });
+        if (!userHasPermission) addUser(userName);else setUserName('');
+      }
+    }
+  };
+
+  var addUser = function addUser(userName) {
+    setLoading(true);
+    addPermissions({
+      userName: userName,
+      instancePath: instancePath
+    }).then(function (data) {
+      setUserName('');
+      setPermissions(function (permissions) {
+        var newPermissions = permissions.concat([data]);
+        onUpdatePermissions(newPermissions);
+        return newPermissions;
+      });
+    })["finally"](function () {
+      return setLoading(false);
+    });
+  };
+
+  var removeUser = function removeUser(user) {
+    return function () {
+      removePermissions({
+        instancePath: instancePath,
+        user: user
+      }).then(function () {
+        setPermissions(function (permissions) {
+          var newPermissions = permissions.filter(function (i) {
+            return !lodashEs.isEqual(i, user);
+          });
+          onUpdatePermissions(newPermissions);
+          return newPermissions;
+        });
+      });
+    };
+  };
+
+  var renderUser = function renderUser(user, index) {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: cx(css$y.user, {
+        disabled: !user.user
+      }),
+      key: index
+    }, /*#__PURE__*/React__default.createElement(Avatar, {
+      className: css$y.userPic,
+      name: user.user || user.email
+    }), /*#__PURE__*/React__default.createElement("div", {
+      className: css$y.userName
+    }, user.user || user.email), /*#__PURE__*/React__default.createElement("span", {
+      onClick: removeUser(user),
+      className: cx(css$y.userDelete, 'mdi mdi-close')
+    }), user.user && /*#__PURE__*/React__default.createElement("span", {
+      className: cx(css$y.userMessage, css$y.userMessageSuccess)
+    }, t('done')), user.email && /*#__PURE__*/React__default.createElement("span", {
+      className: css$y.userMessage
+    }, t('waitingForAcceptance')));
+  };
+
+  var origin = window.location.origin;
+  return /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$y.desktopButton, className),
+    color: "primary",
+    size: "small",
+    variant: "contained",
+    onClick: toggleModal
+  }, t('share')), /*#__PURE__*/React__default.createElement(Button, {
+    className: cx(css$y.mobileButton, className),
+    color: "primary",
+    size: "small",
+    onClick: toggleModal
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-share-variant"
+  })), instancePath && /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: isShowModal,
+    onClose: toggleModal,
+    size: "small",
+    title: t('shareStack'),
+    className: css$y.modal,
+    dialogClassName: css$y.dialog,
+    withCloseButton: true
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.description
+  }, isPrivate ? t('theCurrentStackIsPrivateButYouCanMakeItPublic') : t('theCurrentStackIsPublicButYouCanMakeItPrivateAndShareWithSelectedUsersOnly')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.copylink
+  }, /*#__PURE__*/React__default.createElement(TextField, {
+    className: css$y.textInput,
+    readOnly: true,
+    value: origin + "/" + instancePath
+  }), /*#__PURE__*/React__default.createElement(Copy, {
+    className: css$y.copy,
+    copyText: origin + "/" + instancePath,
+    successMessage: t('linkIsCopied')
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.content
+  }, /*#__PURE__*/React__default.createElement(CheckboxField, {
+    className: css$y.switcher,
+    id: "checkbox-is-private",
+    name: "private",
+    appearance: "switcher",
+    onChange: onChangeIsPrivate,
+    value: isPrivate,
+    offLabel: t('everyoneWithTheLink'),
+    onLabel: t('selectedUsersOnly')
+  }), isPrivate && /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.checkUserName
+  }, /*#__PURE__*/React__default.createElement(TextField, {
+    disabled: loading,
+    placeholder: t('enterUsernameAndPressEnter'),
+    className: css$y.textInput,
+    value: userName,
+    onChange: onChangeUserName,
+    onKeyPress: onKeyPressUserName
+  }), Boolean(userName.length) && !loading && /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$y.checkUserMessage, {
+      success: userExists,
+      fail: userExists === false,
+      secondary: isEmail
+    })
+  }, userExists && !isEmail && t('userExists'), !userExists && !isEmail && t('userNotFound'), isEmail && t('enterToInvite'))), isPrivate && /*#__PURE__*/React__default.createElement("div", {
+    className: css$y.users
+  }, permissions.map(renderUser)))));
+};
+
+var css$z = {"loader":"_2wNmt","title":"_1Ms-2","stacks-pulse":"_FjfKI","label":"_1rFaq","description":"_1Rg_O","diagram":"_2Aj7C"};
 
 var Loader$1 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.loader
+    className: css$z.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.title
+    className: css$z.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.label
+    className: css$z.label
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.description
+    className: css$z.description
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$x.diagram
+    className: css$z.diagram
   }));
 };
 
-var css$y = {"readme":"_1PJ3A","container":"_-2BiZ","header":"_3iG0n","title":"_g2ESz","edit":"_nlNob","content":"_3ljCE","field":"_3xq6J","emptyMessage":"_2_Q5X","preview":"_2KwU9","help":"_PBB0u","buttons":"_3X-XL","button":"_16WI-"};
+var css$A = {"readme":"_1PJ3A","container":"_-2BiZ","header":"_3iG0n","title":"_g2ESz","edit":"_nlNob","content":"_3ljCE","field":"_3xq6J","emptyMessage":"_2_Q5X","preview":"_2KwU9","help":"_PBB0u","buttons":"_3X-XL","button":"_16WI-"};
 
 var EmptyMessage = function EmptyMessage(_ref) {
   var onAdd = _ref.onAdd;
@@ -3244,62 +3606,49 @@ var Readme = function Readme(_ref2) {
 
   if (!(data === null || data === void 0 ? void 0 : data.readme) && data.user !== currentUserName || category !== 'mlModel') return null;
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$y.readme, className)
+    className: cx(css$A.readme, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.container
+    className: css$A.container
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.header
+    className: css$A.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.title
+    className: css$A.title
   }, t('readme')), data.user === currentUserName && !isEdit && /*#__PURE__*/React__default.createElement(Button, {
     color: 'secondary',
-    className: css$y.edit,
+    className: css$A.edit,
     onClick: edit
   }, /*#__PURE__*/React__default.createElement("span", {
     className: 'mdi mdi-pencil'
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.content
+    className: css$A.content
   }, !isEdit && !data.readme && /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.emptyMessage
+    className: css$A.emptyMessage
   }, /*#__PURE__*/React__default.createElement(EmptyMessage, {
     onAdd: onAddReadme
   })), isEdit && /*#__PURE__*/React__default.createElement(TextAreaField, {
     ref: textareaRef,
     onChange: onChange,
-    className: css$y.field,
+    className: css$A.field,
     value: value
   }), !isEdit && data.readme && /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.preview
+    className: css$A.preview
   }, /*#__PURE__*/React__default.createElement(ReactMarkdown, null, data.readme)))), isEdit && /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.help
+    className: css$A.help
   }, ' **Strong** # Title `code` - List'), isEdit && /*#__PURE__*/React__default.createElement("div", {
-    className: css$y.buttons
+    className: css$A.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     variant: "contained",
     color: "secondary",
     onClick: cancel,
-    className: css$y.button
+    className: css$A.button
   }, t('cancel')), /*#__PURE__*/React__default.createElement(Button, {
     size: "small",
     color: "primary",
     variant: "contained",
     onClick: save,
-    className: css$y.button
+    className: css$A.button
   }, t('save')))));
-};
-
-var isEmail = function isEmail(value) {
-  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
-};
-var isRequired = function isRequired(value) {
-  return !(value === null || value === undefined || value === '');
-};
-var noSpaces = function noSpaces(value) {
-  return /^[\S]*$/.test(value);
-};
-var isValidStackName = function isValidStackName(value) {
-  return /^[^\/]/.test(value) && /^[a-zA-Z0-9\/_]+$/.test(value);
 };
 
 var validationMap = {
@@ -3392,7 +3741,7 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 });
 
-var css$z = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","sideHeader":"_1FUDu","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","filters":"_1-hdZ","attachment-head":"_282UU","attachment":"_3IGZo","readme":"_mADeQ","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","sideHeader":"_1FUDu","share":"_2kaMN","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","filters":"_1-hdZ","attachment-head":"_282UU","attachment":"_3IGZo","readme":"_mADeQ","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
 
 var Details = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
@@ -3411,11 +3760,10 @@ var Details = function Details(_ref) {
       backUrl = _ref.backUrl,
       user = _ref.user,
       stack = _ref.stack,
-      renderHeader = _ref.renderHeader,
-      renderSideHeader = _ref.renderSideHeader,
-      renderSidebar = _ref.renderSidebar,
       configurePythonCommand = _ref.configurePythonCommand,
-      configureRCommand = _ref.configureRCommand;
+      configureRCommand = _ref.configureRCommand,
+      setPrivate = _ref.setPrivate,
+      updatePermissions = _ref.updatePermissions;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -3568,9 +3916,7 @@ var Details = function Details(_ref) {
   var attachment = lodashEs.get(frame, "attachments[" + attachmentIndex + "]");
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$z.details, {
-      'with-sidebar': Boolean(renderSidebar)
-    })
+    className: cx(css$B.details)
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -3579,21 +3925,33 @@ var Details = function Details(_ref) {
   }, currentUser === user ? t('backToMyStacks') : t('backToStacksOF', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.header
+    className: css$B.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.title
+    className: css$B.title
   }, data.name, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), renderHeader && renderHeader(), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.sideHeader
-  }, renderSideHeader && renderSideHeader(), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$z.dropdown,
+  })), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
+    className: css$B.permissions,
+    permissions: data.permissions
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$B.sideHeader
+  }, data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Share, {
+    instancePath: user + "/" + stack,
+    onUpdatePrivate: setPrivate,
+    className: css$B.share,
+    defaultIsPrivate: data["private"],
+    defaultPermissions: data.permissions,
+    onUpdatePermissions: function onUpdatePermissions(permissions) {
+      return updatePermissions(user + "/" + stack, permissions);
+    }
+  }), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$B.dropdown,
     items: [{
       title: t('upload'),
       onClick: toggleUpload
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$z['dropdown-button'],
+    className: css$B['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
@@ -3603,31 +3961,31 @@ var Details = function Details(_ref) {
     headId: headId,
     onMarkAsHead: onChangeHeadFrame,
     onChange: onChangeFrame,
-    className: css$z.revisions
+    className: css$B.revisions
   }), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$z.tabs,
+    className: css$B.tabs,
     onChange: onChangeTab,
     value: activeTab,
     items: tabs
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.container
+    className: css$B.container
   }, /*#__PURE__*/React__default.createElement(StackFilters, {
     fields: fields,
     form: form,
     onChange: onChange,
-    className: cx(css$z.filters)
+    className: cx(css$B.filters)
   }), attachment && (attachment.description || attachment['content_type'] === 'text/csv') && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z['attachment-head']
+    className: css$B['attachment-head']
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.description
+    className: css$B.description
   }, attachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
     source: attachment.description
   })), attachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.actions
+    className: css$B.actions
   }, attachment.preview && /*#__PURE__*/React__default.createElement("div", {
-    className: css$z.label
+    className: css$B.label
   }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
-    className: css$z['label-tooltip']
+    className: css$B['label-tooltip']
   }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
     href: "#",
     onClick: showHowToModal
@@ -3635,15 +3993,15 @@ var Details = function Details(_ref) {
     href: "#",
     onClick: onClickDownloadAttachment
   }, t('download')), attachment.length && /*#__PURE__*/React__default.createElement("span", {
-    className: css$z.size
+    className: css$B.size
   }, "(", formatBytes(attachment.length), ")"))), frame && /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$z.attachment,
+    className: css$B.attachment,
     withLoader: true,
     stack: user + "/" + stack,
     frameId: frame.id,
     id: attachmentIndex || 0
   })), data && /*#__PURE__*/React__default.createElement(Readme, {
-    className: css$z.readme,
+    className: css$B.readme,
     data: data,
     onUpdate: onUpdateReadme
   }), /*#__PURE__*/React__default.createElement(Modal, {
@@ -3652,7 +4010,7 @@ var Details = function Details(_ref) {
     onClose: hideHowToModal,
     size: "big",
     title: t('howToFetchDataUsingTheAPI'),
-    className: css$z.modal
+    className: css$B.modal
   }, /*#__PURE__*/React__default.createElement(HowTo, {
     configurePythonCommand: configurePythonCommand,
     configureRCommand: configureRCommand,
@@ -3664,13 +4022,7 @@ var Details = function Details(_ref) {
   })));
 };
 
-var useDebounce = (function (callback, depsOrDelay, deps) {
-  var delay = 300;
-  if (typeof depsOrDelay === 'number') delay = depsOrDelay;else deps = depsOrDelay;
-  return React.useCallback(lodashEs.debounce(callback, delay), deps);
-});
-
-var css$A = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
+var css$C = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
 
 var MB = 1048576;
 
@@ -3818,7 +4170,7 @@ var Upload = function Upload(_ref) {
   return /*#__PURE__*/React__default.createElement(React.Fragment, null, withButton && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$A.upload, className),
+    className: cx(css$C.upload, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -3827,12 +4179,12 @@ var Upload = function Upload(_ref) {
     isShow: isShowModal,
     size: "small"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.content
+    className: css$C.content
   }, !stack && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.subtitle
+    className: css$C.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewStack')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$A.field,
+    className: css$C.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -3842,31 +4194,31 @@ var Upload = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.subtitle
+    className: css$C.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
-    className: css$A.dragndrop,
+    className: css$C.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$A.buttons
+    className: css$C.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$A.button,
+    className: css$C.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: closeHandle,
-    className: css$A.button,
+    className: css$C.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel')))));
 };
 
-var css$B = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
+var css$D = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
 
 var MB$1 = 1048576;
 
@@ -4005,14 +4357,14 @@ var Upload$1 = function Upload(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$B.upload, className)
+    className: cx(css$D.upload, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.content
+    className: css$D.content
   }, !stack && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.subtitle
+    className: css$D.subtitle
   }, t('stackName')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$B.field,
+    className: css$D.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -4022,39 +4374,38 @@ var Upload$1 = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.subtitle
+    className: css$D.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
     ref: fileFieldRef,
-    className: css$B.dragndrop,
+    className: css$D.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.buttons
+    className: css$D.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$B.button,
+    className: css$D.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: clearForm,
-    className: css$B.button,
+    className: css$D.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel'))));
 };
 
-var css$C = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
+var css$E = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
 
 var UploadStack = function UploadStack(_ref) {
   var user = _ref.user,
       refresh = _ref.refresh,
       apiUrl = _ref.apiUrl,
       configurePythonCommand = _ref.configurePythonCommand,
-      configureRCommand = _ref.configureRCommand,
       withFileUpload = _ref.withFileUpload;
 
   var _useTranslation = reactI18next.useTranslation(),
@@ -4071,71 +4422,47 @@ var UploadStack = function UploadStack(_ref) {
   var tabs = [{
     label: t('python'),
     value: 1
-  }, {
-    label: t('r'),
-    value: 2
   }];
   if (withFileUpload) tabs.push({
     label: t('upload'),
     value: 3
   });
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.howto
+    className: css$E.howto
   }, /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$C.tabs,
+    className: css$E.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: tabs
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.description
-  }, t('installPipOrCondaPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$C.tabs,
+    className: css$E.description
+  }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$E.tabs,
     value: activePlatformTab,
     onChange: setActivePlatformTab,
     tabs: [{
       label: t('pip'),
       value: 1
-    }, {
-      label: t('conda'),
-      value: 2
     }]
   }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
+    className: css$E.code,
     language: "bash"
-  }, "pip install dstack"), activePlatformTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
-    language: "bash"
-  }, "conda install dstack -c dstack.ai"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.description
+  }, "pip install dstack"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
+    className: css$E.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.description
+    className: css$E.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
+    className: css$E.code,
     language: "python"
-  }, reportPlotPythonCode)), activeCodeTab === 2 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.description
-  }, t('installRPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
-    language: "r"
-  }, installRPackageCode), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.description
-  }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
-    language: "r"
-  }, configureRCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.description
-  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$C.code,
-    language: "r"
-  }, reportPlotRCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {
+  }, reportPlotPythonCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {
     user: user,
     refresh: refresh,
     apiUrl: apiUrl
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.footer,
+    className: css$E.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks', {
         href: config.DOCS_URL
@@ -4144,8 +4471,8 @@ var UploadStack = function UploadStack(_ref) {
   }));
 };
 
-var api = apiFabric();
-var useActions = (function () {
+var api$1 = apiFabric();
+var useActions$1 = (function () {
   var _useAppStore = useAppStore(),
       apiUrl = _useAppStore[0].apiUrl;
 
@@ -4155,7 +4482,7 @@ var useActions = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp2 = _catch(function () {
-          return Promise.resolve(api.get(apiUrl + config.JOB_DETAILS(user, id))).then(function (request) {
+          return Promise.resolve(api$1.get(apiUrl + config.JOB_DETAILS(user, id))).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4173,7 +4500,7 @@ var useActions = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp4 = _catch(function () {
-          return Promise.resolve(api.post(apiUrl + config.JOB_RUN, params)).then(function (request) {
+          return Promise.resolve(api$1.post(apiUrl + config.JOB_RUN, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4191,7 +4518,7 @@ var useActions = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp6 = _catch(function () {
-          return Promise.resolve(api.post(apiUrl + config.JOB_STOP, params)).then(function (request) {
+          return Promise.resolve(api$1.post(apiUrl + config.JOB_STOP, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4209,7 +4536,7 @@ var useActions = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp8 = _catch(function () {
-          return Promise.resolve(api.post(apiUrl + config.JOB_CREATE, params)).then(function (request) {
+          return Promise.resolve(api$1.post(apiUrl + config.JOB_CREATE, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4227,7 +4554,7 @@ var useActions = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp10 = _catch(function () {
-          return Promise.resolve(api.post(apiUrl + config.JOB_UPDATE, params)).then(function (request) {
+          return Promise.resolve(api$1.post(apiUrl + config.JOB_UPDATE, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4245,7 +4572,7 @@ var useActions = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp12 = _catch(function () {
-          return Promise.resolve(api.post(apiUrl + config.JOB_DELETE, params)).then(function (request) {
+          return Promise.resolve(api$1.post(apiUrl + config.JOB_DELETE, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4269,31 +4596,31 @@ var useActions = (function () {
   };
 });
 
-var css$D = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
+var css$F = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
 
 var Loader$2 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.loader
+    className: css$F.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.title
+    className: css$F.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.text
+    className: css$F.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.table
+    className: css$F.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$F.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$F.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$F.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$F.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$F.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.item
+    className: css$F.item
   })));
 };
 
@@ -4306,7 +4633,7 @@ var calculateJobProgress = function calculateJobProgress(job) {
   return [progress, leftDuration];
 };
 
-var css$E = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
+var css$G = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
 
 var Progress = function Progress(_ref) {
   var data = _ref.data,
@@ -4342,20 +4669,20 @@ var Progress = function Progress(_ref) {
       leftDuration = _calculateJobProgress[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$E.section, className)
+    className: cx(css$G.section, className)
   }, !onlyDuration && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.progressBar
+    className: css$G.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.progress,
+    className: css$G.progress,
     style: {
       width: progress + "%"
     }
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.time
+    className: css$G.time
   }, getFormattedDuration(leftDuration), " ", t('left')));
 };
 
-var css$F = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
+var css$H = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
 
 var REFRESH_TIMEOUT = 2000;
 
@@ -4371,7 +4698,7 @@ var TableRow = React.memo(function (_ref) {
       onEdit = _ref.onEdit,
       onDelete = _ref.onDelete;
 
-  var _useActions = useActions(),
+  var _useActions = useActions$1(),
       runJob = _useActions.runJob,
       stopJob = _useActions.stopJob;
 
@@ -4448,61 +4775,61 @@ var TableRow = React.memo(function (_ref) {
     switch (jobData.status) {
       case 'SCHEDULED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$F.status
+          className: css$H.status
         }, t('inProgress'), "\u2026");
 
       case 'RUNNING':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$F.status
+          className: css$H.status
         }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress, {
-          className: css$F.progress,
+          className: css$H.progress,
           data: jobData
         }));
 
       case 'TIMEOUT':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$F.status, 'fail')
+          className: cx(css$H.status, 'fail')
         }, "\u26D4\uFE0F ", t('failedDueToTimeout'));
 
       case 'FAILED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$F.status, 'fail')
+          className: cx(css$H.status, 'fail')
         }, "\u26D4\uFE0F ", t('failed'));
 
       case 'FINISHED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$F.status, 'success')
+          className: cx(css$H.status, 'success')
         }, "\u2705 ", t('completed'));
 
       case 'CREATED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$F.status
+          className: css$H.status
         }, t('neverRun'));
 
       default:
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$F.status
+          className: css$H.status
         }, t(jobData.status.toLowerCase()));
     }
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$F.row, {
+    className: cx(css$H.row, {
       red: ['TIMEOUT', 'FAILED'].indexOf(jobData.status) > -1
     }),
     onClick: rowClick
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.cell
+    className: css$H.cell
   }, getTitle()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.cell
+    className: css$H.cell
   }, t(jobData.runtime)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.cell
+    className: css$H.cell
   }, moment(jobData.started).format('MM-DD-YYYY [at] HH:mm')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.cell
+    className: css$H.cell
   }, getFormattedDuration(jobData.finished - jobData.started)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.cell
+    className: css$H.cell
   }, renderStatus(), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$F.dropdown,
+    className: css$H.dropdown,
     items: [].concat(['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? [{
       title: t('stop'),
       onClick: onStop
@@ -4519,7 +4846,7 @@ var TableRow = React.memo(function (_ref) {
   })));
 });
 
-var css$G = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
+var css$I = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
 
 var dataFormat$1 = function dataFormat(data) {
   return data.jobs;
@@ -4528,7 +4855,7 @@ var dataFormat$1 = function dataFormat(data) {
 var List$1 = function List() {
   var _currentUser$data;
 
-  var _useActions = useActions(),
+  var _useActions = useActions$1(),
       createJob = _useActions.createJob,
       removeJob = _useActions.removeJob;
 
@@ -4607,7 +4934,7 @@ var List$1 = function List() {
 
   if (!data) return /*#__PURE__*/React__default.createElement(Loader$2, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.list
+    className: css$I.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
@@ -4616,14 +4943,14 @@ var List$1 = function List() {
     placeholder: t('findJob'),
     size: "small",
     value: search,
-    className: css$G.search,
+    className: css$I.search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.title
+    className: css$I.title
   }, currentUserName === user ? t('myJobs') : t('jobsOf', {
     name: user
   }), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$G.button,
+    className: css$I.button,
     variant: "contained",
     color: "primary",
     size: "small",
@@ -4631,7 +4958,7 @@ var List$1 = function List() {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), " ", t('newJob'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.text
+    className: css$I.text
   }, t('youHaveJobs', {
     count: data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
@@ -4641,27 +4968,27 @@ var List$1 = function List() {
     className: "mdi mdi-open-in-new"
   })), "."), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('findJob'),
-    className: css$G.mobileSearch,
+    className: css$I.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableWrap
+    className: css$I.tableWrap
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.table
+    className: css$I.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableCaptions
+    className: css$I.tableCaptions
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableCell
+    className: css$I.tableCell
   }, t('job')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableCell
+    className: css$I.tableCell
   }, t('runtime')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableCell
+    className: css$I.tableCell
   }, t('lastRun')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableCell
+    className: css$I.tableCell
   }, t('timeSpent')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.tableCell
+    className: css$I.tableCell
   }, t('status'))), items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(TableRow, {
       data: item,
@@ -4714,7 +5041,7 @@ var useAppProgress = (function () {
   };
 });
 
-var css$H = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
+var css$J = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
 
 var timeout = null;
 
@@ -4781,9 +5108,9 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [nextRunDelay]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$H.schedule, className)
+    className: cx(css$J.schedule, className)
   }, t('runtime'), ":", /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: cx(css$H.dropdown, css$H.runtime),
+    className: cx(css$J.dropdown, css$J.runtime),
     items: [{
       title: t('python'),
       onClick: runtimeChange('python')
@@ -4792,12 +5119,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: runtimeChange('r')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$H.dropdownButton,
+    className: css$J.dropdownButton,
     color: "primary"
   }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), t('jobIs'), " ", scheduleType !== 'unscheduled' && t('scheduled'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$H.dropdown,
+    className: css$J.dropdown,
     items: [{
       title: t('unscheduled'),
       onClick: scheduleTypeChange('unscheduled')
@@ -4806,12 +5133,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: scheduleTypeChange('daily')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$H.dropdownButton,
+    className: css$J.dropdownButton,
     color: "primary"
   }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), scheduleType === 'daily' && /*#__PURE__*/React__default.createElement(React.Fragment, null, t('at'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$H.dropdown,
+    className: css$J.dropdown,
     items: new Array(24).fill(0).map(function (i, index) {
       var time = (index < 10 ? '0' + index : index) + ":00";
       return {
@@ -4820,17 +5147,17 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       };
     })
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$H.dropdownButton,
+    className: css$J.dropdownButton,
     color: "primary"
   }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), /*#__PURE__*/React__default.createElement("div", {
     ref: messageRef,
-    className: cx(css$H.message, 'green-text')
+    className: cx(css$J.message, 'green-text')
   }, "The next run starts in ", getFormattedDuration(nextRunDelay))));
 };
 
-var css$I = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
+var css$K = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
 
 var CodeEditor = function CodeEditor(_ref) {
   var _ref$value = _ref.value,
@@ -4859,16 +5186,16 @@ var CodeEditor = function CodeEditor(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [saved]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$I.editor, className)
+    className: cx(css$K.editor, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.success,
+    className: css$K.success,
     ref: successMessageRef
   }, t('changesSaved')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.scroll
+    className: css$K.scroll
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.content
+    className: css$K.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.lineNumbers,
+    className: css$K.lineNumbers,
     dangerouslySetInnerHTML: {
       __html: lineNos
     }
@@ -4889,7 +5216,7 @@ var CodeEditor = function CodeEditor(_ref) {
   }))));
 };
 
-var css$J = {"status":"_3Pfpo"};
+var css$L = {"status":"_3Pfpo"};
 
 var Status = function Status(_ref) {
   var data = _ref.data;
@@ -4899,7 +5226,7 @@ var Status = function Status(_ref) {
 
   if (!data.started) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.status
+    className: css$L.status
   }, t('lastRunning'), ' ', moment(data.started).format("MM-DD-YYYY [" + t('at') + "] HH:mm"), /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-clock-outline"
   }), ['RUNNING', 'SCHEDULED'].indexOf(data.status) >= 0 ? /*#__PURE__*/React__default.createElement("span", null, ' ', t('inProgress'), "\u2026") : getFormattedDuration(data.finished - data.started)), data.status === 'FAILED' && /*#__PURE__*/React__default.createElement("span", {
@@ -4913,7 +5240,7 @@ var Status = function Status(_ref) {
   }), t('failedDueToTimeout')));
 };
 
-var css$K = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
+var css$M = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
 
 var Logs = function Logs(_ref) {
   var data = _ref.data,
@@ -4935,40 +5262,40 @@ var Logs = function Logs(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$K.logs, className)
+    className: cx(css$M.logs, className)
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$K.button,
+    className: css$M.button,
     onClick: toggleShow,
     color: "primary",
     size: "small"
   }, t('logs')), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$K.text, {
+    className: cx(css$M.text, {
       open: isShown
     })
   }, /*#__PURE__*/React__default.createElement("pre", null, data.logs), updated && /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.label
+    className: css$M.label
   }, t('updated'), " ", moment(updated).fromNow())));
 };
 
-var css$L = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
+var css$N = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
 
 var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.loader
+    className: css$N.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.title
+    className: css$N.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.text1
+    className: css$N.text1
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.text2
+    className: css$N.text2
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.code
+    className: css$N.code
   }));
 };
 
-var css$M = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
+var css$O = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
 
 var REFRESH_TIMEOUT$1 = 3000;
 
@@ -4981,7 +5308,7 @@ var Details$1 = function Details(_ref) {
 
   _objectDestructuringEmpty(_ref);
 
-  var _useActions = useActions(),
+  var _useActions = useActions$1(),
       runJob = _useActions.runJob,
       stopJob = _useActions.stopJob,
       updateJob = _useActions.updateJob,
@@ -5220,7 +5547,7 @@ var Details$1 = function Details(_ref) {
   }, t('goToMyJobs')), "."));
   if (!jobData) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.details
+    className: css$O.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -5229,25 +5556,25 @@ var Details$1 = function Details(_ref) {
   }, currentUserName === user ? t('backToJobs') : t('backToJobsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.header
+    className: css$O.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.title
+    className: css$O.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$M.edit,
+    className: css$O.edit,
     value: titleValue,
     onChange: onChangeTitle,
     readOnly: currentUserName !== user,
     placeholder: t('newJob')
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.side
+    className: css$O.side
   }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress, {
     onlyDuration: true,
-    className: css$M.progress,
+    className: css$O.progress,
     data: jobData
   }), jobData.status === 'FAILED' && /*#__PURE__*/React__default.createElement("div", {
     className: "red-text"
   }, t('sorryButYourCodeDoesntLookLikePythonJob')), ['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? /*#__PURE__*/React__default.createElement(Button, {
-    className: css$M.button,
+    className: css$O.button,
     color: "fail",
     size: "small",
     variant: "contained",
@@ -5256,7 +5583,7 @@ var Details$1 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-pause"
   }), t('stop')) : /*#__PURE__*/React__default.createElement(Button, {
-    className: css$M.button,
+    className: css$O.button,
     color: "success",
     size: "small",
     variant: "contained",
@@ -5265,42 +5592,42 @@ var Details$1 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-play"
   }), t('run'))), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$M.dropdown,
+    className: css$O.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$M.dropdownButton,
+    className: css$O.dropdownButton,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   })))), /*#__PURE__*/React__default.createElement(Status, {
     data: jobData
   }), /*#__PURE__*/React__default.createElement(ScheduleSettings, {
-    className: css$M.schedule,
+    className: css$O.schedule,
     data: jobData,
     onChange: onChangeSchedule,
     onChangeRuntime: onChangeRuntime
   }), /*#__PURE__*/React__default.createElement(CodeEditor, {
-    className: css$M.codeEditor,
+    className: css$O.codeEditor,
     value: code,
     onChange: onChangeCode,
     language: jobData.runtime,
     saved: codeSaved
   }), /*#__PURE__*/React__default.createElement(Logs, {
-    className: css$M.logs,
+    className: css$O.logs,
     data: jobData
   }));
 };
 
-var css$N = {"jobs":"_z2_YO"};
+var css$P = {"jobs":"_z2_YO"};
 
 var Jobs = function Jobs(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.jobs
+    className: css$P.jobs
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Switch, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Route, {
     path: routes.jobs(),
     exact: true,
@@ -5311,7 +5638,7 @@ var Jobs = function Jobs(_ref) {
   })));
 };
 
-var css$O = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
+var css$Q = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
 
 var Item$1 = function Item(_ref) {
   var data = _ref.data,
@@ -5330,35 +5657,35 @@ var Item$1 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteItem);
   return /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/" + user + "/d/" + data.id,
-    className: css$O.item,
+    className: css$Q.item,
     ref: ref
   }, Boolean(data.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.label
+    className: css$Q.label
   }, t('stacksWithCount', {
     count: data.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.previewWrap
+    className: css$Q.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$O.attachment,
+    className: css$Q.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.emptyMessage
+    className: css$Q.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.section
+    className: css$Q.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.content
+    className: css$Q.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.name
+    className: css$Q.name
   }, data.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), user !== data.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.by
+    className: css$Q.by
   }, t('by'), " ", data.user), renderContent && renderContent(data)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$O.dropdown,
+    className: css$Q.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteItem
@@ -5366,34 +5693,34 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$P = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
+var css$R = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
 
 var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.loader
+    className: css$R.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.text
+    className: css$R.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.grid
+    className: css$R.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.item
+    className: css$R.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.pic
+    className: css$R.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.section
+    className: css$R.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.item
+    className: css$R.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.pic
+    className: css$R.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.section
+    className: css$R.section
   }))));
 };
 
-var api$1 = apiFabric();
-var useActions$1 = (function () {
+var api$2 = apiFabric();
+var useActions$2 = (function () {
   var _useAppStore = useAppStore(),
       apiUrl = _useAppStore[0].apiUrl;
 
@@ -5401,7 +5728,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp2 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.DASHBOARD_CREATE, {
+          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CREATE, {
             user: userName
           })).then(function (request) {
             resolve(request.data);
@@ -5421,7 +5748,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp4 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.DASHBOARD_UPDATE, _extends({
+          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_UPDATE, _extends({
             user: userName,
             id: id
           }, fields))).then(function (request) {
@@ -5442,7 +5769,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp6 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.DASHBOARD_DELETE, {
+          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_DELETE, {
             user: userName,
             id: reportId
           })).then(function (request) {
@@ -5463,7 +5790,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp8 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.DASHBOARD_CARDS_INSERT + '?attachments=true', {
+          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CARDS_INSERT + '?attachments=true', {
             user: userName,
             dashboard: id,
             cards: cards,
@@ -5486,7 +5813,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp10 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.DASHBOARD_CARDS_UPDATE, _extends({
+          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CARDS_UPDATE, _extends({
             user: userName,
             dashboard: id,
             stack: stack
@@ -5508,7 +5835,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp12 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.DASHBOARD_CARDS_DELETE, {
+          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CARDS_DELETE, {
             user: userName,
             dashboard: id,
             stack: stack
@@ -5536,7 +5863,7 @@ var useActions$1 = (function () {
   };
 });
 
-var css$Q = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
+var css$S = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
 
 var dataFormat$3 = function dataFormat(data) {
   return data.dashboards;
@@ -5562,7 +5889,7 @@ var List$2 = function List(_ref) {
 
   var currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
 
-  var _useActions = useActions$1(),
+  var _useActions = useActions$2(),
       createReport = _useActions.createReport,
       deleteReport = _useActions.deleteReport;
 
@@ -5627,37 +5954,37 @@ var List$2 = function List(_ref) {
   }, t('goToMyDashboards')), "."));
   if (!data) return /*#__PURE__*/React__default.createElement(Loader$4, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.list
+    className: css$S.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$Q.search,
+    className: css$S.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.title
+    className: css$S.title
   }, currentUserName === user ? t('myReports') : t('reportsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$Q.mobileSearch,
+    className: css$S.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.grid
+    className: css$S.grid
   }, currentUserName === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: create,
-    className: cx(css$Q.add, {
+    className: cx(css$S.add, {
       disabled: creating
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.caption
+    className: css$S.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newReport'))), items.map(function (item, index) {
@@ -5670,23 +5997,23 @@ var List$2 = function List(_ref) {
   })));
 };
 
-var css$R = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
+var css$T = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
 
 var Loader$5 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.loader
+    className: css$T.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.text
+    className: css$T.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.filters
+    className: css$T.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.grid
+    className: css$T.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.item
+    className: css$T.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.item
+    className: css$T.item
   })));
 };
 
@@ -5762,39 +6089,39 @@ var GridProvider = /*#__PURE__*/function (_Component) {
   return GridProvider;
 }(React.Component);
 
-var css$S = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
+var css$U = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
 
 var Loader$6 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.loader
+    className: css$U.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.text
+    className: css$U.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.grid
+    className: css$U.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.item
+    className: css$U.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.pic
+    className: css$U.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.section
+    className: css$U.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.item
+    className: css$U.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.pic
+    className: css$U.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.section
+    className: css$U.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.item
+    className: css$U.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.pic
+    className: css$U.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.section
+    className: css$U.section
   }))));
 };
 
-var css$T = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
+var css$V = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
 
 var dataFormat$4 = function dataFormat(data) {
   return data.stacks;
@@ -5885,13 +6212,13 @@ var AddStacksModal = function AddStacksModal(_ref) {
 
   var isUserOwner = currentUserName === params.user;
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$T.stacks,
+    dialogClassName: css$V.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$T.search,
+    className: css$V.search,
     isDark: true,
     size: "middle",
     showEverything: true,
@@ -5899,42 +6226,42 @@ var AddStacksModal = function AddStacksModal(_ref) {
     value: searchQuery,
     onChange: onChangeSearch
   }), !data && /*#__PURE__*/React__default.createElement(Loader$6, null), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.message
+    className: css$V.message
   }, isUserOwner ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), data && Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.text
+    className: css$V.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), data && Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.grid
+    className: css$V.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$T.item,
+      className: css$V.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$T.checkbox,
+      className: css$V.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
       data: item
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.buttons
+    className: css$V.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$T.button,
+    className: css$V.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$T.button,
+    className: css$V.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
   }, t('cancel')))));
 };
 
-var css$U = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
+var css$W = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
 
 var viewValueMap = {
   grid: 1,
@@ -6075,53 +6402,53 @@ var Card = React.memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$U.card, "col-" + columns, className),
+    className: cx(css$W.card, "col-" + columns, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.inner
+    className: css$W.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.head
+    className: css$W.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$U.name, {
+    className: cx(css$W.name, {
       readonly: !updateCard
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.nameValue
+    className: css$W.nameValue
   }, (title === null || title === void 0 ? void 0 : title.length) ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$U.nameEdit, {
+    className: cx(css$W.nameEdit, {
       active: !(title === null || title === void 0 ? void 0 : title.length)
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$U.infoTime
+      className: css$W.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.info
+    className: css$W.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$U.button, css$U.link),
+    className: cx(css$W.button, css$W.link),
     color: "secondary",
     Component: reactRouterDom.Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.cardControls
+    className: css$W.cardControls
   }, deleteCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$U.button),
+    className: cx(css$W.button),
     color: "secondary",
     onClick: deleteCard
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-trash-can-outline"
   })), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$U.button, css$U.move),
+    className: cx(css$W.button, css$W.move),
     color: "secondary",
     onMouseEnter: onEnterMove,
     onMouseLeave: onLeaveMove
@@ -6130,9 +6457,9 @@ var Card = React.memo(function (_ref) {
   })), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     onChange: onChangeView,
     value: data.columns === 1 ? 'grid' : 'list',
-    className: css$U.viewSwitcher
+    className: css$W.viewSwitcher
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.description
+    className: css$W.description
   }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
     value: data.description,
     ref: descFieldRef,
@@ -6141,18 +6468,18 @@ var Card = React.memo(function (_ref) {
     onBlur: onBlurDescription,
     readOnly: !updateCard
   }), !isShowDesc && updateCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$U.addDesc),
+    className: cx(css$W.addDesc),
     color: "secondary",
     onClick: addDesc
   }, "+ ", t('addDescription'))), headId && attachmentIndex !== null ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$U.attachment,
+    className: css$W.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.emptyMessage
+    className: css$W.emptyMessage
   }, t('emptyDashboard'))));
 });
 
@@ -6194,17 +6521,14 @@ var DnDItem = React.memo(function (_ref) {
   });
 });
 
-var css$V = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
+var css$X = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","permissions":"_3OGBJ","share":"_198zx","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
 
 var dataFormat$5 = function dataFormat(data) {
   return data.dashboard;
 };
 
-var Details$2 = function Details(_ref) {
+var Details$2 = function Details() {
   var _currentUser$data, _data$description;
-
-  var renderHeader = _ref.renderHeader,
-      renderSideHeader = _ref.renderSideHeader;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -6228,7 +6552,7 @@ var Details$2 = function Details(_ref) {
 
   var currentUserName = (_currentUser$data = currentUser.data) === null || _currentUser$data === void 0 ? void 0 : _currentUser$data.user;
 
-  var _useActions = useActions$1(),
+  var _useActions = useActions$2(),
       deleteReport = _useActions.deleteReport,
       updateReport = _useActions.updateReport,
       reportInsertCard = _useActions.reportInsertCard,
@@ -6293,10 +6617,12 @@ var Details$2 = function Details(_ref) {
     }
 
     if ((prevData === null || prevData === void 0 ? void 0 : prevData.description) !== (data === null || data === void 0 ? void 0 : data.description)) setIsShowDesc(Boolean(data === null || data === void 0 ? void 0 : (_data$description2 = data.description) === null || _data$description2 === void 0 ? void 0 : _data$description2.length));
-    return function () {
-      return setGridItems([]);
-    };
   }, [data]);
+  React.useEffect(function () {
+    return function () {
+      setGridItems([]);
+    };
+  }, []);
   React.useEffect(function () {
     if (filteredCards.length) {
       setGridItems(filteredCards);
@@ -6426,9 +6752,14 @@ var Details$2 = function Details(_ref) {
 
   var onChangePrivate = function onChangePrivate(isPrivate) {
     try {
-      return Promise.resolve(update({
+      update({
         "private": isPrivate
-      })).then(function () {});
+      }).then(function () {
+        mutate(_extends({}, data, {
+          "private": isPrivate
+        }), false);
+      });
+      return Promise.resolve();
     } catch (e) {
       return Promise.reject(e);
     }
@@ -6442,8 +6773,8 @@ var Details$2 = function Details(_ref) {
         return {
           stack: stack
         };
-      }), data === null || data === void 0 ? void 0 : (_data$cards = data.cards) === null || _data$cards === void 0 ? void 0 : _data$cards.length)).then(function (_ref2) {
-        var cards = _ref2.dashboard.cards;
+      }), data === null || data === void 0 ? void 0 : (_data$cards = data.cards) === null || _data$cards === void 0 ? void 0 : _data$cards.length)).then(function (_ref) {
+        var cards = _ref.dashboard.cards;
         var newCards = cards.filter(function (c) {
           return stacks.indexOf(c.stack) >= 0;
         });
@@ -6472,11 +6803,17 @@ var Details$2 = function Details(_ref) {
     };
   };
 
+  var updatePermissions = function updatePermissions(permissions) {
+    mutate(_extends({}, data, {
+      permissions: permissions
+    }), false);
+  };
+
   var getUpdatedCardFunc = function getUpdatedCardFunc(stack) {
     return function (fields) {
       try {
-        return Promise.resolve(reportUpdateCard(user, id, stack, fields)).then(function (_ref3) {
-          var newCards = _ref3.cards;
+        return Promise.resolve(reportUpdateCard(user, id, stack, fields)).then(function (_ref2) {
+          var newCards = _ref2.cards;
           var updatedCard = newCards.find(function (i) {
             return i.stack === stack;
           });
@@ -6522,7 +6859,7 @@ var Details$2 = function Details(_ref) {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$V.filters, {
+      className: cx(css$X.filters, {
         'with-select': hasSelectField
       })
     });
@@ -6555,7 +6892,7 @@ var Details$2 = function Details(_ref) {
   var isUserOwner = currentUserName === user;
   var CardWrapComponent = isUserOwner ? DnDItem : React.Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.details
+    className: css$X.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -6564,68 +6901,72 @@ var Details$2 = function Details(_ref) {
   }, currentUserName === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.header
+    className: css$X.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.title
+    className: css$X.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$V.edit,
-    value: data.title,
+    className: css$X.edit,
+    value: data.title || '',
     onChange: onChangeTitle,
     readOnly: currentUserName !== data.user,
     placeholder: t('newDashboard')
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
-  })), renderHeader && renderHeader({
-    data: data
+  })), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
+    className: css$X.permissions,
+    permissions: data.permissions
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.sideHeader
+    className: css$X.sideHeader
   }, isUserOwner && /*#__PURE__*/React__default.createElement("a", {
-    className: css$V.addButton,
+    className: css$X.addButton,
     onClick: toggleAddStackModal,
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
-  }), t('addStack')), renderSideHeader && renderSideHeader({
-    data: data,
-    onChangePrivate: onChangePrivate,
-    mutateData: mutate
+  }), t('addStack')), isUserOwner && /*#__PURE__*/React__default.createElement(Share, {
+    instancePath: user + "/d/" + data.id,
+    onUpdatePrivate: onChangePrivate,
+    className: css$X.share,
+    defaultIsPrivate: data["private"],
+    defaultPermissions: data.permissions,
+    onUpdatePermissions: updatePermissions
   }), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$V.dropdown,
+    className: css$X.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteDashboard
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$V['dropdown-button'],
+    className: css$X['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.description
+    className: css$X.description
   }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
-    value: data.description,
+    value: data.description || '',
     ref: descFieldRef,
     placeholder: t('description'),
     onChange: onChangeDescription,
     onBlur: onBlurDescription,
     readOnly: currentUserName !== data.user
   }), !isShowDesc && currentUserName === data.user && /*#__PURE__*/React__default.createElement(Button, {
-    className: css$V.addDesc,
+    className: css$X.addDesc,
     color: "secondary",
     onClick: addDesc
   }, "+ ", t('addDescription'))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$V.tabs,
+    className: css$X.tabs,
     onChange: onChangeTab,
     value: activeTab,
     items: tabs
   }), Boolean(items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.container
+    className: css$X.container
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.section
+    className: css$X.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.fields
+    className: css$X.fields
   }, renderFilters())), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$V.cards)
+    className: cx(css$X.cards)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -6641,9 +6982,9 @@ var Details$2 = function Details(_ref) {
       moveAvailable: isUserOwner
     }));
   }))), !items.length && !(data === null || data === void 0 ? void 0 : data.cards) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.empty
+    className: css$X.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), isUserOwner && /*#__PURE__*/React__default.createElement(React.Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$V.addButton,
+    className: css$X.addButton,
     onClick: toggleAddStackModal,
     href: "#"
   }, t('addStack')), ".")), /*#__PURE__*/React__default.createElement(AddStacksModal, {
@@ -6653,13 +6994,13 @@ var Details$2 = function Details(_ref) {
   }));
 };
 
-var css$W = {"reports":"_30ROl"};
+var css$Y = {"reports":"_30ROl"};
 
 var Reports = function Reports(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.reports
+    className: css$Y.reports
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Switch, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Route, {
     path: routes.reports(),
     exact: true,
@@ -6766,7 +7107,7 @@ function SvgLogo(props) {
   }, props), _ref$5, _ref2$2, _ref3$2, _ref4$1, _ref5);
 }
 
-var css$X = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
+var css$Z = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -6775,35 +7116,35 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$X.header, className)
+    className: cx(css$Z.header, className)
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/",
-    className: css$X.logo
+    className: css$Z.logo
   }, /*#__PURE__*/React__default.createElement(SvgLogo, null)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.buttons
+    className: css$Z.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: reactRouterDom.Link,
     to: "/auth/login",
-    className: css$X.button,
+    className: css$Z.button,
     color: "primary",
     variant: "contained"
   }, t('logIn'))));
 };
 
-var css$Y = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
+var css$_ = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.layout
+    className: css$_.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$Y.header
+    className: css$_.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.main
+    className: css$_.main
   }, children));
 };
 
-var css$Z = {"infoButton":"_2zmYM"};
+var css$$ = {"infoButton":"_2zmYM"};
 
 var SettingsInformation = function SettingsInformation(_ref) {
   var className = _ref.className,
@@ -6823,7 +7164,7 @@ var SettingsInformation = function SettingsInformation(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$Z.infoButton, className),
+    className: cx(css$$.infoButton, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal

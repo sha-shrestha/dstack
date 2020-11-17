@@ -11,6 +11,18 @@ var routes = {
   verifyUser: function verifyUser() {
     return '/auth/verify';
   },
+  authSignUp: function authSignUp() {
+    return '/auth/signup';
+  },
+  authForgetPassword: function authForgetPassword() {
+    return '/auth/forget-password';
+  },
+  authResetPassword: function authResetPassword() {
+    return '/auth/reset-password';
+  },
+  confirmEmailMessage: function confirmEmailMessage() {
+    return '/auth/confirm-message';
+  },
   stacks: function stacks(user) {
     if (user === void 0) {
       user = ':user';
