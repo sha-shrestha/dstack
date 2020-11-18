@@ -50,13 +50,23 @@ export default {
     TOKEN_STORAGE_KEY: 'token',
 };
 
+export const reportModelPythonCode = `import dstack as ds
+from sklearn.linear_model import LogisticRegression
+
+# Load and prepare data (X_train, y_train)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+ds.push("my_model", model, "My first linear model")`;
+
 export const reportPlotPythonCode = `import matplotlib.pyplot as plt
 import dstack as ds
 
 fig = plt.figure()
 plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
 
-ds.push_frame("simple", fig, "My first plot")`;
+ds.push_frame("my_plot", fig, "My first plot")`;
 
 export const installRPackageCode = 'install.packages("dstack")';
 

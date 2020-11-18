@@ -7,7 +7,7 @@ import Tabs from '../../Tabs';
 import Upload from './Upload';
 import css from './styles.module.css';
 import config from '../../config';
-import {reportPlotPythonCode} from '../../config';
+import {reportModelPythonCode, reportPlotPythonCode} from '../../config';
 
 type Props = {
     user?: string,
@@ -95,7 +95,7 @@ const UploadStack = ({
                     className={css.code}
                     language="python"
                 >
-                    {reportPlotPythonCode}
+                    {reportModelPythonCode}
                 </CodeViewer>}
 
                 {activePublishTab === 2 && <CodeViewer
