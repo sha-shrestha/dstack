@@ -7,7 +7,7 @@ import Tabs from '../../Tabs';
 import Upload from './Upload';
 import css from './styles.module.css';
 import config from '../../config';
-import {reportPlotPythonCode, installRPackageCode, reportPlotRCode} from '../../config';
+import {reportPlotPythonCode} from '../../config';
 
 type Props = {
     user?: string,
@@ -21,17 +21,28 @@ const UploadStack = ({
     refresh,
     apiUrl,
     configurePythonCommand,
-    configureRCommand,
     withFileUpload,
 }: Props) => {
     const {t} = useTranslation();
     const [activeCodeTab, setActiveCodeTab] = useState(1);
-    const [activePlatformTab, setActivePlatformTab] = useState(1);
+    const [activePublishTab, setActivePublishTab] = useState(1);
 
     const tabs = [
         {
             label: t('python'),
             value: 1,
+        },
+    ];
+
+    const publishTabs = [
+        {
+            label: t('model'),
+            value: 1,
+        },
+
+        {
+            label: t('chart'),
+            value: 2,
         },
     ];
 
@@ -43,35 +54,24 @@ const UploadStack = ({
 
     return (
         <div className={css.howto}>
-            <Tabs
-                className={css.tabs}
-                value={activeCodeTab}
-                onChange={setActiveCodeTab}
-                tabs={tabs}
-            />
+            {tabs.length > 1 && (
+                <Tabs
+                    className={css.tabs}
+                    value={activeCodeTab}
+                    onChange={setActiveCodeTab}
+                    tabs={tabs}
+                />
+            )}
 
             {activeCodeTab === 1 && <div>
                 <div className={css.description}>{t('installPipPackage')}</div>
 
-                <Tabs
-                    className={css.tabs}
-                    value={activePlatformTab}
-                    onChange={setActivePlatformTab}
-
-                    tabs={[
-                        {
-                            label: t('pip'),
-                            value: 1,
-                        },
-                    ]}
-                />
-
-                {activePlatformTab === 1 && <CodeViewer
+                <CodeViewer
                     className={css.code}
                     language="bash"
                 >
                     pip install dstack
-                </CodeViewer>}
+                </CodeViewer>
 
                 <div className={css.description}>{t('configureDStack')}</div>
 
@@ -84,12 +84,26 @@ const UploadStack = ({
 
                 <div className={css.description}>{t('reportPlotIntro')}</div>
 
-                <CodeViewer
+                <Tabs
+                    className={css.tabs}
+                    value={activePublishTab}
+                    onChange={setActivePublishTab}
+                    tabs={publishTabs}
+                />
+
+                {activePublishTab === 1 && <CodeViewer
                     className={css.code}
                     language="python"
                 >
                     {reportPlotPythonCode}
-                </CodeViewer>
+                </CodeViewer>}
+
+                {activePublishTab === 2 && <CodeViewer
+                    className={css.code}
+                    language="python"
+                >
+                    {reportPlotPythonCode}
+                </CodeViewer>}
             </div>}
 
             {activeCodeTab === 3 && <Upload

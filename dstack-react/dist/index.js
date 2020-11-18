@@ -2977,37 +2977,13 @@ var HowTo = function HowTo(_ref) {
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
 
-  var _useState = React.useState(1),
-      activeCodeTab = _useState[0],
-      setActiveCodeTab = _useState[1];
-
-  var _useState2 = React.useState(1),
-      activePlatformTab = _useState2[0],
-      setActivePlatformTab = _useState2[1];
-
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$w.howto
   }, !modalMode && /*#__PURE__*/React__default.createElement("div", {
     className: css$w.title
-  }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$w.tabs,
-    value: activeCodeTab,
-    onChange: setActiveCodeTab,
-    tabs: [{
-      label: t('python'),
-      value: 1
-    }]
-  }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
+  }, t('howToFetchDataUsingTheAPI')), /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
     className: css$w.description
-  }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$w.tabs,
-    value: activePlatformTab,
-    onChange: setActivePlatformTab,
-    tabs: [{
-      label: t('pip'),
-      value: 1
-    }]
-  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+  }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$w.code,
     language: "bash"
   }, "pip install dstack"), /*#__PURE__*/React__default.createElement("div", {
@@ -4416,12 +4392,19 @@ var UploadStack = function UploadStack(_ref) {
       setActiveCodeTab = _useState[1];
 
   var _useState2 = React.useState(1),
-      activePlatformTab = _useState2[0],
-      setActivePlatformTab = _useState2[1];
+      activePublishTab = _useState2[0],
+      setActivePublishTab = _useState2[1];
 
   var tabs = [{
     label: t('python'),
     value: 1
+  }];
+  var publishTabs = [{
+    label: t('model'),
+    value: 1
+  }, {
+    label: t('chart'),
+    value: 2
   }];
   if (withFileUpload) tabs.push({
     label: t('upload'),
@@ -4429,22 +4412,14 @@ var UploadStack = function UploadStack(_ref) {
   });
   return /*#__PURE__*/React__default.createElement("div", {
     className: css$E.howto
-  }, /*#__PURE__*/React__default.createElement(Tabs, {
+  }, tabs.length > 1 && /*#__PURE__*/React__default.createElement(Tabs, {
     className: css$E.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: tabs
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
     className: css$E.description
-  }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$E.tabs,
-    value: activePlatformTab,
-    onChange: setActivePlatformTab,
-    tabs: [{
-      label: t('pip'),
-      value: 1
-    }]
-  }), activePlatformTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+  }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$E.code,
     language: "bash"
   }, "pip install dstack"), /*#__PURE__*/React__default.createElement("div", {
@@ -4454,7 +4429,15 @@ var UploadStack = function UploadStack(_ref) {
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
     className: css$E.description
-  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(CodeViewer, {
+  }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(Tabs, {
+    className: css$E.tabs,
+    value: activePublishTab,
+    onChange: setActivePublishTab,
+    tabs: publishTabs
+  }), activePublishTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
+    className: css$E.code,
+    language: "python"
+  }, reportPlotPythonCode), activePublishTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
     className: css$E.code,
     language: "python"
   }, reportPlotPythonCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {

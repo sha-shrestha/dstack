@@ -38,6 +38,7 @@ button.button {
         }
     }
     &:global(.large) {
+        font-size: 16px;
         @media (--mobile) {
             height: 36px;
             padding: 0 16px;

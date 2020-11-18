@@ -130,6 +130,7 @@ export default {
     'maxSymbol_plural': 'max {{count}} symbols',
     'mlModel': 'ML model',
     'mlModel_plural': 'ML models',
+    'model': 'Model',
     'multipleMatches': 'Multiple matches',
     'myDashboards': 'My Dashboards',
     'myJobs': 'My Jobs',

@@ -2,7 +2,6 @@
 
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import Tabs from '../../Tabs';
 import CodeViewer from '../../CodeViewer';
 import {isString} from 'lodash-es';
 import config from '../../config';
@@ -56,8 +55,6 @@ type Props = {
 
 const HowTo = ({modalMode, data, configurePythonCommand}: Props) => {
     const {t} = useTranslation();
-    const [activeCodeTab, setActiveCodeTab] = useState(1);
-    const [activePlatformTab, setActivePlatformTab] = useState(1);
 
     return (
         <div className={css.howto}>
@@ -65,41 +62,15 @@ const HowTo = ({modalMode, data, configurePythonCommand}: Props) => {
                 <div className={css.title}>{t('howToFetchDataUsingTheAPI')}</div>
             )}
 
-            <Tabs
-                className={css.tabs}
-                value={activeCodeTab}
-                onChange={setActiveCodeTab}
-
-                tabs={[
-                    {
-                        label: t('python'),
-                        value: 1,
-                    },
-                ]}
-            />
-
-            {activeCodeTab === 1 && <div>
+            <div>
                 <div className={css.description}>{t('installPipPackage')}</div>
 
-                <Tabs
-                    className={css.tabs}
-                    value={activePlatformTab}
-                    onChange={setActivePlatformTab}
-
-                    tabs={[
-                        {
-                            label: t('pip'),
-                            value: 1,
-                        },
-                    ]}
-                />
-
-                {activePlatformTab === 1 && <CodeViewer
+                <CodeViewer
                     className={css.code}
                     language="bash"
                 >
                     pip install dstack
-                </CodeViewer>}
+                </CodeViewer>
 
                 <div className={css.description}>{t('configureDStack')}</div>
 
@@ -118,7 +89,7 @@ const HowTo = ({modalMode, data, configurePythonCommand}: Props) => {
                 >
                     {pullPythonCode(data)}
                 </CodeViewer>
-            </div>}
+            </div>
 
             <div
                 className={css.footer}
