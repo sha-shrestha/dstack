@@ -53,8 +53,6 @@ export default {
 export const reportModelPythonCode = `import dstack as ds
 from sklearn.linear_model import LogisticRegression
 
-# Load and prepare data (X_train, y_train)
-
 model = LogisticRegression()
 model.fit(X_train, y_train)
 
