@@ -259,7 +259,7 @@ var config = {
   BLOG_URL: 'https://blog.dstack.ai',
   TOKEN_STORAGE_KEY: 'token'
 };
-var reportModelPythonCode = "import dstack as ds\nfrom sklearn.linear_model import LogisticRegression\n\n# Load and prepare data (X_train, y_train)\n\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\n\nds.push(\"my_model\", model, \"My first linear model\")";
+var reportModelPythonCode = "import dstack as ds\nfrom sklearn.linear_model import LogisticRegression\n\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\n\nds.push(\"my_model\", model, \"My first linear model\")";
 var reportPlotPythonCode = "import matplotlib.pyplot as plt\nimport dstack as ds\n\nfig = plt.figure()\nplt.plot([1, 2, 3, 4], [1, 4, 9, 16])\n\nds.push_frame(\"my_plot\", fig, \"My first plot\")";
 
 var apiFabric = function apiFabric(_temp) {
