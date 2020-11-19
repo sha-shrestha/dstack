@@ -10,6 +10,8 @@ interface AppConfig {
     val dataDirectory: String
     val fileDirectory: String
     val jobDirectory: String
+    val appDirectory: String
+    val executionDirectory: String
     val adminEmail: String?
     val smtpHost: String?
     val smtpPort: Int?

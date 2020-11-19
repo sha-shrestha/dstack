@@ -113,6 +113,16 @@ internal fun attachmentNotFound() = response(
     OpStatus("attachment not found")
 )
 
+internal fun unsupportedApplication(application: String?) = response(
+    Response.Status.UNSUPPORTED_MEDIA_TYPE,
+    OpStatus("unsupported application: $application")
+)
+
+internal fun executionNotFound() = response(
+        Response.Status.NOT_FOUND,
+        OpStatus("execution not found")
+)
+
 data class ExistStatus(val exists: Boolean)
 
 internal fun userExists(status: Boolean) = ok(ExistStatus(status))

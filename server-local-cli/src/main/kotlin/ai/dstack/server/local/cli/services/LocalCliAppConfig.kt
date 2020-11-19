@@ -10,7 +10,7 @@ class LocalCliAppConfig : AppConfig {
             return System.getenv("dstack_host_name") ?: "localhost"
         }
 
-    override val port: Int?
+    override val port: Int
         get() {
             return System.getenv("dstack_port")?.toInt() ?: internalPort
         }
@@ -50,6 +50,16 @@ class LocalCliAppConfig : AppConfig {
     override val jobDirectory: String
         get() {
             return "${homeDirectory}/jobs"
+        }
+
+    override val appDirectory: String
+        get() {
+            return "${homeDirectory}/applications"
+        }
+
+    override val executionDirectory: String
+        get() {
+            return "${homeDirectory}/executions"
         }
 
     override val adminEmail: String
