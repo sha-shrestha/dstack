@@ -151,7 +151,7 @@ class LocalExecutionService @Autowired constructor(
             |import json
             |import traceback
             |from pathlib import Path
-            |from dstack.application.controls import unpack_view
+            |from dstack.controls import unpack_view
             |from dstack import AutoHandler
             |
             |executions_home = sys.argv[1]
