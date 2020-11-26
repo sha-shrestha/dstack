@@ -10,6 +10,7 @@ export default views => {
 
     views.forEach((view, index) => {
         fields[index] = {
+            label: view.label,
             type: typeMap[view.type],
             value: view.data,
             disabled: !view.enabled,

@@ -10,6 +10,8 @@ export default {
     'and': 'and',
     'app': 'App',
     'app_plural': 'Apps',
+    'application': 'Application',
+    'application_plural': 'Applications',
     'apply': 'Apply',
     'areYouSureYouWantToDelete': 'Are you sure you want to delete {{name}} stack? You will not be able to recover it.',
     'areYouSureYouWantToChangeTheCurrentHeadRevisionToByName': 'Are you sure you want to change the current head revision to “{{frame}}”?',

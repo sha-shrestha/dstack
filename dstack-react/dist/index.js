@@ -897,6 +897,7 @@ var parseStackViews = (function (views) {
   var fields = {};
   views.forEach(function (view, index) {
     fields[index] = {
+      label: view.label,
       type: typeMap[view.type],
       value: view.data,
       disabled: !view.enabled
@@ -1542,7 +1543,7 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"filters":"_kiZkv","select":"_4Up3c","field":"_3_9Ku","button":"_1xfTz"};
+var css$i = {"filters":"_kiZkv","field":"_3_9Ku","slider":"_3xe_A","button":"_1xfTz"};
 
 var StackFilters = function StackFilters(_ref) {
   var className = _ref.className,
@@ -1555,23 +1556,16 @@ var StackFilters = function StackFilters(_ref) {
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
 
-  var hasSelectField = React.useMemo(function () {
-    return Object.keys(fields).some(function (key) {
-      return fields[key].type === 'select';
-    });
-  }, [fields]);
   if (!Object.keys(fields).length) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$i.filters, className, {
-      'with-select': hasSelectField
-    })
+    className: cx(css$i.filters, className)
   }, Object.keys(fields).map(function (key) {
     switch (fields[key].type) {
       case 'text':
         return /*#__PURE__*/React__default.createElement(TextField, {
           size: "small",
           key: "text-" + key,
-          className: cx(css$i.field),
+          className: cx(css$i.field, css$i.text),
           onChange: function onChange(event) {
             return _onChange(key, event.target.value);
           },
@@ -1610,7 +1604,7 @@ var StackFilters = function StackFilters(_ref) {
       case 'slider':
         return /*#__PURE__*/React__default.createElement(SliderField, {
           key: "slider-" + key,
-          className: css$i.field,
+          className: cx(css$i.field, css$i.slider),
           onChange: _onChange,
           align: "right",
           label: fields[key].label,
@@ -2842,7 +2836,7 @@ var List = function List(_ref) {
       value: 'mlModel'
     },
     app: {
-      label: t('app_plural'),
+      label: t('application_plural'),
       value: 'app'
     }
   };
@@ -4125,7 +4119,23 @@ var Details = function Details(_ref) {
   })));
 };
 
-var css$C = {"progress":"_1PIt0","percent":"_m5cJQ","bar":"_1v1JQ","label":"_1xBAh"};
+var css$C = {"loader":"_31Z5G","item":"_2uYpQ","filter-pulse":"_vad3r","button":"_3Q3GW"};
+
+var Loader$2 = function Loader(_ref) {
+  _objectDestructuringEmpty(_ref);
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.loader
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.item
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.button
+  }));
+};
+
+var css$D = {"progress":"_1PIt0","percent":"_m5cJQ","bar":"_1v1JQ","label":"_1xBAh"};
 
 var Progress = function Progress(_ref) {
   var _ref$isActive = _ref.isActive,
@@ -4183,17 +4193,17 @@ var Progress = function Progress(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.progress
+    className: css$D.progress
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.percent
+    className: css$D.percent
   }, Math.floor(progress), " %"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.bar
+    className: css$D.bar
   }, /*#__PURE__*/React__default.createElement("div", {
     style: {
       width: progress + "%"
     }
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.label
+    className: css$D.label
   }, t('calculatingTheData')));
 };
 
@@ -4245,7 +4255,7 @@ var actions$1 = (function () {
   };
 });
 
-var css$D = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
+var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
 
 var Details$1 = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
@@ -4290,17 +4300,21 @@ var Details$1 = function Details(_ref) {
       executing = _useState3[0],
       setExecuting = _useState3[1];
 
-  var _useState4 = React.useState(null),
-      appAttachment = _useState4[0],
-      setAppAttachment = _useState4[1];
+  var _useState4 = React.useState(false),
+      calculating = _useState4[0],
+      setCalculating = _useState4[1];
 
-  var _useState5 = React.useState(),
-      activeTab = _useState5[0],
-      setActiveTab = _useState5[1];
+  var _useState5 = React.useState(null),
+      appAttachment = _useState5[0],
+      setAppAttachment = _useState5[1];
 
-  var _useState6 = React.useState([]),
-      tabs = _useState6[0],
-      setTabs = _useState6[1];
+  var _useState6 = React.useState(),
+      activeTab = _useState6[0],
+      setActiveTab = _useState6[1];
+
+  var _useState7 = React.useState([]),
+      tabs = _useState7[0],
+      setTabs = _useState7[1];
 
   var prevFrame = usePrevious(frame);
 
@@ -4308,9 +4322,9 @@ var Details$1 = function Details(_ref) {
       executeStack = _actions.executeStack,
       pollStack = _actions.pollStack;
 
-  var _useState7 = React.useState(false),
-      isShowHowToModal = _useState7[0],
-      setIsShowHowToModal = _useState7[1];
+  var _useState8 = React.useState(false),
+      isShowHowToModal = _useState8[0],
+      setIsShowHowToModal = _useState8[1];
 
   var showHowToModal = function showHowToModal(event) {
     event.preventDefault();
@@ -4341,11 +4355,11 @@ var Details$1 = function Details(_ref) {
   };
 
   var updateExecuteData = function updateExecuteData(data) {
-    setExecuteData(data);
     var fields = parseStackViews(data.views);
     var form = getFormFromViews(data.views);
     setFields(fields);
     setForm(form);
+    setExecuteData(data);
   };
 
   var hasApplyButton = function hasApplyButton() {
@@ -4355,14 +4369,19 @@ var Details$1 = function Details(_ref) {
     });
   };
 
-  var submit = function submit(form) {
+  var submit = function submit(form, apply) {
+    if (apply === void 0) {
+      apply = true;
+    }
+
     setExecuting(true);
+    if (apply) setCalculating(true);else setAppAttachment(null);
     executeStack({
       user: data.user,
       stack: data.name,
       frame: frame === null || frame === void 0 ? void 0 : frame.id,
       attachment: attachmentIndex || 0,
-      apply: true,
+      apply: apply,
       views: executeData.views.map(function (view, index) {
         switch (view.type) {
           case 'ApplyView':
@@ -4385,16 +4404,17 @@ var Details$1 = function Details(_ref) {
         return view;
       })
     }).then(function (data) {
+      setExecuting(false);
       updateExecuteData(data);
-      checkFinished({
+      if (apply) checkFinished({
         id: data.id
       });
     });
   };
 
   reactUse.useDebounce(function () {
-    if (!hasApplyButton() && !lodashEs.isEqual(form, getFormFromViews(executeData === null || executeData === void 0 ? void 0 : executeData.views)) && appAttachment) {
-      submit(form);
+    if (!lodashEs.isEqual(form, getFormFromViews(executeData === null || executeData === void 0 ? void 0 : executeData.views)) && !executing) {
+      submit(form, !!(!hasApplyButton() && appAttachment));
     }
   }, 300, [form]);
 
@@ -4403,12 +4423,12 @@ var Details$1 = function Details(_ref) {
   };
 
   React.useEffect(function () {
-    if (executeData && executeData.status === 'READY' && !appAttachment) {
-      if (!hasApplyButton()) submit(form);
+    if (executeData && executeData.status === 'READY' && !appAttachment && !executing) {
+      if (!hasApplyButton()) submit(form, true);
     }
   }, [executeData]);
   React.useEffect(function () {
-    if (data && frame) {
+    if (data && frame && !loading) {
       setExecuting(true);
       setExecuteData(null);
       setAppAttachment(null);
@@ -4509,19 +4529,19 @@ var Details$1 = function Details(_ref) {
         });
       }, 3000);
 
-      if (data.status === 'FINISHED') {
-        setAppAttachment(data.output);
+      if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
+        setCalculating(false);
       }
 
-      if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
-        setExecuting(false);
+      if (data.status === 'FINISHED') {
+        setAppAttachment(data.output);
       }
     });
   };
 
-  if (loading || !executeData && executing) return /*#__PURE__*/React__default.createElement(Loader$1, null);
+  if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$D.details)
+    className: cx(css$E.details)
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -4530,33 +4550,33 @@ var Details$1 = function Details(_ref) {
   }, currentUser === user ? t('backToMyStacks') : t('backToStacksOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.header
+    className: css$E.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.title
+    className: css$E.title
   }, data.name, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
-    className: css$D.permissions,
+    className: css$E.permissions,
     permissions: data.permissions
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.sideHeader
+    className: css$E.sideHeader
   }, data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Share, {
     instancePath: user + "/" + stack,
     onUpdatePrivate: setPrivate,
-    className: css$D.share,
+    className: css$E.share,
     defaultIsPrivate: data["private"],
     defaultPermissions: data.permissions,
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
   }), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$D.dropdown,
+    className: css$E.dropdown,
     items: [{
       title: t('upload'),
       onClick: toggleUpload
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$D['dropdown-button'],
+    className: css$E['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
@@ -4566,44 +4586,46 @@ var Details$1 = function Details(_ref) {
     headId: headId,
     onMarkAsHead: onChangeHeadFrame,
     onChange: onChangeFrame,
-    className: css$D.revisions
+    className: css$E.revisions
   }), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$D.tabs,
+    className: css$E.tabs,
     onChange: onChangeTab,
     value: activeTab,
     items: tabs
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.container
+  }), !executeData && executing && /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.container
+  }, /*#__PURE__*/React__default.createElement(Loader$2, null)), executeData && /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.container
   }, /*#__PURE__*/React__default.createElement(StackFilters, {
     fields: fields,
     form: form,
     onChange: onChange,
     onApply: onApply,
-    className: cx(css$D.filters),
-    disabled: executing
+    className: cx(css$E.filters),
+    disabled: executing || calculating
   }), appAttachment && (appAttachment.description || appAttachment['content_type'] === 'text/csv') && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D['attachment-head']
+    className: css$E['attachment-head']
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.description
+    className: css$E.description
   }, appAttachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
     source: appAttachment.description
   })), appAttachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.actions
+    className: css$E.actions
   }, appAttachment.preview && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.label
+    className: css$E.label
   }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
-    className: css$D['label-tooltip']
+    className: css$E['label-tooltip']
   }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
     href: "#",
     onClick: showHowToModal
   }, t('useThisStackViaAPI')), appAttachment.length && /*#__PURE__*/React__default.createElement("span", {
-    className: css$D.size
-  }, "(", formatBytes(appAttachment.length), ")"))), appAttachment && !executing && /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$D.attachment,
+    className: css$E.size
+  }, "(", formatBytes(appAttachment.length), ")"))), appAttachment && !calculating && /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$E.attachment,
     stack: user + "/" + stack,
     customData: appAttachment
-  }), executing && /*#__PURE__*/React__default.createElement(Progress, null)), data && /*#__PURE__*/React__default.createElement(Readme, {
-    className: css$D.readme,
+  }), calculating && /*#__PURE__*/React__default.createElement(Progress, null)), data && /*#__PURE__*/React__default.createElement(Readme, {
+    className: css$E.readme,
     data: data,
     onUpdate: onUpdateReadme
   }), /*#__PURE__*/React__default.createElement(Modal, {
@@ -4612,7 +4634,7 @@ var Details$1 = function Details(_ref) {
     onClose: hideHowToModal,
     size: "big",
     title: t('howToFetchDataUsingTheAPI'),
-    className: css$D.modal
+    className: css$E.modal
   }, /*#__PURE__*/React__default.createElement(HowTo, {
     configurePythonCommand: configurePythonCommand,
     configureRCommand: configureRCommand,
@@ -4624,7 +4646,7 @@ var Details$1 = function Details(_ref) {
   })));
 };
 
-var css$E = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
+var css$F = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
 
 var MB = 1048576;
 
@@ -4772,7 +4794,7 @@ var Upload = function Upload(_ref) {
   return /*#__PURE__*/React__default.createElement(React.Fragment, null, withButton && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$E.upload, className),
+    className: cx(css$F.upload, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -4781,12 +4803,12 @@ var Upload = function Upload(_ref) {
     isShow: isShowModal,
     size: "small"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.content
+    className: css$F.content
   }, !stack && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.subtitle
+    className: css$F.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewStack')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$E.field,
+    className: css$F.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -4796,31 +4818,31 @@ var Upload = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.subtitle
+    className: css$F.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
-    className: css$E.dragndrop,
+    className: css$F.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.buttons
+    className: css$F.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$E.button,
+    className: css$F.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: closeHandle,
-    className: css$E.button,
+    className: css$F.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel')))));
 };
 
-var css$F = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
+var css$G = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
 
 var MB$1 = 1048576;
 
@@ -4959,14 +4981,14 @@ var Upload$1 = function Upload(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$F.upload, className)
+    className: cx(css$G.upload, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.content
+    className: css$G.content
   }, !stack && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.subtitle
+    className: css$G.subtitle
   }, t('stackName')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$F.field,
+    className: css$G.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -4976,32 +4998,32 @@ var Upload$1 = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.subtitle
+    className: css$G.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
     ref: fileFieldRef,
-    className: css$F.dragndrop,
+    className: css$G.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.buttons
+    className: css$G.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$F.button,
+    className: css$G.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: clearForm,
-    className: css$F.button,
+    className: css$G.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel'))));
 };
 
-var css$G = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
+var css$H = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
 
 var UploadStack = function UploadStack(_ref) {
   var user = _ref.user,
@@ -5037,41 +5059,41 @@ var UploadStack = function UploadStack(_ref) {
     value: 3
   });
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.howto
+    className: css$H.howto
   }, tabs.length > 1 && /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$G.tabs,
+    className: css$H.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: tabs
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.description
+    className: css$H.description
   }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$G.code,
+    className: css$H.code,
     language: "bash"
   }, "pip install dstack"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.description
+    className: css$H.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$G.code,
+    className: css$H.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.description
+    className: css$H.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$G.tabs,
+    className: css$H.tabs,
     value: activePublishTab,
     onChange: setActivePublishTab,
     tabs: publishTabs
   }), activePublishTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$G.code,
+    className: css$H.code,
     language: "python"
   }, reportModelPythonCode), activePublishTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$G.code,
+    className: css$H.code,
     language: "python"
   }, reportPlotPythonCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {
     user: user,
     refresh: refresh,
     apiUrl: apiUrl
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.footer,
+    className: css$H.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks', {
         href: config.DOCS_URL
@@ -5205,31 +5227,31 @@ var useActions$1 = (function () {
   };
 });
 
-var css$H = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
+var css$I = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
 
-var Loader$2 = function Loader(_ref) {
+var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.loader
+    className: css$I.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.title
+    className: css$I.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.text
+    className: css$I.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.table
+    className: css$I.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
+    className: css$I.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
+    className: css$I.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
+    className: css$I.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
+    className: css$I.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
+    className: css$I.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.item
+    className: css$I.item
   })));
 };
 
@@ -5242,7 +5264,7 @@ var calculateJobProgress = function calculateJobProgress(job) {
   return [progress, leftDuration];
 };
 
-var css$I = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
+var css$J = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
 
 var Progress$1 = function Progress(_ref) {
   var data = _ref.data,
@@ -5278,20 +5300,20 @@ var Progress$1 = function Progress(_ref) {
       leftDuration = _calculateJobProgress[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$I.section, className)
+    className: cx(css$J.section, className)
   }, !onlyDuration && /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.progressBar
+    className: css$J.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.progress,
+    className: css$J.progress,
     style: {
       width: progress + "%"
     }
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.time
+    className: css$J.time
   }, getFormattedDuration(leftDuration), " ", t('left')));
 };
 
-var css$J = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
+var css$K = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
 
 var REFRESH_TIMEOUT = 2000;
 
@@ -5384,61 +5406,61 @@ var TableRow = React.memo(function (_ref) {
     switch (jobData.status) {
       case 'SCHEDULED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$J.status
+          className: css$K.status
         }, t('inProgress'), "\u2026");
 
       case 'RUNNING':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$J.status
+          className: css$K.status
         }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress$1, {
-          className: css$J.progress,
+          className: css$K.progress,
           data: jobData
         }));
 
       case 'TIMEOUT':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$J.status, 'fail')
+          className: cx(css$K.status, 'fail')
         }, "\u26D4\uFE0F ", t('failedDueToTimeout'));
 
       case 'FAILED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$J.status, 'fail')
+          className: cx(css$K.status, 'fail')
         }, "\u26D4\uFE0F ", t('failed'));
 
       case 'FINISHED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$J.status, 'success')
+          className: cx(css$K.status, 'success')
         }, "\u2705 ", t('completed'));
 
       case 'CREATED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$J.status
+          className: css$K.status
         }, t('neverRun'));
 
       default:
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$J.status
+          className: css$K.status
         }, t(jobData.status.toLowerCase()));
     }
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$J.row, {
+    className: cx(css$K.row, {
       red: ['TIMEOUT', 'FAILED'].indexOf(jobData.status) > -1
     }),
     onClick: rowClick
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.cell
+    className: css$K.cell
   }, getTitle()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.cell
+    className: css$K.cell
   }, t(jobData.runtime)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.cell
+    className: css$K.cell
   }, moment(jobData.started).format('MM-DD-YYYY [at] HH:mm')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.cell
+    className: css$K.cell
   }, getFormattedDuration(jobData.finished - jobData.started)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$J.cell
+    className: css$K.cell
   }, renderStatus(), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$J.dropdown,
+    className: css$K.dropdown,
     items: [].concat(['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? [{
       title: t('stop'),
       onClick: onStop
@@ -5455,7 +5477,7 @@ var TableRow = React.memo(function (_ref) {
   })));
 });
 
-var css$K = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
+var css$L = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
 
 var dataFormat$1 = function dataFormat(data) {
   return data.jobs;
@@ -5541,9 +5563,9 @@ var List$1 = function List() {
     };
   };
 
-  if (!data) return /*#__PURE__*/React__default.createElement(Loader$2, null);
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$3, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.list
+    className: css$L.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
@@ -5552,14 +5574,14 @@ var List$1 = function List() {
     placeholder: t('findJob'),
     size: "small",
     value: search,
-    className: css$K.search,
+    className: css$L.search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.title
+    className: css$L.title
   }, currentUserName === user ? t('myJobs') : t('jobsOf', {
     name: user
   }), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$K.button,
+    className: css$L.button,
     variant: "contained",
     color: "primary",
     size: "small",
@@ -5567,7 +5589,7 @@ var List$1 = function List() {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), " ", t('newJob'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.text
+    className: css$L.text
   }, t('youHaveJobs', {
     count: data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
@@ -5577,27 +5599,27 @@ var List$1 = function List() {
     className: "mdi mdi-open-in-new"
   })), "."), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('findJob'),
-    className: css$K.mobileSearch,
+    className: css$L.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableWrap
+    className: css$L.tableWrap
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.table
+    className: css$L.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableCaptions
+    className: css$L.tableCaptions
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableCell
+    className: css$L.tableCell
   }, t('job')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableCell
+    className: css$L.tableCell
   }, t('runtime')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableCell
+    className: css$L.tableCell
   }, t('lastRun')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableCell
+    className: css$L.tableCell
   }, t('timeSpent')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.tableCell
+    className: css$L.tableCell
   }, t('status'))), items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(TableRow, {
       data: item,
@@ -5650,7 +5672,7 @@ var useAppProgress = (function () {
   };
 });
 
-var css$L = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
+var css$M = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
 
 var timeout = null;
 
@@ -5717,9 +5739,9 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [nextRunDelay]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$L.schedule, className)
+    className: cx(css$M.schedule, className)
   }, t('runtime'), ":", /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: cx(css$L.dropdown, css$L.runtime),
+    className: cx(css$M.dropdown, css$M.runtime),
     items: [{
       title: t('python'),
       onClick: runtimeChange('python')
@@ -5728,12 +5750,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: runtimeChange('r')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$L.dropdownButton,
+    className: css$M.dropdownButton,
     color: "primary"
   }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), t('jobIs'), " ", scheduleType !== 'unscheduled' && t('scheduled'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$L.dropdown,
+    className: css$M.dropdown,
     items: [{
       title: t('unscheduled'),
       onClick: scheduleTypeChange('unscheduled')
@@ -5742,12 +5764,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: scheduleTypeChange('daily')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$L.dropdownButton,
+    className: css$M.dropdownButton,
     color: "primary"
   }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), scheduleType === 'daily' && /*#__PURE__*/React__default.createElement(React.Fragment, null, t('at'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$L.dropdown,
+    className: css$M.dropdown,
     items: new Array(24).fill(0).map(function (i, index) {
       var time = (index < 10 ? '0' + index : index) + ":00";
       return {
@@ -5756,17 +5778,17 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       };
     })
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$L.dropdownButton,
+    className: css$M.dropdownButton,
     color: "primary"
   }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), /*#__PURE__*/React__default.createElement("div", {
     ref: messageRef,
-    className: cx(css$L.message, 'green-text')
+    className: cx(css$M.message, 'green-text')
   }, "The next run starts in ", getFormattedDuration(nextRunDelay))));
 };
 
-var css$M = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
+var css$N = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
 
 var CodeEditor = function CodeEditor(_ref) {
   var _ref$value = _ref.value,
@@ -5795,16 +5817,16 @@ var CodeEditor = function CodeEditor(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [saved]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$M.editor, className)
+    className: cx(css$N.editor, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.success,
+    className: css$N.success,
     ref: successMessageRef
   }, t('changesSaved')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.scroll
+    className: css$N.scroll
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.content
+    className: css$N.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.lineNumbers,
+    className: css$N.lineNumbers,
     dangerouslySetInnerHTML: {
       __html: lineNos
     }
@@ -5825,7 +5847,7 @@ var CodeEditor = function CodeEditor(_ref) {
   }))));
 };
 
-var css$N = {"status":"_3Pfpo"};
+var css$O = {"status":"_3Pfpo"};
 
 var Status = function Status(_ref) {
   var data = _ref.data;
@@ -5835,7 +5857,7 @@ var Status = function Status(_ref) {
 
   if (!data.started) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.status
+    className: css$O.status
   }, t('lastRunning'), ' ', moment(data.started).format("MM-DD-YYYY [" + t('at') + "] HH:mm"), /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-clock-outline"
   }), ['RUNNING', 'SCHEDULED'].indexOf(data.status) >= 0 ? /*#__PURE__*/React__default.createElement("span", null, ' ', t('inProgress'), "\u2026") : getFormattedDuration(data.finished - data.started)), data.status === 'FAILED' && /*#__PURE__*/React__default.createElement("span", {
@@ -5849,7 +5871,7 @@ var Status = function Status(_ref) {
   }), t('failedDueToTimeout')));
 };
 
-var css$O = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
+var css$P = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
 
 var Logs = function Logs(_ref) {
   var data = _ref.data,
@@ -5871,40 +5893,40 @@ var Logs = function Logs(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$O.logs, className)
+    className: cx(css$P.logs, className)
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$O.button,
+    className: css$P.button,
     onClick: toggleShow,
     color: "primary",
     size: "small"
   }, t('logs')), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$O.text, {
+    className: cx(css$P.text, {
       open: isShown
     })
   }, /*#__PURE__*/React__default.createElement("pre", null, data.logs), updated && /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.label
+    className: css$P.label
   }, t('updated'), " ", moment(updated).fromNow())));
 };
 
-var css$P = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
+var css$Q = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
 
-var Loader$3 = function Loader(_ref) {
+var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.loader
+    className: css$Q.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.title
+    className: css$Q.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.text1
+    className: css$Q.text1
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.text2
+    className: css$Q.text2
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.code
+    className: css$Q.code
   }));
 };
 
-var css$Q = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
+var css$R = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
 
 var REFRESH_TIMEOUT$1 = 3000;
 
@@ -6147,7 +6169,7 @@ var Details$2 = function Details(_ref) {
     }
   };
 
-  if (!jobData && !error) return /*#__PURE__*/React__default.createElement(Loader$3, null);
+  if (!jobData && !error) return /*#__PURE__*/React__default.createElement(Loader$4, null);
   if ((error === null || error === void 0 ? void 0 : error.status) === 403) return /*#__PURE__*/React__default.createElement(AccessForbidden, null, t('youDontHaveAnAccessToThisJob'), ".", isSignedIn() && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: routes.dashboards(currentUserName)
   }, t('goToMyJobs'))));
@@ -6156,7 +6178,7 @@ var Details$2 = function Details(_ref) {
   }, t('goToMyJobs')), "."));
   if (!jobData) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.details
+    className: css$R.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -6165,25 +6187,25 @@ var Details$2 = function Details(_ref) {
   }, currentUserName === user ? t('backToJobs') : t('backToJobsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.header
+    className: css$R.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.title
+    className: css$R.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$Q.edit,
+    className: css$R.edit,
     value: titleValue,
     onChange: onChangeTitle,
     readOnly: currentUserName !== user,
     placeholder: t('newJob')
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.side
+    className: css$R.side
   }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress$1, {
     onlyDuration: true,
-    className: css$Q.progress,
+    className: css$R.progress,
     data: jobData
   }), jobData.status === 'FAILED' && /*#__PURE__*/React__default.createElement("div", {
     className: "red-text"
   }, t('sorryButYourCodeDoesntLookLikePythonJob')), ['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Q.button,
+    className: css$R.button,
     color: "fail",
     size: "small",
     variant: "contained",
@@ -6192,7 +6214,7 @@ var Details$2 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-pause"
   }), t('stop')) : /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Q.button,
+    className: css$R.button,
     color: "success",
     size: "small",
     variant: "contained",
@@ -6201,42 +6223,42 @@ var Details$2 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-play"
   }), t('run'))), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$Q.dropdown,
+    className: css$R.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Q.dropdownButton,
+    className: css$R.dropdownButton,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   })))), /*#__PURE__*/React__default.createElement(Status, {
     data: jobData
   }), /*#__PURE__*/React__default.createElement(ScheduleSettings, {
-    className: css$Q.schedule,
+    className: css$R.schedule,
     data: jobData,
     onChange: onChangeSchedule,
     onChangeRuntime: onChangeRuntime
   }), /*#__PURE__*/React__default.createElement(CodeEditor, {
-    className: css$Q.codeEditor,
+    className: css$R.codeEditor,
     value: code,
     onChange: onChangeCode,
     language: jobData.runtime,
     saved: codeSaved
   }), /*#__PURE__*/React__default.createElement(Logs, {
-    className: css$Q.logs,
+    className: css$R.logs,
     data: jobData
   }));
 };
 
-var css$R = {"jobs":"_z2_YO"};
+var css$S = {"jobs":"_z2_YO"};
 
 var Jobs = function Jobs(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.jobs
+    className: css$S.jobs
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Switch, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Route, {
     path: routes.jobs(),
     exact: true,
@@ -6247,7 +6269,7 @@ var Jobs = function Jobs(_ref) {
   })));
 };
 
-var css$S = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
+var css$T = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
 
 var Item$1 = function Item(_ref) {
   var data = _ref.data,
@@ -6266,35 +6288,35 @@ var Item$1 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteItem);
   return /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/" + user + "/d/" + data.id,
-    className: css$S.item,
+    className: css$T.item,
     ref: ref
   }, Boolean(data.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.label
+    className: css$T.label
   }, t('stacksWithCount', {
     count: data.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.previewWrap
+    className: css$T.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$S.attachment,
+    className: css$T.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.emptyMessage
+    className: css$T.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.section
+    className: css$T.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.content
+    className: css$T.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.name
+    className: css$T.name
   }, data.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), user !== data.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.by
+    className: css$T.by
   }, t('by'), " ", data.user), renderContent && renderContent(data)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$S.dropdown,
+    className: css$T.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteItem
@@ -6302,29 +6324,29 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$T = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
+var css$U = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
 
-var Loader$4 = function Loader(_ref) {
+var Loader$5 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.loader
+    className: css$U.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.text
+    className: css$U.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.grid
+    className: css$U.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.item
+    className: css$U.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.pic
+    className: css$U.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.section
+    className: css$U.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.item
+    className: css$U.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.pic
+    className: css$U.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.section
+    className: css$U.section
   }))));
 };
 
@@ -6472,7 +6494,7 @@ var useActions$2 = (function () {
   };
 });
 
-var css$U = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
+var css$V = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
 
 var dataFormat$3 = function dataFormat(data) {
   return data.dashboards;
@@ -6561,39 +6583,39 @@ var List$2 = function List(_ref) {
   if ((error === null || error === void 0 ? void 0 : error.status) === 404) return /*#__PURE__*/React__default.createElement(NotFound, null, t('theDashboardYouAreRookingForCouldNotBeFound'), ' ', isSignedIn() && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: routes.reportsDetails(currentUserName)
   }, t('goToMyDashboards')), "."));
-  if (!data) return /*#__PURE__*/React__default.createElement(Loader$4, null);
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$5, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.list
+    className: css$V.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$U.search,
+    className: css$V.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.title
+    className: css$V.title
   }, currentUserName === user ? t('myReports') : t('reportsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$U.mobileSearch,
+    className: css$V.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.grid
+    className: css$V.grid
   }, currentUserName === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: create,
-    className: cx(css$U.add, {
+    className: cx(css$V.add, {
       disabled: creating
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.caption
+    className: css$V.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newReport'))), items.map(function (item, index) {
@@ -6606,23 +6628,23 @@ var List$2 = function List(_ref) {
   })));
 };
 
-var css$V = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
+var css$W = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
 
-var Loader$5 = function Loader(_ref) {
+var Loader$6 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.loader
+    className: css$W.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.text
+    className: css$W.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.filters
+    className: css$W.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.grid
+    className: css$W.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.item
+    className: css$W.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.item
+    className: css$W.item
   })));
 };
 
@@ -6698,39 +6720,39 @@ var GridProvider = /*#__PURE__*/function (_Component) {
   return GridProvider;
 }(React.Component);
 
-var css$W = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
+var css$X = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
 
-var Loader$6 = function Loader(_ref) {
+var Loader$7 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.loader
+    className: css$X.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.text
+    className: css$X.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.grid
+    className: css$X.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.item
+    className: css$X.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.pic
+    className: css$X.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.section
+    className: css$X.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.item
+    className: css$X.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.pic
+    className: css$X.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.section
+    className: css$X.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.item
+    className: css$X.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.pic
+    className: css$X.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.section
+    className: css$X.section
   }))));
 };
 
-var css$X = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
+var css$Y = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
 
 var dataFormat$4 = function dataFormat(data) {
   return data.stacks;
@@ -6821,56 +6843,56 @@ var AddStacksModal = function AddStacksModal(_ref) {
 
   var isUserOwner = currentUserName === params.user;
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$X.stacks,
+    dialogClassName: css$Y.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$X.search,
+    className: css$Y.search,
     isDark: true,
     size: "middle",
     showEverything: true,
     placeholder: t('findStack'),
     value: searchQuery,
     onChange: onChangeSearch
-  }), !data && /*#__PURE__*/React__default.createElement(Loader$6, null), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.message
+  }), !data && /*#__PURE__*/React__default.createElement(Loader$7, null), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$Y.message
   }, isUserOwner ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), data && Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.text
+    className: css$Y.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), data && Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.grid
+    className: css$Y.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$X.item,
+      className: css$Y.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$X.checkbox,
+      className: css$Y.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
       data: item
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.buttons
+    className: css$Y.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$X.button,
+    className: css$Y.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$X.button,
+    className: css$Y.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
   }, t('cancel')))));
 };
 
-var css$Y = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
+var css$Z = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
 
 var viewValueMap = {
   grid: 1,
@@ -7011,53 +7033,53 @@ var Card = React.memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$Y.card, "col-" + columns, className),
+    className: cx(css$Z.card, "col-" + columns, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.inner
+    className: css$Z.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.head
+    className: css$Z.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$Y.name, {
+    className: cx(css$Z.name, {
       readonly: !updateCard
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.nameValue
+    className: css$Z.nameValue
   }, (title === null || title === void 0 ? void 0 : title.length) ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$Y.nameEdit, {
+    className: cx(css$Z.nameEdit, {
       active: !(title === null || title === void 0 ? void 0 : title.length)
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$Y.infoTime
+      className: css$Z.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.info
+    className: css$Z.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$Y.button, css$Y.link),
+    className: cx(css$Z.button, css$Z.link),
     color: "secondary",
     Component: reactRouterDom.Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.cardControls
+    className: css$Z.cardControls
   }, deleteCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$Y.button),
+    className: cx(css$Z.button),
     color: "secondary",
     onClick: deleteCard
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-trash-can-outline"
   })), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$Y.button, css$Y.move),
+    className: cx(css$Z.button, css$Z.move),
     color: "secondary",
     onMouseEnter: onEnterMove,
     onMouseLeave: onLeaveMove
@@ -7066,9 +7088,9 @@ var Card = React.memo(function (_ref) {
   })), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     onChange: onChangeView,
     value: data.columns === 1 ? 'grid' : 'list',
-    className: css$Y.viewSwitcher
+    className: css$Z.viewSwitcher
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.description
+    className: css$Z.description
   }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
     value: data.description,
     ref: descFieldRef,
@@ -7077,18 +7099,18 @@ var Card = React.memo(function (_ref) {
     onBlur: onBlurDescription,
     readOnly: !updateCard
   }), !isShowDesc && updateCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$Y.addDesc),
+    className: cx(css$Z.addDesc),
     color: "secondary",
     onClick: addDesc
   }, "+ ", t('addDescription'))), headId && attachmentIndex !== null ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$Y.attachment,
+    className: css$Z.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.emptyMessage
+    className: css$Z.emptyMessage
   }, t('emptyDashboard'))));
 });
 
@@ -7130,7 +7152,7 @@ var DnDItem = React.memo(function (_ref) {
   });
 });
 
-var css$Z = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","permissions":"_3OGBJ","share":"_198zx","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
+var css$_ = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","permissions":"_3OGBJ","share":"_198zx","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
 
 var dataFormat$5 = function dataFormat(data) {
   return data.dashboard;
@@ -7468,7 +7490,7 @@ var Details$3 = function Details() {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$Z.filters, {
+      className: cx(css$_.filters, {
         'with-select': hasSelectField
       })
     });
@@ -7497,11 +7519,11 @@ var Details$3 = function Details() {
   if ((error === null || error === void 0 ? void 0 : error.status) === 404) return /*#__PURE__*/React__default.createElement(NotFound, null, t('theDashboardYouAreRookingForCouldNotBeFound'), ' ', isSignedIn() && /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: routes.reports(currentUserName)
   }, t('goToMyDashboards')), "."));
-  if (!data) return /*#__PURE__*/React__default.createElement(Loader$5, null);
+  if (!data) return /*#__PURE__*/React__default.createElement(Loader$6, null);
   var isUserOwner = currentUserName === user;
   var CardWrapComponent = isUserOwner ? DnDItem : React.Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.details
+    className: css$_.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -7510,11 +7532,11 @@ var Details$3 = function Details() {
   }, currentUserName === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.header
+    className: css$_.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.title
+    className: css$_.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$Z.edit,
+    className: css$_.edit,
     value: data.title || '',
     onChange: onChangeTitle,
     readOnly: currentUserName !== data.user,
@@ -7522,12 +7544,12 @@ var Details$3 = function Details() {
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
-    className: css$Z.permissions,
+    className: css$_.permissions,
     permissions: data.permissions
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.sideHeader
+    className: css$_.sideHeader
   }, isUserOwner && /*#__PURE__*/React__default.createElement("a", {
-    className: css$Z.addButton,
+    className: css$_.addButton,
     onClick: toggleAddStackModal,
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
@@ -7535,23 +7557,23 @@ var Details$3 = function Details() {
   }), t('addStack')), isUserOwner && /*#__PURE__*/React__default.createElement(Share, {
     instancePath: user + "/d/" + data.id,
     onUpdatePrivate: onChangePrivate,
-    className: css$Z.share,
+    className: css$_.share,
     defaultIsPrivate: data["private"],
     defaultPermissions: data.permissions,
     onUpdatePermissions: updatePermissions
   }), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$Z.dropdown,
+    className: css$_.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteDashboard
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Z['dropdown-button'],
+    className: css$_['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.description
+    className: css$_.description
   }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
     value: data.description || '',
     ref: descFieldRef,
@@ -7560,22 +7582,22 @@ var Details$3 = function Details() {
     onBlur: onBlurDescription,
     readOnly: currentUserName !== data.user
   }), !isShowDesc && currentUserName === data.user && /*#__PURE__*/React__default.createElement(Button, {
-    className: css$Z.addDesc,
+    className: css$_.addDesc,
     color: "secondary",
     onClick: addDesc
   }, "+ ", t('addDescription'))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$Z.tabs,
+    className: css$_.tabs,
     onChange: onChangeTab,
     value: activeTab,
     items: tabs
   }), Boolean(items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.container
+    className: css$_.container
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.section
+    className: css$_.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.fields
+    className: css$_.fields
   }, renderFilters())), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$Z.cards)
+    className: cx(css$_.cards)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -7591,9 +7613,9 @@ var Details$3 = function Details() {
       moveAvailable: isUserOwner
     }));
   }))), !items.length && !(data === null || data === void 0 ? void 0 : data.cards) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.empty
+    className: css$_.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), isUserOwner && /*#__PURE__*/React__default.createElement(React.Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$Z.addButton,
+    className: css$_.addButton,
     onClick: toggleAddStackModal,
     href: "#"
   }, t('addStack')), ".")), /*#__PURE__*/React__default.createElement(AddStacksModal, {
@@ -7603,13 +7625,13 @@ var Details$3 = function Details() {
   }));
 };
 
-var css$_ = {"reports":"_30ROl"};
+var css$$ = {"reports":"_30ROl"};
 
 var Reports = function Reports(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.reports
+    className: css$$.reports
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Switch, null, /*#__PURE__*/React__default.createElement(reactRouterDom.Route, {
     path: routes.reports(),
     exact: true,
@@ -7716,7 +7738,7 @@ function SvgLogo(props) {
   }, props), _ref$6, _ref2$3, _ref3$2, _ref4$1, _ref5);
 }
 
-var css$$ = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
+var css$10 = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -7725,35 +7747,35 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$$.header, className)
+    className: cx(css$10.header, className)
   }, /*#__PURE__*/React__default.createElement(reactRouterDom.Link, {
     to: "/",
-    className: css$$.logo
+    className: css$10.logo
   }, /*#__PURE__*/React__default.createElement(SvgLogo, null)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$$.buttons
+    className: css$10.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: reactRouterDom.Link,
     to: "/auth/login",
-    className: css$$.button,
+    className: css$10.button,
     color: "primary",
     variant: "contained"
   }, t('logIn'))));
 };
 
-var css$10 = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
+var css$11 = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$10.layout
+    className: css$11.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$10.header
+    className: css$11.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$10.main
+    className: css$11.main
   }, children));
 };
 
-var css$11 = {"infoButton":"_2zmYM"};
+var css$12 = {"infoButton":"_2zmYM"};
 
 var SettingsInformation = function SettingsInformation(_ref) {
   var className = _ref.className,
@@ -7773,7 +7795,7 @@ var SettingsInformation = function SettingsInformation(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(React.Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$11.infoButton, className),
+    className: cx(css$12.infoButton, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal

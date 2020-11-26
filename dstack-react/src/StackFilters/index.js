@@ -1,5 +1,5 @@
 // @flow
-import React, {useMemo} from 'react';
+import React from 'react';
 import cx from 'classnames';
 import {useTranslation} from 'react-i18next';
 import SelectField from '../SelectField';
@@ -18,23 +18,19 @@ type Props = {
 
 const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Props) => {
     const {t} = useTranslation();
-    const hasSelectField = useMemo(
-        () => Object.keys(fields).some(key => fields[key].type === 'select'),
-        [fields],
-    );
 
     if (!Object.keys(fields).length)
         return null;
 
     return (
-        <div className={cx(css.filters, className, {'with-select': hasSelectField})}>
+        <div className={cx(css.filters, className)}>
             {Object.keys(fields).map(key => {
                 switch (fields[key].type) {
                     case 'text':
                         return <TextField
                             size="small"
                             key={`text-${key}`}
-                            className={cx(css.field)}
+                            className={cx(css.field, css.text)}
                             onChange={event => onChange(key, event.target.value)}
                             label={fields[key].label}
                             name={key}
@@ -69,7 +65,7 @@ const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Pr
                     case 'slider':
                         return <SliderField
                             key={`slider-${key}`}
-                            className={css.field}
+                            className={cx(css.field, css.slider)}
                             onChange={onChange}
                             align="right"
                             label={fields[key].label}

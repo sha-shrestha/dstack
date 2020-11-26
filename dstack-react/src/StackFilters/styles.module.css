@@ -2,25 +2,21 @@
 @import "styles/media.css";
 .filters {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     flex-wrap: wrap;
     margin-bottom: -20px;
-    &:global(.with-select) {
-        padding-top: 18px;
-    }
-}
-.select {
-    @media (--desktop) {
-        margin-top: -16px;
-    }
 }
 .field {
     margin-bottom: 20px;
+    padding-bottom: 0 !important;
     flex-wrap: wrap;
     &:nth-last-child(n+2) {
         margin-right: 14px;
     }
+    &.slider {
+        min-height: 30px;
+    }
 }
 .button {
-    padding-bottom: 16px;
+
 }

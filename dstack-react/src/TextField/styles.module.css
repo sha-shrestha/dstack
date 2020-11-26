@@ -24,6 +24,9 @@
         }
     }
     &:global(.small) {
+        .label {
+            margin-bottom: 4px;
+        }
         & .input {
             & > input {
                 height: var(--textarea-small-height);

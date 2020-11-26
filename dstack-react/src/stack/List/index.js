@@ -56,7 +56,7 @@ const List = ({
         },
 
         app: {
-            label: t('app_plural'),
+            label: t('application_plural'),
             value: 'app',
         },
     };

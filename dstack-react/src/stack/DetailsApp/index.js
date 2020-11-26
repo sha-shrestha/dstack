@@ -20,6 +20,7 @@ import StackHowToFetchData from '../HowToFetchData';
 import StackAttachment from '../Attachment';
 import StackFrames from '../Frames';
 import Loader from '../Details/components/Loader';
+import FilterLoader from './components/Loader';
 import Tabs from '../Details/components/Tabs';
 import Readme from '../Details/components/Readme';
 import Progress from './components/Progress';
@@ -79,6 +80,7 @@ const Details = ({
     const [fields, setFields] = useState({});
     const [executeData, setExecuteData] = useState(null);
     const [executing, setExecuting] = useState(false);
+    const [calculating, setCalculating] = useState(false);
     const [appAttachment, setAppAttachment] = useState(null);
     const [activeTab, setActiveTab] = useState();
     const [tabs, setTabs] = useState([]);
@@ -115,13 +117,12 @@ const Details = ({
     };
 
     const updateExecuteData = data => {
-        setExecuteData(data);
-
         const fields = parseStackViews(data.views);
         const form = getFormFromViews(data.views);
 
         setFields(fields);
         setForm(form);
+        setExecuteData(data);
     };
 
     const hasApplyButton = () => {
@@ -131,15 +132,20 @@ const Details = ({
         return executeData.views.some(view => view.type === 'ApplyView');
     };
 
-    const submit = form => {
+    const submit = (form, apply = true) => {
         setExecuting(true);
+
+        if (apply)
+            setCalculating(true);
+        else
+            setAppAttachment(null);
 
         executeStack({
             user: data.user,
             stack: data.name,
             frame: frame?.id,
             attachment: attachmentIndex || 0,
-            apply: true,
+            apply,
             views: executeData.views.map((view, index) => {
                 switch (view.type) {
                     case 'ApplyView':
@@ -158,28 +164,31 @@ const Details = ({
             }),
         })
             .then(data => {
+                setExecuting(false);
                 updateExecuteData(data);
-                checkFinished({id: data.id});
+
+                if (apply)
+                    checkFinished({id: data.id});
             });
     };
 
     useDebounce(() => {
-        if (!hasApplyButton() && !isEqual(form, getFormFromViews(executeData?.views)) && appAttachment) {
-            submit(form);
+        if (!isEqual(form, getFormFromViews(executeData?.views)) && !executing) {
+            submit(form, !!(!hasApplyButton() && appAttachment));
         }
     }, 300, [form]);
 
     const onApply = () => submit(form);
 
     useEffect(() => {
-        if (executeData && executeData.status === 'READY' && !appAttachment) {
+        if (executeData && executeData.status === 'READY' && !appAttachment && !executing) {
             if (!hasApplyButton())
-                submit(form);
+                submit(form, true);
         }
     }, [executeData]);
 
     useEffect(() => {
-        if (data && frame) {
+        if (data && frame && !loading) {
             setExecuting(true);
             setExecuteData(null);
             setAppAttachment(null);
@@ -291,17 +300,17 @@ const Details = ({
                         checkFinished({id: data.id});
                     }, 3000);
 
-                if (data.status === 'FINISHED') {
-                    setAppAttachment(data.output);
+                if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
+                    setCalculating(false);
                 }
 
-                if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
-                    setExecuting(false);
+                if (data.status === 'FINISHED') {
+                    setAppAttachment(data.output);
                 }
             });
     };
 
-    if (loading || (!executeData && executing))
+    if (loading)
         return <Loader />;
 
     return (
@@ -384,57 +393,63 @@ const Details = ({
                 items={tabs}
             />}
 
-            <div className={css.container}>
-                <StackFilters
-                    fields={fields}
-                    form={form}
-                    onChange={onChange}
-                    onApply={onApply}
-                    className={cx(css.filters)}
-                    disabled={executing}
-                />
+            {(!executeData && executing) && <div className={css.container}>
+                <FilterLoader />
+            </div>}
 
-                {appAttachment
-                && (appAttachment.description || appAttachment['content_type'] === 'text/csv')
-                && (
-                    <div className={css['attachment-head']}>
-                        <div className={css.description}>
-                            {appAttachment.description && (<MarkdownRender source={appAttachment.description} />)}
-                        </div>
-
-                        {appAttachment['content_type'] === 'text/csv' && (
-                            <div className={css.actions}>
-                                {appAttachment.preview && (
-                                    <div className={css.label}>
-                                        {t('preview')}
-
-                                        <div className={css['label-tooltip']}>
-                                            {t('theTableBelowShowsOnlyAPreview')}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                {/*<span>{t('or')}</span>*/}
-                                {/*<a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>*/}
-                                {appAttachment.length && (
-                                    <span className={css.size}>({formatBytes(appAttachment.length)})</span>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {appAttachment && !executing && (
-                    <StackAttachment
-                        className={css.attachment}
-                        stack={`${user}/${stack}`}
-                        customData={appAttachment}
+            {executeData && (
+                <div className={css.container}>
+                    <StackFilters
+                        fields={fields}
+                        form={form}
+                        onChange={onChange}
+                        onApply={onApply}
+                        className={cx(css.filters)}
+                        disabled={executing || calculating}
                     />
-                )}
 
-                {executing && <Progress />}
-            </div>
+                    {appAttachment
+                    && (appAttachment.description || appAttachment['content_type'] === 'text/csv')
+                    && (
+                        <div className={css['attachment-head']}>
+                            <div className={css.description}>
+                                {appAttachment.description && (<MarkdownRender source={appAttachment.description} />)}
+                            </div>
+
+                            {appAttachment['content_type'] === 'text/csv' && (
+                                <div className={css.actions}>
+                                    {appAttachment.preview && (
+                                        <div className={css.label}>
+                                            {t('preview')}
+
+                                            <div className={css['label-tooltip']}>
+                                                {t('theTableBelowShowsOnlyAPreview')}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
+                                    {/*<span>{t('or')}</span>*/}
+                                    {/*<a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>*/}
+                                    {appAttachment.length && (
+                                        <span className={css.size}>({formatBytes(appAttachment.length)})</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {appAttachment && !calculating && (
+                        <StackAttachment
+                            className={css.attachment}
+                            stack={`${user}/${stack}`}
+                            customData={appAttachment}
+                        />
+                    )}
+
+                    {calculating && <Progress />}
+                </div>
+            )}
 
             {data && (
                 <Readme

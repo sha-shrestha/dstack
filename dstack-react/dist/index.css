@@ -1341,6 +1341,9 @@ button._2lKoS {
                 height: 40px;
                 padding: 11px 10px;
             }
+._3WCaE.small ._1mHtq {
+            margin-bottom: 4px;
+        }
 ._3WCaE.small ._9Tk5W > input {
                 height: 30px;
                 padding: 6px 3px;
@@ -2324,14 +2327,14 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     }
 ._2_NXc.left ._Zo_r8 {
       order: 2;
-      margin-left: 8px;
+      margin-left: 16px;
     }
 ._2_NXc.right ._31Ylv {
       order: 2;
     }
 ._2_NXc.right ._Zo_r8 {
       order: 1;
-      margin-right: 8px;
+      margin-right: 16px;
     }
 ._2_NXc ._Zo_r8 {
     font-size: 14px;
@@ -3008,27 +3011,23 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 
 ._kiZkv {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     flex-wrap: wrap;
     margin-bottom: -20px;
 }
-._kiZkv.with-select {
-        padding-top: 18px;
-    }
-@media (min-width: 981px) {
-._4Up3c {
-        margin-top: -16px
-}
-    }
 ._3_9Ku {
     margin-bottom: 20px;
+    padding-bottom: 0 !important;
     flex-wrap: wrap;
 }
 ._3_9Ku:nth-last-child(n+2) {
         margin-right: 14px;
     }
+._3_9Ku._3xe_A {
+        min-height: 30px;
+    }
 ._1xfTz {
-    padding-bottom: 16px;
+
 }
 
 ._2DYF1 {
@@ -4514,6 +4513,57 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 ._2TdJX ._RhHmq ._26mqa:nth-child(n+2) {
                 margin-left: 12px;
             }
+
+._31Z5G {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    background-color: rgb(255, 255, 255);
+}
+._31Z5G > * {
+        margin-bottom: 20px;
+    }
+._31Z5G > *:nth-last-child(n+2) {
+            margin-right: 14px;
+        }
+._2uYpQ {
+    width: 154px;
+    height: 30px;
+    background: linear-gradient(90deg, #F7F9FB -3.86%, #EEF1F3 34.95%, #FDFDFD 107.97%);
+    -webkit-animation: _vad3r 1.5s infinite;
+            animation: _vad3r 1.5s infinite;
+}
+._3Q3GW {
+    width: 65px;
+    height: 30px;
+    background: linear-gradient(90deg, #F7F9FB -3.86%, #EEF1F3 34.95%, #FDFDFD 107.97%);
+    -webkit-animation: _vad3r 1.5s infinite;
+            animation: _vad3r 1.5s infinite;
+}
+@-webkit-keyframes _vad3r {
+    0% {
+        opacity: .6;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: .6;
+    }
+}
+@keyframes _vad3r {
+    0% {
+        opacity: .6;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: .6;
+    }
+}
+
+
 
 :root {
 
