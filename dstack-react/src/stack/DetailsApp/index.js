@@ -3,10 +3,10 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import cx from 'classnames';
 import {isEqual, get} from 'lodash-es';
+import {useDebounce} from 'react-use';
 import usePrevious from '../../hooks/usePrevious';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
-import {debounce as _debounce} from 'lodash-es';
 import Button from '../../Button';
 import MarkdownRender from '../../MarkdownRender';
 import Modal from '../../Modal';
@@ -19,11 +19,13 @@ import StackFilters from '../../StackFilters';
 import StackHowToFetchData from '../HowToFetchData';
 import StackAttachment from '../Attachment';
 import StackFrames from '../Frames';
-import Loader from './components/Loader';
-import Tabs from './components/Tabs';
-import Readme from './components/Readme';
+import Loader from '../Details/components/Loader';
+import Tabs from '../Details/components/Tabs';
+import Readme from '../Details/components/Readme';
+import Progress from './components/Progress';
 import useForm from '../../hooks/useForm';
-import {formatBytes, parseStackParams, parseStackTabs} from '../../utils';
+import {formatBytes, parseStackTabs, parseStackViews} from '../../utils';
+import actions from '../actions';
 import css from './styles.module.css';
 
 type Props = {
@@ -40,8 +42,8 @@ type Props = {
     stack: string,
     headId: number,
     onChangeHeadFrame: Function,
-    onUpdateReadme: Function,
     onChangeAttachmentIndex: Function,
+    onUpdateReadme: Function,
     onChangeFrame: Function,
     configurePythonCommand: string,
     configureRCommand: string,
@@ -74,10 +76,14 @@ const Details = ({
     const {t} = useTranslation();
     const didMountRef = useRef(false);
     const {form, setForm, onChange} = useForm({});
-    const [activeTab, setActiveTab] = useState();
     const [fields, setFields] = useState({});
+    const [executeData, setExecuteData] = useState(null);
+    const [executing, setExecuting] = useState(false);
+    const [appAttachment, setAppAttachment] = useState(null);
+    const [activeTab, setActiveTab] = useState();
     const [tabs, setTabs] = useState([]);
     const prevFrame = usePrevious(frame);
+    const {executeStack, pollStack} = actions();
 
     const [isShowHowToModal, setIsShowHowToModal] = useState(false);
 
@@ -86,55 +92,119 @@ const Details = ({
         setIsShowHowToModal(true);
     };
 
+    const getFormFromViews = views => {
+        if (!views || !Array.isArray(views))
+            return {};
+
+        return views.reduce((result, view, index) => {
+            switch (view.type) {
+                case 'ApplyView':
+                    return result;
+                case 'SliderView':
+                    result[index] = view.data[view.selected];
+                    break;
+                case 'ComboBoxView':
+                    result[index] = view.selected;
+                    break;
+                default:
+                    result[index] = view.data;
+            }
+
+            return result;
+        }, {});
+    };
+
+    const updateExecuteData = data => {
+        setExecuteData(data);
+
+        const fields = parseStackViews(data.views);
+        const form = getFormFromViews(data.views);
+
+        setFields(fields);
+        setForm(form);
+    };
+
+    const hasApplyButton = () => {
+        if (!executeData?.views || !Array.isArray(executeData.views))
+            return false;
+
+        return executeData.views.some(view => view.type === 'ApplyView');
+    };
+
+    const submit = form => {
+        setExecuting(true);
+
+        executeStack({
+            user: data.user,
+            stack: data.name,
+            frame: frame?.id,
+            attachment: attachmentIndex || 0,
+            apply: true,
+            views: executeData.views.map((view, index) => {
+                switch (view.type) {
+                    case 'ApplyView':
+                        return view;
+                    case 'ComboBoxView':
+                        view.selected = form[index];
+                        break;
+                    case 'SliderView':
+                        view.selected = view.data.findIndex(i => i === form[index]);
+                        break;
+                    default:
+                        view.data = form[index];
+                }
+
+                return view;
+            }),
+        })
+            .then(data => {
+                updateExecuteData(data);
+                checkFinished({id: data.id});
+            });
+    };
+
+    useDebounce(() => {
+        if (!hasApplyButton() && !isEqual(form, getFormFromViews(executeData?.views)) && appAttachment) {
+            submit(form);
+        }
+    }, 300, [form]);
+
+    const onApply = () => submit(form);
+
+    useEffect(() => {
+        if (executeData && executeData.status === 'READY' && !appAttachment) {
+            if (!hasApplyButton())
+                submit(form);
+        }
+    }, [executeData]);
+
+    useEffect(() => {
+        if (data && frame) {
+            setExecuting(true);
+            setExecuteData(null);
+            setAppAttachment(null);
+
+            executeStack({
+                user: data.user,
+                stack: data.name,
+                frame: frame?.id,
+                attachment: attachmentIndex || 0,
+            })
+                .then(data => {
+                    setExecuting(false);
+                    updateExecuteData(data);
+                })
+                .catch(() => setExecuting(false));
+        }
+
+    }, [data, frame, attachmentIndex]);
+
     const hideHowToModal = () => setIsShowHowToModal(false);
 
     useEffect(() => {
         if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame)
             parseTabs();
     }, [frame]);
-
-    const findAttach = useCallback((form, tabName, attachmentIndex) => {
-        const attachments = get(frame, 'attachments');
-        const fields = Object.keys(form);
-        const tab = tabs.find(t => t.value === tabName);
-
-        if (!attachments)
-            return;
-
-        if (fields.length || tabs.length) {
-            attachments.some((attach, index) => {
-                let valid = true;
-
-                if (tab
-                    && attach.params[tab.value]?.type !== 'tab'
-                    && attach.params[tab.key]?.title !== tab.value
-                )
-                    return false;
-
-                fields.forEach(key => {
-                    if (!attach.params || !isEqual(attach.params[key], form[key]))
-                        valid = false;
-                });
-
-                if (valid && !(attachmentIndex === undefined && index === 0))
-                    onChangeAttachmentIndex(index);
-
-                return valid;
-            });
-        }
-    }, [tabs]);
-
-    const findAttachDebounce = useCallback(_debounce(findAttach, 300), [data, frame, findAttach]);
-
-    useEffect(() => {
-        if (didMountRef.current)
-            findAttachDebounce(form, activeTab, attachmentIndex);
-    }, [form]);
-
-    useEffect(() => {
-        if (didMountRef.current)
-            parseParams();
-    }, [activeTab]);
 
     useEffect(() => {
         if (!didMountRef.current)
@@ -183,36 +253,55 @@ const Details = ({
         }
     };
 
-    const parseParams = () => {
+    // const onClickDownloadAttachment = event => {
+    //     event.preventDefault();
+    //     downloadAttachment();
+    // };
+
+    const onChangeTab = tabName => {
+        setActiveTab(tabName);
+
         const attachments = get(frame, 'attachments');
-        const tab = tabs.find(t => t.value === activeTab);
-        const attachment = getCurrentAttachment(tab);
-        const fields = parseStackParams(attachments, tab);
+        const tab = tabs.find(t => t.value === tabName);
 
-        setFields(fields);
+        if (!attachments)
+            return;
 
-        if (attachment) {
-            const params = {...attachment.params};
-            const tab = Object.keys(params).find(key => params[key]?.type === 'tab');
+        if (tabs.length) {
+            attachments.some((attach, index) => {
 
-            delete params[tab];
-            setForm(params);
+                if (tab
+                    && attach.params[tab.value]?.type !== 'tab'
+                    && attach.params[tab.key]?.title !== tab.value
+                )
+                    return false;
+
+                onChangeAttachmentIndex(index);
+
+                return true;
+            });
         }
     };
 
-    const onClickDownloadAttachment = event => {
-        event.preventDefault();
-        downloadAttachment();
+    const checkFinished = ({id}) => {
+        pollStack({id: id})
+            .then(data => {
+                if (['SCHEDULED', 'RUNNING'].indexOf(data.status) >= 0)
+                    setTimeout(() => {
+                        checkFinished({id: data.id});
+                    }, 3000);
+
+                if (data.status === 'FINISHED') {
+                    setAppAttachment(data.output);
+                }
+
+                if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
+                    setExecuting(false);
+                }
+            });
     };
 
-    const onChangeTab = tabName => {
-        findAttachDebounce(form, tabName, attachmentIndex);
-        setActiveTab(tabName);
-    };
-
-    const attachment = get(frame, `attachments[${attachmentIndex}]`);
-
-    if (loading)
+    if (loading || (!executeData && executing))
         return <Loader />;
 
     return (
@@ -300,20 +389,22 @@ const Details = ({
                     fields={fields}
                     form={form}
                     onChange={onChange}
+                    onApply={onApply}
                     className={cx(css.filters)}
+                    disabled={executing}
                 />
 
-                {attachment
-                && (attachment.description || attachment['content_type'] === 'text/csv')
+                {appAttachment
+                && (appAttachment.description || appAttachment['content_type'] === 'text/csv')
                 && (
                     <div className={css['attachment-head']}>
                         <div className={css.description}>
-                            {attachment.description && (<MarkdownRender source={attachment.description} />)}
+                            {appAttachment.description && (<MarkdownRender source={appAttachment.description} />)}
                         </div>
 
-                        {attachment['content_type'] === 'text/csv' && (
+                        {appAttachment['content_type'] === 'text/csv' && (
                             <div className={css.actions}>
-                                {attachment.preview && (
+                                {appAttachment.preview && (
                                     <div className={css.label}>
                                         {t('preview')}
 
@@ -324,25 +415,25 @@ const Details = ({
                                 )}
 
                                 <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                <span>{t('or')}</span>
-                                <a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>
-                                {attachment.length && (
-                                    <span className={css.size}>({formatBytes(attachment.length)})</span>
+                                {/*<span>{t('or')}</span>*/}
+                                {/*<a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>*/}
+                                {appAttachment.length && (
+                                    <span className={css.size}>({formatBytes(appAttachment.length)})</span>
                                 )}
                             </div>
                         )}
                     </div>
                 )}
 
-                {frame && (
+                {appAttachment && !executing && (
                     <StackAttachment
                         className={css.attachment}
-                        withLoader
                         stack={`${user}/${stack}`}
-                        frameId={frame.id}
-                        id={attachmentIndex || 0}
+                        customData={appAttachment}
                     />
                 )}
+
+                {executing && <Progress />}
             </div>
 
             {data && (
@@ -367,7 +458,7 @@ const Details = ({
 
                     data={{
                         stack: `${user}/${stack}`,
-                        params: form,
+                        params: {},
                     }}
 
                     modalMode

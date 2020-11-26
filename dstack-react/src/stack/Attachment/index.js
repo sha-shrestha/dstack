@@ -26,6 +26,7 @@ const Attachment = ({
     isList,
     withLoader,
     stack,
+    customData,
 }: Props) => {
     const {fetchAttachment} = actions();
     const [{data, apiUrl}] = useStateValue();
@@ -54,7 +55,9 @@ const Attachment = ({
     };
 
     useEffect(() => {
-        if (!isList && attachment
+        if (!customData
+            && !isList
+            && attachment
             && !isEqual(prevAttachment, attachment)
             && attachment.preview
             && isImageType(attachment['content_type'])
@@ -64,7 +67,8 @@ const Attachment = ({
     }, [data]);
 
     useEffect(() => {
-        if (!isList
+        if (!customData
+            && !isList
             && (typeof id === 'number' && frameId)
             && ((!attachment.data && !error) || (attachment?.index !== id))
         ) {
@@ -73,10 +77,14 @@ const Attachment = ({
     }, [id, frameId]);
 
     const [ref] = useIntersectionObserver(() => {
-        if (isList && !loading && (
-            (!attachment.data && !error)
-            || (attachment.data && attachment.index !== id)
-        ))
+        if (!customData
+            && isList
+            && !loading
+            && (
+                (!attachment.data && !error)
+                || (attachment.data && attachment.index !== id)
+            )
+        )
             fetchAttachment(stack, frameId, id);
     }, {}, [id, frameId, data]);
 
@@ -94,7 +102,7 @@ const Attachment = ({
                     className={css.view}
                     isList={isList}
                     fullAttachment={fullAttachment}
-                    attachment={attachment}
+                    attachment={customData ? customData : attachment}
                     stack={stack}
                 />
             )}

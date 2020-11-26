@@ -11,7 +11,7 @@
 }
 .select {
     @media (--desktop) {
-        margin-top: -18px;
+        margin-top: -16px;
     }
 }
 .field {
@@ -20,4 +20,7 @@
     &:nth-last-child(n+2) {
         margin-right: 14px;
     }
+}
+.button {
+    padding-bottom: 16px;
 }

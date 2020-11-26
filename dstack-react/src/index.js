@@ -41,6 +41,7 @@ export {default as StackListItem} from './stack/ListItem';
 export {default as StackHowToFetchData} from './stack/HowToFetchData';
 export {default as StackFrames} from './stack/Frames';
 export {default as StackDetails} from './stack/Details';
+export {default as StackDetailsApp} from './stack/DetailsApp';
 export {default as StackUpload} from './stack/Upload';
 export {default as UploadStack} from './stack/UploadStack';
 

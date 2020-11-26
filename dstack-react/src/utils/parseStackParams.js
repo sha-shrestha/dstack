@@ -26,6 +26,7 @@ export default (attachments, tab) => {
 
     Object.keys(fields).forEach(key => {
         fields[key].options = uniq(fields[key].options);
+        fields[key].label = key;
 
         if (typeof fields[key].options[0] === 'string') {
             fields[key].type = 'select';

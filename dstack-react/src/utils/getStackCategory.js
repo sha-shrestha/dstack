@@ -15,7 +15,7 @@ export default ({application, contentType}) => {
         case (/^torch\/*/.test(application)):
             return 'mlModel';
 
-        case false:
+        case (application === 'application/python' && contentType === 'application/octet-stream'):
             return 'app';
 
         default:

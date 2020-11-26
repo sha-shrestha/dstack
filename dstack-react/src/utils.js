@@ -6,8 +6,10 @@ import downloadFile from './utils/downloadFile';
 import parseStackParams from './utils/parseStackParams';
 import parseStackTabs from './utils/parseStackTabs';
 import getFormattedDuration from './utils/getFormattedDuration';
+import getStackCategory from './utils/getStackCategory';
 import fileToBaseTo64 from './utils/fileToBaseTo64';
 import dataFetcher from './utils/dataFetcher';
+import parseStackViews from './utils/parseStackViews';
 import config from './config';
 
 const isSignedIn = () => {
@@ -26,6 +28,8 @@ export {
     parseStackParams,
     parseStackTabs,
     getFormattedDuration,
+    getStackCategory,
     fileToBaseTo64,
-    dataFetcher
+    dataFetcher,
+    parseStackViews
 };

@@ -54,6 +54,11 @@ const List = ({
             label: t('mlModel_plural'),
             value: 'mlModel',
         },
+
+        app: {
+            label: t('app_plural'),
+            value: 'app',
+        },
     };
 
     const [view, setView] = useListViewSwitcher('stack-list');

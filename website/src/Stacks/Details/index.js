@@ -6,8 +6,8 @@ import {useTranslation} from 'react-i18next';
 import {Link, useHistory, useLocation, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 import Helmet from 'react-helmet';
-import {AccessForbidden, NotFound, StackDetails, StackUpload} from '@dstackai/dstack-react';
-import {isSignedIn, parseSearch} from '@dstackai/dstack-react/dist/utils';
+import {AccessForbidden, NotFound, StackDetails, StackDetailsApp, StackUpload} from '@dstackai/dstack-react';
+import {isSignedIn, parseSearch, getStackCategory} from '@dstackai/dstack-react/dist/utils';
 import {deleteStack} from 'Stacks/List/actions';
 import {fetchDetails, clearDetails, fetchFrame, downloadAttachment, update, updatePermissions} from './actions';
 import routes from 'routes';
@@ -186,13 +186,23 @@ const Details = ({
 
     const currentFrameId = selectedFrame ? selectedFrame : get(data, 'head.id');
 
+    const contentType = get(data, 'head.attachments[0].content_type');
+    const application = get(data, 'head.attachments[0].application');
+
+    const category = getStackCategory({
+        application,
+        contentType,
+    });
+
+    const DetailsComponent = category === 'app' ? StackDetailsApp : StackDetails;
+
     return (
         <Fragment>
             <Helmet>
                 <title>dstack.ai | {params.user} | {params.stack}</title>
             </Helmet>
 
-            <StackDetails
+            <DetailsComponent
                 loading={loading}
                 currentFrameId={currentFrameId}
                 frame={frame}

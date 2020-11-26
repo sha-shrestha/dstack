@@ -105,6 +105,7 @@ var parseStackParams = (function (attachments, tab) {
   });
   Object.keys(fields).forEach(function (key) {
     fields[key].options = lodashEs.uniq(fields[key].options);
+    fields[key].label = key;
 
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
@@ -169,6 +170,34 @@ var getFormattedDuration = (function (duration) {
   if (minutes) string += " " + moment.duration(minutes, 'minutes').as('minutes') + "min";
   if (seconds) string += " " + moment.duration(seconds, 'seconds').asSeconds() + "sec";
   return string;
+});
+
+var getStackCategory = (function (_ref) {
+  var application = _ref.application,
+      contentType = _ref.contentType;
+
+  switch (true) {
+    case contentType === 'image/svg+xml':
+    case contentType === 'image/png':
+    case contentType === 'image/jpeg':
+    case application === 'plotly':
+    case application === 'bokeh':
+      return 'chart';
+
+    case contentType === 'text/csv':
+      return 'table';
+
+    case application === 'sklearn':
+    case /^tensorflow\/*/.test(application):
+    case /^torch\/*/.test(application):
+      return 'mlModel';
+
+    case application === 'application/python' && contentType === 'application/octet-stream':
+      return 'app';
+
+    default:
+      return null;
+  }
 });
 
 var fileToBase64 = function fileToBase64(file) {
@@ -241,6 +270,8 @@ var config = {
   },
   STACK_UPDATE: '/stacks/update',
   STACK_PUSH: '/stacks/push',
+  APPS_EXECUTE: '/apps/execute',
+  APPS_POLL: '/apps/poll',
   DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
     return "/dashboards/" + userName;
   },
@@ -317,6 +348,44 @@ var fetcher = function fetcher(url, responseDataFormat) {
   }
 };
 
+var typeMap = {
+  'TextFieldView': 'text',
+  'ComboBoxView': 'select',
+  'SliderView': 'slider',
+  'ApplyView': 'apply'
+};
+var parseStackViews = (function (views) {
+  var fields = {};
+  views.forEach(function (view, index) {
+    fields[index] = {
+      type: typeMap[view.type],
+      value: view.data,
+      disabled: !view.enabled
+    };
+
+    if (view.type === 'ComboBoxView') {
+      fields[index].options = view.titles.map(function (title, i) {
+        return {
+          label: title,
+          value: i
+        };
+      });
+      fields[index].value = view.selected;
+    }
+
+    if (view.type === 'SliderView') {
+      fields[index].options = {};
+      view.data.forEach(function (item) {
+        return fields[index].options[item] = item;
+      });
+      fields[index].min = Math.min.apply(null, view.data);
+      fields[index].max = Math.max.apply(null, view.data);
+      fields[index].value = view.data[view.selected];
+    }
+  });
+  return fields;
+});
+
 var isSignedIn = function isSignedIn() {
   var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
   return Boolean(token && token.length);
@@ -328,9 +397,11 @@ exports.fileToBaseTo64 = fileToBase64;
 exports.formatBytes = formatBytes;
 exports.getDataFailedRequest = getDataFailedRequest;
 exports.getFormattedDuration = getFormattedDuration;
+exports.getStackCategory = getStackCategory;
 exports.isSignedIn = isSignedIn;
 exports.parseSearch = parseSearch;
 exports.parseStackParams = parseStackParams;
 exports.parseStackTabs = parseStackTabs;
+exports.parseStackViews = parseStackViews;
 exports.unicodeBase64Decode = unicodeBase64Decode;
 //# sourceMappingURL=utils.js.map

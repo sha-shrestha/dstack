@@ -39,7 +39,7 @@ const SelectField = ({
     ...props
 }: Props) => {
     const onChangeHandle = (value: Array<string>) => {
-        if (value.indexOf(allValue) >= 0)
+        if (typeof value === 'string' && value.indexOf(allValue) >= 0)
             if (value.length > options.length)
                 value = [];
             else

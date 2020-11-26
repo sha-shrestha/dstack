@@ -58,6 +58,9 @@ const Item = ({
             case 'mlModel':
                 return <MLIcon />;
 
+            case 'app':
+                return <AppIcon />;
+
             default:
                 return null;
         }

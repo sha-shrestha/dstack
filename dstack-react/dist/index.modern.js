@@ -16,6 +16,7 @@ import Slider from 'rc-slider';
 import Plot from 'react-plotly.js';
 import { parse } from 'csv-string';
 import { Link, useParams, useHistory, Switch, Route } from 'react-router-dom';
+import { useDebounce as useDebounce$1, usePrevious as usePrevious$1 } from 'react-use';
 import { v4 } from 'uuid';
 import useSWR from 'swr';
 import Editor from 'react-simple-code-editor';
@@ -23,7 +24,6 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-r';
 import 'prismjs/themes/prism.css';
-import { usePrevious as usePrevious$1 } from 'react-use';
 import { useDrag, useDrop } from 'react-dnd';
 export { DndProvider } from 'react-dnd';
 
@@ -228,6 +228,8 @@ var config = {
   },
   STACK_UPDATE: '/stacks/update',
   STACK_PUSH: '/stacks/push',
+  APPS_EXECUTE: '/apps/execute',
+  APPS_POLL: '/apps/poll',
   DASHBOARD_LIST: function DASHBOARD_LIST(userName) {
     return "/dashboards/" + userName;
   },
@@ -705,6 +707,7 @@ var parseStackParams = (function (attachments, tab) {
   });
   Object.keys(fields).forEach(function (key) {
     fields[key].options = uniq(fields[key].options);
+    fields[key].label = key;
 
     if (typeof fields[key].options[0] === 'string') {
       fields[key].type = 'select';
@@ -769,6 +772,34 @@ var getFormattedDuration = (function (duration) {
   if (minutes) string += " " + moment.duration(minutes, 'minutes').as('minutes') + "min";
   if (seconds) string += " " + moment.duration(seconds, 'seconds').asSeconds() + "sec";
   return string;
+});
+
+var getStackCategory = (function (_ref) {
+  var application = _ref.application,
+      contentType = _ref.contentType;
+
+  switch (true) {
+    case contentType === 'image/svg+xml':
+    case contentType === 'image/png':
+    case contentType === 'image/jpeg':
+    case application === 'plotly':
+    case application === 'bokeh':
+      return 'chart';
+
+    case contentType === 'text/csv':
+      return 'table';
+
+    case application === 'sklearn':
+    case /^tensorflow\/*/.test(application):
+    case /^torch\/*/.test(application):
+      return 'mlModel';
+
+    case application === 'application/python' && contentType === 'application/octet-stream':
+      return 'app';
+
+    default:
+      return null;
+  }
 });
 
 var fileToBase64 = function fileToBase64(file) {
@@ -852,6 +883,44 @@ var fetcher = function fetcher(url, responseDataFormat) {
     return Promise.reject(e);
   }
 };
+
+var typeMap = {
+  'TextFieldView': 'text',
+  'ComboBoxView': 'select',
+  'SliderView': 'slider',
+  'ApplyView': 'apply'
+};
+var parseStackViews = (function (views) {
+  var fields = {};
+  views.forEach(function (view, index) {
+    fields[index] = {
+      type: typeMap[view.type],
+      value: view.data,
+      disabled: !view.enabled
+    };
+
+    if (view.type === 'ComboBoxView') {
+      fields[index].options = view.titles.map(function (title, i) {
+        return {
+          label: title,
+          value: i
+        };
+      });
+      fields[index].value = view.selected;
+    }
+
+    if (view.type === 'SliderView') {
+      fields[index].options = {};
+      view.data.forEach(function (item) {
+        return fields[index].options[item] = item;
+      });
+      fields[index].min = Math.min.apply(null, view.data);
+      fields[index].max = Math.max.apply(null, view.data);
+      fields[index].value = view.data[view.selected];
+    }
+  });
+  return fields;
+});
 
 var isSignedIn = function isSignedIn() {
   var token = localStorage.getItem(config.TOKEN_STORAGE_KEY);
@@ -1361,7 +1430,7 @@ var SelectField = function SelectField(_ref) {
       props = _objectWithoutPropertiesLoose(_ref, ["align", "label", "disabled", "placeholder", "value", "className", "mode", "onChange", "options", "showSearch"]);
 
   var onChangeHandle = function onChangeHandle(value) {
-    if (value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
+    if (typeof value === 'string' && value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
       return o.value;
     });
     if (onChange) onChange(value);
@@ -1470,13 +1539,19 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"filters":"_kiZkv","select":"_4Up3c","field":"_3_9Ku"};
+var css$i = {"filters":"_kiZkv","select":"_4Up3c","field":"_3_9Ku","button":"_1xfTz"};
 
 var StackFilters = function StackFilters(_ref) {
   var className = _ref.className,
       fields = _ref.fields,
       form = _ref.form,
-      _onChange = _ref.onChange;
+      _onChange = _ref.onChange,
+      onApply = _ref.onApply,
+      disabled = _ref.disabled;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
   var hasSelectField = useMemo(function () {
     return Object.keys(fields).some(function (key) {
       return fields[key].type === 'select';
@@ -1489,6 +1564,20 @@ var StackFilters = function StackFilters(_ref) {
     })
   }, Object.keys(fields).map(function (key) {
     switch (fields[key].type) {
+      case 'text':
+        return /*#__PURE__*/React__default.createElement(TextField, {
+          size: "small",
+          key: "text-" + key,
+          className: cx(css$i.field),
+          onChange: function onChange(event) {
+            return _onChange(key, event.target.value);
+          },
+          label: fields[key].label,
+          name: key,
+          value: form[key],
+          disabled: disabled || fields[key].disabled
+        });
+
       case 'select':
         return /*#__PURE__*/React__default.createElement(SelectField, {
           key: "select-" + key,
@@ -1497,10 +1586,11 @@ var StackFilters = function StackFilters(_ref) {
           onChange: function onChange(value) {
             return _onChange(key, value);
           },
-          label: key,
+          label: fields[key].label,
           name: key,
           options: fields[key].options,
-          value: Array.isArray(form[key]) ? form[key] : [form[key]]
+          value: Array.isArray(form[key]) ? form[key] : [form[key]],
+          disabled: disabled || fields[key].disabled
         });
 
       case 'checkbox':
@@ -1508,9 +1598,10 @@ var StackFilters = function StackFilters(_ref) {
           key: "checkbox-" + key,
           className: css$i.field,
           onChange: _onChange,
-          label: key,
+          label: fields[key].label,
           name: key,
-          value: form[key]
+          value: form[key],
+          disabled: disabled || fields[key].disabled
         });
 
       case 'slider':
@@ -1519,14 +1610,27 @@ var StackFilters = function StackFilters(_ref) {
           className: css$i.field,
           onChange: _onChange,
           align: "right",
-          label: key,
+          label: fields[key].label,
           name: key,
           value: form[key],
           step: null,
           min: fields[key].min,
           max: fields[key].max,
-          marks: fields[key].options
+          marks: fields[key].options,
+          disabled: disabled || fields[key].disabled
         });
+
+      case 'apply':
+        return /*#__PURE__*/React__default.createElement("div", {
+          key: "apply-" + key,
+          className: cx(css$i.field, css$i.button)
+        }, onApply && /*#__PURE__*/React__default.createElement(Button, {
+          size: "small",
+          color: "primary",
+          variant: "contained",
+          onClick: onApply,
+          disabled: disabled || fields[key].disabled
+        }, t('apply')));
 
       default:
         return null;
@@ -2178,7 +2282,8 @@ var Attachment = function Attachment(_ref) {
       frameId = _ref.frameId,
       isList = _ref.isList,
       withLoader = _ref.withLoader,
-      stack = _ref.stack;
+      stack = _ref.stack,
+      customData = _ref.customData;
 
   var _actions = actions(),
       fetchAttachment = _actions.fetchAttachment;
@@ -2231,18 +2336,18 @@ var Attachment = function Attachment(_ref) {
   };
 
   useEffect(function () {
-    if (!isList && attachment && !isEqual(prevAttachment, attachment) && attachment.preview && isImageType(attachment['content_type'])) {
+    if (!customData && !isList && attachment && !isEqual(prevAttachment, attachment) && attachment.preview && isImageType(attachment['content_type'])) {
       fetchFullAttachment();
     }
   }, [data]);
   useEffect(function () {
-    if (!isList && typeof id === 'number' && frameId && (!attachment.data && !error || (attachment === null || attachment === void 0 ? void 0 : attachment.index) !== id)) {
+    if (!customData && !isList && typeof id === 'number' && frameId && (!attachment.data && !error || (attachment === null || attachment === void 0 ? void 0 : attachment.index) !== id)) {
       fetchAttachment(stack, frameId, id);
     }
   }, [id, frameId]);
 
   var _useIntersectionObser = useIntersectionObserver(function () {
-    if (isList && !loading && (!attachment.data && !error || attachment.data && attachment.index !== id)) fetchAttachment(stack, frameId, id);
+    if (!customData && isList && !loading && (!attachment.data && !error || attachment.data && attachment.index !== id)) fetchAttachment(stack, frameId, id);
   }, {}, [id, frameId, data]),
       ref = _useIntersectionObser[0];
 
@@ -2257,38 +2362,10 @@ var Attachment = function Attachment(_ref) {
     className: css$r.view,
     isList: isList,
     fullAttachment: fullAttachment,
-    attachment: attachment,
+    attachment: customData ? customData : attachment,
     stack: stack
   }));
 };
-
-var getStackCategory = (function (_ref) {
-  var application = _ref.application,
-      contentType = _ref.contentType;
-
-  switch (true) {
-    case contentType === 'image/svg+xml':
-    case contentType === 'image/png':
-    case contentType === 'image/jpeg':
-    case application === 'plotly':
-    case application === 'bokeh':
-      return 'chart';
-
-    case contentType === 'text/csv':
-      return 'table';
-
-    case application === 'sklearn':
-    case /^tensorflow\/*/.test(application):
-    case /^torch\/*/.test(application):
-      return 'mlModel';
-
-    case false:
-      return 'app';
-
-    default:
-      return null;
-  }
-});
 
 var css$s = {"list":"_FL7ja","avatar":"_37Kcf","count":"_11i1Z"};
 
@@ -2486,6 +2563,48 @@ function SvgTable(props) {
   }, props), _ref$4);
 }
 
+function _extends$6() {
+  _extends$6 = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends$6.apply(this, arguments);
+}
+
+var _ref$5 = /*#__PURE__*/createElement("g", {
+  clipPath: "url(#app_svg__clip0)",
+  fill: "#86A6DD"
+}, /*#__PURE__*/createElement("path", {
+  d: "M7.857 0H.714A.714.714 0 000 .714v7.143c0 .395.32.714.714.714h7.143c.395 0 .714-.319.714-.714V.714A.714.714 0 007.857 0zm-.714 7.143H1.429V1.429h5.714v5.714zM7.857 11.429H.714a.714.714 0 00-.714.714v7.143c0 .394.32.714.714.714h7.143c.395 0 .714-.32.714-.714v-7.143a.714.714 0 00-.714-.714zm-.714 7.142H1.429v-5.714h5.714v5.714zM19.286 11.429h-7.143a.714.714 0 00-.714.714v7.143c0 .394.32.714.714.714h7.143c.395 0 .714-.32.714-.714v-7.143a.714.714 0 00-.714-.714zm-.714 7.142h-5.715v-5.714h5.715v5.714z"
+}), /*#__PURE__*/createElement("path", {
+  d: "M19.79 6.22a.714.714 0 000-1.01l-5-5a.714.714 0 00-1.01 0l-5 5a.712.712 0 000 1.01l5 5a.712.712 0 001.01 0l5-5zm-9.494-.506l3.99-3.99 3.99 3.99-3.99 3.99-3.99-3.99z"
+}));
+
+var _ref2$2 = /*#__PURE__*/createElement("defs", null, /*#__PURE__*/createElement("clipPath", {
+  id: "app_svg__clip0"
+}, /*#__PURE__*/createElement("path", {
+  d: "M0 0h20v20H0z"
+})));
+
+function SvgApp(props) {
+  return /*#__PURE__*/createElement("svg", _extends$6({
+    width: 20,
+    height: 20,
+    viewBox: "0 0 20 20",
+    fill: "none"
+  }, props), _ref$5, _ref2$2);
+}
+
 var css$t = {"item":"_fLtf5","name":"_147V3","delete":"_2PoaL","icon":"_3yxhI","top":"_3aJqR","permissions":"_2SUP0","date":"_2c9og"};
 
 var Item = function Item(_ref) {
@@ -2526,6 +2645,9 @@ var Item = function Item(_ref) {
 
       case 'mlModel':
         return /*#__PURE__*/React__default.createElement(SvgMl, null);
+
+      case 'app':
+        return /*#__PURE__*/React__default.createElement(SvgApp, null);
 
       default:
         return null;
@@ -2715,6 +2837,10 @@ var List = function List(_ref) {
     mlModel: {
       label: t('mlModel_plural'),
       value: 'mlModel'
+    },
+    app: {
+      label: t('app_plural'),
+      value: 'app'
     }
   };
 
@@ -3896,7 +4022,7 @@ var Details = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement(BackButton, {
     Component: Link,
     to: backUrl
-  }, currentUser === user ? t('backToMyStacks') : t('backToStacksOF', {
+  }, currentUser === user ? t('backToMyStacks') : t('backToStacksOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
     className: css$B.header
@@ -3996,7 +4122,506 @@ var Details = function Details(_ref) {
   })));
 };
 
-var css$C = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
+var css$C = {"progress":"_1PIt0","percent":"_m5cJQ","bar":"_1v1JQ","label":"_1xBAh"};
+
+var Progress = function Progress(_ref) {
+  var _ref$isActive = _ref.isActive,
+      isActive = _ref$isActive === void 0 ? true : _ref$isActive;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var _useState = useState(0),
+      progress = _useState[0],
+      setProgress = _useState[1];
+
+  var step = useRef(0.01);
+  var currentProgress = useRef(0);
+  var prevIsActive = usePrevious(isActive);
+  var requestFrame = useRef(null);
+  var isActiveRef = useRef(false);
+  useEffect(function () {
+    isActiveRef.current = isActive;
+
+    if (isActive) {
+      setProgress(0);
+      step.current = 0.01;
+      currentProgress.current = 0;
+      startCalculateProgress();
+    }
+
+    if (prevIsActive === true && isActive === false) {
+      setProgress(100);
+      setTimeout(function () {
+        return setProgress(0);
+      }, 800);
+    }
+
+    if (isActive === null) {
+      setProgress(0);
+    }
+
+    if (!isActive && requestFrame.current) {
+      cancelAnimationFrame(requestFrame.current);
+    }
+  }, [isActive]);
+
+  var calculateProgress = function calculateProgress() {
+    currentProgress.current += step.current;
+    var progress = Math.round(Math.atan(currentProgress.current) / (Math.PI / 2) * 100 * 1000) / 1000;
+    setProgress(progress);
+    if (progress > 70) step.current = 0.005;
+    if (progress >= 100 || !isActiveRef.current) cancelAnimationFrame(requestFrame.current);
+    if (isActiveRef.current) requestFrame.current = requestAnimationFrame(calculateProgress);
+  };
+
+  var startCalculateProgress = function startCalculateProgress() {
+    requestAnimationFrame(calculateProgress);
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.progress
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.percent
+  }, Math.floor(progress), " %"), /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.bar
+  }, /*#__PURE__*/React__default.createElement("div", {
+    style: {
+      width: progress + "%"
+    }
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: css$C.label
+  }, t('calculatingTheData')));
+};
+
+var api$1 = apiFabric();
+var actions$1 = (function () {
+  var _useAppStore = useAppStore(),
+      apiUrl = _useAppStore[0].apiUrl;
+
+  var executeStack = function executeStack(params) {
+    return new Promise(function (resolve) {
+      try {
+        var _temp2 = _catch(function () {
+          return Promise.resolve(api$1.post(apiUrl + config.APPS_EXECUTE, params)).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  var pollStack = function pollStack(_ref) {
+    var id = _ref.id;
+    return new Promise(function (resolve) {
+      try {
+        var _temp4 = _catch(function () {
+          return Promise.resolve(api$1.get(apiUrl + config.APPS_POLL + ("?id=" + id))).then(function (request) {
+            resolve(request.data);
+          });
+        }, function () {
+          resolve({});
+        });
+
+        return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(function () {}) : void 0);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    });
+  };
+
+  return {
+    executeStack: executeStack,
+    pollStack: pollStack
+  };
+});
+
+var css$D = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
+
+var Details$1 = function Details(_ref) {
+  var currentFrameId = _ref.currentFrameId,
+      headId = _ref.headId,
+      onChangeHeadFrame = _ref.onChangeHeadFrame,
+      attachmentIndex = _ref.attachmentIndex,
+      onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
+      onChangeFrame = _ref.onChangeFrame,
+      onUpdateReadme = _ref.onUpdateReadme,
+      data = _ref.data,
+      frame = _ref.frame,
+      loading = _ref.loading,
+      currentUser = _ref.currentUser,
+      toggleUpload = _ref.toggleUpload,
+      backUrl = _ref.backUrl,
+      user = _ref.user,
+      stack = _ref.stack,
+      configurePythonCommand = _ref.configurePythonCommand,
+      configureRCommand = _ref.configureRCommand,
+      setPrivate = _ref.setPrivate,
+      updatePermissions = _ref.updatePermissions;
+
+  var _useTranslation = useTranslation(),
+      t = _useTranslation.t;
+
+  var didMountRef = useRef(false);
+
+  var _useForm = useForm({}),
+      form = _useForm.form,
+      setForm = _useForm.setForm,
+      onChange = _useForm.onChange;
+
+  var _useState = useState({}),
+      fields = _useState[0],
+      setFields = _useState[1];
+
+  var _useState2 = useState(null),
+      executeData = _useState2[0],
+      setExecuteData = _useState2[1];
+
+  var _useState3 = useState(false),
+      executing = _useState3[0],
+      setExecuting = _useState3[1];
+
+  var _useState4 = useState(null),
+      appAttachment = _useState4[0],
+      setAppAttachment = _useState4[1];
+
+  var _useState5 = useState(),
+      activeTab = _useState5[0],
+      setActiveTab = _useState5[1];
+
+  var _useState6 = useState([]),
+      tabs = _useState6[0],
+      setTabs = _useState6[1];
+
+  var prevFrame = usePrevious(frame);
+
+  var _actions = actions$1(),
+      executeStack = _actions.executeStack,
+      pollStack = _actions.pollStack;
+
+  var _useState7 = useState(false),
+      isShowHowToModal = _useState7[0],
+      setIsShowHowToModal = _useState7[1];
+
+  var showHowToModal = function showHowToModal(event) {
+    event.preventDefault();
+    setIsShowHowToModal(true);
+  };
+
+  var getFormFromViews = function getFormFromViews(views) {
+    if (!views || !Array.isArray(views)) return {};
+    return views.reduce(function (result, view, index) {
+      switch (view.type) {
+        case 'ApplyView':
+          return result;
+
+        case 'SliderView':
+          result[index] = view.data[view.selected];
+          break;
+
+        case 'ComboBoxView':
+          result[index] = view.selected;
+          break;
+
+        default:
+          result[index] = view.data;
+      }
+
+      return result;
+    }, {});
+  };
+
+  var updateExecuteData = function updateExecuteData(data) {
+    setExecuteData(data);
+    var fields = parseStackViews(data.views);
+    var form = getFormFromViews(data.views);
+    setFields(fields);
+    setForm(form);
+  };
+
+  var hasApplyButton = function hasApplyButton() {
+    if (!(executeData === null || executeData === void 0 ? void 0 : executeData.views) || !Array.isArray(executeData.views)) return false;
+    return executeData.views.some(function (view) {
+      return view.type === 'ApplyView';
+    });
+  };
+
+  var submit = function submit(form) {
+    setExecuting(true);
+    executeStack({
+      user: data.user,
+      stack: data.name,
+      frame: frame === null || frame === void 0 ? void 0 : frame.id,
+      attachment: attachmentIndex || 0,
+      apply: true,
+      views: executeData.views.map(function (view, index) {
+        switch (view.type) {
+          case 'ApplyView':
+            return view;
+
+          case 'ComboBoxView':
+            view.selected = form[index];
+            break;
+
+          case 'SliderView':
+            view.selected = view.data.findIndex(function (i) {
+              return i === form[index];
+            });
+            break;
+
+          default:
+            view.data = form[index];
+        }
+
+        return view;
+      })
+    }).then(function (data) {
+      updateExecuteData(data);
+      checkFinished({
+        id: data.id
+      });
+    });
+  };
+
+  useDebounce$1(function () {
+    if (!hasApplyButton() && !isEqual(form, getFormFromViews(executeData === null || executeData === void 0 ? void 0 : executeData.views)) && appAttachment) {
+      submit(form);
+    }
+  }, 300, [form]);
+
+  var onApply = function onApply() {
+    return submit(form);
+  };
+
+  useEffect(function () {
+    if (executeData && executeData.status === 'READY' && !appAttachment) {
+      if (!hasApplyButton()) submit(form);
+    }
+  }, [executeData]);
+  useEffect(function () {
+    if (data && frame) {
+      setExecuting(true);
+      setExecuteData(null);
+      setAppAttachment(null);
+      executeStack({
+        user: data.user,
+        stack: data.name,
+        frame: frame === null || frame === void 0 ? void 0 : frame.id,
+        attachment: attachmentIndex || 0
+      }).then(function (data) {
+        setExecuting(false);
+        updateExecuteData(data);
+      })["catch"](function () {
+        return setExecuting(false);
+      });
+    }
+  }, [data, frame, attachmentIndex]);
+
+  var hideHowToModal = function hideHowToModal() {
+    return setIsShowHowToModal(false);
+  };
+
+  useEffect(function () {
+    if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseTabs();
+  }, [frame]);
+  useEffect(function () {
+    if (!didMountRef.current) didMountRef.current = true;
+  }, []);
+
+  var getCurrentAttachment = function getCurrentAttachment(selectedTab) {
+    var attachments = get(frame, 'attachments');
+    var attachment;
+
+    if (selectedTab) {
+      attachment = attachments.find(function (attach) {
+        var _attach$params$select, _attach$params$select2;
+
+        return ((_attach$params$select = attach.params[selectedTab.value]) === null || _attach$params$select === void 0 ? void 0 : _attach$params$select.type) === 'tab' || ((_attach$params$select2 = attach.params[selectedTab.key]) === null || _attach$params$select2 === void 0 ? void 0 : _attach$params$select2.title) === selectedTab.value;
+      });
+    } else if (attachmentIndex !== undefined) {
+      if (attachments[attachmentIndex]) {
+        attachment = attachments[attachmentIndex];
+      }
+    } else {
+      attachment = attachments[0];
+    }
+
+    return attachment;
+  };
+
+  var parseTabs = function parseTabs() {
+    var attachments = get(frame, 'attachments');
+    if (!attachments || !attachments.length) return;
+    var tabs = parseStackTabs(attachments);
+    var attachment = getCurrentAttachment();
+    setTabs(tabs);
+
+    if (attachment) {
+      var _params$tab;
+
+      var params = _extends({}, attachment.params);
+
+      var tab = Object.keys(params).find(function (key) {
+        var _params$key;
+
+        return ((_params$key = params[key]) === null || _params$key === void 0 ? void 0 : _params$key.type) === 'tab';
+      });
+      setActiveTab(((_params$tab = params[tab]) === null || _params$tab === void 0 ? void 0 : _params$tab.title) || tab || null);
+    }
+  };
+
+  var onChangeTab = function onChangeTab(tabName) {
+    setActiveTab(tabName);
+    var attachments = get(frame, 'attachments');
+    var tab = tabs.find(function (t) {
+      return t.value === tabName;
+    });
+    if (!attachments) return;
+
+    if (tabs.length) {
+      attachments.some(function (attach, index) {
+        var _attach$params$tab$va, _attach$params$tab$ke;
+
+        if (tab && ((_attach$params$tab$va = attach.params[tab.value]) === null || _attach$params$tab$va === void 0 ? void 0 : _attach$params$tab$va.type) !== 'tab' && ((_attach$params$tab$ke = attach.params[tab.key]) === null || _attach$params$tab$ke === void 0 ? void 0 : _attach$params$tab$ke.title) !== tab.value) return false;
+        onChangeAttachmentIndex(index);
+        return true;
+      });
+    }
+  };
+
+  var checkFinished = function checkFinished(_ref2) {
+    var id = _ref2.id;
+    pollStack({
+      id: id
+    }).then(function (data) {
+      if (['SCHEDULED', 'RUNNING'].indexOf(data.status) >= 0) setTimeout(function () {
+        checkFinished({
+          id: data.id
+        });
+      }, 3000);
+
+      if (data.status === 'FINISHED') {
+        setAppAttachment(data.output);
+      }
+
+      if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
+        setExecuting(false);
+      }
+    });
+  };
+
+  if (loading || !executeData && executing) return /*#__PURE__*/React__default.createElement(Loader$1, null);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$D.details)
+  }, /*#__PURE__*/React__default.createElement(Yield, {
+    name: "header-yield"
+  }, /*#__PURE__*/React__default.createElement(BackButton, {
+    Component: Link,
+    to: backUrl
+  }, currentUser === user ? t('backToMyStacks') : t('backToStacksOf', {
+    name: user
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.header
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.title
+  }, data.name, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
+  })), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
+    className: css$D.permissions,
+    permissions: data.permissions
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.sideHeader
+  }, data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Share, {
+    instancePath: user + "/" + stack,
+    onUpdatePrivate: setPrivate,
+    className: css$D.share,
+    defaultIsPrivate: data["private"],
+    defaultPermissions: data.permissions,
+    onUpdatePermissions: function onUpdatePermissions(permissions) {
+      return updatePermissions(user + "/" + stack, permissions);
+    }
+  }), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$D.dropdown,
+    items: [{
+      title: t('upload'),
+      onClick: toggleUpload
+    }]
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$D['dropdown-button'],
+    color: "secondary"
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-dots-horizontal"
+  }))))), /*#__PURE__*/React__default.createElement(Frames, {
+    frames: get(data, 'frames', []),
+    frame: currentFrameId,
+    headId: headId,
+    onMarkAsHead: onChangeHeadFrame,
+    onChange: onChangeFrame,
+    className: css$D.revisions
+  }), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
+    className: css$D.tabs,
+    onChange: onChangeTab,
+    value: activeTab,
+    items: tabs
+  }), /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.container
+  }, /*#__PURE__*/React__default.createElement(StackFilters, {
+    fields: fields,
+    form: form,
+    onChange: onChange,
+    onApply: onApply,
+    className: cx(css$D.filters),
+    disabled: executing
+  }), appAttachment && (appAttachment.description || appAttachment['content_type'] === 'text/csv') && /*#__PURE__*/React__default.createElement("div", {
+    className: css$D['attachment-head']
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.description
+  }, appAttachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
+    source: appAttachment.description
+  })), appAttachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.actions
+  }, appAttachment.preview && /*#__PURE__*/React__default.createElement("div", {
+    className: css$D.label
+  }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
+    className: css$D['label-tooltip']
+  }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
+    href: "#",
+    onClick: showHowToModal
+  }, t('useThisStackViaAPI')), appAttachment.length && /*#__PURE__*/React__default.createElement("span", {
+    className: css$D.size
+  }, "(", formatBytes(appAttachment.length), ")"))), appAttachment && !executing && /*#__PURE__*/React__default.createElement(Attachment, {
+    className: css$D.attachment,
+    stack: user + "/" + stack,
+    customData: appAttachment
+  }), executing && /*#__PURE__*/React__default.createElement(Progress, null)), data && /*#__PURE__*/React__default.createElement(Readme, {
+    className: css$D.readme,
+    data: data,
+    onUpdate: onUpdateReadme
+  }), /*#__PURE__*/React__default.createElement(Modal, {
+    isShow: isShowHowToModal,
+    withCloseButton: true,
+    onClose: hideHowToModal,
+    size: "big",
+    title: t('howToFetchDataUsingTheAPI'),
+    className: css$D.modal
+  }, /*#__PURE__*/React__default.createElement(HowTo, {
+    configurePythonCommand: configurePythonCommand,
+    configureRCommand: configureRCommand,
+    data: {
+      stack: user + "/" + stack,
+      params: {}
+    },
+    modalMode: true
+  })));
+};
+
+var css$E = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};
 
 var MB = 1048576;
 
@@ -4144,7 +4769,7 @@ var Upload = function Upload(_ref) {
   return /*#__PURE__*/React__default.createElement(Fragment, null, withButton && /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: t('uploadTooltip')
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$C.upload, className),
+    className: cx(css$E.upload, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -4153,12 +4778,12 @@ var Upload = function Upload(_ref) {
     isShow: isShowModal,
     size: "small"
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.content
+    className: css$E.content
   }, !stack && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.subtitle
+    className: css$E.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewStack')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$C.field,
+    className: css$E.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -4168,31 +4793,31 @@ var Upload = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.subtitle
+    className: css$E.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
-    className: css$C.dragndrop,
+    className: css$E.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.buttons
+    className: css$E.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$C.button,
+    className: css$E.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: closeHandle,
-    className: css$C.button,
+    className: css$E.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel')))));
 };
 
-var css$D = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
+var css$F = {"upload":"_2UOiz","content":"_22x3Q","subtitle":"_2sXDC","field":"_3icVJ","dragndrop":"_30Hxh","buttons":"_3VDuj","button":"_2bzId"};
 
 var MB$1 = 1048576;
 
@@ -4331,14 +4956,14 @@ var Upload$1 = function Upload(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$D.upload, className)
+    className: cx(css$F.upload, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.content
+    className: css$F.content
   }, !stack && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.subtitle
+    className: css$F.subtitle
   }, t('stackName')), /*#__PURE__*/React__default.createElement(TextField, {
     size: "middle",
-    className: css$D.field,
+    className: css$F.field,
     name: "stack",
     onChange: onChange,
     value: form.value,
@@ -4348,32 +4973,32 @@ var Upload$1 = function Upload(_ref) {
     }),
     errors: getErrorsText('stack')
   })), stack && file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.subtitle
+    className: css$F.subtitle
   }, t('theUploadedFileWouldBeSavedAsANewRevisionOfTheStack')), /*#__PURE__*/React__default.createElement(FileDragnDrop$1, {
     ref: fileFieldRef,
-    className: css$D.dragndrop,
+    className: css$F.dragndrop,
     formats: ['.csv', '.png', '.svg', '.jpg'],
     onChange: setFile,
     loading: uploading,
     progressPercent: progress
   })), file && /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.buttons
+    className: css$F.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$D.button,
+    className: css$F.button,
     variant: "contained",
     color: "primary",
     disabled: !file || !form.stack.length || uploading,
     onClick: submit
   }, t('save')), /*#__PURE__*/React__default.createElement(Button, {
     onClick: clearForm,
-    className: css$D.button,
+    className: css$F.button,
     variant: "contained",
     color: "secondary",
     disabled: uploading
   }, t('cancel'))));
 };
 
-var css$E = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
+var css$G = {"howto":"_362z-","tabs":"_h6zun","description":"_SODNv","code":"_WU2Z-","footer":"_1DRv-"};
 
 var UploadStack = function UploadStack(_ref) {
   var user = _ref.user,
@@ -4409,41 +5034,41 @@ var UploadStack = function UploadStack(_ref) {
     value: 3
   });
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.howto
+    className: css$G.howto
   }, tabs.length > 1 && /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$E.tabs,
+    className: css$G.tabs,
     value: activeCodeTab,
     onChange: setActiveCodeTab,
     tabs: tabs
   }), activeCodeTab === 1 && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.description
+    className: css$G.description
   }, t('installPipPackage')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$E.code,
+    className: css$G.code,
     language: "bash"
   }, "pip install dstack"), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.description
+    className: css$G.description
   }, t('configureDStack')), /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$E.code,
+    className: css$G.code,
     language: "bash"
   }, configurePythonCommand), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.description
+    className: css$G.description
   }, t('reportPlotIntro')), /*#__PURE__*/React__default.createElement(Tabs, {
-    className: css$E.tabs,
+    className: css$G.tabs,
     value: activePublishTab,
     onChange: setActivePublishTab,
     tabs: publishTabs
   }), activePublishTab === 1 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$E.code,
+    className: css$G.code,
     language: "python"
   }, reportModelPythonCode), activePublishTab === 2 && /*#__PURE__*/React__default.createElement(CodeViewer, {
-    className: css$E.code,
+    className: css$G.code,
     language: "python"
   }, reportPlotPythonCode)), activeCodeTab === 3 && /*#__PURE__*/React__default.createElement(Upload$1, {
     user: user,
     refresh: refresh,
     apiUrl: apiUrl
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.footer,
+    className: css$G.footer,
     dangerouslySetInnerHTML: {
       __html: t('notClearCheckTheDocks', {
         href: config.DOCS_URL
@@ -4452,7 +5077,7 @@ var UploadStack = function UploadStack(_ref) {
   }));
 };
 
-var api$1 = apiFabric();
+var api$2 = apiFabric();
 var useActions$1 = (function () {
   var _useAppStore = useAppStore(),
       apiUrl = _useAppStore[0].apiUrl;
@@ -4463,7 +5088,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp2 = _catch(function () {
-          return Promise.resolve(api$1.get(apiUrl + config.JOB_DETAILS(user, id))).then(function (request) {
+          return Promise.resolve(api$2.get(apiUrl + config.JOB_DETAILS(user, id))).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4481,7 +5106,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp4 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.JOB_RUN, params)).then(function (request) {
+          return Promise.resolve(api$2.post(apiUrl + config.JOB_RUN, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4499,7 +5124,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp6 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.JOB_STOP, params)).then(function (request) {
+          return Promise.resolve(api$2.post(apiUrl + config.JOB_STOP, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4517,7 +5142,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp8 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.JOB_CREATE, params)).then(function (request) {
+          return Promise.resolve(api$2.post(apiUrl + config.JOB_CREATE, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4535,7 +5160,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp10 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.JOB_UPDATE, params)).then(function (request) {
+          return Promise.resolve(api$2.post(apiUrl + config.JOB_UPDATE, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4553,7 +5178,7 @@ var useActions$1 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp12 = _catch(function () {
-          return Promise.resolve(api$1.post(apiUrl + config.JOB_DELETE, params)).then(function (request) {
+          return Promise.resolve(api$2.post(apiUrl + config.JOB_DELETE, params)).then(function (request) {
             resolve(request.data);
           });
         }, function () {
@@ -4577,31 +5202,31 @@ var useActions$1 = (function () {
   };
 });
 
-var css$F = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
+var css$H = {"loader":"_DHDDF","title":"_3eHle","loader-pulsee":"_3Q4hE","text":"_2QdBi","table":"_3c_Ia","item":"_2_9nD"};
 
 var Loader$2 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.loader
+    className: css$H.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.title
+    className: css$H.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.text
+    className: css$H.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.table
+    className: css$H.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
+    className: css$H.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
+    className: css$H.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
+    className: css$H.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
+    className: css$H.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
+    className: css$H.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$F.item
+    className: css$H.item
   })));
 };
 
@@ -4614,9 +5239,9 @@ var calculateJobProgress = function calculateJobProgress(job) {
   return [progress, leftDuration];
 };
 
-var css$G = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
+var css$I = {"section":"_3RnYw","progressBar":"_3xjSa","progress":"_3eEzL","time":"_1q33r"};
 
-var Progress = function Progress(_ref) {
+var Progress$1 = function Progress(_ref) {
   var data = _ref.data,
       className = _ref.className,
       onlyDuration = _ref.onlyDuration;
@@ -4650,20 +5275,20 @@ var Progress = function Progress(_ref) {
       leftDuration = _calculateJobProgress[1];
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$G.section, className)
+    className: cx(css$I.section, className)
   }, !onlyDuration && /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.progressBar
+    className: css$I.progressBar
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.progress,
+    className: css$I.progress,
     style: {
       width: progress + "%"
     }
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$G.time
+    className: css$I.time
   }, getFormattedDuration(leftDuration), " ", t('left')));
 };
 
-var css$H = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
+var css$J = {"row":"_2f7FO","dropdown":"_2hTQP","cell":"_3ntzL","status":"_2MUSr","progress":"_1J2il"};
 
 var REFRESH_TIMEOUT = 2000;
 
@@ -4756,61 +5381,61 @@ var TableRow = memo(function (_ref) {
     switch (jobData.status) {
       case 'SCHEDULED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$H.status
+          className: css$J.status
         }, t('inProgress'), "\u2026");
 
       case 'RUNNING':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$H.status
-        }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress, {
-          className: css$H.progress,
+          className: css$J.status
+        }, t('inProgress'), "\u2026", /*#__PURE__*/React__default.createElement(Progress$1, {
+          className: css$J.progress,
           data: jobData
         }));
 
       case 'TIMEOUT':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$H.status, 'fail')
+          className: cx(css$J.status, 'fail')
         }, "\u26D4\uFE0F ", t('failedDueToTimeout'));
 
       case 'FAILED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$H.status, 'fail')
+          className: cx(css$J.status, 'fail')
         }, "\u26D4\uFE0F ", t('failed'));
 
       case 'FINISHED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: cx(css$H.status, 'success')
+          className: cx(css$J.status, 'success')
         }, "\u2705 ", t('completed'));
 
       case 'CREATED':
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$H.status
+          className: css$J.status
         }, t('neverRun'));
 
       default:
         return /*#__PURE__*/React__default.createElement("div", {
-          className: css$H.status
+          className: css$J.status
         }, t(jobData.status.toLowerCase()));
     }
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$H.row, {
+    className: cx(css$J.row, {
       red: ['TIMEOUT', 'FAILED'].indexOf(jobData.status) > -1
     }),
     onClick: rowClick
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.cell
+    className: css$J.cell
   }, getTitle()), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.cell
+    className: css$J.cell
   }, t(jobData.runtime)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.cell
+    className: css$J.cell
   }, moment(jobData.started).format('MM-DD-YYYY [at] HH:mm')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.cell
+    className: css$J.cell
   }, getFormattedDuration(jobData.finished - jobData.started)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$H.cell
+    className: css$J.cell
   }, renderStatus(), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$H.dropdown,
+    className: css$J.dropdown,
     items: [].concat(['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? [{
       title: t('stop'),
       onClick: onStop
@@ -4827,7 +5452,7 @@ var TableRow = memo(function (_ref) {
   })));
 });
 
-var css$I = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
+var css$K = {"list":"_VXs44","title":"_r4zAA","button":"_21dbT","search":"_1mylL","mobileSearch":"_3Oub0","text":"_Ra7UV","tableWrap":"_2CYWc","table":"_2iL6k","tableCaptions":"_2YOUS","tableCell":"_3tQ5e"};
 
 var dataFormat$1 = function dataFormat(data) {
   return data.jobs;
@@ -4915,7 +5540,7 @@ var List$1 = function List() {
 
   if (!data) return /*#__PURE__*/React__default.createElement(Loader$2, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.list
+    className: css$K.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
@@ -4924,14 +5549,14 @@ var List$1 = function List() {
     placeholder: t('findJob'),
     size: "small",
     value: search,
-    className: css$I.search,
+    className: css$K.search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.title
+    className: css$K.title
   }, currentUserName === user ? t('myJobs') : t('jobsOf', {
     name: user
   }), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$I.button,
+    className: css$K.button,
     variant: "contained",
     color: "primary",
     size: "small",
@@ -4939,7 +5564,7 @@ var List$1 = function List() {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), " ", t('newJob'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.text
+    className: css$K.text
   }, t('youHaveJobs', {
     count: data.length
   }), ' ', /*#__PURE__*/React__default.createElement("a", {
@@ -4949,27 +5574,27 @@ var List$1 = function List() {
     className: "mdi mdi-open-in-new"
   })), "."), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('findJob'),
-    className: css$I.mobileSearch,
+    className: css$K.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableWrap
+    className: css$K.tableWrap
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.table
+    className: css$K.table
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableCaptions
+    className: css$K.tableCaptions
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableCell
+    className: css$K.tableCell
   }, t('job')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableCell
+    className: css$K.tableCell
   }, t('runtime')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableCell
+    className: css$K.tableCell
   }, t('lastRun')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableCell
+    className: css$K.tableCell
   }, t('timeSpent')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$I.tableCell
+    className: css$K.tableCell
   }, t('status'))), items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(TableRow, {
       data: item,
@@ -5022,7 +5647,7 @@ var useAppProgress = (function () {
   };
 });
 
-var css$J = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
+var css$L = {"schedule":"_YoEcM","dropdown":"_3RJdh","runtime":"_2h8GE","dropdownButton":"_3fdRe","message":"_1byIj"};
 
 var timeout = null;
 
@@ -5089,9 +5714,9 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [nextRunDelay]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$J.schedule, className)
+    className: cx(css$L.schedule, className)
   }, t('runtime'), ":", /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: cx(css$J.dropdown, css$J.runtime),
+    className: cx(css$L.dropdown, css$L.runtime),
     items: [{
       title: t('python'),
       onClick: runtimeChange('python')
@@ -5100,12 +5725,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: runtimeChange('r')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$J.dropdownButton,
+    className: css$L.dropdownButton,
     color: "primary"
   }, t(data.runtime), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), t('jobIs'), " ", scheduleType !== 'unscheduled' && t('scheduled'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$J.dropdown,
+    className: css$L.dropdown,
     items: [{
       title: t('unscheduled'),
       onClick: scheduleTypeChange('unscheduled')
@@ -5114,12 +5739,12 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       onClick: scheduleTypeChange('daily')
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$J.dropdownButton,
+    className: css$L.dropdownButton,
     color: "primary"
   }, t(scheduleType), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), scheduleType === 'daily' && /*#__PURE__*/React__default.createElement(Fragment, null, t('at'), /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$J.dropdown,
+    className: css$L.dropdown,
     items: new Array(24).fill(0).map(function (i, index) {
       var time = (index < 10 ? '0' + index : index) + ":00";
       return {
@@ -5128,17 +5753,17 @@ var ScheduleSettings = function ScheduleSettings(_ref) {
       };
     })
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$J.dropdownButton,
+    className: css$L.dropdownButton,
     color: "primary"
   }, scheduleTime, " UTC", /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-chevron-down"
   }))), /*#__PURE__*/React__default.createElement("div", {
     ref: messageRef,
-    className: cx(css$J.message, 'green-text')
+    className: cx(css$L.message, 'green-text')
   }, "The next run starts in ", getFormattedDuration(nextRunDelay))));
 };
 
-var css$K = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
+var css$M = {"editor":"_m0hwp","token":"_281_3","atrule":"_1M8ph","attr-value":"_T6_N1","keyword":"_1gT7U","function":"_2ZXkX","class-name":"_upcGt","selector":"_3rmyW","attr-name":"_I3P48","string":"_hoRdC","char":"_1uxpB","builtin":"_3xCwG","inserted":"_2Lvrk","scroll":"_1yHaS","content":"_3cHiP","success":"_1Z8bo","lineNumbers":"_1CW5r"};
 
 var CodeEditor = function CodeEditor(_ref) {
   var _ref$value = _ref.value,
@@ -5167,16 +5792,16 @@ var CodeEditor = function CodeEditor(_ref) {
     if (isDidMount.current) isDidMount.current = false;
   }, [saved]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$K.editor, className)
+    className: cx(css$M.editor, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.success,
+    className: css$M.success,
     ref: successMessageRef
   }, t('changesSaved')), /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.scroll
+    className: css$M.scroll
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.content
+    className: css$M.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$K.lineNumbers,
+    className: css$M.lineNumbers,
     dangerouslySetInnerHTML: {
       __html: lineNos
     }
@@ -5197,7 +5822,7 @@ var CodeEditor = function CodeEditor(_ref) {
   }))));
 };
 
-var css$L = {"status":"_3Pfpo"};
+var css$N = {"status":"_3Pfpo"};
 
 var Status = function Status(_ref) {
   var data = _ref.data;
@@ -5207,7 +5832,7 @@ var Status = function Status(_ref) {
 
   if (!data.started) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$L.status
+    className: css$N.status
   }, t('lastRunning'), ' ', moment(data.started).format("MM-DD-YYYY [" + t('at') + "] HH:mm"), /*#__PURE__*/React__default.createElement("span", null, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-clock-outline"
   }), ['RUNNING', 'SCHEDULED'].indexOf(data.status) >= 0 ? /*#__PURE__*/React__default.createElement("span", null, ' ', t('inProgress'), "\u2026") : getFormattedDuration(data.finished - data.started)), data.status === 'FAILED' && /*#__PURE__*/React__default.createElement("span", {
@@ -5221,7 +5846,7 @@ var Status = function Status(_ref) {
   }), t('failedDueToTimeout')));
 };
 
-var css$M = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
+var css$O = {"logs":"_1poNo","button":"_35eOC","text":"_2eQos","label":"_LksjJ"};
 
 var Logs = function Logs(_ref) {
   var data = _ref.data,
@@ -5243,40 +5868,40 @@ var Logs = function Logs(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$M.logs, className)
+    className: cx(css$O.logs, className)
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$M.button,
+    className: css$O.button,
     onClick: toggleShow,
     color: "primary",
     size: "small"
   }, t('logs')), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$M.text, {
+    className: cx(css$O.text, {
       open: isShown
     })
   }, /*#__PURE__*/React__default.createElement("pre", null, data.logs), updated && /*#__PURE__*/React__default.createElement("div", {
-    className: css$M.label
+    className: css$O.label
   }, t('updated'), " ", moment(updated).fromNow())));
 };
 
-var css$N = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
+var css$P = {"loader":"_2nOeY","loader-pulse":"_1Aj7Q","title":"_RJ2x5","text1":"_2hZDH","text2":"_1-tIa","code":"_3LgqO"};
 
 var Loader$3 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.loader
+    className: css$P.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.title
+    className: css$P.title
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.text1
+    className: css$P.text1
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.text2
+    className: css$P.text2
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$N.code
+    className: css$P.code
   }));
 };
 
-var css$O = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
+var css$Q = {"details":"_1K_mA","header":"_1nmEh","dropdown":"_3RSoB","dropdownButton":"_2dnN2","title":"_3U50H","edit":"_bgkiC","side":"_3uIQ_","progress":"_1jRHi","button":"_2J0VV","schedule":"_2YXFa","codeEditor":"_1M2Sw","logs":"_ZQT6g"};
 
 var REFRESH_TIMEOUT$1 = 3000;
 
@@ -5284,7 +5909,7 @@ var dataFormat$2 = function dataFormat(data) {
   return data.job;
 };
 
-var Details$1 = function Details(_ref) {
+var Details$2 = function Details(_ref) {
   var _currentUser$data;
 
   _objectDestructuringEmpty(_ref);
@@ -5528,7 +6153,7 @@ var Details$1 = function Details(_ref) {
   }, t('goToMyJobs')), "."));
   if (!jobData) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.details
+    className: css$Q.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -5537,25 +6162,25 @@ var Details$1 = function Details(_ref) {
   }, currentUserName === user ? t('backToJobs') : t('backToJobsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.header
+    className: css$Q.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.title
+    className: css$Q.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$O.edit,
+    className: css$Q.edit,
     value: titleValue,
     onChange: onChangeTitle,
     readOnly: currentUserName !== user,
     placeholder: t('newJob')
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$O.side
-  }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress, {
+    className: css$Q.side
+  }, jobData.status === 'RUNNING' && /*#__PURE__*/React__default.createElement(Progress$1, {
     onlyDuration: true,
-    className: css$O.progress,
+    className: css$Q.progress,
     data: jobData
   }), jobData.status === 'FAILED' && /*#__PURE__*/React__default.createElement("div", {
     className: "red-text"
   }, t('sorryButYourCodeDoesntLookLikePythonJob')), ['RUNNING', 'SCHEDULED', 'STOPPING'].indexOf(jobData.status) >= 0 ? /*#__PURE__*/React__default.createElement(Button, {
-    className: css$O.button,
+    className: css$Q.button,
     color: "fail",
     size: "small",
     variant: "contained",
@@ -5564,7 +6189,7 @@ var Details$1 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-pause"
   }), t('stop')) : /*#__PURE__*/React__default.createElement(Button, {
-    className: css$O.button,
+    className: css$Q.button,
     color: "success",
     size: "small",
     variant: "contained",
@@ -5573,53 +6198,53 @@ var Details$1 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-play"
   }), t('run'))), currentUserName === user && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$O.dropdown,
+    className: css$Q.dropdown,
     items: [{
       title: t('delete'),
       onClick: onClickDelete
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$O.dropdownButton,
+    className: css$Q.dropdownButton,
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   })))), /*#__PURE__*/React__default.createElement(Status, {
     data: jobData
   }), /*#__PURE__*/React__default.createElement(ScheduleSettings, {
-    className: css$O.schedule,
+    className: css$Q.schedule,
     data: jobData,
     onChange: onChangeSchedule,
     onChangeRuntime: onChangeRuntime
   }), /*#__PURE__*/React__default.createElement(CodeEditor, {
-    className: css$O.codeEditor,
+    className: css$Q.codeEditor,
     value: code,
     onChange: onChangeCode,
     language: jobData.runtime,
     saved: codeSaved
   }), /*#__PURE__*/React__default.createElement(Logs, {
-    className: css$O.logs,
+    className: css$Q.logs,
     data: jobData
   }));
 };
 
-var css$P = {"jobs":"_z2_YO"};
+var css$R = {"jobs":"_z2_YO"};
 
 var Jobs = function Jobs(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$P.jobs
+    className: css$R.jobs
   }, /*#__PURE__*/React__default.createElement(Switch, null, /*#__PURE__*/React__default.createElement(Route, {
     path: routes.jobs(),
     exact: true,
     component: List$1
   }), /*#__PURE__*/React__default.createElement(Route, {
     path: routes.jobsDetails(),
-    component: Details$1
+    component: Details$2
   })));
 };
 
-var css$Q = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
+var css$S = {"item":"_2TtG-","preview":"_l7PkQ","label":"_IluCM","previewWrap":"_JeLjN","emptyMessage":"_3FYnh","attachment":"_29ErP","section":"_t4Sh3","content":"_1PvDk","name":"_246Ao","by":"_15CWL","permissions":"_Venzr","dropdown":"_3zDl9","preview-stack-pulse":"_1TX_d"};
 
 var Item$1 = function Item(_ref) {
   var data = _ref.data,
@@ -5638,35 +6263,35 @@ var Item$1 = function Item(_ref) {
   var isShowDropdown = Boolean(deleteItem);
   return /*#__PURE__*/React__default.createElement(Link, {
     to: "/" + user + "/d/" + data.id,
-    className: css$Q.item,
+    className: css$S.item,
     ref: ref
   }, Boolean(data.cards.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.label
+    className: css$S.label
   }, t('stacksWithCount', {
     count: data.cards.length
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.previewWrap
+    className: css$S.previewWrap
   }, hasStacks ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$Q.attachment,
+    className: css$S.attachment,
     isList: true,
     withLoader: true,
     frameId: card.head.id,
     stack: card.stack,
     id: 0
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.emptyMessage
+    className: css$S.emptyMessage
   }, t('emptyDashboard'))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.section
+    className: css$S.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.content
+    className: css$S.content
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.name
+    className: css$S.name
   }, data.title, ' ', /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), user !== data.user && /*#__PURE__*/React__default.createElement("div", {
-    className: css$Q.by
+    className: css$S.by
   }, t('by'), " ", data.user), renderContent && renderContent(data)), isShowDropdown && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$Q.dropdown,
+    className: css$S.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteItem
@@ -5674,33 +6299,33 @@ var Item$1 = function Item(_ref) {
   })));
 };
 
-var css$R = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
+var css$T = {"loader":"_Tepr9","text":"_123Jw","dashboards-pulse":"_DeSvR","grid":"_37UOy","item":"_B93bY","pic":"_33hqz","section":"_3jX_z"};
 
 var Loader$4 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.loader
+    className: css$T.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.text
+    className: css$T.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.grid
+    className: css$T.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.item
+    className: css$T.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.pic
+    className: css$T.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.section
+    className: css$T.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.item
+    className: css$T.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.pic
+    className: css$T.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$R.section
+    className: css$T.section
   }))));
 };
 
-var api$2 = apiFabric();
+var api$3 = apiFabric();
 var useActions$2 = (function () {
   var _useAppStore = useAppStore(),
       apiUrl = _useAppStore[0].apiUrl;
@@ -5709,7 +6334,7 @@ var useActions$2 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp2 = _catch(function () {
-          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CREATE, {
+          return Promise.resolve(api$3.post(apiUrl + config.DASHBOARD_CREATE, {
             user: userName
           })).then(function (request) {
             resolve(request.data);
@@ -5729,7 +6354,7 @@ var useActions$2 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp4 = _catch(function () {
-          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_UPDATE, _extends({
+          return Promise.resolve(api$3.post(apiUrl + config.DASHBOARD_UPDATE, _extends({
             user: userName,
             id: id
           }, fields))).then(function (request) {
@@ -5750,7 +6375,7 @@ var useActions$2 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp6 = _catch(function () {
-          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_DELETE, {
+          return Promise.resolve(api$3.post(apiUrl + config.DASHBOARD_DELETE, {
             user: userName,
             id: reportId
           })).then(function (request) {
@@ -5771,7 +6396,7 @@ var useActions$2 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp8 = _catch(function () {
-          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CARDS_INSERT + '?attachments=true', {
+          return Promise.resolve(api$3.post(apiUrl + config.DASHBOARD_CARDS_INSERT + '?attachments=true', {
             user: userName,
             dashboard: id,
             cards: cards,
@@ -5794,7 +6419,7 @@ var useActions$2 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp10 = _catch(function () {
-          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CARDS_UPDATE, _extends({
+          return Promise.resolve(api$3.post(apiUrl + config.DASHBOARD_CARDS_UPDATE, _extends({
             user: userName,
             dashboard: id,
             stack: stack
@@ -5816,7 +6441,7 @@ var useActions$2 = (function () {
     return new Promise(function (resolve) {
       try {
         var _temp12 = _catch(function () {
-          return Promise.resolve(api$2.post(apiUrl + config.DASHBOARD_CARDS_DELETE, {
+          return Promise.resolve(api$3.post(apiUrl + config.DASHBOARD_CARDS_DELETE, {
             user: userName,
             dashboard: id,
             stack: stack
@@ -5844,7 +6469,7 @@ var useActions$2 = (function () {
   };
 });
 
-var css$S = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
+var css$U = {"list":"_uwcI_","title":"_36F7e","search":"_1HsPY","mobileSearch":"_3JBKO","text":"_11SLK","grid":"_2KJdC","add":"_3vd7A","caption":"_2_R7F"};
 
 var dataFormat$3 = function dataFormat(data) {
   return data.dashboards;
@@ -5935,37 +6560,37 @@ var List$2 = function List(_ref) {
   }, t('goToMyDashboards')), "."));
   if (!data) return /*#__PURE__*/React__default.createElement(Loader$4, null);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.list
+    className: css$U.list
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(SearchField, {
     showEverything: true,
     isDark: true,
-    className: css$S.search,
+    className: css$U.search,
     placeholder: t('findDashboard'),
     size: "small",
     value: search,
     onChange: onChangeSearch
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.title
+    className: css$U.title
   }, currentUserName === user ? t('myReports') : t('reportsOf', {
     name: user
   }), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("span", null, data.length)), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     placeholder: t('search'),
-    className: css$S.mobileSearch,
+    className: css$U.mobileSearch,
     showEverything: true,
     size: "small",
     value: search,
     onChange: onChangeSearch
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.grid
+    className: css$U.grid
   }, currentUserName === user && /*#__PURE__*/React__default.createElement("div", {
     onClick: create,
-    className: cx(css$S.add, {
+    className: cx(css$U.add, {
       disabled: creating
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$S.caption
+    className: css$U.caption
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-plus"
   }), t('newReport'))), items.map(function (item, index) {
@@ -5978,23 +6603,23 @@ var List$2 = function List(_ref) {
   })));
 };
 
-var css$T = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
+var css$V = {"loader":"_3meGS","text":"_2fWbA","dashboards-details-pulse":"_nJVCo","filters":"_3RT0J","grid":"_qat5v","item":"_2kTBz"};
 
 var Loader$5 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.loader
+    className: css$V.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.text
+    className: css$V.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.filters
+    className: css$V.filters
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.grid
+    className: css$V.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.item
+    className: css$V.item
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$T.item
+    className: css$V.item
   })));
 };
 
@@ -6070,39 +6695,39 @@ var GridProvider = /*#__PURE__*/function (_Component) {
   return GridProvider;
 }(Component);
 
-var css$U = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
+var css$W = {"loader":"_3bVFk","text":"_2ZWwD","stacks-pulse":"_32IBp","grid":"_1NGPz","item":"_pEfso","pic":"_3Cu55","section":"_3VyE7"};
 
 var Loader$6 = function Loader(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.loader
+    className: css$W.loader
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.text
+    className: css$W.text
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.grid
+    className: css$W.grid
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.item
+    className: css$W.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.pic
+    className: css$W.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.section
+    className: css$W.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.item
+    className: css$W.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.pic
+    className: css$W.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.section
+    className: css$W.section
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.item
+    className: css$W.item
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.pic
+    className: css$W.pic
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$U.section
+    className: css$W.section
   }))));
 };
 
-var css$V = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
+var css$X = {"stacks":"_1EVMf","grid":"_23g1_","search":"_2aMVS","message":"_1MJtk","text":"_3eeN7","item":"_1S3Mz","checkbox":"_1Zf0d","buttons":"_1HBY_","button":"_1m3l6"};
 
 var dataFormat$4 = function dataFormat(data) {
   return data.stacks;
@@ -6193,13 +6818,13 @@ var AddStacksModal = function AddStacksModal(_ref) {
 
   var isUserOwner = currentUserName === params.user;
   return /*#__PURE__*/React__default.createElement(Modal, {
-    dialogClassName: css$V.stacks,
+    dialogClassName: css$X.stacks,
     isShow: isShow,
     title: t('selectStacks'),
     onClose: onClose,
     withCloseButton: true
   }, data && Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
-    className: css$V.search,
+    className: css$X.search,
     isDark: true,
     size: "middle",
     showEverything: true,
@@ -6207,42 +6832,42 @@ var AddStacksModal = function AddStacksModal(_ref) {
     value: searchQuery,
     onChange: onChangeSearch
   }), !data && /*#__PURE__*/React__default.createElement(Loader$6, null), data && Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.message
+    className: css$X.message
   }, isUserOwner ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: params.user
   })), data && Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.text
+    className: css$X.text
   }, t('noStacksAreFoundedMatchedTheSearchCriteria')), data && Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.grid
+    className: css$X.grid
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement("div", {
-      className: css$V.item,
+      className: css$X.item,
       key: index,
       onClick: getOnClickStack(item)
     }, /*#__PURE__*/React__default.createElement(CheckboxField, {
-      className: css$V.checkbox,
+      className: css$X.checkbox,
       value: isChecked(item),
       readOnly: true
     }), /*#__PURE__*/React__default.createElement(Item, {
       data: item
     }));
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$V.buttons
+    className: css$X.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$V.button,
+    className: css$X.button,
     color: "primary",
     variant: "contained",
     disabled: !selected.length,
     onClick: submit
   }, t('addSelectedStacks')), /*#__PURE__*/React__default.createElement(Button, {
-    className: css$V.button,
+    className: css$X.button,
     color: "secondary",
     variant: "contained",
     onClick: onClose
   }, t('cancel')))));
 };
 
-var css$W = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
+var css$Y = {"card":"_2USXU","inner":"_nCWYo","head":"_3Ir7x","name":"_dAh2C","nameEdit":"_3U2XI","nameValue":"_1d1pL","info":"_1KbVf","dropdown":"_3Fjm5","button":"_3jXy5","move":"_1XXQ2","viewSwitcher":"_2EIG0","cardControls":"_M80-o","description":"_1od1n","addDesc":"_24azt","infoTime":"_ISfic","emptyMessage":"_3Fu27","attachment":"_3x5M9"};
 
 var viewValueMap = {
   grid: 1,
@@ -6383,53 +7008,53 @@ var Card = memo(function (_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$W.card, "col-" + columns, className),
+    className: cx(css$Y.card, "col-" + columns, className),
     ref: forwardedRef
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.inner
+    className: css$Y.inner
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.head
+    className: css$Y.head
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$W.name, {
+    className: cx(css$Y.name, {
       readonly: !updateCard
     })
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.nameValue
+    className: css$Y.nameValue
   }, (title === null || title === void 0 ? void 0 : title.length) ? title : t('title')), /*#__PURE__*/React__default.createElement("input", {
     value: title,
     type: "text",
     placeholder: t('title'),
     onChange: onChangeTitle,
-    className: cx(css$W.nameEdit, {
+    className: cx(css$Y.nameEdit, {
       active: !(title === null || title === void 0 ? void 0 : title.length)
     })
   })), /*#__PURE__*/React__default.createElement(Tooltip, {
     overlayContent: /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement("div", null, t('updatedByName', {
       name: stackOwner
     })), data.head && /*#__PURE__*/React__default.createElement("div", {
-      className: css$W.infoTime
+      className: css$Y.infoTime
     }, moment(data.head.timestamp).format('D MMM YYYY')))
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.info
+    className: css$Y.info
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-information-outline"
   }))), /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$W.button, css$W.link),
+    className: cx(css$Y.button, css$Y.link),
     color: "secondary",
     Component: Link,
     to: "/" + data.stack
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-open-in-new"
   })), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.cardControls
+    className: css$Y.cardControls
   }, deleteCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$W.button),
+    className: cx(css$Y.button),
     color: "secondary",
     onClick: deleteCard
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-trash-can-outline"
   })), moveAvailable && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$W.button, css$W.move),
+    className: cx(css$Y.button, css$Y.move),
     color: "secondary",
     onMouseEnter: onEnterMove,
     onMouseLeave: onLeaveMove
@@ -6438,9 +7063,9 @@ var Card = memo(function (_ref) {
   })), /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     onChange: onChangeView,
     value: data.columns === 1 ? 'grid' : 'list',
-    className: css$W.viewSwitcher
+    className: css$Y.viewSwitcher
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.description
+    className: css$Y.description
   }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
     value: data.description,
     ref: descFieldRef,
@@ -6449,18 +7074,18 @@ var Card = memo(function (_ref) {
     onBlur: onBlurDescription,
     readOnly: !updateCard
   }), !isShowDesc && updateCard && /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$W.addDesc),
+    className: cx(css$Y.addDesc),
     color: "secondary",
     onClick: addDesc
   }, "+ ", t('addDescription'))), headId && attachmentIndex !== null ? /*#__PURE__*/React__default.createElement(Attachment, {
-    className: css$W.attachment,
+    className: css$Y.attachment,
     isList: true,
     withLoader: true,
     stack: data.stack,
     frameId: headId,
     id: attachmentIndex
   }) : /*#__PURE__*/React__default.createElement("div", {
-    className: css$W.emptyMessage
+    className: css$Y.emptyMessage
   }, t('emptyDashboard'))));
 });
 
@@ -6502,13 +7127,13 @@ var DnDItem = memo(function (_ref) {
   });
 });
 
-var css$X = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","permissions":"_3OGBJ","share":"_198zx","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
+var css$Z = {"details":"_1YGMH","header":"_1lU-L","title":"_2HPT5","edit":"_3ezYE","permissions":"_3OGBJ","share":"_198zx","sideHeader":"_2PqMZ","addButton":"_4KCh5","description":"_1peNb","addDesc":"_-FjzY","dropdown":"_2-VRH","tabs":"_pJ1U-","container":"_3V4ls","section":"_2_7da","cards":"_3OOzf","fields":"_WLi30","filters":"_2q551","empty":"_13-9o"};
 
 var dataFormat$5 = function dataFormat(data) {
   return data.dashboard;
 };
 
-var Details$2 = function Details() {
+var Details$3 = function Details() {
   var _currentUser$data, _data$description;
 
   var _useTranslation = useTranslation(),
@@ -6840,7 +7465,7 @@ var Details$2 = function Details() {
       fields: fields,
       form: form,
       onChange: onChange,
-      className: cx(css$X.filters, {
+      className: cx(css$Z.filters, {
         'with-select': hasSelectField
       })
     });
@@ -6873,7 +7498,7 @@ var Details$2 = function Details() {
   var isUserOwner = currentUserName === user;
   var CardWrapComponent = isUserOwner ? DnDItem : Fragment;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.details
+    className: css$Z.details
   }, /*#__PURE__*/React__default.createElement(Yield, {
     name: "header-yield"
   }, /*#__PURE__*/React__default.createElement(BackButton, {
@@ -6882,11 +7507,11 @@ var Details$2 = function Details() {
   }, currentUserName === user ? t('backToDashboards') : t('backToDashboardsOf', {
     name: user
   }))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.header
+    className: css$Z.header
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.title
+    className: css$Z.title
   }, /*#__PURE__*/React__default.createElement(StretchTitleField, {
-    className: css$X.edit,
+    className: css$Z.edit,
     value: data.title || '',
     onChange: onChangeTitle,
     readOnly: currentUserName !== data.user,
@@ -6894,12 +7519,12 @@ var Details$2 = function Details() {
   }), /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-lock" + (data["private"] ? '' : '-open')
   })), data["private"] && /*#__PURE__*/React__default.createElement(PermissionUsers, {
-    className: css$X.permissions,
+    className: css$Z.permissions,
     permissions: data.permissions
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.sideHeader
+    className: css$Z.sideHeader
   }, isUserOwner && /*#__PURE__*/React__default.createElement("a", {
-    className: css$X.addButton,
+    className: css$Z.addButton,
     onClick: toggleAddStackModal,
     href: "#"
   }, /*#__PURE__*/React__default.createElement("span", {
@@ -6907,23 +7532,23 @@ var Details$2 = function Details() {
   }), t('addStack')), isUserOwner && /*#__PURE__*/React__default.createElement(Share, {
     instancePath: user + "/d/" + data.id,
     onUpdatePrivate: onChangePrivate,
-    className: css$X.share,
+    className: css$Z.share,
     defaultIsPrivate: data["private"],
     defaultPermissions: data.permissions,
     onUpdatePermissions: updatePermissions
   }), isUserOwner && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$X.dropdown,
+    className: css$Z.dropdown,
     items: [{
       title: t('delete'),
       onClick: deleteDashboard
     }]
   }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$X['dropdown-button'],
+    className: css$Z['dropdown-button'],
     color: "secondary"
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-dots-horizontal"
   }))))), /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.description
+    className: css$Z.description
   }, isShowDesc && /*#__PURE__*/React__default.createElement(StretchTextAreaField, {
     value: data.description || '',
     ref: descFieldRef,
@@ -6932,22 +7557,22 @@ var Details$2 = function Details() {
     onBlur: onBlurDescription,
     readOnly: currentUserName !== data.user
   }), !isShowDesc && currentUserName === data.user && /*#__PURE__*/React__default.createElement(Button, {
-    className: css$X.addDesc,
+    className: css$Z.addDesc,
     color: "secondary",
     onClick: addDesc
   }, "+ ", t('addDescription'))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
-    className: css$X.tabs,
+    className: css$Z.tabs,
     onChange: onChangeTab,
     value: activeTab,
     items: tabs
   }), Boolean(items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.container
+    className: css$Z.container
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.section
+    className: css$Z.section
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.fields
+    className: css$Z.fields
   }, renderFilters())), /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$X.cards)
+    className: cx(css$Z.cards)
   }, items.map(function (item) {
     return /*#__PURE__*/React__default.createElement(CardWrapComponent, _extends({
       key: item.card.stack
@@ -6963,9 +7588,9 @@ var Details$2 = function Details() {
       moveAvailable: isUserOwner
     }));
   }))), !items.length && !(data === null || data === void 0 ? void 0 : data.cards) && /*#__PURE__*/React__default.createElement("div", {
-    className: css$X.empty
+    className: css$Z.empty
   }, t('thereAreNoStacksYet'), " ", /*#__PURE__*/React__default.createElement("br", null), t('youCanSendStacksYouWantToBeHereLaterOrAddItRightNow'), isUserOwner && /*#__PURE__*/React__default.createElement(Fragment, null, ' ', /*#__PURE__*/React__default.createElement("a", {
-    className: css$X.addButton,
+    className: css$Z.addButton,
     onClick: toggleAddStackModal,
     href: "#"
   }, t('addStack')), ".")), /*#__PURE__*/React__default.createElement(AddStacksModal, {
@@ -6975,25 +7600,25 @@ var Details$2 = function Details() {
   }));
 };
 
-var css$Y = {"reports":"_30ROl"};
+var css$_ = {"reports":"_30ROl"};
 
 var Reports = function Reports(_ref) {
   _objectDestructuringEmpty(_ref);
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$Y.reports
+    className: css$_.reports
   }, /*#__PURE__*/React__default.createElement(Switch, null, /*#__PURE__*/React__default.createElement(Route, {
     path: routes.reports(),
     exact: true,
     component: List$2
   }), /*#__PURE__*/React__default.createElement(Route, {
     path: routes.reportsDetails(),
-    component: Details$2
+    component: Details$3
   })));
 };
 
-function _extends$6() {
-  _extends$6 = Object.assign || function (target) {
+function _extends$7() {
+  _extends$7 = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -7007,15 +7632,15 @@ function _extends$6() {
     return target;
   };
 
-  return _extends$6.apply(this, arguments);
+  return _extends$7.apply(this, arguments);
 }
 
-var _ref$5 = /*#__PURE__*/createElement("path", {
+var _ref$6 = /*#__PURE__*/createElement("path", {
   d: "M72.388 28.36c.867-.884 1.3-2.063 1.3-3.536 0-1.473-.433-2.643-1.3-3.51-.85-.867-1.863-1.3-3.042-1.3-1.179 0-2.201.425-3.068 1.274-.85.85-1.274 2.01-1.274 3.484 0 1.473.425 2.66 1.274 3.562.867.884 1.89 1.326 3.068 1.326 1.179 0 2.193-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.127 0 2.115.26 2.964.78.867.503 1.534 1.17 2.002 2.002V12.76h2.99V32h-2.99v-2.678a5.766 5.766 0 01-2.002 2.132c-.85.52-1.837.78-2.964.78zM79.921 21.782c0-1.213.511-2.236 1.534-3.068 1.023-.85 2.366-1.274 4.03-1.274 1.664 0 2.981.416 3.952 1.248.988.815 1.517 1.933 1.586 3.354h-3.042c-.052-.71-.303-1.265-.754-1.664-.433-.399-1.049-.598-1.846-.598-.797 0-1.421.182-1.872.546-.45.347-.676.815-.676 1.404 0 .572.286 1.023.858 1.352.572.33 1.265.572 2.08.728.832.156 1.655.347 2.47.572a4.422 4.422 0 012.106 1.248c.572.59.858 1.387.858 2.392 0 1.248-.529 2.262-1.586 3.042-1.04.78-2.383 1.17-4.03 1.17-1.647 0-2.981-.399-4.004-1.196-1.023-.797-1.586-1.933-1.69-3.406h3.068c.052.71.312 1.265.78 1.664s1.1.598 1.898.598c.815 0 1.456-.173 1.924-.52.485-.364.728-.84.728-1.43s-.286-1.049-.858-1.378c-.572-.33-1.274-.572-2.106-.728a71.892 71.892 0 01-2.47-.572 4.632 4.632 0 01-2.08-1.196c-.572-.572-.858-1.335-.858-2.288zM101.402 20.092h-3.484v7.93c0 .537.121.927.364 1.17.26.225.693.338 1.3.338h1.82V32h-2.34c-2.756 0-4.134-1.326-4.134-3.978v-7.93h-1.69v-2.418h1.69v-3.562h2.99v3.562h3.484v2.418zM113.572 28.36c.866-.884 1.3-2.063 1.3-3.536 0-1.473-.434-2.643-1.3-3.51-.85-.867-1.864-1.3-3.042-1.3-1.179 0-2.202.425-3.068 1.274-.85.85-1.274 2.01-1.274 3.484 0 1.473.424 2.66 1.274 3.562.866.884 1.889 1.326 3.068 1.326 1.178 0 2.192-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.126 0 2.114.26 2.964.78.866.503 1.534 1.17 2.002 2.002v-2.548h2.99V32h-2.99v-2.678a5.774 5.774 0 01-2.002 2.132c-.85.52-1.838.78-2.964.78zM127.787 32.234c-2.08 0-3.77-.676-5.07-2.028-1.3-1.352-1.95-3.137-1.95-5.356 0-2.236.65-4.03 1.95-5.382 1.317-1.352 3.007-2.028 5.07-2.028 1.733 0 3.163.416 4.29 1.248 1.144.815 1.915 1.985 2.314 3.51h-3.198c-.538-1.508-1.673-2.262-3.406-2.262-1.214 0-2.184.433-2.912 1.3-.711.85-1.066 2.045-1.066 3.588 0 1.543.355 2.747 1.066 3.614.728.867 1.698 1.3 2.912 1.3 1.716 0 2.851-.754 3.406-2.262h3.198c-.416 1.456-1.196 2.617-2.34 3.484-1.144.85-2.566 1.274-4.264 1.274zM140.308 32h-2.964V12.76h2.964v11.18l5.2-6.266h4.108l-6.604 7.176 6.604 7.15h-4.004l-5.304-6.162V32zM154.107 31.506a1.78 1.78 0 01-1.274.494c-.503 0-.927-.173-1.274-.52a1.75 1.75 0 01-.494-1.248c0-.503.165-.927.494-1.274.347-.347.771-.52 1.274-.52s.927.173 1.274.52c.347.347.52.771.52 1.274s-.173.927-.52 1.274zM167.298 28.36c.867-.884 1.3-2.063 1.3-3.536 0-1.473-.433-2.643-1.3-3.51-.849-.867-1.863-1.3-3.042-1.3-1.179 0-2.201.425-3.068 1.274-.849.85-1.274 2.01-1.274 3.484 0 1.473.425 2.66 1.274 3.562.867.884 1.889 1.326 3.068 1.326s2.193-.433 3.042-1.3zm-3.666 3.874c-1.907 0-3.51-.693-4.81-2.08-1.3-1.404-1.95-3.19-1.95-5.356 0-2.184.641-3.952 1.924-5.304 1.3-1.37 2.912-2.054 4.836-2.054 1.127 0 2.115.26 2.964.78a5.284 5.284 0 012.002 2.002v-2.548h2.99V32h-2.99v-2.678a5.766 5.766 0 01-2.002 2.132c-.849.52-1.837.78-2.964.78zM178.861 13.878c0 .537-.182.988-.546 1.352-.364.364-.815.546-1.352.546-.52 0-.962-.182-1.326-.546-.364-.364-.546-.815-.546-1.352 0-.537.182-.988.546-1.352a1.805 1.805 0 011.326-.546c.537 0 .988.182 1.352.546.364.364.546.815.546 1.352zM175.481 32V17.674h2.964V32h-2.964z",
   fill: "#303340"
 });
 
-var _ref2$2 = /*#__PURE__*/createElement("rect", {
+var _ref2$3 = /*#__PURE__*/createElement("rect", {
   width: 31.284,
   height: 29.645,
   rx: 3,
@@ -7080,15 +7705,15 @@ var _ref5 = /*#__PURE__*/createElement("defs", null, /*#__PURE__*/createElement(
 })));
 
 function SvgLogo(props) {
-  return /*#__PURE__*/createElement("svg", _extends$6({
+  return /*#__PURE__*/createElement("svg", _extends$7({
     width: 179,
     height: 48,
     viewBox: "0 0 179 48",
     fill: "none"
-  }, props), _ref$5, _ref2$2, _ref3$2, _ref4$1, _ref5);
+  }, props), _ref$6, _ref2$3, _ref3$2, _ref4$1, _ref5);
 }
 
-var css$Z = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
+var css$$ = {"header":"_3C4T1","logo":"_1jfuS","buttons":"_2EQYi","button":"_3cb7N"};
 
 var Header = function Header(_ref) {
   var className = _ref.className;
@@ -7097,35 +7722,35 @@ var Header = function Header(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$Z.header, className)
+    className: cx(css$$.header, className)
   }, /*#__PURE__*/React__default.createElement(Link, {
     to: "/",
-    className: css$Z.logo
+    className: css$$.logo
   }, /*#__PURE__*/React__default.createElement(SvgLogo, null)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$Z.buttons
+    className: css$$.buttons
   }, /*#__PURE__*/React__default.createElement(Button, {
     Component: Link,
     to: "/auth/login",
-    className: css$Z.button,
+    className: css$$.button,
     color: "primary",
     variant: "contained"
   }, t('logIn'))));
 };
 
-var css$_ = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
+var css$10 = {"layout":"_23bi3","header":"_1chFa","main":"_70hee"};
 
 var UnAuthorizedLayout = function UnAuthorizedLayout(_ref) {
   var children = _ref.children;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.layout
+    className: css$10.layout
   }, /*#__PURE__*/React__default.createElement(Header, {
-    className: css$_.header
+    className: css$10.header
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$_.main
+    className: css$10.main
   }, children));
 };
 
-var css$$ = {"infoButton":"_2zmYM"};
+var css$11 = {"infoButton":"_2zmYM"};
 
 var SettingsInformation = function SettingsInformation(_ref) {
   var className = _ref.className,
@@ -7145,7 +7770,7 @@ var SettingsInformation = function SettingsInformation(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
-    className: cx(css$$.infoButton, className),
+    className: cx(css$11.infoButton, className),
     size: "small",
     color: "secondary",
     onClick: toggleModal
@@ -7160,5 +7785,5 @@ var SettingsInformation = function SettingsInformation(_ref) {
   }, renderModalContent()));
 };
 
-export { AccessForbidden, AppStoreProvider, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Jobs, Loader, MarkdownRender, Modal, NotFound, ProgressBar, Details$2 as ReportDetails, List$2 as ReportList, Reports, SearchField, SelectField, SettingsInformation, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTextAreaField as StretchTextareaField, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, apiFabric, actionsTypes as appStoreActionTypes, config, useAppStore };
+export { AccessForbidden, AppStoreProvider, Avatar, BackButton, Button, CheckboxField, CodeViewer, Copy, GridContext as DnDGridContext, GridProvider as DnDGridContextProvider, DnDItem, Dropdown, FileDragnDrop$1 as FileDragnDrop, Jobs, Loader, MarkdownRender, Modal, NotFound, ProgressBar, Details$3 as ReportDetails, List$2 as ReportList, Reports, SearchField, SelectField, SettingsInformation, SliderField, Spinner, Attachment as StackAttachment, StateProvider as StackAttachmentProvider, Details as StackDetails, Details$1 as StackDetailsApp, StackFilters, Frames as StackFrames, HowTo as StackHowToFetchData, List as StackList, Item as StackListItem, Upload as StackUpload, StretchTextAreaField as StretchTextareaField, StretchTitleField, Tabs, TextAreaField, TextField, Tooltip, UnAuthorizedLayout, UploadStack, ViewSwitcher, Yield, apiFabric, actionsTypes as appStoreActionTypes, config, useAppStore };
 //# sourceMappingURL=index.modern.js.map

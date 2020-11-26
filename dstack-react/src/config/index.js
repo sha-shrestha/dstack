@@ -22,6 +22,9 @@ export default {
     STACK_UPDATE: '/stacks/update',
     STACK_PUSH: '/stacks/push',
 
+    APPS_EXECUTE: '/apps/execute',
+    APPS_POLL: '/apps/poll',
+
     DASHBOARD_LIST: userName => `/dashboards/${userName}`,
     DASHBOARD_DETAILS: (userName, id) => `/dashboards/${userName}/${id}`,
     DASHBOARD_CREATE: '/dashboards/create',
