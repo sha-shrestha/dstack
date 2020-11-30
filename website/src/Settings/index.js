@@ -3,8 +3,8 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next';
-import {debounce as _debounce} from 'lodash-es';
-import {Button, TextField, Copy, SettingsInformation, UploadStack} from '@dstackai/dstack-react';
+import {debounce as _debounce, get} from 'lodash-es';
+import {Button, TextField, CheckboxField, Copy, SettingsInformation, UploadStack} from '@dstackai/dstack-react';
 import {updateToken} from 'App/actions';
 import {updateSettings} from './actions';
 import config from 'config';
@@ -17,30 +17,39 @@ type Props = {
     currentUser: string,
     currentUserToken: string,
 
+    userData: {
+        user: string,
+        token: string,
+    },
+
     history: {push: Function}
 }
 
-const Settings = ({updateToken, currentUser, currentUserToken, updateSettings}: Props) => {
+const Settings = ({updateToken, currentUser, userData, currentUserToken, updateSettings}: Props) => {
     const {t} = useTranslation();
     const availableSendingSettings = useRef(false);
     const [isEditName, setIsEditName] = useState(false);
     const updateSettingsDebounce = useCallback(_debounce(updateSettings, 300), []);
 
-    const [form, setForm] = useState({});
+    const [form, setForm] = useState({private: get(userData, 'settings.general.default_access_level') === 'private'});
 
     useEffect(() => {
-        setForm({...form});
+        setForm({
+            ...form,
+            private: get(userData, 'settings.general.default_access_level') === 'private',
+
+        });
     }, [currentUser]);
 
     useEffect(() => {
         if (availableSendingSettings.current)
             updateSettingsDebounce({
                 user: currentUser,
-                general: {},
+                general: {'default_access_level': form.private ? 'private' : 'public'},
             });
         else
             availableSendingSettings.current = true;
-    }, [form.comments]);
+    }, [form.private, form.comments]);
 
     const cancelEditName = () => {
         setForm({
@@ -119,6 +128,23 @@ const Settings = ({updateToken, currentUser, currentUserToken, updateSettings}: 
             </div>
 
             <div className={css.section}>
+                <div className={css['section-title']}>{t('general')}</div>
+
+                <div className={css.item}>
+                    <CheckboxField
+                        align="right"
+                        appearance="switcher"
+                        label={t('theDefaultAccessLevel')}
+                        offLabel={t('public')}
+                        onLabel={t('private')}
+                        name="private"
+                        value={form.private}
+                        onChange={onChange}
+                    />
+                </div>
+            </div>
+
+            <div className={css.section}>
                 <div className={css['section-title']}>{t('token')}</div>
 
                 <div className={css.apitoken}>
@@ -161,6 +187,7 @@ const Settings = ({updateToken, currentUser, currentUserToken, updateSettings}: 
 
 export default connect(
     state => ({
+        userData: state.app.userData,
         currentUser: state.app.userData?.user,
         currentUserToken: state.app.userData?.token,
     }),
