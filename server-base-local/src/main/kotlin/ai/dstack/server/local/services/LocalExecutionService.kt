@@ -238,9 +238,9 @@ class LocalExecutionService @Autowired constructor(
             |    except Exception:
             |        execution['status'] = 'FAILED'
             |        execution['logs'] = str(traceback.format_exc())
-            |        if 'views' not in execution:
-            |            execution['views'] = [v.pack() for v in views]
-            |            
+            |        
+            |    if 'views' not in execution:
+            |        execution['views'] = [v.pack() for v in views]
             |    execution_file.write_text(json.dumps(execution))
             |
             |
