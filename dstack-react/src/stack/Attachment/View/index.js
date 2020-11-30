@@ -51,12 +51,13 @@ const View = ({frameId, attachment, fullAttachment, isList, className, requestSt
     }, []);
 
     useEffect(() => {
-        if (noRender)
+        if (noRender) {
             setNoRender(false);
+        }
     }, [noRender]);
 
     useEffect(() => {
-        if (attachment && attachment['application'] === 'plotly') {
+        if (attachment && attachment['application'] === 'plotly' && !noRender) {
             setNoRender(true);
         }
         if (attachment && attachment['application'] === 'bokeh') {

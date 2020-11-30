@@ -29,6 +29,8 @@ import {formatBytes, parseStackTabs, parseStackViews} from '../../utils';
 import actions from '../actions';
 import css from './styles.module.css';
 
+const REFRESH_INTERVAL = 1000;
+
 type Props = {
     loading: boolean,
     currentFrameId: number,
@@ -298,7 +300,7 @@ const Details = ({
                 if (['SCHEDULED', 'RUNNING'].indexOf(data.status) >= 0)
                     setTimeout(() => {
                         checkFinished({id: data.id});
-                    }, 3000);
+                    }, REFRESH_INTERVAL);
 
                 if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
                     setCalculating(false);
@@ -390,6 +392,7 @@ const Details = ({
                 className={css.tabs}
                 onChange={onChangeTab}
                 value={activeTab}
+                disabled={executing || calculating}
                 items={tabs}
             />}
 

@@ -1938,10 +1938,12 @@ var View = function View(_ref) {
     };
   }, []);
   React.useEffect(function () {
-    if (noRender) setNoRender(false);
+    if (noRender) {
+      setNoRender(false);
+    }
   }, [noRender]);
   React.useEffect(function () {
-    if (attachment && attachment['application'] === 'plotly') {
+    if (attachment && attachment['application'] === 'plotly' && !noRender) {
       setNoRender(true);
     }
 
@@ -2707,14 +2709,16 @@ var Tabs$1 = function Tabs(_ref) {
   var className = _ref.className,
       value = _ref.value,
       items = _ref.items,
-      onChange = _ref.onChange;
+      onChange = _ref.onChange,
+      disabled = _ref.disabled;
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$u.tabs, className)
   }, items.map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
       className: cx(css$u.tab, {
-        active: value === i.value
+        active: value === i.value,
+        disabled: disabled || i.disabled
       }),
       onClick: function onClick() {
         return onChange(i.value);
@@ -4257,6 +4261,8 @@ var actions$1 = (function () {
 
 var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
 
+var REFRESH_INTERVAL = 1000;
+
 var Details$1 = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
       headId = _ref.headId,
@@ -4527,7 +4533,7 @@ var Details$1 = function Details(_ref) {
         checkFinished({
           id: data.id
         });
-      }, 3000);
+      }, REFRESH_INTERVAL);
 
       if (['FINISHED', 'FAILED', 'READY'].indexOf(data.status) >= 0) {
         setCalculating(false);
@@ -4591,6 +4597,7 @@ var Details$1 = function Details(_ref) {
     className: css$E.tabs,
     onChange: onChangeTab,
     value: activeTab,
+    disabled: executing || calculating,
     items: tabs
   }), !executeData && executing && /*#__PURE__*/React__default.createElement("div", {
     className: css$E.container
