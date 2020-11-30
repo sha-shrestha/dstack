@@ -304,6 +304,10 @@ const Details = ({
                 )
                     return false;
 
+                if (onChangeExecutionId)
+                    onChangeExecutionId(undefined);
+
+                setExecuteData(null);
                 onChangeAttachmentIndex(index);
 
                 return true;

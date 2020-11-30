@@ -4541,6 +4541,8 @@ var Details$1 = function Details(_ref) {
         var _attach$params$tab$va, _attach$params$tab$ke;
 
         if (tab && ((_attach$params$tab$va = attach.params[tab.value]) === null || _attach$params$tab$va === void 0 ? void 0 : _attach$params$tab$va.type) !== 'tab' && ((_attach$params$tab$ke = attach.params[tab.key]) === null || _attach$params$tab$ke === void 0 ? void 0 : _attach$params$tab$ke.title) !== tab.value) return false;
+        if (onChangeExecutionId) onChangeExecutionId(undefined);
+        setExecuteData(null);
         onChangeAttachmentIndex(index);
         return true;
       });

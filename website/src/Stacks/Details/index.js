@@ -152,6 +152,7 @@ const Details = ({
     const onChangeFrame = frameId => {
         setSelectedFrame(frameId);
         setAttachmentIndex(undefined);
+        setExecutionId(undefined);
     };
 
     const toggleUploadModal = () => setIsShowUploadModal(!isShowUploadModal);
