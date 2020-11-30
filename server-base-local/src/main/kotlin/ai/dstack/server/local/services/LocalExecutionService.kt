@@ -24,22 +24,22 @@ class LocalExecutionService @Autowired constructor(
 
     private val executionHome = File(config.executionDirectory).absolutePath
 
-    override fun execute(userName: String, attachment: Attachment, views: List<Map<String, Any?>>?, apply: Boolean): Execution {
+    override fun execute(stackPath: String, attachment: Attachment, views: List<Map<String, Any?>>?, apply: Boolean): Execution {
         val id = UUID.randomUUID().toString()
         return if (config.pythonExecutable != null) {
             extractApplicationIfMissing(attachment)
 
             val executionFile = executionFile(id)
             if (apply) {
-                writeExecutionFile(userName, executionFile, id, views)
+                writeExecutionFile(stackPath, executionFile, id, views)
             }
 
-            val p = getProcess(attachment, userName)
+            val p = getProcess(attachment, stackPath)
             val command = mutableMapOf<String, Any?>()
             command["views"] = views
             return if (apply) {
                 command["id"] = id
-                command["user"] = userName
+                command["stack"] = stackPath
                 sendCommand(p, command)
                 poll(id)!!
             } else {
@@ -47,10 +47,10 @@ class LocalExecutionService @Autowired constructor(
                     sendCommand(p, command)
                     receiveResponse(p)
                 }
-                Execution(userName, id, viewsJson.toViews(), ExecutionStatus.Ready, null, null)
+                Execution(stackPath, id, viewsJson.toViews(), ExecutionStatus.Ready, null, null)
             }
         } else {
-            Execution(userName, id = id, views = emptyList(), status = ExecutionStatus.Failed, output = null,
+            Execution(stackPath, id = id, views = emptyList(), status = ExecutionStatus.Failed, output = null,
                     logs = "The Python executable is not configured.")
         }
     }
@@ -67,10 +67,10 @@ class LocalExecutionService @Autowired constructor(
 
     private val processes = mutableMapOf<String, Process>()
 
-    private fun getProcess(attachment: Attachment, userName: String): Process {
+    private fun getProcess(attachment: Attachment, stackPath: String): Process {
         val p = processes.getOrPut(attachment.filePath) {
             val executorFile = executorFile(attachment)
-            val commands = mutableListOf(config.pythonExecutable, executorFile.name, executionHome, userName)
+            val commands = mutableListOf(config.pythonExecutable, executorFile.name, executionHome, stackPath)
             ProcessBuilder(commands).directory(destDir(attachment)).start().also {
                 LocalSchedulerService.ErrorLogger(it.errorStream).start()
             }
@@ -79,7 +79,7 @@ class LocalExecutionService @Autowired constructor(
             p
         } else {
             processes.remove(attachment.filePath, p)
-            getProcess(attachment, userName)
+            getProcess(attachment, stackPath)
         }
     }
 
@@ -98,7 +98,7 @@ class LocalExecutionService @Autowired constructor(
     private fun readExecution(executionFile: File, id: String): Execution {
         val execution = executionFileObjectMapper.readValue(executionFile, Map::class.java)
         val views = execution["views"] as List<Map<String, Any?>>?
-        return Execution(execution["user"] as String, id, views,
+        return Execution(execution["stack"] as String, id, views,
                 ExecutionStatus.fromCode(execution["status"]!!.toString()),
                 execution["output"]?.let {
                     val output = it as Map<*, *>
@@ -109,10 +109,10 @@ class LocalExecutionService @Autowired constructor(
         )
     }
 
-    private fun writeExecutionFile(userName: String, executionFile: File, id: String, views: List<Map<String, Any?>>?) {
+    private fun writeExecutionFile(stackPath: String, executionFile: File, id: String, views: List<Map<String, Any?>>?) {
         executionFile.parentFile.mkdirs()
         val execution = mutableMapOf<String, Any?>()
-        execution["user"] = userName
+        execution["stack"] = stackPath
         execution["id"] = id
         if (views != null) {
             execution["views"] = views
@@ -150,7 +150,7 @@ class LocalExecutionService @Autowired constructor(
     private fun destDir(attachment: Attachment) =
             File(config.appDirectory + "/" + attachment.filePath)
 
-    private val executorVersion = 2
+    private val executorVersion = 3
 
     private fun executorFile(attachment: Attachment) = File(destDir(attachment), "execute_v${executorVersion}.py")
 
@@ -188,6 +188,7 @@ class LocalExecutionService @Autowired constructor(
             |from pathlib import Path
             |from dstack.controls import unpack_view
             |from dstack import AutoHandler
+            |from dstack.controls import Apply
             |
             |executions_home = sys.argv[1]
             |
@@ -201,21 +202,30 @@ class LocalExecutionService @Autowired constructor(
             |
             |$loadFuncScript
             |
-            |def apply(views, execution_id, user_name):
+            |def apply(views, execution_id, stack_path):
             |    executions = Path(executions_home)
             |    executions.mkdir(exist_ok=True)
             |    execution_file = executions / (execution_id + '.json')
             |    
             |    execution = {
-            |        'user': user_name,
+            |        'stack': stack_path,
             |        'id': execution_id,
-            |        'status': 'RUNNING' if apply else 'READY',
-            |        'views': [v.pack() for v in views]
+            |        'status': 'RUNNING' if apply else 'READY'
             |    }
-            |    
-            |    execution_file.write_text(json.dumps(execution))
-            |    
+            |        
             |    try:
+            |        has_dependant = False
+            |        has_apply = False
+            |        for c in controller.map.values():
+            |            if isinstance(c, Apply):
+            |                has_apply = True
+            |            if c.is_dependent():
+            |                has_dependant = True
+            |        if has_dependant and not has_apply:               
+            |            views = controller.list(views)
+            |            execution['views'] = [v.pack() for v in views]
+            |            execution_file.write_text(json.dumps(execution))
+            |        
             |        result = controller.apply(func, views)
             |        execution['status'] = 'FINISHED'
             |        output = {}
@@ -228,6 +238,9 @@ class LocalExecutionService @Autowired constructor(
             |    except Exception:
             |        execution['status'] = 'FAILED'
             |        execution['logs'] = str(traceback.format_exc())
+            |        if 'views' not in execution:
+            |            execution['views'] = [v.pack() for v in views]
+            |            
             |    execution_file.write_text(json.dumps(execution))
             |
             |
@@ -236,8 +249,8 @@ class LocalExecutionService @Autowired constructor(
             |    _views = command_json.get("views")
             |    execution_id = command_json.get("id")
             |    views = [unpack_view(v) for v in _views] if _views else None
-            |    user_name = command_json.get("user")
-            |    return views, execution_id, user_name
+            |    stack_path = command_json.get("stack")
+            |    return views, execution_id, stack_path
             |
             |
             |def print_views_stdout(views):
@@ -248,11 +261,12 @@ class LocalExecutionService @Autowired constructor(
             |while True:
             |    # TODO: Support timeout in future
             |    command = sys.stdin.readline()
-            |    views, execution_id, user_name = parse_command(command)
-            |    if views and execution_id and user_name:
-            |        apply(views, execution_id, user_name)
+            |    views, execution_id, stack_path = parse_command(command)
+            |    if views and execution_id and stack_path:
+            |        apply(views, execution_id, stack_path)
             |    else:
             |        # TODO: Make it possible to transport the views state without transporting the entire data
+            |        # TODO: Handle exceptions
             |        print_views_stdout(controller.list(views))
             |
             """.trimMargin()

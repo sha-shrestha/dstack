@@ -7,6 +7,7 @@ import ai.dstack.server.jersey.resources.malformedRequest
 import ai.dstack.server.jersey.resources.ok
 import ai.dstack.server.jersey.resources.payload.ExecutePayload
 import ai.dstack.server.jersey.resources.stackNotFound
+import ai.dstack.server.jersey.resources.stacks.parseStackPath
 import ai.dstack.server.jersey.resources.status.toStatus
 import ai.dstack.server.services.*
 import mu.KLogging
@@ -57,37 +58,32 @@ class AppResources {
             return if (stack != null) {
                 val session = headers.bearer?.let { sessionService.get(it) }
                 val userByToken = headers.bearer?.let { if (session == null) userService.findByToken(it) else null }
-                val userName = session?.userName ?: userByToken?.name
-                if (userName != null) {
-                    val public = !stack.private
-                    val permitted = public
-                            || (session != null &&
-                            (session.userName == stack.userName
-                                    || permissionService.get(stack.path, session.userName) != null))
-                            || (userByToken != null &&
-                            (userByToken.name == stack.userName
-                                    || permissionService.get(stack.path, userByToken.name) != null))
-                    if (permitted) {
-                        val frame = frameService.get(stack.path, payload.frame!!)
-                        if (frame != null) {
-                            val attachment = attachmentService.get(frame.path, payload.attachment!!)
-                            if (attachment != null) {
-                                if (attachment.application == "application/python") {
-                                    // TODO: Cache session, userByToken, stack, frame, attachment
-                                    val execution = executionService.execute(userName, attachment,
-                                            payload.views, payload.apply == true)
-                                    ok(execution.toStatus())
-                                } else {
-                                    unsupportedApplication(attachment.application)
-                                }
+                val public = !stack.private
+                val permitted = public
+                        || (session != null &&
+                        (session.userName == stack.userName
+                                || permissionService.get(stack.path, session.userName) != null))
+                        || (userByToken != null &&
+                        (userByToken.name == stack.userName
+                                || permissionService.get(stack.path, userByToken.name) != null))
+                if (permitted) {
+                    val frame = frameService.get(stack.path, payload.frame!!)
+                    if (frame != null) {
+                        val attachment = attachmentService.get(frame.path, payload.attachment!!)
+                        if (attachment != null) {
+                            if (attachment.application == "application/python") {
+                                // TODO: Cache session, userByToken, stack, frame, attachment
+                                val execution = executionService.execute(stack.path, attachment,
+                                        payload.views, payload.apply == true)
+                                ok(execution.toStatus())
                             } else {
-                                attachmentNotFound()
+                                unsupportedApplication(attachment.application)
                             }
                         } else {
-                            frameNotFound()
+                            attachmentNotFound()
                         }
                     } else {
-                        badCredentials()
+                        frameNotFound()
                     }
                 } else {
                     badCredentials()
@@ -107,22 +103,31 @@ class AppResources {
         return if (id.isNullOrBlank()) {
             malformedRequest()
         } else {
-            val session = headers.bearer?.let { sessionService.get(it) }
-            val userByToken = headers.bearer?.let { if (session == null) userService.findByToken(it) else null }
-            val userName = session?.userName ?: userByToken?.name
-            if (userName != null) {
-                val execution = executionService.poll(id)
-                if (execution != null) {
-                    if (execution.userName == userName) {
+            val execution = executionService.poll(id)
+            if (execution != null) {
+                val (u, s) = execution.stackPath.parseStackPath()
+                val stack = stackService.get(u, s)
+                if (stack != null) {
+                    val session = headers.bearer?.let { sessionService.get(it) }
+                    val userByToken = headers.bearer?.let { if (session == null) userService.findByToken(it) else null }
+                    val public = !stack.private
+                    val permitted = public
+                            || (session != null &&
+                            (session.userName == stack.userName
+                                    || permissionService.get(stack.path, session.userName) != null))
+                            || (userByToken != null &&
+                            (userByToken.name == stack.userName
+                                    || permissionService.get(stack.path, userByToken.name) != null))
+                    if (permitted) {
                         ok(execution.toStatus())
                     } else {
                         badCredentials()
                     }
                 } else {
-                    executionNotFound()
+                    stackNotFound()
                 }
             } else {
-                badCredentials()
+                executionNotFound()
             }
         }
     }

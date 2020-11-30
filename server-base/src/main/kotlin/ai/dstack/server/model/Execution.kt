@@ -26,7 +26,7 @@ data class ExecutionOutput(
 )
 
 data class Execution(
-        val userName: String,
+        val stackPath: String,
         val id: String,
         val views: List<Map<String, Any?>>?,
         val status: ExecutionStatus,
