@@ -336,13 +336,13 @@ const Details = ({
                     if (isUpdateData) {
                         setExecuting(false);
                         updateExecuteData(data);
-
-                        setError({
-                            date: Date.now(),
-                            status: data.status,
-                            logs: data.logs,
-                        });
                     }
+
+                    setError({
+                        date: Date.now(),
+                        status: data.status,
+                        logs: data.logs,
+                    });
                 }
             });
     };

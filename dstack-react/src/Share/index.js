@@ -13,6 +13,7 @@ import Button from '../Button';
 import {isValidEmail} from '../validations';
 import useActions from './actions';
 import css from './styles.module.css';
+import {useAppStore} from "../AppStore";
 
 type Props = {
     className?: string,
@@ -34,6 +35,7 @@ const Share = ({
     onUpdatePrivate,
     onUpdatePermissions,
 }: Props) => {
+    const [{configInfo}] = useAppStore();
     const [userExists, setUserExists] = useState(null);
     const [isEmail, setIsEmail] = useState(false);
     const [isPrivate, setIsPrivate] = useState(defaultIsPrivate);
@@ -73,7 +75,7 @@ const Share = ({
     const onChangeUserName = event => {
         setUserName(event.target.value);
 
-        if (isValidEmail(event.target.value).isValid) {
+        if (isValidEmail(event.target.value).isValid && configInfo.data['email_enabled']) {
             setUserExists(null);
             setIsEmail(true);
         } else {
@@ -228,7 +230,10 @@ const Share = ({
                     {isPrivate && <div className={css.checkUserName}>
                         <TextField
                             disabled={loading}
-                            placeholder={t('enterUsernameAndPressEnter')}
+                            placeholder={configInfo.data['email_enabled']
+                                ? t('enterUsernameEmailAndPressEnter')
+                                : t('enterUsernameAndPressEnter')
+                            }
                             className={css.textInput}
                             value={userName}
                             onChange={onChangeUserName}
