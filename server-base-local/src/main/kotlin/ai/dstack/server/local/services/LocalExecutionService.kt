@@ -2,6 +2,7 @@ package ai.dstack.server.local.services
 
 import ai.dstack.server.model.*
 import ai.dstack.server.services.*
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,7 +13,6 @@ import java.io.IOException
 import java.util.zip.ZipEntry
 import java.io.FileOutputStream
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 @Component
@@ -28,24 +28,58 @@ class LocalExecutionService @Autowired constructor(
         val id = UUID.randomUUID().toString()
         return if (config.pythonExecutable != null) {
             extractApplicationIfMissing(attachment)
-            val executorFile = executorFile(attachment)
 
             val executionFile = executionFile(id)
-            writeExecutionFile(userName, executionFile, id, views)
-
-            val commands = mutableListOf(config.pythonExecutable, executorFile.name,
-                    executionHome, userName, id, if (apply) "True" else "False")
-            val p = ProcessBuilder(commands).directory(destDir(attachment)).start()
-            LocalSchedulerService.ErrorLogger(p.errorStream).start()
             if (apply) {
-                p.waitFor(1, TimeUnit.SECONDS)
-            } else {
-                p.waitFor()
+                writeExecutionFile(userName, executionFile, id, views)
             }
-            poll(id)!!
+
+            val p = getProcess(attachment, userName)
+            val command = mutableMapOf<String, Any?>()
+            command["views"] = views
+            return if (apply) {
+                command["id"] = id
+                command["user"] = userName
+                sendCommand(p, command)
+                poll(id)!!
+            } else {
+                val viewsJson = synchronized(p) {
+                    sendCommand(p, command)
+                    receiveResponse(p)
+                }
+                Execution(userName, id, viewsJson.toViews(), ExecutionStatus.Ready, null, null)
+            }
         } else {
             Execution(userName, id = id, views = emptyList(), status = ExecutionStatus.Failed, output = null,
                     logs = "The Python executable is not configured.")
+        }
+    }
+
+    private fun receiveResponse(p: Process) = p.inputStream.bufferedReader().readLine()
+
+    private fun sendCommand(p: Process, command: MutableMap<String, Any?>) {
+        p.outputStream.write((commandObjectMapper.writeValueAsString(command) + "\n").toByteArray())
+        p.outputStream.flush()
+    }
+
+    private fun String?.toViews() =
+            commandObjectMapper.readValue(this, object : TypeReference<List<Map<String, Any>>>() {})
+
+    private val processes = mutableMapOf<String, Process>()
+
+    private fun getProcess(attachment: Attachment, userName: String): Process {
+        val p = processes.getOrPut(attachment.filePath) {
+            val executorFile = executorFile(attachment)
+            val commands = mutableListOf(config.pythonExecutable, executorFile.name, executionHome, userName)
+            ProcessBuilder(commands).directory(destDir(attachment)).start().also {
+                LocalSchedulerService.ErrorLogger(it.errorStream).start()
+            }
+        }
+        return if (p.isAlive) {
+            p
+        } else {
+            processes.remove(attachment.filePath, p)
+            getProcess(attachment, userName)
         }
     }
 
@@ -59,6 +93,7 @@ class LocalExecutionService @Autowired constructor(
     }
 
     private val executionFileObjectMapper = ObjectMapper()
+    private val commandObjectMapper = ObjectMapper()
 
     private fun readExecution(executionFile: File, id: String): Execution {
         val execution = executionFileObjectMapper.readValue(executionFile, Map::class.java)
@@ -115,7 +150,7 @@ class LocalExecutionService @Autowired constructor(
     private fun destDir(attachment: Attachment) =
             File(config.appDirectory + "/" + attachment.filePath)
 
-    private val executorVersion = 1
+    private val executorVersion = 2
 
     private fun executorFile(attachment: Attachment) = File(destDir(attachment), "execute_v${executorVersion}.py")
 
@@ -142,7 +177,7 @@ class LocalExecutionService @Autowired constructor(
             val (module, name) = getModuleAndFunc(functionSettings["data"] as String)
             "from $module import $name as func"
         } else {
-            "with open(\"function.pickle\", \"rb\") as f:\n\tfunc = cloudpickle.load(f)"
+            "with open(\"function.pickle\", \"rb\") as f:\n    func = cloudpickle.load(f)"
         }
 
         val script = """
@@ -151,13 +186,10 @@ class LocalExecutionService @Autowired constructor(
             |import json
             |import traceback
             |from pathlib import Path
-            |from dstack.application.controls import unpack_view
+            |from dstack.controls import unpack_view
             |from dstack import AutoHandler
             |
             |executions_home = sys.argv[1]
-            |user_name = sys.argv[2]
-            |execution_id = sys.argv[3]
-            |apply = sys.argv[4] == 'True'
             |
             |with open("controller.pickle", "rb") as f:
             |    controller = cloudpickle.load(f)
@@ -166,32 +198,23 @@ class LocalExecutionService @Autowired constructor(
             |    for i in range(len(c._parents)):
             |        c._parents[i] = controller.map[c._parents[i]._id]
             |
-            |executions = Path(executions_home)
-            |executions.mkdir(exist_ok=True)
-            |execution_file = executions / (execution_id + '.json')
-            |
-            |if execution_file.exists():
-            |    execution = json.loads(execution_file.read_bytes())
-            |    _views = execution.get("views")
-            |    if _views:
-            |        views = controller.list([unpack_view(v) for v in _views])
-            |    else:
-            |        views = controller.list()
-            |else:
-            |    views = controller.list()
-            |
-            |execution = {
-            |    'user': user_name,
-            |    'id': execution_id,
-            |    'status': 'RUNNING' if apply else 'READY',
-            |    'views': [v.pack() for v in views]
-            |}
-            |
-            |execution_file.write_text(json.dumps(execution))
             |
             |$loadFuncScript
             |
-            |if apply:
+            |def apply(views, execution_id, user_name):
+            |    executions = Path(executions_home)
+            |    executions.mkdir(exist_ok=True)
+            |    execution_file = executions / (execution_id + '.json')
+            |    
+            |    execution = {
+            |        'user': user_name,
+            |        'id': execution_id,
+            |        'status': 'RUNNING' if apply else 'READY',
+            |        'views': [v.pack() for v in views]
+            |    }
+            |    
+            |    execution_file.write_text(json.dumps(execution))
+            |    
             |    try:
             |        result = controller.apply(func, views)
             |        execution['status'] = 'FINISHED'
@@ -206,6 +229,32 @@ class LocalExecutionService @Autowired constructor(
             |        execution['status'] = 'FAILED'
             |        execution['logs'] = str(traceback.format_exc())
             |    execution_file.write_text(json.dumps(execution))
+            |
+            |
+            |def parse_command(command):
+            |    command_json = json.loads(command)
+            |    _views = command_json.get("views")
+            |    execution_id = command_json.get("id")
+            |    views = [unpack_view(v) for v in _views] if _views else None
+            |    user_name = command_json.get("user")
+            |    return views, execution_id, user_name
+            |
+            |
+            |def print_views_stdout(views):
+            |    sys.stdout.write(json.dumps([v.pack() for v in (views or [])], indent=None, separators=(",",":")) + "\n")
+            |    sys.stdout.flush()
+            |
+            |
+            |while True:
+            |    # TODO: Support timeout in future
+            |    command = sys.stdin.readline()
+            |    views, execution_id, user_name = parse_command(command)
+            |    if views and execution_id and user_name:
+            |        apply(views, execution_id, user_name)
+            |    else:
+            |        # TODO: Make it possible to transport the views state without transporting the entire data
+            |        print_views_stdout(controller.list(views))
+            |
             """.trimMargin()
         executorFile.writeText(script)
     }
