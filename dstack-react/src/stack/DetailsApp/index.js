@@ -5,6 +5,7 @@ import cx from 'classnames';
 import {isEqual, get} from 'lodash-es';
 import {useDebounce} from 'react-use';
 import usePrevious from '../../hooks/usePrevious';
+import moment from 'moment';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import Button from '../../Button';
@@ -44,8 +45,10 @@ type Props = {
     user: string,
     stack: string,
     headId: number,
+    executionId: string,
     onChangeHeadFrame: Function,
     onChangeAttachmentIndex: Function,
+    onChangeExecutionId: Function,
     onUpdateReadme: Function,
     onChangeFrame: Function,
     configurePythonCommand: string,
@@ -57,6 +60,8 @@ type Props = {
 const Details = ({
     currentFrameId,
     headId,
+    executionId,
+    onChangeExecutionId,
     onChangeHeadFrame,
     attachmentIndex,
     onChangeAttachmentIndex,
@@ -83,6 +88,7 @@ const Details = ({
     const [executeData, setExecuteData] = useState(null);
     const [executing, setExecuting] = useState(false);
     const [calculating, setCalculating] = useState(false);
+    const [error, setError] = useState(null);
     const [appAttachment, setAppAttachment] = useState(null);
     const [activeTab, setActiveTab] = useState();
     const [tabs, setTabs] = useState([]);
@@ -169,8 +175,12 @@ const Details = ({
                 setExecuting(false);
                 updateExecuteData(data);
 
-                if (apply)
+                if (apply) {
                     checkFinished({id: data.id});
+
+                    if (typeof onChangeExecutionId === 'function')
+                        onChangeExecutionId(data.id);
+                }
             });
     };
 
@@ -191,21 +201,28 @@ const Details = ({
 
     useEffect(() => {
         if (data && frame && !loading) {
-            setExecuting(true);
-            setExecuteData(null);
-            setAppAttachment(null);
+            if (!executeData && !executionId) {
+                setExecuting(true);
+                setExecuteData(null);
+                setAppAttachment(null);
 
-            executeStack({
-                user: data.user,
-                stack: data.name,
-                frame: frame?.id,
-                attachment: attachmentIndex || 0,
-            })
-                .then(data => {
-                    setExecuting(false);
-                    updateExecuteData(data);
+                executeStack({
+                    user: data.user,
+                    stack: data.name,
+                    frame: frame?.id,
+                    attachment: attachmentIndex || 0,
                 })
-                .catch(() => setExecuting(false));
+                    .then(data => {
+                        setExecuting(false);
+                        updateExecuteData(data);
+                    })
+                    .catch(() => setExecuting(false));
+            } else {
+                setExecuting(true);
+                setCalculating(true);
+                setAppAttachment(null);
+                checkFinished({id: executionId, isUpdateData: true});
+            }
         }
 
     }, [data, frame, attachmentIndex]);
@@ -294,7 +311,7 @@ const Details = ({
         }
     };
 
-    const checkFinished = ({id}) => {
+    const checkFinished = ({id, isUpdateData}) => {
         pollStack({id: id})
             .then(data => {
                 if (['SCHEDULED', 'RUNNING'].indexOf(data.status) >= 0)
@@ -308,6 +325,24 @@ const Details = ({
 
                 if (data.status === 'FINISHED') {
                     setAppAttachment(data.output);
+
+                    if (isUpdateData) {
+                        setExecuting(false);
+                        updateExecuteData(data);
+                    }
+                }
+
+                if (data.status === 'FAILED') {
+                    if (isUpdateData) {
+                        setExecuting(false);
+                        updateExecuteData(data);
+
+                        setError({
+                            date: Date.now(),
+                            status: data.status,
+                            logs: data.logs,
+                        });
+                    }
                 }
             });
     };
@@ -451,6 +486,22 @@ const Details = ({
                     )}
 
                     {calculating && <Progress />}
+
+                    {!calculating && !executing && !appAttachment && !error && (
+                        <div className={css.emptyMessage}>
+                            {t('clickApplyToSeeTheResult')}
+                        </div>
+                    )}
+
+                    {!calculating && !executing && error && (
+                        <div className={css.error}>
+                            <div className={css.message}>
+                                <span className="mdi mdi-alert-circle-outline" /> {t('appStackError')}
+                            </div>
+                            <div className={css.fromAgo}>{t('updated')} {moment(error.date).fromNow()}</div>
+                            <div className={css.log}>{error.logs}</div>
+                        </div>
+                    )}
                 </div>
             )}
 

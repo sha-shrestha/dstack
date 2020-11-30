@@ -185,10 +185,42 @@
 .attachment-head + .attachment {
     margin-top: 16px;
 }
+.emptyMessage {
+    padding-top: 150px;
+    padding-bottom: 150px;
+    font-size: 13px;
+    line-height: 16px;
+    color: rgba(48, 52, 64, 0.6);
+    text-align: center;
+}
 
 .readme {
     margin-top: 20px;
     flex-shrink: 0;
+}
+.error {
+    margin-top: 30px;
+    .message {
+        font-size: 14px;
+        line-height: 17px;
+        color: #AF4545;
+    }
+    .fromAgo {
+        margin-top: 10px;
+        font-size: 13px;
+        line-height: 16px;
+        color: rgba(48, 52, 64, 0.5);
+    }
+    .log {
+        font-family: "Roboto Mono", monospace;
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 18px;
+        color: #303440;
+        white-space: pre;
+        overflow: auto;
+        max-height: 412px;
+    }
 }
 
 .modal {

@@ -4259,13 +4259,15 @@ var actions$1 = (function () {
   };
 });
 
-var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
+var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","emptyMessage":"_16j-R","readme":"_19inZ","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
 
 var REFRESH_INTERVAL = 1000;
 
 var Details$1 = function Details(_ref) {
   var currentFrameId = _ref.currentFrameId,
       headId = _ref.headId,
+      executionId = _ref.executionId,
+      onChangeExecutionId = _ref.onChangeExecutionId,
       onChangeHeadFrame = _ref.onChangeHeadFrame,
       attachmentIndex = _ref.attachmentIndex,
       onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
@@ -4311,16 +4313,20 @@ var Details$1 = function Details(_ref) {
       setCalculating = _useState4[1];
 
   var _useState5 = React.useState(null),
-      appAttachment = _useState5[0],
-      setAppAttachment = _useState5[1];
+      error = _useState5[0],
+      setError = _useState5[1];
 
-  var _useState6 = React.useState(),
-      activeTab = _useState6[0],
-      setActiveTab = _useState6[1];
+  var _useState6 = React.useState(null),
+      appAttachment = _useState6[0],
+      setAppAttachment = _useState6[1];
 
-  var _useState7 = React.useState([]),
-      tabs = _useState7[0],
-      setTabs = _useState7[1];
+  var _useState7 = React.useState(),
+      activeTab = _useState7[0],
+      setActiveTab = _useState7[1];
+
+  var _useState8 = React.useState([]),
+      tabs = _useState8[0],
+      setTabs = _useState8[1];
 
   var prevFrame = usePrevious(frame);
 
@@ -4328,9 +4334,9 @@ var Details$1 = function Details(_ref) {
       executeStack = _actions.executeStack,
       pollStack = _actions.pollStack;
 
-  var _useState8 = React.useState(false),
-      isShowHowToModal = _useState8[0],
-      setIsShowHowToModal = _useState8[1];
+  var _useState9 = React.useState(false),
+      isShowHowToModal = _useState9[0],
+      setIsShowHowToModal = _useState9[1];
 
   var showHowToModal = function showHowToModal(event) {
     event.preventDefault();
@@ -4412,9 +4418,13 @@ var Details$1 = function Details(_ref) {
     }).then(function (data) {
       setExecuting(false);
       updateExecuteData(data);
-      if (apply) checkFinished({
-        id: data.id
-      });
+
+      if (apply) {
+        checkFinished({
+          id: data.id
+        });
+        if (typeof onChangeExecutionId === 'function') onChangeExecutionId(data.id);
+      }
     });
   };
 
@@ -4435,20 +4445,30 @@ var Details$1 = function Details(_ref) {
   }, [executeData]);
   React.useEffect(function () {
     if (data && frame && !loading) {
-      setExecuting(true);
-      setExecuteData(null);
-      setAppAttachment(null);
-      executeStack({
-        user: data.user,
-        stack: data.name,
-        frame: frame === null || frame === void 0 ? void 0 : frame.id,
-        attachment: attachmentIndex || 0
-      }).then(function (data) {
-        setExecuting(false);
-        updateExecuteData(data);
-      })["catch"](function () {
-        return setExecuting(false);
-      });
+      if (!executeData && !executionId) {
+        setExecuting(true);
+        setExecuteData(null);
+        setAppAttachment(null);
+        executeStack({
+          user: data.user,
+          stack: data.name,
+          frame: frame === null || frame === void 0 ? void 0 : frame.id,
+          attachment: attachmentIndex || 0
+        }).then(function (data) {
+          setExecuting(false);
+          updateExecuteData(data);
+        })["catch"](function () {
+          return setExecuting(false);
+        });
+      } else {
+        setExecuting(true);
+        setCalculating(true);
+        setAppAttachment(null);
+        checkFinished({
+          id: executionId,
+          isUpdateData: true
+        });
+      }
     }
   }, [data, frame, attachmentIndex]);
 
@@ -4525,7 +4545,8 @@ var Details$1 = function Details(_ref) {
   };
 
   var checkFinished = function checkFinished(_ref2) {
-    var id = _ref2.id;
+    var id = _ref2.id,
+        isUpdateData = _ref2.isUpdateData;
     pollStack({
       id: id
     }).then(function (data) {
@@ -4541,6 +4562,23 @@ var Details$1 = function Details(_ref) {
 
       if (data.status === 'FINISHED') {
         setAppAttachment(data.output);
+
+        if (isUpdateData) {
+          setExecuting(false);
+          updateExecuteData(data);
+        }
+      }
+
+      if (data.status === 'FAILED') {
+        if (isUpdateData) {
+          setExecuting(false);
+          updateExecuteData(data);
+          setError({
+            date: Date.now(),
+            status: data.status,
+            logs: data.logs
+          });
+        }
       }
     });
   };
@@ -4631,7 +4669,19 @@ var Details$1 = function Details(_ref) {
     className: css$E.attachment,
     stack: user + "/" + stack,
     customData: appAttachment
-  }), calculating && /*#__PURE__*/React__default.createElement(Progress, null)), data && /*#__PURE__*/React__default.createElement(Readme, {
+  }), calculating && /*#__PURE__*/React__default.createElement(Progress, null), !calculating && !executing && !appAttachment && !error && /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.emptyMessage
+  }, t('clickApplyToSeeTheResult')), !calculating && !executing && error && /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.error
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.message
+  }, /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-alert-circle-outline"
+  }), " ", t('appStackError')), /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.fromAgo
+  }, t('updated'), " ", moment(error.date).fromNow()), /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.log
+  }, error.logs))), data && /*#__PURE__*/React__default.createElement(Readme, {
     className: css$E.readme,
     data: data,
     onUpdate: onUpdateReadme

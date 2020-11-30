@@ -59,6 +59,7 @@ const Details = ({
 
     const [attachmentIndex, setAttachmentIndex] = useState(parsedAttachmentIndex);
     const [selectedFrame, setSelectedFrame] = useState(searchParams.f);
+    const [executionId, setExecutionId] = useState(searchParams['execution_id']);
     const [headId, setHeadId] = useState(null);
 
     const {t} = useTranslation();
@@ -83,6 +84,9 @@ const Details = ({
             if (searchParams.f !== selectedFrame)
                 setSelectedFrame(searchParams.f);
 
+            if (searchParams['execution_id'] !== executionId)
+                setExecutionId(searchParams['execution_id']);
+
         } else {
             isFirstChangeSearch.current = true;
         }
@@ -97,6 +101,9 @@ const Details = ({
         if (selectedFrame && selectedFrame !== headId)
             searchParams.f = selectedFrame;
 
+        if (executionId)
+            searchParams['execution_id'] = executionId;
+
         const searchString = Object
             .keys(searchParams)
             .map(key => `${key}=${searchParams[key]}`)
@@ -104,7 +111,7 @@ const Details = ({
 
         if (location.search.replace('?', '') !== searchString)
             push({search: searchString.length ? `?${searchString}` : ''});
-    }, [attachmentIndex, selectedFrame, headId]);
+    }, [attachmentIndex, selectedFrame, executionId, headId]);
 
     const fetchData = () => {
         fetchDetails(params.user, params.stack);
@@ -207,6 +214,7 @@ const Details = ({
                 currentFrameId={currentFrameId}
                 frame={frame}
                 attachmentIndex={attachmentIndex || 0}
+                executionId={executionId}
                 data={data}
                 frameRequestStatus={frameRequestStatus}
                 currentUser={currentUser}
@@ -220,6 +228,7 @@ const Details = ({
                 onUpdateReadme={onUpdateReadme}
                 onChangeFrame={onChangeFrame}
                 onChangeHeadFrame={setHeadFrame}
+                onChangeExecutionId={setExecutionId}
                 onChangeAttachmentIndex={setAttachmentIndex}
                 downloadAttachment={downloadAttachmentHandle}
                 configurePythonCommand={config.CONFIGURE_PYTHON_COMMAND(currentUserToken, currentUser)}
