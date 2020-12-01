@@ -176,7 +176,7 @@ const Details = ({
                 updateExecuteData(data);
 
                 if (apply) {
-                    checkFinished({id: data.id});
+                    checkFinished({id: data.id, isUpdateData: apply});
 
                     if (typeof onChangeExecutionId === 'function')
                         onChangeExecutionId(data.id);
@@ -389,6 +389,11 @@ const Details = ({
                             className={css.share}
                             defaultIsPrivate={data.private}
                             defaultPermissions={data.permissions}
+                            urlParams={{
+                                a: attachmentIndex ? attachmentIndex : null,
+                                f: frame?.id !== data?.head?.id ? frame?.id : null,
+                                'execution_id': executionId,
+                            }}
 
                             onUpdatePermissions={
                                 permissions => updatePermissions(`${user}/${stack}`, permissions)

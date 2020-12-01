@@ -251,6 +251,11 @@ const Details = ({
                             defaultIsPrivate={data.private}
                             defaultPermissions={data.permissions}
 
+                            urlParams={{
+                                a: attachmentIndex ? attachmentIndex : null,
+                                f: frame?.id !== data?.head?.id ? frame?.id : null,
+                            }}
+
                             onUpdatePermissions={
                                 permissions => updatePermissions(`${user}/${stack}`, permissions)
                             }

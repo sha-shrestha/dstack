@@ -1,5 +1,5 @@
 // @flow
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useMemo} from 'react';
 import {isEqual} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
@@ -11,12 +11,13 @@ import CheckboxField from '../CheckboxField';
 import TextField from '../TextField';
 import Button from '../Button';
 import {isValidEmail} from '../validations';
+import {useAppStore} from '../AppStore';
 import useActions from './actions';
 import css from './styles.module.css';
-import {useAppStore} from "../AppStore";
 
 type Props = {
     className?: string,
+    urlParams?: {[key: string]: any},
     update: Function,
     onUpdatePrivate: Function,
     onUpdatePermissions: Function,
@@ -33,6 +34,7 @@ const Share = ({
     defaultIsPrivate = false,
     defaultPermissions = [],
     onUpdatePrivate,
+    urlParams = {},
     onUpdatePermissions,
 }: Props) => {
     const [{configInfo}] = useAppStore();
@@ -162,6 +164,21 @@ const Share = ({
         );
     };
 
+    const searchString = useMemo(() => {
+        const searchString = Object
+            .keys(urlParams)
+            .reduce((result, key) => {
+                if (urlParams[key])
+                    result.push(`${key}=${urlParams[key]}`);
+
+                return result;
+            }, [])
+            .join('&');
+
+        if (searchString)
+            return `?${searchString}`;
+    }, [urlParams]);
+
     const {origin} = window.location;
 
     return (
@@ -205,12 +222,12 @@ const Share = ({
                     <TextField
                         className={css.textInput}
                         readOnly
-                        value={`${origin}/${instancePath}`}
+                        value={`${origin}/${instancePath}${searchString}`}
                     />
 
                     <Copy
                         className={css.copy}
-                        copyText={`${origin}/${instancePath}`}
+                        copyText={`${origin}/${instancePath}${searchString}`}
                         successMessage={t('linkIsCopied')}
                     />
                 </div>

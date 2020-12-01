@@ -1,4 +1,4 @@
-import React__default, { createContext, useReducer, useContext, createElement, forwardRef, useState, useRef, useEffect, useImperativeHandle, memo, useCallback, Fragment, useMemo, Component } from 'react';
+import React__default, { createContext, useReducer, useContext, createElement, forwardRef, useState, useRef, useEffect, useImperativeHandle, memo, useCallback, useMemo, Fragment, Component } from 'react';
 import axios from 'axios';
 import { get, uniq, isEqual, isString, debounce } from 'lodash-es';
 import cx from 'classnames';
@@ -3403,6 +3403,8 @@ var Share = function Share(_ref) {
       _ref$defaultPermissio = _ref.defaultPermissions,
       defaultPermissions = _ref$defaultPermissio === void 0 ? [] : _ref$defaultPermissio,
       onUpdatePrivate = _ref.onUpdatePrivate,
+      _ref$urlParams = _ref.urlParams,
+      urlParams = _ref$urlParams === void 0 ? {} : _ref$urlParams,
       onUpdatePermissions = _ref.onUpdatePermissions;
 
   var _useAppStore = useAppStore(),
@@ -3550,6 +3552,13 @@ var Share = function Share(_ref) {
     }, t('waitingForAcceptance')));
   };
 
+  var searchString = useMemo(function () {
+    var searchString = Object.keys(urlParams).reduce(function (result, key) {
+      if (urlParams[key]) result.push(key + "=" + urlParams[key]);
+      return result;
+    }, []).join('&');
+    if (searchString) return "?" + searchString;
+  }, [urlParams]);
   var origin = window.location.origin;
   return /*#__PURE__*/React__default.createElement(Fragment, null, /*#__PURE__*/React__default.createElement(Button, {
     className: cx(css$y.desktopButton, className),
@@ -3579,10 +3588,10 @@ var Share = function Share(_ref) {
   }, /*#__PURE__*/React__default.createElement(TextField, {
     className: css$y.textInput,
     readOnly: true,
-    value: origin + "/" + instancePath
+    value: origin + "/" + instancePath + searchString
   }), /*#__PURE__*/React__default.createElement(Copy, {
     className: css$y.copy,
-    copyText: origin + "/" + instancePath,
+    copyText: origin + "/" + instancePath + searchString,
     successMessage: t('linkIsCopied')
   })), /*#__PURE__*/React__default.createElement("div", {
     className: css$y.content
@@ -3845,6 +3854,8 @@ var useForm = (function (initialFormState, fieldsValidators) {
 var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","sideHeader":"_1FUDu","share":"_2kaMN","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","filters":"_1-hdZ","attachment-head":"_282UU","attachment":"_3IGZo","readme":"_mADeQ","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
 
 var Details = function Details(_ref) {
+  var _data$head;
+
   var currentFrameId = _ref.currentFrameId,
       headId = _ref.headId,
       onChangeHeadFrame = _ref.onChangeHeadFrame,
@@ -4042,6 +4053,10 @@ var Details = function Details(_ref) {
     className: css$B.share,
     defaultIsPrivate: data["private"],
     defaultPermissions: data.permissions,
+    urlParams: {
+      a: attachmentIndex ? attachmentIndex : null,
+      f: (frame === null || frame === void 0 ? void 0 : frame.id) !== (data === null || data === void 0 ? void 0 : (_data$head = data.head) === null || _data$head === void 0 ? void 0 : _data$head.id) ? frame === null || frame === void 0 ? void 0 : frame.id : null
+    },
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
@@ -4264,6 +4279,8 @@ var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions"
 var REFRESH_INTERVAL = 1000;
 
 var Details$1 = function Details(_ref) {
+  var _data$head;
+
   var currentFrameId = _ref.currentFrameId,
       headId = _ref.headId,
       executionId = _ref.executionId,
@@ -4421,7 +4438,8 @@ var Details$1 = function Details(_ref) {
 
       if (apply) {
         checkFinished({
-          id: data.id
+          id: data.id,
+          isUpdateData: apply
         });
         if (typeof onChangeExecutionId === 'function') onChangeExecutionId(data.id);
       }
@@ -4613,6 +4631,11 @@ var Details$1 = function Details(_ref) {
     className: css$E.share,
     defaultIsPrivate: data["private"],
     defaultPermissions: data.permissions,
+    urlParams: {
+      a: attachmentIndex ? attachmentIndex : null,
+      f: (frame === null || frame === void 0 ? void 0 : frame.id) !== (data === null || data === void 0 ? void 0 : (_data$head = data.head) === null || _data$head === void 0 ? void 0 : _data$head.id) ? frame === null || frame === void 0 ? void 0 : frame.id : null,
+      'execution_id': executionId
+    },
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
