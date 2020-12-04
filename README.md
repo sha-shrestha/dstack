@@ -1,6 +1,12 @@
 **dstack is an open-source platform for rapid development of data applications using Python.**
 
-![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)
+![Action Status](https://github.com/dstackai/dstack-server/workflows/Build/badge.svg) [![PyPI version](https://badge.fury.io/py/dstack.svg)](https://badge.fury.io/py/dstack) [![Discord Chat](https://img.shields.io/discord/687649691688501294.svg)](https://discord.gg/)
+
+---
+
+**We're rolling out a new feature that makes building data applications really easy. Give a try to its [Beta version](https://docs.dstack.ai/open-source/applications)!**
+
+---
 
 Push ML models, visualizations, and code to dstack.ai to build data applications in minutes.
 No development or deployment skills are required.
