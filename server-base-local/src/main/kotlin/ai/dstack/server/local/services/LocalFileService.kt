@@ -44,10 +44,10 @@ class LocalFileService(@Autowired val config: AppConfig) : FileService {
         }
     }
 
-    override fun download(path: String, user: User, filename: String, type: String): URI {
+    override fun download(path: String, user: User, filename: String, contentType: String): URI {
         return URI.create(
-            "${config.address}/api/files/$path?user=${user.name}&code=${user.verificationCode}&filename=${filename}&type=${URLEncoder.encode(
-                patchContentType(type), StandardCharsets.UTF_8.toString()
+            "${config.address}/api/files/$path?user=${user.name}&code=${user.verificationCode}&filename=${filename}&content_type=${URLEncoder.encode(
+                patchContentType(contentType), StandardCharsets.UTF_8.toString()
             )}"
         )
     }

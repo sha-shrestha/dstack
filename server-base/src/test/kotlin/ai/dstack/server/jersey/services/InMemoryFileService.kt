@@ -31,7 +31,7 @@ class InMemoryFileService: FileService {
         throw NotSupportedException()
     }
 
-    override fun download(path: String, user: User, filename: String, type: String): URI {
+    override fun download(path: String, user: User, filename: String, contentType: String): URI {
         throw NotSupportedException()
     }
 

@@ -76,7 +76,7 @@ class AttachResources {
                             else
                                 null
                             val downloadUrl = if (attachment.length >= MAX_DATA_LENGTH && d == true)
-                                fileService.download(attachment.filePath, user, attachment.filename, attachment.legacyType)
+                                fileService.download(attachment.filePath, user, attachment.filename, attachment.contentType)
                             else
                                 null
                             val preview = if (attachment.length >= MAX_DATA_LENGTH && d != true) true else null

@@ -46,10 +46,10 @@ class FilesResources {
     @Path("/{path: .+}")
     @Throws(IOException::class)
     fun download(
-        @Context resp: HttpServletResponse, @PathParam("path") path: String,
+        @PathParam("path") path: String,
         @QueryParam("user") user: String, @QueryParam("code") code: String,
         @QueryParam("filename") filename: String,
-        @QueryParam("type") type: String
+        @QueryParam("content_type") contentType: String
     ): Response? {
         val u = userStream.get(user)
         return if (u != null && u.verificationCode == code) {
@@ -65,8 +65,8 @@ class FilesResources {
             }
             return ok(streamingOutput)
                 .header("content-disposition", "attachment; filename=$filename")
-                .chainIfNotNull(type) {
-                    header("content-type", type)
+                .chainIfNotNull(contentType) {
+                    header("content-type", contentType)
                     header("content-length", length)
                 }.build()
         } else {

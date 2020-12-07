@@ -9,7 +9,7 @@ interface FileService {
     fun get(path: String): ByteArray
     fun delete(prefix: String)
     fun preview(path: String, length: Long): ByteArray
-    fun download(path: String, user: User, filename: String, type: String): URI
+    fun download(path: String, user: User, filename: String, contentType: String): URI
 
     // TODO: New attachment will have "image/svg+xml" type. This code is for legacy attachments.
     fun patchContentType(type: String?) = if (type == "image/svg") "image/svg+xml" else type
