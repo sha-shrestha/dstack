@@ -73,7 +73,8 @@ class UserResources {
                         )
                     ),
                     user.createdDate.toString(),
-                    user.plan.code
+                    user.plan.code,
+                    user.role.code
                 ))
             }
         }
@@ -130,6 +131,8 @@ class UserResources {
                                 verificationCode,
                                 verified,
                                 payload.plan?.let { UserPlan.fromCode(it) } ?: UserPlan.Free,
+                                // TODO: Reconsider registration after introducing user management
+                                UserRole.Write,
                                 LocalDate.now(ZoneOffset.UTC),
                                 Settings(
                                     General(AccessLevel.Public),
@@ -160,10 +163,12 @@ class UserResources {
     }
 
     private fun replaceEmailPermissionsWithUserPermissions(user: User) {
-        val permissions = permissionService.findByIdentity(user.email)
-        permissions.forEach { p ->
-            permissionService.delete(p)
-            permissionService.add(Permission(p.path, user.name))
+        if (user.email != null) {
+            val permissions = permissionService.findByIdentity(user.email)
+            permissions.forEach { p ->
+                permissionService.delete(p)
+                permissionService.add(Permission(p.path, user.name))
+            }
         }
     }
 
@@ -186,6 +191,7 @@ class UserResources {
                         unverifiedUser.verificationCode,
                         true,
                         unverifiedUser.plan,
+                        unverifiedUser.role,
                         LocalDate.now(ZoneOffset.UTC),
                         unverifiedUser.settings,
                         userName

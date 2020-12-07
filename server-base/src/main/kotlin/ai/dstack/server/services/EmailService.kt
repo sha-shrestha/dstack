@@ -88,7 +88,7 @@ interface EmailService {
                 |We received a request to reset your password. To reset your password, please follow this url:
                 |
                 |${config.address}/auth/reset-password?email=${URLEncoder.encode(
-                user.email,
+                user.email!!,
                 "UTF-8"
             )}&code=${user.verificationCode}
                 |
@@ -104,10 +104,10 @@ interface EmailService {
                 |<p>We received a request to reset your password. To reset your password, please follow this url:<p/>
                 |
                 |<p><a href="${config.address}/auth/reset-password?email=${URLEncoder.encode(
-                user.email,
+                user.email!!,
                 "UTF-8"
             )}&code=${user.verificationCode}">${config.address}/auth/reset-password?email=${URLEncoder.encode(
-                user.email,
+                user.email!!,
                 "utf-8"
             )}&code=${user.verificationCode}</a><p/>
                 |

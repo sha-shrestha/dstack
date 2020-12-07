@@ -43,6 +43,7 @@ class SQLiteUserService (private val repository: UserRepository) : UserService {
             verificationCode = verificationCode,
             verified = verified,
             plan = plan.code,
+            role = role.code,
             createdDate = createdDate,
             settings = settings.let {
                 UserItemSettings(
@@ -78,14 +79,16 @@ class SQLiteUserService (private val repository: UserRepository) : UserService {
 
     private fun UserItem.toUser(): User {
         return this.let { u ->
-            ai.dstack.server.model.User(
+            User(
                 u.name, u.email, u.password,
-                u.token, u.verificationCode, u.verified, ai.dstack.server.model.UserPlan.fromCode(u.plan),
+                u.token, u.verificationCode, u.verified, UserPlan.fromCode(u.plan),
+                // No role code means, the user was created before introducing roles. Consider these users to be admins.
+                u.role?.let { UserRole.fromCode(it) } ?: UserRole.Admin,
                 u.createdDate, u.settings.let { s ->
-                    ai.dstack.server.model.Settings(
-                        ai.dstack.server.model.General(s.general.defaultAccessLevel),
+                    Settings(
+                        General(s.general.defaultAccessLevel),
                         s.notifications.let { n ->
-                            ai.dstack.server.model.Notifications(n.comments, n.newsletter)
+                            Notifications(n.comments, n.newsletter)
                         }
                     )
                 }, u.unverifiedName

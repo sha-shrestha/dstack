@@ -29,12 +29,13 @@ open class Startup {
         if (user == null) {
             user = User(
                 name = "dstack",
-                email = "dstack@localhost",
+                email = null,
                 password = RandomString(8, ThreadLocalRandom.current()).nextString(),
                 token = UUID.randomUUID().toString(),
                 verificationCode = UUID.randomUUID().toString(),
                 verified = true,
                 plan = UserPlan.Free,
+                role = UserRole.Admin,
                 createdDate = LocalDate.now(),
                 unverifiedName = "dstack",
                 settings = Settings(General(AccessLevel.Public),

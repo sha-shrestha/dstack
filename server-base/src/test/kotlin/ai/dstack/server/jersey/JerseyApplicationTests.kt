@@ -216,8 +216,9 @@ class JerseyApplicationTests : JerseyTest() {
     fun testJobs() {
         val testUser = User(
                 "test_user", "test@gmail.com", "test",
-                "test_token", "test_code", true, UserPlan.Free,
-                LocalDate.now(), Settings(General(AccessLevel.Public), Notifications(true, true)), "test_user"
+                "test_token", "test_code", true, UserPlan.Free, UserRole.Admin,
+                LocalDate.now(), Settings(General(AccessLevel.Public),
+                Notifications(true, true)), "test_user"
         )
         userService.create(testUser)
 
@@ -352,8 +353,9 @@ class JerseyApplicationTests : JerseyTest() {
     fun testDashboards() {
         val testUser = User(
                 "test_user", "test@gmail.com", "test",
-                "test_token", "test_code", true, UserPlan.Free,
-                LocalDate.now(), Settings(General(AccessLevel.Public), Notifications(true, true)), "test_user"
+                "test_token", "test_code", true, UserPlan.Free, UserRole.Admin,
+                LocalDate.now(), Settings(General(AccessLevel.Public),
+                Notifications(true, true)), "test_user"
         )
         userService.create(testUser)
         val testSession = Session(
@@ -461,8 +463,9 @@ class JerseyApplicationTests : JerseyTest() {
     fun testStacks() {
         val testUser = User(
                 "test_user", "test@gmail.com", "test",
-                "test_token", "test_code", true, UserPlan.Free,
-                LocalDate.now(), Settings(General(AccessLevel.Public), Notifications(comments = true, newsletter = true)), "test_user"
+                "test_token", "test_code", true, UserPlan.Free, UserRole.Admin,
+                LocalDate.now(), Settings(General(AccessLevel.Public),
+                Notifications(comments = true, newsletter = true)), "test_user"
         )
         userService.create(testUser)
 

@@ -42,7 +42,7 @@ data class UserItem(
     val name: String,
 
     @Column
-    val email: String,
+    val email: String?,
 
     @Column
     val password: String,
@@ -56,8 +56,12 @@ data class UserItem(
     @Column
     val verified: Boolean,
 
+    @Deprecated("Will be dropped in January")
     @Column
     val plan: String,
+
+    @Column
+    val role: String?,
 
     @Column(name = "created_date")
     val createdDate: LocalDate,

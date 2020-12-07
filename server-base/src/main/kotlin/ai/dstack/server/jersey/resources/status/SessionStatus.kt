@@ -21,7 +21,7 @@ data class RuntimeInfo(
 data class SessionStatus(
     val user: String,
     val token: String,
-    val email: String,
+    val email: String?,
     val verified: Boolean,
     val settings: SettingsInfo
 )
