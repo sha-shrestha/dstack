@@ -1,28 +1,33 @@
 @import "styles/variables.css";
 @import "styles/media.css";
+:root {
+    --sidebar-width: 250px;
+}
 .loader {
-    display: flex;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    background-color: var(--color-white);
+    @media (--desktop) {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 1fr;
+        grid-template-rows: auto 1fr;
+        grid-column-gap: 30px;
+        grid-template-areas:
+            "sidebar content";
+    }
     & > * {
-        margin-bottom: 20px;
-        &:nth-last-child(n+2) {
-            margin-right: 14px;
-        }
+        min-height: 250px;
     }
 }
-.item {
-    width: 154px;
-    height: 30px;
+.side {
+    grid-area: sidebar;
     background: linear-gradient(90deg, #F7F9FB -3.86%, #EEF1F3 34.95%, #FDFDFD 107.97%);
     animation: filter-pulse 1.5s infinite;
 }
-.button {
-    width: 65px;
-    height: 30px;
+.content {
+    grid-area: content;
     background: linear-gradient(90deg, #F7F9FB -3.86%, #EEF1F3 34.95%, #FDFDFD 107.97%);
     animation: filter-pulse 1.5s infinite;
+    @media (--mobile) {
+        margin-top: 16px;
+    }
 }
 
 @keyframes filter-pulse {

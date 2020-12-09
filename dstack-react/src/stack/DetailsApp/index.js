@@ -441,11 +441,11 @@ const Details = ({
             />}
 
             {(!executeData && executing) && <div className={css.container}>
-                <FilterLoader />
+                <FilterLoader className={css.filterLoader} />
             </div>}
 
             {executeData && (
-                <div className={css.container}>
+                <div className={cx(css.container, {[css.withFilters]: Object.keys(fields).length})}>
                     <StackFilters
                         fields={fields}
                         form={form}
@@ -456,35 +456,38 @@ const Details = ({
                     />
 
                     {appAttachment
-                    && (appAttachment.description || appAttachment['content_type'] === 'text/csv')
-                    && (
-                        <div className={css['attachment-head']}>
-                            <div className={css.description}>
-                                {appAttachment.description && (<MarkdownRender source={appAttachment.description} />)}
-                            </div>
-
-                            {appAttachment['content_type'] === 'text/csv' && (
-                                <div className={css.actions}>
-                                    {appAttachment.preview && (
-                                        <div className={css.label}>
-                                            {t('preview')}
-
-                                            <div className={css['label-tooltip']}>
-                                                {t('theTableBelowShowsOnlyAPreview')}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                    {/*<span>{t('or')}</span>*/}
-                                    {/*<a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>*/}
-                                    {appAttachment.length && (
-                                        <span className={css.size}>({formatBytes(appAttachment.length)})</span>
+                        && (appAttachment.description || appAttachment['content_type'] === 'text/csv')
+                        && (
+                            <div className={css['attachment-head']}>
+                                <div className={css.description}>
+                                    {appAttachment.description && (
+                                        <MarkdownRender source={appAttachment.description} />
                                     )}
                                 </div>
-                            )}
-                        </div>
-                    )}
+
+                                {appAttachment['content_type'] === 'text/csv' && (
+                                    <div className={css.actions}>
+                                        {appAttachment.preview && (
+                                            <div className={css.label}>
+                                                {t('preview')}
+
+                                                <div className={css['label-tooltip']}>
+                                                    {t('theTableBelowShowsOnlyAPreview')}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
+                                        {/*<span>{t('or')}</span>*/}
+                                        {/*<a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>*/}
+                                        {appAttachment.length && (
+                                            <span className={css.size}>({formatBytes(appAttachment.length)})</span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )
+                    }
 
                     {appAttachment && !calculating && (
                         <StackAttachment
@@ -494,7 +497,7 @@ const Details = ({
                         />
                     )}
 
-                    {calculating && <Progress />}
+                    {calculating && <Progress className={css.progress} />}
 
                     {!calculating && !executing && !appAttachment && !error && (
                         <div className={css.emptyMessage}>

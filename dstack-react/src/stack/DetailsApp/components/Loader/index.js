@@ -1,16 +1,16 @@
 // @flow
 
 import React from 'react';
+import cn from 'classnames';
 import css from './styles.module.css';
 
 type Props = {}
 
-const Loader = ({}: Props) => {
+const Loader = ({className}: Props) => {
     return (
-        <div className={css.loader}>
-            <div className={css.item} />
-            <div className={css.item} />
-            <div className={css.button} />
+        <div className={cn(css.loader, className)}>
+            <div className={css.side} />
+            <div className={css.content} />
         </div>
     );
 };

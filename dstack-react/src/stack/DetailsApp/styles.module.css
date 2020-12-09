@@ -1,7 +1,7 @@
 @import "styles/variables.css";
 @import "styles/media.css";
 :root {
-    --sidebar-width: 240px;
+    --sidebar-width: 250px;
 }
 
 .details {
@@ -162,43 +162,72 @@
 .container {
     flex-shrink: 0;
     margin-top: 20px;
-    padding: 20px;
     border-radius: 4px;
     border: 1px solid rgb(233, 234, 238);
     min-height: 200px;
-}
-.filters {
-
-}
-.filters + .attachment-head {
     @media (--mobile) {
-        margin-top: 20px;
+        padding: 10px;
     }
     @media (--desktop) {
-        margin-top: 24px;
+        padding: 11px;
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 1fr;
+        grid-template-rows: auto 1fr;
+        grid-column-gap: 30px;
+        grid-template-areas:
+            "head head"
+            "content content";
+        &.withFilters {
+            grid-template-areas:
+            "filters head"
+            "filters content";
+        }
     }
 }
 .attachment-head {
+    grid-area: head;
     display: flex;
     align-items: flex-start;
+    margin-bottom: 16px;
+    @media (--mobile) {
+        margin-top: 16px;
+    }
 }
-.attachment-head + .attachment {
-    margin-top: 16px;
+.filters {
+    @media (--desktop) {
+        grid-area: filters;
+        margin-right: 30px;
+        padding: 12px 20px 20px;
+        background-color: #F8F7F9;
+    }
+}
+.filterLoader {
+    grid-column: 1 / -1;
+}
+.attachment {
+    grid-area: content;
+    min-width: 0;
+}
+.progress {
+    grid-area: content;
+    min-width: 0;
 }
 .emptyMessage {
-    padding-top: 150px;
-    padding-bottom: 150px;
+    min-width: 0;
+    grid-area: content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 250px;
     font-size: 13px;
     line-height: 16px;
     color: rgba(48, 52, 64, 0.6);
     text-align: center;
 }
-
-.readme {
-    margin-top: 20px;
-    flex-shrink: 0;
-}
 .error {
+    min-width: 0;
+    grid-area: content;
     margin-top: 30px;
     .message {
         font-size: 14px;
@@ -222,7 +251,10 @@
         max-height: 412px;
     }
 }
-
+.readme {
+    margin-top: 20px;
+    flex-shrink: 0;
+}
 .modal {
     & .description {
         font-size: 14px;

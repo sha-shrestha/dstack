@@ -1,9 +1,10 @@
 import React, {useState, useRef, useEffect} from 'react';
+import cn from 'classnames';
 import {useTranslation} from 'react-i18next';
-import css from './styles.module.css';
 import usePrevious from '../../../../hooks/usePrevious';
+import css from './styles.module.css';
 
-const Progress = ({isActive = true}) => {
+const Progress = ({isActive = true, className}) => {
     const {t} = useTranslation();
     const [progress, setProgress] = useState(0);
     const step = useRef(0.01);
@@ -57,7 +58,7 @@ const Progress = ({isActive = true}) => {
     };
 
     return (
-        <div className={css.progress}>
+        <div className={cn(css.progress, className)}>
             <div className={css.percent}>
                 {Math.floor(progress)} %
             </div>

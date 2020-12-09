@@ -5,6 +5,7 @@
     font-size: 14px;
     line-height: 16px;
     min-width: 170px;
+    background-color: var(--color-white);
     &-disabled {
       &, & input {
         cursor: not-allowed;

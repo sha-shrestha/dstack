@@ -1,6 +1,6 @@
 // @flow
 import React, {useState, useEffect, Fragment, useMemo} from 'react';
-import {isEqual} from 'lodash-es';
+import {isEqual, get} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
 import useDebounce from '../hooks/useDebounce';
@@ -77,7 +77,7 @@ const Share = ({
     const onChangeUserName = event => {
         setUserName(event.target.value);
 
-        if (isValidEmail(event.target.value).isValid && configInfo.data['email_enabled']) {
+        if (isValidEmail(event.target.value).isValid && get(configInfo, 'data.email_enabled')) {
             setUserExists(null);
             setIsEmail(true);
         } else {
@@ -247,7 +247,7 @@ const Share = ({
                     {isPrivate && <div className={css.checkUserName}>
                         <TextField
                             disabled={loading}
-                            placeholder={configInfo.data['email_enabled']
+                            placeholder={get(configInfo, 'data.email_enabled')
                                 ? t('enterUsernameEmailAndPressEnter')
                                 : t('enterUsernameAndPressEnter')
                             }

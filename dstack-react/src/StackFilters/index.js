@@ -81,7 +81,7 @@ const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Pr
                     case 'apply':
                         return <div
                             key={`apply-${key}`}
-                            className={cx(css.field, css.button)}
+                            className={cx(css.field, css.buttons)}
                         >
                             {onApply && (
                                 <Button

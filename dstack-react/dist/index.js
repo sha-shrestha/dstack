@@ -1543,7 +1543,7 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"filters":"_kiZkv","field":"_3_9Ku","slider":"_3xe_A","button":"_1xfTz"};
+var css$i = {"filters":"_kiZkv","field":"_3_9Ku","buttons":"_1fRrD"};
 
 var StackFilters = function StackFilters(_ref) {
   var className = _ref.className,
@@ -1620,7 +1620,7 @@ var StackFilters = function StackFilters(_ref) {
       case 'apply':
         return /*#__PURE__*/React__default.createElement("div", {
           key: "apply-" + key,
-          className: cx(css$i.field, css$i.button)
+          className: cx(css$i.field, css$i.buttons)
         }, onApply && /*#__PURE__*/React__default.createElement(Button, {
           size: "small",
           color: "primary",
@@ -3480,7 +3480,7 @@ var Share = function Share(_ref) {
   var onChangeUserName = function onChangeUserName(event) {
     setUserName(event.target.value);
 
-    if (isValidEmail(event.target.value).isValid && configInfo.data['email_enabled']) {
+    if (isValidEmail(event.target.value).isValid && lodashEs.get(configInfo, 'data.email_enabled')) {
       setUserExists(null);
       setIsEmail(true);
     } else {
@@ -3611,7 +3611,7 @@ var Share = function Share(_ref) {
     className: css$y.checkUserName
   }, /*#__PURE__*/React__default.createElement(TextField, {
     disabled: loading,
-    placeholder: configInfo.data['email_enabled'] ? t('enterUsernameEmailAndPressEnter') : t('enterUsernameAndPressEnter'),
+    placeholder: lodashEs.get(configInfo, 'data.email_enabled') ? t('enterUsernameEmailAndPressEnter') : t('enterUsernameAndPressEnter'),
     className: css$y.textInput,
     value: userName,
     onChange: onChangeUserName,
@@ -3854,10 +3854,10 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 });
 
-var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","sideHeader":"_1FUDu","share":"_2kaMN","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","filters":"_1-hdZ","attachment-head":"_282UU","attachment":"_3IGZo","readme":"_mADeQ","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","sideHeader":"_1FUDu","share":"_2kaMN","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","withFilters":"_3exQh","attachment-head":"_282UU","filters":"_1-hdZ","attachment":"_3IGZo","readme":"_mADeQ","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
 
 var Details = function Details(_ref) {
-  var _data$head;
+  var _data$head, _cx;
 
   var currentFrameId = _ref.currentFrameId,
       headId = _ref.headId,
@@ -4087,7 +4087,7 @@ var Details = function Details(_ref) {
     value: activeTab,
     items: tabs
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.container
+    className: cx(css$B.container, (_cx = {}, _cx[css$B.withFilters] = Object.keys(fields).length, _cx))
   }, /*#__PURE__*/React__default.createElement(StackFilters, {
     fields: fields,
     form: form,
@@ -4141,19 +4141,16 @@ var Details = function Details(_ref) {
   })));
 };
 
-var css$C = {"loader":"_31Z5G","item":"_2uYpQ","filter-pulse":"_vad3r","button":"_3Q3GW"};
+var css$C = {"loader":"_31Z5G","side":"_k2iUe","filter-pulse":"_vad3r","content":"_kUkc8"};
 
 var Loader$2 = function Loader(_ref) {
-  _objectDestructuringEmpty(_ref);
-
+  var className = _ref.className;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.loader
+    className: cx(css$C.loader, className)
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
+    className: css$C.side
   }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.item
-  }), /*#__PURE__*/React__default.createElement("div", {
-    className: css$C.button
+    className: css$C.content
   }));
 };
 
@@ -4161,7 +4158,8 @@ var css$D = {"progress":"_1PIt0","percent":"_m5cJQ","bar":"_1v1JQ","label":"_1xB
 
 var Progress = function Progress(_ref) {
   var _ref$isActive = _ref.isActive,
-      isActive = _ref$isActive === void 0 ? true : _ref$isActive;
+      isActive = _ref$isActive === void 0 ? true : _ref$isActive,
+      className = _ref.className;
 
   var _useTranslation = reactI18next.useTranslation(),
       t = _useTranslation.t;
@@ -4215,7 +4213,7 @@ var Progress = function Progress(_ref) {
   };
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$D.progress
+    className: cx(css$D.progress, className)
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$D.percent
   }, Math.floor(progress), " %"), /*#__PURE__*/React__default.createElement("div", {
@@ -4277,12 +4275,12 @@ var actions$1 = (function () {
   };
 });
 
-var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","filters":"_283Wj","attachment-head":"_2Py9M","attachment":"_1QLqg","emptyMessage":"_16j-R","readme":"_19inZ","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
+var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withFilters":"_1Rz21","attachment-head":"_2Py9M","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
 
 var REFRESH_INTERVAL = 1000;
 
 var Details$1 = function Details(_ref) {
-  var _data$head;
+  var _data$head, _cx;
 
   var currentFrameId = _ref.currentFrameId,
       headId = _ref.headId,
@@ -4668,8 +4666,10 @@ var Details$1 = function Details(_ref) {
     items: tabs
   }), !executeData && executing && /*#__PURE__*/React__default.createElement("div", {
     className: css$E.container
-  }, /*#__PURE__*/React__default.createElement(Loader$2, null)), executeData && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.container
+  }, /*#__PURE__*/React__default.createElement(Loader$2, {
+    className: css$E.filterLoader
+  })), executeData && /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$E.container, (_cx = {}, _cx[css$E.withFilters] = Object.keys(fields).length, _cx))
   }, /*#__PURE__*/React__default.createElement(StackFilters, {
     fields: fields,
     form: form,
@@ -4698,7 +4698,9 @@ var Details$1 = function Details(_ref) {
     className: css$E.attachment,
     stack: user + "/" + stack,
     customData: appAttachment
-  }), calculating && /*#__PURE__*/React__default.createElement(Progress, null), !calculating && !executing && !appAttachment && !error && /*#__PURE__*/React__default.createElement("div", {
+  }), calculating && /*#__PURE__*/React__default.createElement(Progress, {
+    className: css$E.progress
+  }), !calculating && !executing && !appAttachment && !error && /*#__PURE__*/React__default.createElement("div", {
     className: css$E.emptyMessage
   }, t('clickApplyToSeeTheResult')), !calculating && !executing && error && /*#__PURE__*/React__default.createElement("div", {
     className: css$E.error

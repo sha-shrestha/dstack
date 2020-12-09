@@ -28,8 +28,10 @@
     }
   }
   & .label {
-    font-size: 14px;
-    line-height: 16px;
+      font-size: 12px;
+      line-height: 14px;
+      color: var(--color-dark-gray);
+      opacity: .7;
   }
   & :global {
     .rc-slider {

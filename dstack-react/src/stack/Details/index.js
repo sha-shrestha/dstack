@@ -300,7 +300,7 @@ const Details = ({
                 items={tabs}
             />}
 
-            <div className={css.container}>
+            <div className={cx(css.container, {[css.withFilters]: Object.keys(fields).length})}>
                 <StackFilters
                     fields={fields}
                     form={form}
@@ -309,35 +309,36 @@ const Details = ({
                 />
 
                 {attachment
-                && (attachment.description || attachment['content_type'] === 'text/csv')
-                && (
-                    <div className={css['attachment-head']}>
-                        <div className={css.description}>
-                            {attachment.description && (<MarkdownRender source={attachment.description} />)}
-                        </div>
-
-                        {attachment['content_type'] === 'text/csv' && (
-                            <div className={css.actions}>
-                                {attachment.preview && (
-                                    <div className={css.label}>
-                                        {t('preview')}
-
-                                        <div className={css['label-tooltip']}>
-                                            {t('theTableBelowShowsOnlyAPreview')}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                <span>{t('or')}</span>
-                                <a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>
-                                {attachment.length && (
-                                    <span className={css.size}>({formatBytes(attachment.length)})</span>
-                                )}
+                    && (attachment.description || attachment['content_type'] === 'text/csv')
+                    && (
+                        <div className={css['attachment-head']}>
+                            <div className={css.description}>
+                                {attachment.description && (<MarkdownRender source={attachment.description} />)}
                             </div>
-                        )}
-                    </div>
-                )}
+
+                            {attachment['content_type'] === 'text/csv' && (
+                                <div className={css.actions}>
+                                    {attachment.preview && (
+                                        <div className={css.label}>
+                                            {t('preview')}
+
+                                            <div className={css['label-tooltip']}>
+                                                {t('theTableBelowShowsOnlyAPreview')}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
+                                    <span>{t('or')}</span>
+                                    <a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>
+                                    {attachment.length && (
+                                        <span className={css.size}>({formatBytes(attachment.length)})</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )
+                }
 
                 {frame && (
                     <StackAttachment
