@@ -14,16 +14,19 @@ import ai.dstack.server.jersey.resources.userExists
 import ai.dstack.server.jersey.resources.userNotFound
 import ai.dstack.server.jersey.resources.userNotVerified
 import mu.KLogging
+import java.security.SecureRandom
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import java.util.stream.Collectors
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.container.ResourceContext
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.Response
+
 
 @Path("/users")
 class UserResources {
@@ -283,7 +286,8 @@ class UserResources {
                             user.settings.notifications.comments,
                             user.settings.notifications.newsletter
                         )
-                    )
+                    ),
+                    user.role.code
                 )
             )
         }
@@ -394,6 +398,160 @@ class UserResources {
             }
         }
     }
+
+    @GET
+    @Path("list")
+    @Produces(JSON_UTF8)
+    fun users(@Context headers: HttpHeaders): Response {
+        val session = headers.bearer?.let { sessionService.get(it) }
+        val user = session?.let { userService.get(it.userName) }
+        logger.debug { "session: ${headers.bearer}" }
+        return if (session == null || !session.valid || user == null || user.role != UserRole.Admin) {
+            badCredentials()
+        } else {
+            sessionService.renew(session)
+            val users = userService.findAll()
+            ok(UsersStatus(users.map {
+                UserStatus(user.name, user.token, user.email, user.verified,
+                        SettingsInfo(
+                                GeneralInfo(user.settings.general.defaultAccessLevel.name.toLowerCase()),
+                                NotificationsInfo(
+                                        user.settings.notifications.comments,
+                                        user.settings.notifications.newsletter
+                                )
+                        ),
+                        user.createdDate.toString(),
+                        user.plan.code,
+                        user.role.code
+                )
+            }.toList()))
+        }
+    }
+
+    @POST
+    @Path("/create")
+    @Consumes(JSON_UTF8)
+    @Produces(JSON_UTF8)
+    fun create(payload: CreateUserPayload?, @Context headers: HttpHeaders): Response {
+        return if (payload.isMalformed) {
+            malformedRequest()
+        } else {
+            val session = headers.bearer?.let { sessionService.get(it) }
+            val u = session?.let { userService.get(it.userName) }
+            logger.debug { "session: ${headers.bearer}" }
+            return if (session == null || !session.valid || u == null || u.role != UserRole.Admin) {
+                badCredentials()
+            } else {
+                var user = userService.get(payload!!.name!!)
+                if (user != null && user.verified) {
+                    userAlreadyExists()
+                } else {
+                    user = payload.email?.let { userService.findByEmail(it) }
+                    if (payload.email != null && user != null && user.verified) {
+                        userEmailAlreadyRegistered()
+                    } else {
+                        try {
+                            sessionService.renew(session)
+                            val verificationCode =  UUID.randomUUID().toString()
+                            val token = UUID.randomUUID().toString()
+                            val password = getRandomSpecialChars(8)
+                            user = User(
+                                    payload.name!!,
+                                    payload.email,
+                                    password,
+                                    token,
+                                    verificationCode,
+                                    true,
+                                    UserPlan.valueOf(payload.role!!),
+                                    UserRole.Write,
+                                    LocalDate.now(ZoneOffset.UTC),
+                                    Settings(
+                                            General(AccessLevel.Public),
+                                            Notifications(comments = true, newsletter = true)
+                                    ),
+                                    payload.name
+                            )
+                            userService.create(user)
+                            if (config.emailEnabled) {
+                                emailService.sendVerificationEmail(user)
+                            }
+                            ok(VerificationCodeStatus(payload.name,
+                                    "${config.address}/auth/verify?user=${payload.name}&code=${user.verificationCode}")
+                            )
+                        } catch (e: EntityAlreadyExists) {
+                            userAlreadyExists()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun getRandomSpecialChars(count: Int): String {
+        val random: Random = SecureRandom()
+        val specialChars = random.ints(count.toLong(), 33, 45)
+        return String(specialChars.mapToObj<Char> { data: Int -> data.toChar() }.collect(Collectors.toList()).toCharArray())
+    }
+
+    @POST
+    @Path("/reset")
+    @Consumes(JSON_UTF8)
+    @Produces(JSON_UTF8)
+    fun reset(payload: ResetVerificationCodePayload?, @Context headers: HttpHeaders): Response {
+        return if (payload.isMalformed) {
+            malformedRequest()
+        } else {
+            val session = headers.bearer?.let { sessionService.get(it) }
+            val u = session?.let { userService.get(it.userName) }
+            logger.debug { "session: ${headers.bearer}" }
+            return if (session == null || !session.valid || u == null || u.role != UserRole.Admin) {
+                badCredentials()
+            } else {
+                var user = userService.get(payload!!.name!!)
+                if (user == null) {
+                    userNotFound()
+                } else {
+                    sessionService.renew(session)
+                    val verificationCode =  UUID.randomUUID().toString()
+                    user = user.copy(verificationCode = verificationCode)
+                    userService.update(user)
+                    if (config.emailEnabled) {
+                        emailService.sendVerificationEmail(user)
+                    }
+                    ok(VerificationCodeStatus(user.name,
+                            "${config.address}/auth/verify?user=${payload.name}&code=${user.verificationCode}")
+                    )
+                }
+            }
+        }
+
+    }
+
+    @POST
+    @Path("/delete")
+    @Consumes(JSON_UTF8)
+    @Produces(JSON_UTF8)
+    fun delete(payload: DeleteUserPayload?, @Context headers: HttpHeaders): Response {
+        return if (payload.isMalformed) {
+            malformedRequest()
+        } else {
+            val session = headers.bearer?.let { sessionService.get(it) }
+            val u = session?.let { userService.get(it.userName) }
+            logger.debug { "session: ${headers.bearer}" }
+            return if (session == null || !session.valid || u == null || u.role != UserRole.Admin) {
+                badCredentials()
+            } else {
+                val user = userService.get(payload!!.name!!)
+                if (user == null) {
+                    userNotFound()
+                } else {
+                    sessionService.renew(session)
+                    userService.delete(user)
+                    ok()
+                }
+            }
+        }
+    }
 }
 
 val InfoPayload?.isMalformed get() = this?.user.isNullOrBlank()
@@ -404,6 +562,20 @@ val RegisterPayload?.isMalformed
             || this.email.isMalformedEmail
             || this.password.isNullOrBlank()
             || this.plan.isMalformedPlan
+
+val CreateUserPayload?.isMalformed
+    get() = this == null
+            || this.name.isMalformedUserName
+            || (this.email != null && this.email.isMalformedEmail)
+            || this.role == null
+
+val DeleteUserPayload?.isMalformed
+    get() = this == null
+            || this.name.isMalformedUserName
+
+val ResetVerificationCodePayload?.isMalformed
+    get() = this == null
+            || this.name.isMalformedUserName
 
 val String?.isMalformedEmail: Boolean
     get() {

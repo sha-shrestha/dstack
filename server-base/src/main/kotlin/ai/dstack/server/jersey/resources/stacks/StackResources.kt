@@ -399,18 +399,22 @@ class StackResources {
                         stackNotFound()
                     } else {
                         sessionService.renew(session)
-                        stackService.delete(stack)
-                        frameService.deleteByStackPath(stack.path)
-                        attachmentService.deleteByStackPath(stack.path)
-                        permissionService.deleteByPath(stack.path)
-                        commentService.deleteByStackPath(stack.path)
-                        cardService.deleteByStackPath(stack.path)
-                        fileService.delete(stack.path)
+                        deleteStack(stack)
                         ok()
                     }
                 }
             }
         }
+    }
+
+    private fun deleteStack(stack: Stack) {
+        stackService.delete(stack)
+        frameService.deleteByStackPath(stack.path)
+        attachmentService.deleteByStackPath(stack.path)
+        permissionService.deleteByPath(stack.path)
+        commentService.deleteByStackPath(stack.path)
+        cardService.deleteByStackPath(stack.path)
+        fileService.delete(stack.path)
     }
 
     @Deprecated("Gonna be removed in October")

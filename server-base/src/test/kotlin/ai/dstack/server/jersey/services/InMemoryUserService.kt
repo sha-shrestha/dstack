@@ -8,6 +8,10 @@ import java.time.LocalDate
 class InMemoryUserService(): UserService {
     private val users = mutableListOf<User>()
 
+    override fun findAll(): Sequence<User> {
+        return users.asSequence()
+    }
+
     override fun get(name: String): User? {
         return users.find { it.name == name }
     }

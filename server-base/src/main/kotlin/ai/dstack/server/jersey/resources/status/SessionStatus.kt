@@ -23,5 +23,6 @@ data class SessionStatus(
     val token: String,
     val email: String?,
     val verified: Boolean,
-    val settings: SettingsInfo
+    val settings: SettingsInfo,
+    val role: String
 )

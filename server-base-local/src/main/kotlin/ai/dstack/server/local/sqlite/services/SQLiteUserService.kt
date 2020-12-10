@@ -16,6 +16,10 @@ class SQLiteUserService (private val repository: UserRepository) : UserService {
         return repository.findById(name).toNullable()?.toUser()
     }
 
+    override fun findAll(): Sequence<User> {
+        return repository.findAll().map { it.toUser() }.asSequence()
+    }
+
     override fun findByEmail(email: String): User? {
         return repository.findAllByEmail(email).firstOrNull { it.verified }?.toUser()
     }
