@@ -2,6 +2,7 @@ const typeMap = {
     'TextFieldView': 'text',
     'ComboBoxView': 'select',
     'SliderView': 'slider',
+    'CheckBoxView': 'checkbox',
     'ApplyView': 'apply',
 };
 
@@ -15,6 +16,9 @@ export default views => {
             value: view.data,
             disabled: !view.enabled,
         };
+
+        if (view.type === 'CheckBoxView')
+            fields[index].value = view.selected;
 
         if (view.type === 'ComboBoxView') {
             fields[index].options = view.titles.map((title, i) => ({

@@ -116,6 +116,9 @@ const Details = ({
                 case 'ComboBoxView':
                     result[index] = view.selected;
                     break;
+                case 'CheckBoxView':
+                    result[index] = view.selected;
+                    break;
                 default:
                     result[index] = view.data;
             }
@@ -158,6 +161,7 @@ const Details = ({
                 switch (view.type) {
                     case 'ApplyView':
                         return view;
+                    case 'CheckBoxView':
                     case 'ComboBoxView':
                         view.selected = form[index];
                         break;

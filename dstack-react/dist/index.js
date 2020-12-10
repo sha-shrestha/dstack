@@ -891,6 +891,7 @@ var typeMap = {
   'TextFieldView': 'text',
   'ComboBoxView': 'select',
   'SliderView': 'slider',
+  'CheckBoxView': 'checkbox',
   'ApplyView': 'apply'
 };
 var parseStackViews = (function (views) {
@@ -902,6 +903,7 @@ var parseStackViews = (function (views) {
       value: view.data,
       disabled: !view.enabled
     };
+    if (view.type === 'CheckBoxView') fields[index].value = view.selected;
 
     if (view.type === 'ComboBoxView') {
       fields[index].options = view.titles.map(function (title, i) {
@@ -4376,6 +4378,10 @@ var Details$1 = function Details(_ref) {
           result[index] = view.selected;
           break;
 
+        case 'CheckBoxView':
+          result[index] = view.selected;
+          break;
+
         default:
           result[index] = view.data;
       }
@@ -4417,6 +4423,7 @@ var Details$1 = function Details(_ref) {
           case 'ApplyView':
             return view;
 
+          case 'CheckBoxView':
           case 'ComboBoxView':
             view.selected = form[index];
             break;
