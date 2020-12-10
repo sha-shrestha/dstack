@@ -84,8 +84,6 @@ class AttachResources {
                             ok(
                                 GetAttachStatus(
                                     AttachmentInfo(
-                                        attachment.description,
-                                        attachment.legacyType,
                                         attachment.application,
                                         attachment.contentType,
                                         attachment.params,

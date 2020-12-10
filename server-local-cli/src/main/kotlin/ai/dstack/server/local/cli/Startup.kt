@@ -34,12 +34,11 @@ open class Startup {
                 token = UUID.randomUUID().toString(),
                 verificationCode = UUID.randomUUID().toString(),
                 verified = true,
-                plan = UserPlan.Free,
                 role = UserRole.Admin,
                 createdDate = LocalDate.now(),
                 unverifiedName = "dstack",
                 settings = Settings(General(AccessLevel.Public),
-                    Notifications(false, false))
+                    Notifications(false))
             )
             userService.create(user)
         }

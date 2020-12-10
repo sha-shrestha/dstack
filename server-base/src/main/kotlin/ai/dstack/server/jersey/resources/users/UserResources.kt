@@ -71,12 +71,10 @@ class UserResources {
                     SettingsInfo(
                         GeneralInfo(user.settings.general.defaultAccessLevel.name.toLowerCase()),
                         NotificationsInfo(
-                            user.settings.notifications.comments,
                             user.settings.notifications.newsletter
                         )
                     ),
                     user.createdDate.toString(),
-                    user.plan.code,
                     user.role.code
                 ))
             }
@@ -133,13 +131,12 @@ class UserResources {
                                 token,
                                 verificationCode,
                                 verified,
-                                payload.plan?.let { UserPlan.fromCode(it) } ?: UserPlan.Free,
                                 // TODO: Reconsider registration after introducing user management
                                 UserRole.Write,
                                 LocalDate.now(ZoneOffset.UTC),
                                 Settings(
                                     General(AccessLevel.Public),
-                                    Notifications(comments = true, newsletter = true)
+                                    Notifications(newsletter = true)
                                 ),
                                 payload.name
                             )
@@ -193,7 +190,6 @@ class UserResources {
                         unverifiedUser.token,
                         unverifiedUser.verificationCode,
                         true,
-                        unverifiedUser.plan,
                         unverifiedUser.role,
                         LocalDate.now(ZoneOffset.UTC),
                         unverifiedUser.settings,
@@ -283,7 +279,6 @@ class UserResources {
                     SettingsInfo(
                         GeneralInfo(user.settings.general.defaultAccessLevel.name.toLowerCase()),
                         NotificationsInfo(
-                            user.settings.notifications.comments,
                             user.settings.notifications.newsletter
                         )
                     ),
@@ -371,7 +366,6 @@ class UserResources {
                                 }
                             ),
                             notifications = user.settings.notifications.copy(
-                                comments = payload.notifications?.comments ?: user.settings.notifications.comments,
                                 newsletter = payload.notifications?.newsletter ?: user.settings.notifications.newsletter
                             )
                         )
@@ -416,12 +410,10 @@ class UserResources {
                         SettingsInfo(
                                 GeneralInfo(user.settings.general.defaultAccessLevel.name.toLowerCase()),
                                 NotificationsInfo(
-                                        user.settings.notifications.comments,
                                         user.settings.notifications.newsletter
                                 )
                         ),
                         user.createdDate.toString(),
-                        user.plan.code,
                         user.role.code
                 )
             }.toList()))
@@ -462,12 +454,11 @@ class UserResources {
                                     token,
                                     verificationCode,
                                     true,
-                                    UserPlan.valueOf(payload.role!!),
                                     UserRole.Write,
                                     LocalDate.now(ZoneOffset.UTC),
                                     Settings(
                                             General(AccessLevel.Public),
-                                            Notifications(comments = true, newsletter = true)
+                                            Notifications(newsletter = true)
                                     ),
                                     payload.name
                             )
@@ -618,7 +609,6 @@ val UpdateSettingsPayload?.isMalformed
     ).contains(this.general.defaultAccessLevel))
             || (
             this.general?.defaultAccessLevel == null
-                    && this.notifications?.comments == null
                     && this.notifications?.newsletter == null
             )
 

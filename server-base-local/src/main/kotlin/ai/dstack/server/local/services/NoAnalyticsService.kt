@@ -5,6 +5,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class NoAnalyticsService: AnalyticsService {
-    override fun track(category: String, action: String, label: String?, source: Any?) {
+    override fun track(category: String, action: String, label: String?, source: Any?, remoteAddr: String?) {
     }
 }

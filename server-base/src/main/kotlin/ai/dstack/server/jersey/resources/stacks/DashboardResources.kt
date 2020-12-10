@@ -141,8 +141,7 @@ class DashboardResources {
                                                 BasicFrameInfo(
                                                         h.id,
                                                         h.timestampMillis,
-                                                        emptyMap(),
-                                                        null
+                                                        emptyMap()
                                                 )
                                             }
                                         })
@@ -221,16 +220,13 @@ class DashboardResources {
                                                                         h.id, h.timestampMillis,
                                                                         attachments.map { a ->
                                                                             AttachmentInfo(
-                                                                                    a.description,
-                                                                                    a.legacyType,
                                                                                     a.application,
                                                                                     a.contentType,
                                                                                     a.params,
                                                                                     a.settings,
                                                                                     a.length
                                                                             )
-                                                                        }, h.params,
-                                                                        h.message
+                                                                        }, h.params
                                                                 )
                                                             })
                                                 }.toList(),
@@ -438,15 +434,13 @@ class DashboardResources {
                                                             h.id, h.timestampMillis,
                                                             attachs.map { a ->
                                                                 AttachmentInfo(
-                                                                        a.description,
-                                                                        a.legacyType,
                                                                         a.application,
                                                                         a.contentType,
                                                                         a.params,
                                                                         a.settings,
                                                                         a.length
                                                                 )
-                                                            }, h.params, h.message
+                                                            }, h.params
                                                     )
                                                 })
                                     }

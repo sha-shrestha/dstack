@@ -9,7 +9,7 @@ import ai.dstack.server.local.sqlite.repositories.FrameRepository
 import ai.dstack.server.local.sqlite.toNullable
 import com.fasterxml.jackson.core.type.TypeReference
 
-class SQLiteFrameService (private val repository: FrameRepository) : FrameService {
+class SQLiteFrameService(private val repository: FrameRepository) : FrameService {
     override fun get(stackPath: String, frameId: String): Frame? {
         return repository.findById(mapId(stackPath, frameId)).toNullable()?.toFrame()
     }
@@ -40,9 +40,11 @@ class SQLiteFrameService (private val repository: FrameRepository) : FrameServic
 
     private fun FrameItem.toFrame(): Frame {
         return this.let { f ->
-            ai.dstack.server.model.Frame(f.stack, f.id, f.timestamp, f.size,
-                    f.paramsJson?.let { sqliteMapper.readValue(f.paramsJson,
-                            object : TypeReference<Map<String, Any>>() {}) } ?: emptyMap(), f.message)
+            Frame(f.stack, f.id, f.timestamp, f.size,
+                    f.paramsJson?.let {
+                        sqliteMapper.readValue(f.paramsJson,
+                                object : TypeReference<Map<String, Any>>() {})
+                    } ?: emptyMap())
         }
     }
 
@@ -55,8 +57,7 @@ class SQLiteFrameService (private val repository: FrameRepository) : FrameServic
                     f.size,
                     sqliteMapper.writeValueAsString(
                             f.params
-                    ),
-                    f.message
+                    )
             )
         }
     }

@@ -46,7 +46,6 @@ class SQLiteUserService (private val repository: UserRepository) : UserService {
             token = token,
             verificationCode = verificationCode,
             verified = verified,
-            plan = plan.code,
             role = role.code,
             createdDate = createdDate,
             settings = settings.let {
@@ -54,7 +53,6 @@ class SQLiteUserService (private val repository: UserRepository) : UserService {
                     UserItemSettingsGeneral(it.general.defaultAccessLevel),
                     it.notifications.let { n ->
                         UserItemSettingNotifications(
-                            n.comments,
                             n.newsletter
                         )
                     }
@@ -85,14 +83,14 @@ class SQLiteUserService (private val repository: UserRepository) : UserService {
         return this.let { u ->
             User(
                 u.name, u.email, u.password,
-                u.token, u.verificationCode, u.verified, UserPlan.fromCode(u.plan),
+                u.token, u.verificationCode, u.verified,
                 // No role code means, the user was created before introducing roles. Consider these users to be admins.
                 u.role?.let { UserRole.fromCode(it) } ?: UserRole.Admin,
                 u.createdDate, u.settings.let { s ->
                     Settings(
                         General(s.general.defaultAccessLevel),
                         s.notifications.let { n ->
-                            Notifications(n.comments, n.newsletter)
+                            Notifications(n.newsletter)
                         }
                     )
                 }, u.unverifiedName

@@ -10,7 +10,5 @@ data class UserStatus(
     val settings: SettingsInfo,
     @JsonProperty("created_date")
     val createdDate: String,
-    @Deprecated("Will be dropped in January")
-    val plan: String,
     val role: String
 )

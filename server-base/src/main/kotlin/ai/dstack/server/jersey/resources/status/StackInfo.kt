@@ -21,10 +21,7 @@ data class BasicFrameInfo(
     val id: String,
     @JsonProperty("timestamp")
     val timestampMillis: Long,
-    val params: Map<String, Any>,
-    @Deprecated("Is replaced by params")
-    @JsonProperty("description")
-    val message: String?
+    val params: Map<String, Any>
 )
 
 data class StackInfo(
@@ -34,7 +31,5 @@ data class StackInfo(
     val head: FrameInfo?,
     val readme: String?,
     val permissions: List<PermissionInfo>?,
-    @Deprecated("Gonna be removed in October")
-    val comments: List<CommentInfo>,
     val frames: List<BasicFrameInfo>
 )

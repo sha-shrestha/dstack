@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Notifications(
     @Deprecated("Gonna be removed in October")
-    val comments: Boolean,
-    @Deprecated("Gonna be removed in October")
     @Evolution(default = true, booleanDefault = true)
     val newsletter: Boolean
 )

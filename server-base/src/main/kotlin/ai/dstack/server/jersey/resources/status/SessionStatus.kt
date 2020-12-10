@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class GeneralInfo(@JsonProperty("default_access_level") val defaultAccessLevel: String)
 data class NotificationsInfo(
         @Deprecated("Gonna be removed in October")
-        val comments: Boolean,
-        @Deprecated("Gonna be removed in October")
         val newsletter: Boolean)
 
 data class SettingsInfo(

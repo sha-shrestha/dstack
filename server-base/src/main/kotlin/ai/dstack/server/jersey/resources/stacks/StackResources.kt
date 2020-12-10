@@ -6,7 +6,6 @@ import ai.dstack.server.services.*
 import ai.dstack.server.jersey.resources.*
 import ai.dstack.server.jersey.resources.attachmentAlreadyExists
 import ai.dstack.server.jersey.resources.badCredentials
-import ai.dstack.server.jersey.resources.commentNotFound
 import ai.dstack.server.jersey.resources.frameNotFound
 import ai.dstack.server.jersey.resources.malformedRequest
 import ai.dstack.server.jersey.resources.ok
@@ -19,7 +18,6 @@ import ai.dstack.server.jersey.resources.userNotVerified
 import ai.dstack.server.jersey.resources.users.isMalformedEmail
 import ai.dstack.server.jersey.resources.users.isMalformedUserName
 import mu.KLogging
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.*
@@ -56,9 +54,6 @@ class StackResources {
 
     @Inject
     private lateinit var fileService: FileService
-
-    @Inject
-    private lateinit var commentService: CommentService
 
     @Inject
     private lateinit var permissionService: PermissionService
@@ -132,15 +127,13 @@ class StackResources {
                                                 it.id, it.timestampMillis,
                                                 attachments.map { a ->
                                                     AttachmentInfo(
-                                                            a.description,
-                                                            a.legacyType,
                                                             a.application,
                                                             a.contentType,
-                                                            a.params.orEmpty(),
+                                                            a.params,
                                                             a.settings,
                                                             a.length
                                                     )
-                                                }, it.params, it.message
+                                                }, it.params
                                         )
                                     },
                                     stack.readme,
@@ -151,14 +144,11 @@ class StackResources {
                                                         it.email
                                                 )
                                             }.toList() else null,
-                                    commentService.findByStackPath(stack.path).map {
-                                        CommentInfo(it.id, it.timestampMillis, it.userName, it.text)
-                                    },
                                     frames.map {
                                         BasicFrameInfo(
                                                 it.id,
                                                 it.timestampMillis,
-                                                it.params, it.message
+                                                it.params
                                         )
                                     }
                             )
@@ -236,8 +226,7 @@ class StackResources {
     @Path("/push")
     @Produces(JSON_UTF8)
     @Consumes(JSON_UTF8)
-    fun push(p: PushPayload?, @Context headers: HttpHeaders): Response {
-        val payload = p?.migrateAttachmentType()
+    fun push(payload: PushPayload?, @Context headers: HttpHeaders): Response {
         logger.debug {
             "payload: ${payload?.copy(attachments = payload.attachments?.map { it.copy(data = if (it.data != null) "(hidden)" else null) }
                     ?.toList())}"
@@ -266,8 +255,7 @@ class StackResources {
                                 payload.attachments.size
                             else
                                 payload.size,
-                            payload.params.orEmpty().let { it.mapValues { it.value }.toMap() },
-                            payload.message?.let { if (it.isNotEmpty()) it else null }
+                            payload.params.orEmpty().let { it.mapValues { it.value }.toMap() }
                     )
                     frameService.create(frame)
                 } else if (payload.size != null) {
@@ -279,7 +267,6 @@ class StackResources {
                     payload.attachments.forEachIndexed { i, a ->
                         val index = payload.index ?: i
                         try {
-                            val type = a.type ?: payload.type
                             val application = a.application ?: payload.application
                             val contentType = a.contentType ?: payload.contentType
                             val file = frame.path + "/" + index
@@ -303,8 +290,6 @@ class StackResources {
                                     Attachment(
                                             framePath = frame.path,
                                             filePath = file,
-                                            description = a.description,
-                                            legacyType = type!!,
                                             application = application,
                                             contentType = contentType!!,
                                             length = length,
@@ -412,108 +397,8 @@ class StackResources {
         frameService.deleteByStackPath(stack.path)
         attachmentService.deleteByStackPath(stack.path)
         permissionService.deleteByPath(stack.path)
-        commentService.deleteByStackPath(stack.path)
         cardService.deleteByStackPath(stack.path)
         fileService.delete(stack.path)
-    }
-
-    @Deprecated("Gonna be removed in October")
-    @POST
-    @Path("comments/create")
-    @Consumes(JSON_UTF8)
-    @Produces(JSON_UTF8)
-    fun createComment(payload: CreateCommentPayload?, @Context headers: HttpHeaders): Response {
-        logger.debug { "payload: $payload" }
-        return if (payload.isMalformed) {
-            malformedRequest()
-        } else {
-            val session = headers.bearer?.let { sessionService.get(it) }
-            if (session == null || !session.valid) {
-                badCredentials()
-            } else {
-                val (u, s) = payload!!.stack!!.parseStackPath()
-                val user = userService.get(u)
-                val stack = stackService.get(u, s)
-                when {
-                    user == null -> userNotFound()
-                    !user.verified -> userNotVerified()
-                    stack == null -> stackNotFound()
-                    else -> {
-                        sessionService.renew(session)
-                        val comment = Comment(
-                                UUID.randomUUID().toString(), stack.path, session.userName,
-                                Instant.now().epochSecond, payload.text!!
-                        )
-                        commentService.create(comment)
-                        if (user.settings.notifications.comments && stack.userName != session.userName
-                                && emailService !is NonAvailable
-                        ) {
-                            emailService.sendCommentEmail(user, comment)
-                        }
-                        ok(
-                                CreateCommentStatus(
-                                        comment.id,
-                                        comment.timestampMillis
-                                )
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    @Deprecated("Gonna be removed in October")
-    @POST
-    @Path("comments/delete")
-    @Consumes(JSON_UTF8)
-    @Produces(JSON_UTF8)
-    fun deleteComment(payload: DeleteCommentPayload?, @Context headers: HttpHeaders): Response {
-        logger.debug { "payload: $payload" }
-        return if (payload.isMalformed) {
-            malformedRequest()
-        } else {
-            val session = headers.bearer?.let { sessionService.get(it) }
-            val user = session?.let { userService.get(it.userName) }
-            val comment = commentService.get(payload!!.id!!)
-            if (session == null || !session.valid || user == null) {
-                badCredentials()
-            } else if (!user.verified) {
-                userNotVerified()
-            } else if (comment == null) {
-                commentNotFound()
-            } else {
-                sessionService.renew(session)
-                commentService.delete(comment)
-                ok()
-            }
-        }
-    }
-
-    @Deprecated("Gonna be removed in October")
-    @POST
-    @Path("comments/edit")
-    @Consumes(JSON_UTF8)
-    @Produces(JSON_UTF8)
-    fun deleteComment(payload: EditCommentPayload?, @Context headers: HttpHeaders): Response {
-        logger.debug { "payload: $payload" }
-        return if (payload.isMalformed) {
-            malformedRequest()
-        } else {
-            val session = headers.bearer?.let { sessionService.get(it) }
-            val user = session?.let { userService.get(it.userName) }
-            val comment = commentService.get(payload!!.id!!)
-            if (session == null || !session.valid || user == null) {
-                badCredentials()
-            } else if (!user.verified) {
-                userNotVerified()
-            } else if (comment == null) {
-                commentNotFound()
-            } else {
-                sessionService.renew(session)
-                commentService.update(comment.copy(text = payload.text!!))
-                ok()
-            }
-        }
     }
 
     @POST
@@ -568,18 +453,6 @@ class StackResources {
             }
         }
     }
-}
-
-fun PushPayload.migrateAttachmentType(): PushPayload {
-    val values = AttachmentTypeMigration.migrate(this.type, this.application, this.contentType)
-    return this.copy(type = values.legacyType, application = values.application, contentType = values.contentType,
-            attachments = this.attachments?.map { it.migrateAttachmentType() }
-    )
-}
-
-fun PushPayloadAttachment.migrateAttachmentType(): PushPayloadAttachment {
-    val values = AttachmentTypeMigration.migrate(this.type, this.application, this.contentType)
-    return this.copy(type = values.legacyType, application = values.application, contentType = values.contentType)
 }
 
 fun String.parseStackPath(): Pair<String, String> {
@@ -645,9 +518,9 @@ val PushPayload?.isMalformed: Boolean
                 this?.stack.isNullOrBlank() || this?.id.isNullOrBlank() || this?.timestamp == null
         val missingSize = this?.size == null
         val missingAttachments = (this?.attachments?.size ?: 0) == 0
-        val missingType = (this?.type == null || this.contentType == null)
+        val missingType = (this?.contentType == null)
                 && this?.attachments?.any {
-            it.type == null || it.contentType == null
+            it.contentType == null
         } == true
         // TODO: Do additional validation for parameters
         val containsMalformedAttachments = this?.attachments?.any {

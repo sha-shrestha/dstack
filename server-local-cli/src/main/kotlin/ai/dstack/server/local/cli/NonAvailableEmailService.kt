@@ -1,6 +1,5 @@
 package ai.dstack.server.local.cli
 
-import ai.dstack.server.model.Comment
 import ai.dstack.server.model.User
 import ai.dstack.server.services.EmailService
 import ai.dstack.server.services.NonAvailable
@@ -9,10 +8,6 @@ import org.springframework.stereotype.Component
 @Component
 class NonAvailableEmailService: EmailService, NonAvailable {
     override fun sendVerificationEmail(user: User) {
-        throw UnsupportedOperationException()
-    }
-
-    override fun sendCommentEmail(user: User, comment: Comment) {
         throw UnsupportedOperationException()
     }
 

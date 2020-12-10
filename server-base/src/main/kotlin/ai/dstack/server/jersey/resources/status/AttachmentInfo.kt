@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AttachmentInfo(
-    val description: String?,
-    @Deprecated("Will be dropped in August")
-    val type: String,
     val application: String?,
     @JsonProperty("content_type")
     val contentType: String,

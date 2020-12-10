@@ -47,9 +47,5 @@ data class FrameItem(
     var size: Int?,
 
     @Column(name = "params")
-    var paramsJson: String?,
-
-    @Deprecated("Is replaced by params")
-    @Column
-    var message: String?
+    var paramsJson: String?
 )

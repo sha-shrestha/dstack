@@ -22,9 +22,6 @@ data class UserItemSettingsGeneral(
 data class UserItemSettingNotifications(
     @Deprecated("Gonna be removed in October")
     @Column
-    val comments: Boolean,
-    @Deprecated("Gonna be removed in October")
-    @Column
     val newsletter: Boolean
 )
 
@@ -55,10 +52,6 @@ data class UserItem(
 
     @Column
     val verified: Boolean,
-
-    @Deprecated("Will be dropped in January")
-    @Column
-    val plan: String,
 
     @Column
     val role: String?,

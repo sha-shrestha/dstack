@@ -50,11 +50,6 @@ open class SQLiteConfig {
     }
 
     @Bean
-    open fun commentService(@Autowired repository: CommentRepository): CommentService {
-        return SQLiteCommentService(repository)
-    }
-
-    @Bean
     open fun dashboardService(@Autowired repository: DashboardRepository): DashboardService {
         return SQLiteDashboardService(repository)
     }

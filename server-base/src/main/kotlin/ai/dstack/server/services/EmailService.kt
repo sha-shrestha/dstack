@@ -1,12 +1,10 @@
 package ai.dstack.server.services
 
-import ai.dstack.server.model.Comment
 import ai.dstack.server.model.User
 import java.net.URLEncoder
 
 interface EmailService {
     fun sendVerificationEmail(user: User)
-    fun sendCommentEmail(user: User, comment: Comment)
     fun sendResetEmail(user: User)
     fun sendTriggerEmail(user: User)
     fun sendInviteEmail(fromUser: User, path: String, toEmail: String, verificationCode: String)
@@ -43,39 +41,6 @@ interface EmailService {
                 |The dstack.ai Team""".trimMargin()
         }
 
-        fun commentEmailSubject(comment: Comment): String {
-            val s = comment.stackPath.split("/")
-            return "[dstack.ai] New comment in '${s[1]}'"
-        }
-
-        fun commentEmailHtml(user: User, comment: Comment, config: AppConfig): String {
-            val s = comment.stackPath.split("/")
-            return """<p>Hello, ${user.name}!</p>
-                |
-                |<p>There is a new comment in <a href="${config.address}/${comment.stackPath}">${s[1]}</a> by ${comment.userName}:</p> 
-                |
-                |<i>"${comment.text}"</i>
-                |
-                |<p>Change your dstack.ai <a href="${settingsLink(
-                user,
-                config
-            )}">settings</a> if you don't want to receive emails on new comments.</p>""".trimMargin()
-        }
-
-        fun commentEmailPlainText(user: User, comment: Comment, config: AppConfig): String {
-            val s = comment.stackPath.split("/")
-            return """Hello, ${user.name}!
-                |
-                |There is a new comment in '${s[1]}' by ${comment.userName}: 
-                |
-                |"${comment.text}"
-                |
-                |Change your dstack.ai settings if you don't want to receive emails on new comments: ${settingsLink(
-                user,
-                config
-            )}""".trimMargin()
-        }
-
         private fun settingsLink(user: User, config: AppConfig) =
             "${config.address}/auth/verify?user=${user.name}&code=${user.verificationCode}&next=/settings"
 
@@ -107,7 +72,7 @@ interface EmailService {
                 user.email!!,
                 "UTF-8"
             )}&code=${user.verificationCode}">${config.address}/auth/reset-password?email=${URLEncoder.encode(
-                user.email!!,
+                user.email,
                 "utf-8"
             )}&code=${user.verificationCode}</a><p/>
                 |

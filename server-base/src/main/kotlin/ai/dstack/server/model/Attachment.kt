@@ -5,9 +5,6 @@ import java.time.LocalDate
 data class Attachment(
     val framePath: String,
     val filePath: String,
-    val description: String?,
-    @Deprecated("Will be dropped in August")
-    val legacyType: String,
     val application: String?,
     val contentType: String,
     val length: Long,

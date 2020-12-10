@@ -30,7 +30,6 @@ class JerseyApplicationTests : JerseyTest() {
     private lateinit var appConfig: AppConfig
     private lateinit var emailService: EmailService
     private lateinit var permissionService: PermissionService
-    private lateinit var commentService: CommentService
     private lateinit var schedulerService: SchedulerService
     private lateinit var analyticsService: AnalyticsService
     private lateinit var newsletterService: NewsletterService
@@ -49,7 +48,6 @@ class JerseyApplicationTests : JerseyTest() {
         appConfig = Mockito.mock(AppConfig::class.java)
         emailService = Mockito.mock(EmailService::class.java)
         permissionService = Mockito.mock(PermissionService::class.java)
-        commentService = Mockito.mock(CommentService::class.java)
         schedulerService = Mockito.mock(SchedulerService::class.java)
         analyticsService = Mockito.mock(AnalyticsService::class.java)
         newsletterService = Mockito.mock(NewsletterService::class.java)
@@ -77,7 +75,6 @@ class JerseyApplicationTests : JerseyTest() {
                         bind(emailService).to(EmailService::class.java)
                         bind(fileService).to(FileService::class.java)
                         bind(permissionService).to(PermissionService::class.java)
-                        bind(commentService).to(CommentService::class.java)
                         bind(schedulerService).to(SchedulerService::class.java)
                         bind(analyticsService).to(AnalyticsService::class.java)
                         bind(newsletterService).to(NewsletterService::class.java)
@@ -95,7 +92,6 @@ class JerseyApplicationTests : JerseyTest() {
                 appConfig,
                 emailService,
                 permissionService,
-                commentService,
                 analyticsService,
                 newsletterService
         )
@@ -176,7 +172,6 @@ class JerseyApplicationTests : JerseyTest() {
         Truth.assertThat(rememberResponseSessionStatus.user).isEqualTo("test_user")
         Truth.assertThat(rememberResponseSessionStatus.email).isEqualTo("test@gmail.com")
         Truth.assertThat(rememberResponseSessionStatus.settings.general.defaultAccessLevel).isEqualTo("public")
-        Truth.assertThat(rememberResponseSessionStatus.settings.notifications.comments).isEqualTo(true)
         Truth.assertThat(rememberResponseSessionStatus.settings.notifications.newsletter).isEqualTo(true)
         Truth.assertThat(rememberResponseSessionStatus.token).isEqualTo(verifiedUser.token)
         Truth.assertThat(rememberResponseSessionStatus.verified).isTrue()
@@ -196,10 +191,8 @@ class JerseyApplicationTests : JerseyTest() {
         Truth.assertThat(infoUserStatus.user).isEqualTo("test_user")
         Truth.assertThat(infoUserStatus.email).isEqualTo("test@gmail.com")
         Truth.assertThat(infoUserStatus.settings.general.defaultAccessLevel).isEqualTo("public")
-        Truth.assertThat(infoUserStatus.settings.notifications.comments).isEqualTo(true)
         Truth.assertThat(infoUserStatus.settings.notifications.newsletter).isEqualTo(true)
         Truth.assertThat(infoUserStatus.token).isEqualTo(verifiedUser.token)
-        Truth.assertThat(infoUserStatus.plan).isEqualTo(verifiedUser.plan.code)
         Truth.assertThat(infoUserStatus.createdDate).isEqualTo(LocalDate.now().toString())
         Truth.assertThat(infoUserStatus.verified).isTrue()
 
@@ -216,9 +209,9 @@ class JerseyApplicationTests : JerseyTest() {
     fun testJobs() {
         val testUser = User(
                 "test_user", "test@gmail.com", "test",
-                "test_token", "test_code", true, UserPlan.Free, UserRole.Admin,
+                "test_token", "test_code", true, UserRole.Admin,
                 LocalDate.now(), Settings(General(AccessLevel.Public),
-                Notifications(true, true)), "test_user"
+                Notifications(true)), "test_user"
         )
         userService.create(testUser)
 
@@ -353,9 +346,9 @@ class JerseyApplicationTests : JerseyTest() {
     fun testDashboards() {
         val testUser = User(
                 "test_user", "test@gmail.com", "test",
-                "test_token", "test_code", true, UserPlan.Free, UserRole.Admin,
+                "test_token", "test_code", true, UserRole.Admin,
                 LocalDate.now(), Settings(General(AccessLevel.Public),
-                Notifications(true, true)), "test_user"
+                Notifications(true)), "test_user"
         )
         userService.create(testUser)
         val testSession = Session(
@@ -463,9 +456,9 @@ class JerseyApplicationTests : JerseyTest() {
     fun testStacks() {
         val testUser = User(
                 "test_user", "test@gmail.com", "test",
-                "test_token", "test_code", true, UserPlan.Free, UserRole.Admin,
+                "test_token", "test_code", true, UserRole.Admin,
                 LocalDate.now(), Settings(General(AccessLevel.Public),
-                Notifications(comments = true, newsletter = true)), "test_user"
+                Notifications(newsletter = true)), "test_user"
         )
         userService.create(testUser)
 
@@ -488,7 +481,6 @@ class JerseyApplicationTests : JerseyTest() {
 
         val testData = "Some data".toByteArray()
         val pushPayloadAttach = PushPayloadAttachment(
-                type = null,
                 contentType = "text/plain",
                 application = null,
                 data = Base64.getEncoder().encodeToString(testData).toString(),
@@ -496,14 +488,12 @@ class JerseyApplicationTests : JerseyTest() {
                 params = mapOf(
                         "test_attach_param" to "test_attach_param_value"
                 ),
-                description = "Test attach description",
                 settings = mapOf(
                         "test_setting" to "test_setting_value"
                 )
         )
         val pushPayload = PushPayload("test_user/test_stack", frameId,
                 timestamp = System.currentTimeMillis(),
-                type = null,
                 contentType = null,
                 application = null,
                 attachments = listOf(pushPayloadAttach),
@@ -511,8 +501,7 @@ class JerseyApplicationTests : JerseyTest() {
                         "test_param" to "test_param_value"
                 ),
                 index = null,
-                size = null,
-                message = null
+                size = null
         )
         val pushResponse: Response = target("/stacks/push").request()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + testUser.token)
@@ -530,8 +519,7 @@ class JerseyApplicationTests : JerseyTest() {
         Truth.assertThat(frameResponse.entity<GetFrameStatus>())
                 .isEqualTo(GetFrameStatus(FrameInfo(frameId,
                         pushPayload.timestamp!!,
-                        listOf(AttachmentInfo(pushPayloadAttach.description,
-                                "unknown",
+                        listOf(AttachmentInfo(
                                 pushPayloadAttach.application,
                                 pushPayloadAttach.contentType!!,
                                 pushPayloadAttach.params!!,
@@ -539,8 +527,7 @@ class JerseyApplicationTests : JerseyTest() {
                                 pushPayloadAttach.length!!,
                                 data = null, downloadUrl = null, preview = null,
                                 index = null)),
-                        pushPayload.params!!,
-                        pushPayload.message))
+                        pushPayload.params!!))
                 )
 
         val updateStackPayload = UpdateStackPayload("test_user/test_stack",

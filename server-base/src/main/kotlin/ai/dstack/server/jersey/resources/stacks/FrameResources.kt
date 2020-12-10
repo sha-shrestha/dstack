@@ -59,15 +59,13 @@ class FrameResources {
                                 frame.id, frame.timestampMillis,
                                 attachments.map { a ->
                                     AttachmentInfo(
-                                        a.description,
-                                        a.legacyType,
                                         a.application,
                                         a.contentType,
                                         a.params,
                                         a.settings,
                                         a.length
                                     )
-                                }, frame.params, frame.message
+                                }, frame.params
                             )
                         )
                     )

@@ -45,9 +45,6 @@ class AttachmentItem(
     @Column
     var file: String,
 
-    @Column(name = "type")
-    var legacyType: String,
-
     @Column()
     var application: String?,
 
@@ -56,10 +53,6 @@ class AttachmentItem(
 
     @Column
     var length: Long,
-
-    @Deprecated("Is replaced by params")
-    @Column
-    var description: String?,
 
     @Column(name = "params")
     var paramsJson: String,

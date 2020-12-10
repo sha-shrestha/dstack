@@ -3,7 +3,6 @@ package ai.dstack.server.jersey.resources.payload.resources
 import ai.dstack.server.jersey.resources.payload.PushPayload
 import ai.dstack.server.jersey.resources.payload.PushPayloadAttachment
 import ai.dstack.server.jersey.resources.stacks.isMalformed
-import ai.dstack.server.jersey.resources.stacks.migrateAttachmentType
 import com.google.common.truth.Truth
 import org.junit.jupiter.api.Test
 
@@ -16,15 +15,13 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = null,
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // not a single attachment
@@ -33,18 +30,16 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment( null, null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // no type
@@ -53,18 +48,16 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = null,
                         application = null,
                         contentType = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // no type in attach
@@ -73,18 +66,16 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = null,
                         application = null,
                         contentType = null,
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment("image/png", null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment("image/png", null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // type in attach
@@ -92,18 +83,16 @@ class PushPayloadTest {
                 stack = "cheptsov/test",
                 id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                 timestamp = 1576576185056296,
-                type = null,
                 application = null,
                 contentType = null,
                 index = null,
                 attachments = listOf(
-                        PushPayloadAttachment("image/png", null, null, "haha", null, null, emptyMap(), emptyMap()),
-                        PushPayloadAttachment("image/png", null, null, "hoho", null, null, emptyMap(), emptyMap())
+                        PushPayloadAttachment(null, "image/png", "haha", null, emptyMap(), emptyMap()),
+                        PushPayloadAttachment(null, "image/png", "hoho", null, emptyMap(), emptyMap())
                 ),
                 size = null,
-                params = null,
-                message = null
-        ).migrateAttachmentType().isMalformed).isFalse()
+                params = null
+        ).isMalformed).isFalse()
 
         // no timestamp
         Truth.assertThat(
@@ -111,18 +100,16 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = null,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // no id
@@ -131,18 +118,16 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = null,
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // no stack
@@ -151,18 +136,16 @@ class PushPayloadTest {
                         stack = null,
                         id = "f71e42ae-5209-4d21-933c-883d75722cf6",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // ok
@@ -171,17 +154,15 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isFalse()
 
         // ok
@@ -190,18 +171,16 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = null,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap()),
-                                PushPayloadAttachment(null, null, null, "hoho", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap()),
+                                PushPayloadAttachment(null, null, "hoho", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isFalse()
 
         // ok
@@ -210,15 +189,13 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = null,
                         attachments = null,
                         size = 1,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isFalse()
 
         // ok
@@ -227,17 +204,15 @@ class PushPayloadTest {
                         stack = "cheptsov/folder/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isFalse()
 
         // ok
@@ -246,17 +221,15 @@ class PushPayloadTest {
                         stack = "cheptsov/folder/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, 10000L, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, 10000L, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isFalse()
 
         // not ok
@@ -265,17 +238,15 @@ class PushPayloadTest {
                         stack = "cheptsov/test/",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // not ok
@@ -284,17 +255,15 @@ class PushPayloadTest {
                         stack = "cheptsov//test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // not ok
@@ -303,17 +272,15 @@ class PushPayloadTest {
                         stack = "cheptsov/folder//test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, "haha", null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, "haha", null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
 
         // no data and no length
@@ -322,17 +289,15 @@ class PushPayloadTest {
                         stack = "cheptsov/test",
                         id = "1819447e-97c8-44c4-ae50-3c6d6fa83237",
                         timestamp = 1576576185056296,
-                        type = "image/png",
                         application = null,
-                        contentType = null,
+                        contentType = "image/png",
                         index = 0,
                         attachments = listOf(
-                                PushPayloadAttachment(null, null, null, null, null, null, emptyMap(), emptyMap())
+                                PushPayloadAttachment(null, null, null, null, emptyMap(), emptyMap())
                         ),
                         size = null,
-                        params = null,
-                        message = null
-                ).migrateAttachmentType().isMalformed
+                        params = null
+                ).isMalformed
         ).isTrue()
     }
 }

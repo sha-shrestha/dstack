@@ -10,8 +10,6 @@ data class PushPayload(
         val stack: String?,
         val id: String?,
         val timestamp: Long?,
-        @Deprecated("Will be dropped in August")
-        val type: String?,
         @JsonProperty("application")
         val application: String?,
         @JsonProperty("content_type")
@@ -19,24 +17,18 @@ data class PushPayload(
         val index: Int?,
         val attachments: List<PushPayloadAttachment>?,
         val size: Int?,
-        val params: Map<String, Any>?,
-        @Deprecated("Is replaced by params")
-        val message: String?
+        val params: Map<String, Any>?
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PushPayloadAttachment(
-        @Deprecated("Will be dropped in August")
-        val type: String?,
         @JsonProperty("application")
         val application: String?,
         @JsonProperty("content_type")
         val contentType: String?,
         val data: String?,
         val length: Long?,
-        @Deprecated("Is replaced by params")
-        val description: String?,
         val params: Map<String, Any>?,
         val settings: Map<String, Any>?
 )
