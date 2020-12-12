@@ -1634,7 +1634,7 @@ body ._1mUh_-multiple ._V9Ufm ._3GdNa-mirror {
 body ._1mUh_-multiple ._V9Ufm ._3BOaB {
                 border: none;
                 outline: none;
-                background: rgba(255, 0, 0, 0.2);
+                background: transparent;
                 width: 100%;
             }
 body ._1mUh_-allow-clear._2YFSs ._V9Ufm,
@@ -1697,6 +1697,7 @@ body ._1mUh_-item:nth-child(n+2) {
                 //margin-top: 13px;
             }
 body ._1mUh_-item-group:nth-child(n+2) {
+                padding: 0;
                 height: 1px;
                 margin-top: 13px;
                 background-color: rgb(180, 184, 199);
@@ -2038,7 +2039,7 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 .select-field-multiple .select-field-selector .select-field-selection-search-input {
         border: none;
         outline: none;
-        background: rgba(255, 0, 0, 0.2);
+        background: transparent;
         width: 100%;
       }
 
@@ -2113,8 +2114,10 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
       }
 
 .select-field-item-group:nth-child(n+2) {
+        padding: 0;
         height: 1px;
-        margin-top: 13px;
+        margin-top: 8px;
+        margin-top: 8px;
         background-color: rgb(180, 184, 199);
         opacity: .2;
       }
@@ -4486,22 +4489,12 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
         grid-template-columns: 240px 1fr;
         grid-template-rows: auto 1fr;
         grid-column-gap: 30px;
-        grid-template-areas:
-            "head head"
-            "content content"
+        grid-template-areas: "content content"
 }
         ._3_I7R._3exQh {
-            grid-template-areas:
-            "filters head"
-            "filters content";
+            grid-template-areas: "filters content";
         }
     }
-._282UU {
-    grid-area: head;
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
 @media (min-width: 981px) {
 ._1-hdZ {
         grid-area: filters;
@@ -4517,32 +4510,6 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     margin-top: 20px;
     flex-shrink: 0;
 }
-._2TdJX ._Y6gJz {
-        font-size: 14px;
-        line-height: 22px;
-    }
-@media (max-width: 980px) {
-._2TdJX ._Y6gJz {
-            margin-top: 10px
-    }
-        }
-@media (min-width: 981px) {
-._2TdJX ._Y6gJz {
-            margin-top: 20px
-    }
-        }
-._2TdJX ._RhHmq {
-        margin-top: 20px;
-        display: flex;
-    }
-._2TdJX ._RhHmq ._26mqa {
-            max-width: -webkit-fit-content;
-            max-width: -moz-fit-content;
-            max-width: fit-content;
-        }
-._2TdJX ._RhHmq ._26mqa:nth-child(n+2) {
-                margin-left: 12px;
-            }
 
 @media (min-width: 981px) {
 ._31Z5G {
@@ -4824,26 +4791,11 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
         grid-template-columns: 250px 1fr;
         grid-template-rows: auto 1fr;
         grid-column-gap: 30px;
-        grid-template-areas:
-            "head head"
-            "content content"
+        grid-template-areas: "content content"
 }
         ._2Ro1o._1Rz21 {
-            grid-template-areas:
-            "filters head"
-            "filters content";
+            grid-template-areas: "filters content";
         }
-    }
-._2Py9M {
-    grid-area: head;
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-@media (max-width: 980px) {
-._2Py9M {
-        margin-top: 16px
-}
     }
 @media (min-width: 981px) {
 ._283Wj {
@@ -4907,32 +4859,6 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     margin-top: 20px;
     flex-shrink: 0;
 }
-._yxsOt ._3dUVb {
-        font-size: 14px;
-        line-height: 22px;
-    }
-@media (max-width: 980px) {
-._yxsOt ._3dUVb {
-            margin-top: 10px
-    }
-        }
-@media (min-width: 981px) {
-._yxsOt ._3dUVb {
-            margin-top: 20px
-    }
-        }
-._yxsOt ._3hJo_ {
-        margin-top: 20px;
-        display: flex;
-    }
-._yxsOt ._3hJo_ ._DbGRd {
-            max-width: -webkit-fit-content;
-            max-width: -moz-fit-content;
-            max-width: fit-content;
-        }
-._yxsOt ._3hJo_ ._DbGRd:nth-child(n+2) {
-                margin-left: 12px;
-            }
 
 ._1HGtr {
     padding-left: 0;

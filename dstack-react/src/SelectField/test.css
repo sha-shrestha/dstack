@@ -155,7 +155,7 @@
       :global(.select-field-selection-search-input) {
         border: none;
         outline: none;
-        background: rgba(255, 0, 0, 0.2);
+        background: transparent;
         width: 100%;
       }
     }
@@ -224,8 +224,10 @@
       //margin-top: 13px;
       }
       &-group:nth-child(n+2) {
+        padding: 0;
         height: 1px;
-        margin-top: 13px;
+        margin-top: 8px;
+        margin-top: 8px;
         background-color: var(--color-light-gray);
         opacity: .2;
       }

@@ -39,7 +39,8 @@ const SelectField = ({
     ...props
 }: Props) => {
     const onChangeHandle = (value: Array<string>) => {
-        if (typeof value === 'string' && value.indexOf(allValue) >= 0)
+        console.log(value);
+        if (Array.isArray(value) && value.indexOf(allValue) >= 0)
             if (value.length > options.length)
                 value = [];
             else
@@ -72,7 +73,7 @@ const SelectField = ({
                 // animation={useAnim ? 'slide-up' : null}
                 // choiceTransitionName="rc-select-selection__choice-zoom"
                 prefixCls="select-field"
-                multiple={mode === 'multiple'}
+                mode={mode}
                 showArrow
                 showSearch={showSearch}
                 onSelect={onSelect}

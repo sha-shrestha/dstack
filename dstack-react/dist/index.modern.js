@@ -910,6 +910,7 @@ var parseStackViews = (function (views) {
         };
       });
       fields[index].value = view.selected;
+      fields[index].multiple = view.multiple;
     }
 
     if (view.type === 'SliderView') {
@@ -1433,7 +1434,8 @@ var SelectField = function SelectField(_ref) {
       props = _objectWithoutPropertiesLoose(_ref, ["align", "label", "disabled", "placeholder", "value", "className", "mode", "onChange", "options", "showSearch"]);
 
   var onChangeHandle = function onChangeHandle(value) {
-    if (typeof value === 'string' && value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
+    console.log(value);
+    if (Array.isArray(value) && value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
       return o.value;
     });
     if (onChange) onChange(value);
@@ -1467,7 +1469,7 @@ var SelectField = function SelectField(_ref) {
   }, /*#__PURE__*/React__default.createElement(Select, _extends({
     value: propValue,
     prefixCls: "select-field",
-    multiple: mode === 'multiple',
+    mode: mode,
     showArrow: true,
     showSearch: showSearch,
     onSelect: onSelect,
@@ -1586,11 +1588,13 @@ var StackFilters = function StackFilters(_ref) {
           name: key,
           options: fields[key].options,
           value: Array.isArray(form[key]) ? form[key] : [form[key]],
-          disabled: disabled || fields[key].disabled
+          disabled: disabled || fields[key].disabled,
+          mode: fields[key].multiple ? 'multiple' : null
         });
 
       case 'checkbox':
         return /*#__PURE__*/React__default.createElement(CheckboxField, {
+          appearance: "switcher",
           key: "checkbox-" + key,
           className: css$i.field,
           onChange: _onChange,
@@ -2818,9 +2822,7 @@ var List = function List(_ref) {
       loading = _ref.loading,
       deleteStack = _ref.deleteStack,
       currentUser = _ref.currentUser,
-      user = _ref.user,
-      _ref$renderUploadStac = _ref.renderUploadStack,
-      renderUploadStack = _ref$renderUploadStac === void 0 ? function () {} : _ref$renderUploadStac;
+      user = _ref.user;
 
   var _useTranslation = useTranslation(),
       t = _useTranslation.t;
@@ -2868,17 +2870,13 @@ var List = function List(_ref) {
       isShowWelcomeModal = _useState5[0],
       setIsShowWelcomeModal = _useState5[1];
 
-  var _useState6 = useState(false),
-      isShowUploadStackModal = _useState6[0],
-      setIsShowUploadStackModal = _useState6[1];
-
-  var _useState7 = useState(''),
-      search = _useState7[0],
-      setSearch = _useState7[1];
+  var _useState6 = useState(''),
+      search = _useState6[0],
+      setSearch = _useState6[1];
 
   var isInitialMount = useRef(true);
 
-  var _useState8 = useState(null);
+  var _useState7 = useState(null);
 
   var sortingItems = {
     lastSource: {
@@ -2929,15 +2927,6 @@ var List = function List(_ref) {
     }
   }, [data]);
 
-  var showUploadStackModal = function showUploadStackModal(event) {
-    event.preventDefault();
-    setIsShowUploadStackModal(true);
-  };
-
-  var hideUploadStackModal = function hideUploadStackModal() {
-    return setIsShowUploadStackModal(false);
-  };
-
   var deleteItem = function deleteItem() {
     deleteStack(deletingStack);
     hideDeleteConfirmation();
@@ -2984,15 +2973,7 @@ var List = function List(_ref) {
     size: "small",
     value: search,
     onChange: onChangeSearch
-  }), renderUploadStack && /*#__PURE__*/React__default.createElement(Tooltip, {
-    overlayContent: t('uploadTooltip')
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$v.uploadButton,
-    onClick: showUploadStackModal,
-    color: "primary",
-    variant: "contained",
-    size: "small"
-  }, t('createStack'))))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
+  }))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
     className: css$v.controls
   }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
     className: css$v.viewSwitcher,
@@ -3009,7 +2990,7 @@ var List = function List(_ref) {
     className: css$v.message
   }, user === currentUser ? t('youHaveNoStacksYet') : t('theUserHasNoStacksYetByName', {
     name: user
-  })), !loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack(), !!tabs.length && /*#__PURE__*/React__default.createElement(Tabs$1, {
+  })), !!tabs.length && /*#__PURE__*/React__default.createElement(Tabs$1, {
     className: css$v.tabs,
     items: tabs,
     value: activeTab,
@@ -3066,14 +3047,7 @@ var List = function List(_ref) {
     color: "primary",
     onClick: hideWelcomeModal,
     className: css$v.button
-  }, t('getStarted')))), renderUploadStack && /*#__PURE__*/React__default.createElement(Modal, {
-    isShow: isShowUploadStackModal,
-    withCloseButton: true,
-    onClose: hideUploadStackModal,
-    size: "big",
-    title: t('howToConnectYourDataWithDStack'),
-    className: css$v.modal
-  }, renderUploadStack()));
+  }, t('getStarted')))));
 };
 
 var css$w = {"howto":"_3e8x1","tabs":"_2M-II","description":"_1cd6d","code":"_1VE_j","footer":"_1gsjy"};
@@ -3853,7 +3827,7 @@ var useForm = (function (initialFormState, fieldsValidators) {
   };
 });
 
-var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","sideHeader":"_1FUDu","share":"_2kaMN","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","withFilters":"_3exQh","attachment-head":"_282UU","filters":"_1-hdZ","attachment":"_3IGZo","readme":"_mADeQ","modal":"_2TdJX","buttons":"_RhHmq","button":"_26mqa"};
+var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions":"_3ydGO","sideHeader":"_1FUDu","share":"_2kaMN","dropdown":"_3axDI","description":"_Y6gJz","label":"_2FemD","label-tooltip":"_2Oe5S","actions":"_sZkKa","size":"_Ja107","revisions":"_bLqAO","tabs":"_3mpfk","container":"_3_I7R","withFilters":"_3exQh","filters":"_1-hdZ","attachment":"_3IGZo","readme":"_mADeQ"};
 
 var Details = function Details(_ref) {
   var _data$head, _cx;
@@ -3863,19 +3837,15 @@ var Details = function Details(_ref) {
       onChangeHeadFrame = _ref.onChangeHeadFrame,
       attachmentIndex = _ref.attachmentIndex,
       onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
-      downloadAttachment = _ref.downloadAttachment,
       onChangeFrame = _ref.onChangeFrame,
       onUpdateReadme = _ref.onUpdateReadme,
       data = _ref.data,
       frame = _ref.frame,
       loading = _ref.loading,
       currentUser = _ref.currentUser,
-      toggleUpload = _ref.toggleUpload,
       backUrl = _ref.backUrl,
       user = _ref.user,
       stack = _ref.stack,
-      configurePythonCommand = _ref.configurePythonCommand,
-      configureRCommand = _ref.configureRCommand,
       setPrivate = _ref.setPrivate,
       updatePermissions = _ref.updatePermissions;
 
@@ -3902,20 +3872,6 @@ var Details = function Details(_ref) {
       setTabs = _useState3[1];
 
   var prevFrame = usePrevious(frame);
-
-  var _useState4 = useState(false),
-      isShowHowToModal = _useState4[0],
-      setIsShowHowToModal = _useState4[1];
-
-  var showHowToModal = function showHowToModal(event) {
-    event.preventDefault();
-    setIsShowHowToModal(true);
-  };
-
-  var hideHowToModal = function hideHowToModal() {
-    return setIsShowHowToModal(false);
-  };
-
   useEffect(function () {
     if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseTabs();
   }, [frame]);
@@ -4017,17 +3973,11 @@ var Details = function Details(_ref) {
     }
   };
 
-  var onClickDownloadAttachment = function onClickDownloadAttachment(event) {
-    event.preventDefault();
-    downloadAttachment();
-  };
-
   var onChangeTab = function onChangeTab(tabName) {
     findAttachDebounce(form, tabName, attachmentIndex);
     setActiveTab(tabName);
   };
 
-  var attachment = get(frame, "attachments[" + attachmentIndex + "]");
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$B.details)
@@ -4062,18 +4012,7 @@ var Details = function Details(_ref) {
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
-  }), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$B.dropdown,
-    items: [{
-      title: t('upload'),
-      onClick: toggleUpload
-    }]
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$B['dropdown-button'],
-    color: "secondary"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-dots-horizontal"
-  }))))), /*#__PURE__*/React__default.createElement(Frames, {
+  }))), /*#__PURE__*/React__default.createElement(Frames, {
     frames: get(data, 'frames', []),
     frame: currentFrameId,
     headId: headId,
@@ -4092,27 +4031,7 @@ var Details = function Details(_ref) {
     form: form,
     onChange: onChange,
     className: cx(css$B.filters)
-  }), attachment && (attachment.description || attachment['content_type'] === 'text/csv') && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B['attachment-head']
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.description
-  }, attachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
-    source: attachment.description
-  })), attachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.actions
-  }, attachment.preview && /*#__PURE__*/React__default.createElement("div", {
-    className: css$B.label
-  }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
-    className: css$B['label-tooltip']
-  }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
-    href: "#",
-    onClick: showHowToModal
-  }, t('useThisStackViaAPI')), /*#__PURE__*/React__default.createElement("span", null, t('or')), /*#__PURE__*/React__default.createElement("a", {
-    href: "#",
-    onClick: onClickDownloadAttachment
-  }, t('download')), attachment.length && /*#__PURE__*/React__default.createElement("span", {
-    className: css$B.size
-  }, "(", formatBytes(attachment.length), ")"))), frame && /*#__PURE__*/React__default.createElement(Attachment, {
+  }), frame && /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$B.attachment,
     withLoader: true,
     stack: user + "/" + stack,
@@ -4122,22 +4041,7 @@ var Details = function Details(_ref) {
     className: css$B.readme,
     data: data,
     onUpdate: onUpdateReadme
-  }), /*#__PURE__*/React__default.createElement(Modal, {
-    isShow: isShowHowToModal,
-    withCloseButton: true,
-    onClose: hideHowToModal,
-    size: "big",
-    title: t('howToFetchDataUsingTheAPI'),
-    className: css$B.modal
-  }, /*#__PURE__*/React__default.createElement(HowTo, {
-    configurePythonCommand: configurePythonCommand,
-    configureRCommand: configureRCommand,
-    data: {
-      stack: user + "/" + stack,
-      params: form
-    },
-    modalMode: true
-  })));
+  }));
 };
 
 var css$C = {"loader":"_31Z5G","side":"_k2iUe","filter-pulse":"_vad3r","content":"_kUkc8"};
@@ -4274,7 +4178,7 @@ var actions$1 = (function () {
   };
 });
 
-var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withFilters":"_1Rz21","attachment-head":"_2Py9M","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ","modal":"_yxsOt","buttons":"_3hJo_","button":"_DbGRd"};
+var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withFilters":"_1Rz21","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ"};
 
 var REFRESH_INTERVAL = 1000;
 
@@ -4294,12 +4198,9 @@ var Details$1 = function Details(_ref) {
       frame = _ref.frame,
       loading = _ref.loading,
       currentUser = _ref.currentUser,
-      toggleUpload = _ref.toggleUpload,
       backUrl = _ref.backUrl,
       user = _ref.user,
       stack = _ref.stack,
-      configurePythonCommand = _ref.configurePythonCommand,
-      configureRCommand = _ref.configureRCommand,
       setPrivate = _ref.setPrivate,
       updatePermissions = _ref.updatePermissions;
 
@@ -4350,15 +4251,6 @@ var Details$1 = function Details(_ref) {
   var _actions = actions$1(),
       executeStack = _actions.executeStack,
       pollStack = _actions.pollStack;
-
-  var _useState9 = useState(false),
-      isShowHowToModal = _useState9[0],
-      setIsShowHowToModal = _useState9[1];
-
-  var showHowToModal = function showHowToModal(event) {
-    event.preventDefault();
-    setIsShowHowToModal(true);
-  };
 
   var getFormFromViews = function getFormFromViews(views) {
     if (!views || !Array.isArray(views)) return {};
@@ -4421,6 +4313,9 @@ var Details$1 = function Details(_ref) {
             return view;
 
           case 'CheckBoxView':
+            view.selected = form[index];
+            break;
+
           case 'ComboBoxView':
             view.selected = form[index];
             break;
@@ -4494,11 +4389,6 @@ var Details$1 = function Details(_ref) {
       }
     }
   }, [data, frame, attachmentIndex]);
-
-  var hideHowToModal = function hideHowToModal() {
-    return setIsShowHowToModal(false);
-  };
-
   useEffect(function () {
     if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame) parseTabs();
   }, [frame]);
@@ -4644,18 +4534,7 @@ var Details$1 = function Details(_ref) {
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
-  }), data && data.user === currentUser && /*#__PURE__*/React__default.createElement(Dropdown, {
-    className: css$E.dropdown,
-    items: [{
-      title: t('upload'),
-      onClick: toggleUpload
-    }]
-  }, /*#__PURE__*/React__default.createElement(Button, {
-    className: css$E['dropdown-button'],
-    color: "secondary"
-  }, /*#__PURE__*/React__default.createElement("span", {
-    className: "mdi mdi-dots-horizontal"
-  }))))), /*#__PURE__*/React__default.createElement(Frames, {
+  }))), /*#__PURE__*/React__default.createElement(Frames, {
     frames: get(data, 'frames', []),
     frame: currentFrameId,
     headId: headId,
@@ -4681,24 +4560,7 @@ var Details$1 = function Details(_ref) {
     onApply: onApply,
     className: cx(css$E.filters),
     disabled: executing || calculating
-  }), appAttachment && (appAttachment.description || appAttachment['content_type'] === 'text/csv') && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E['attachment-head']
-  }, /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.description
-  }, appAttachment.description && /*#__PURE__*/React__default.createElement(MarkdownRender, {
-    source: appAttachment.description
-  })), appAttachment['content_type'] === 'text/csv' && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.actions
-  }, appAttachment.preview && /*#__PURE__*/React__default.createElement("div", {
-    className: css$E.label
-  }, t('preview'), /*#__PURE__*/React__default.createElement("div", {
-    className: css$E['label-tooltip']
-  }, t('theTableBelowShowsOnlyAPreview'))), /*#__PURE__*/React__default.createElement("a", {
-    href: "#",
-    onClick: showHowToModal
-  }, t('useThisStackViaAPI')), appAttachment.length && /*#__PURE__*/React__default.createElement("span", {
-    className: css$E.size
-  }, "(", formatBytes(appAttachment.length), ")"))), appAttachment && !calculating && /*#__PURE__*/React__default.createElement(Attachment, {
+  }), appAttachment && !calculating && /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$E.attachment,
     stack: user + "/" + stack,
     customData: appAttachment
@@ -4720,22 +4582,7 @@ var Details$1 = function Details(_ref) {
     className: css$E.readme,
     data: data,
     onUpdate: onUpdateReadme
-  }), /*#__PURE__*/React__default.createElement(Modal, {
-    isShow: isShowHowToModal,
-    withCloseButton: true,
-    onClose: hideHowToModal,
-    size: "big",
-    title: t('howToFetchDataUsingTheAPI'),
-    className: css$E.modal
-  }, /*#__PURE__*/React__default.createElement(HowTo, {
-    configurePythonCommand: configurePythonCommand,
-    configureRCommand: configureRCommand,
-    data: {
-      stack: user + "/" + stack,
-      params: {}
-    },
-    modalMode: true
-  })));
+  }));
 };
 
 var css$F = {"upload":"_1HGtr","content":"_zyXjr","subtitle":"_2QLXi","field":"_2kyid","dragndrop":"_1_81H","buttons":"_1PXB0","button":"_1nx-b"};

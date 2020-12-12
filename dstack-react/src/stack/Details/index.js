@@ -7,23 +7,18 @@ import usePrevious from '../../hooks/usePrevious';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import {debounce as _debounce} from 'lodash-es';
-import Button from '../../Button';
-import MarkdownRender from '../../MarkdownRender';
-import Modal from '../../Modal';
-import Dropdown from '../../Dropdown';
 import Yield from '../../Yield';
 import BackButton from '../../BackButton';
 import Share from '../../Share';
 import PermissionUsers from '../../PermissionUsers';
 import StackFilters from '../../StackFilters';
-import StackHowToFetchData from '../HowToFetchData';
 import StackAttachment from '../Attachment';
 import StackFrames from '../Frames';
 import Loader from './components/Loader';
 import Tabs from './components/Tabs';
 import Readme from './components/Readme';
 import useForm from '../../hooks/useForm';
-import {formatBytes, parseStackParams, parseStackTabs} from '../../utils';
+import {parseStackParams, parseStackTabs} from '../../utils';
 import css from './styles.module.css';
 
 type Props = {
@@ -34,7 +29,6 @@ type Props = {
     data: {},
     currentUser?: string,
     downloadAttachment: Function,
-    toggleUpload: Function,
     backUrl: string,
     user: string,
     stack: string,
@@ -43,8 +37,6 @@ type Props = {
     onUpdateReadme: Function,
     onChangeAttachmentIndex: Function,
     onChangeFrame: Function,
-    configurePythonCommand: string,
-    configureRCommand: string,
     setPrivate: Function,
     updatePermissions: Function,
 }
@@ -62,12 +54,9 @@ const Details = ({
     frame,
     loading,
     currentUser,
-    toggleUpload,
     backUrl,
     user,
     stack,
-    configurePythonCommand,
-    configureRCommand,
     setPrivate,
     updatePermissions,
 }: Props) => {
@@ -78,15 +67,6 @@ const Details = ({
     const [fields, setFields] = useState({});
     const [tabs, setTabs] = useState([]);
     const prevFrame = usePrevious(frame);
-
-    const [isShowHowToModal, setIsShowHowToModal] = useState(false);
-
-    const showHowToModal = event => {
-        event.preventDefault();
-        setIsShowHowToModal(true);
-    };
-
-    const hideHowToModal = () => setIsShowHowToModal(false);
 
     useEffect(() => {
         if ((!isEqual(prevFrame, frame) || !didMountRef.current) && frame)
@@ -200,17 +180,10 @@ const Details = ({
         }
     };
 
-    const onClickDownloadAttachment = event => {
-        event.preventDefault();
-        downloadAttachment();
-    };
-
     const onChangeTab = tabName => {
         findAttachDebounce(form, tabName, attachmentIndex);
         setActiveTab(tabName);
     };
-
-    const attachment = get(frame, `attachments[${attachmentIndex}]`);
 
     if (loading)
         return <Loader />;
@@ -261,26 +234,6 @@ const Details = ({
                             }
                         />
                     )}
-
-                    {data && data.user === currentUser && (
-                        <Dropdown
-                            className={css.dropdown}
-
-                            items={[
-                                {
-                                    title: t('upload'),
-                                    onClick: toggleUpload,
-                                },
-                            ]}
-                        >
-                            <Button
-                                className={css['dropdown-button']}
-                                color="secondary"
-                            >
-                                <span className="mdi mdi-dots-horizontal" />
-                            </Button>
-                        </Dropdown>
-                    )}
                 </div>
             </div>
 
@@ -308,38 +261,6 @@ const Details = ({
                     className={cx(css.filters)}
                 />
 
-                {attachment
-                    && (attachment.description || attachment['content_type'] === 'text/csv')
-                    && (
-                        <div className={css['attachment-head']}>
-                            <div className={css.description}>
-                                {attachment.description && (<MarkdownRender source={attachment.description} />)}
-                            </div>
-
-                            {attachment['content_type'] === 'text/csv' && (
-                                <div className={css.actions}>
-                                    {attachment.preview && (
-                                        <div className={css.label}>
-                                            {t('preview')}
-
-                                            <div className={css['label-tooltip']}>
-                                                {t('theTableBelowShowsOnlyAPreview')}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <a href="#" onClick={showHowToModal}>{t('useThisStackViaAPI')}</a>
-                                    <span>{t('or')}</span>
-                                    <a href="#" onClick={onClickDownloadAttachment}>{t('download')}</a>
-                                    {attachment.length && (
-                                        <span className={css.size}>({formatBytes(attachment.length)})</span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )
-                }
-
                 {frame && (
                     <StackAttachment
                         className={css.attachment}
@@ -358,27 +279,6 @@ const Details = ({
                     onUpdate={onUpdateReadme}
                 />
             )}
-
-            <Modal
-                isShow={isShowHowToModal}
-                withCloseButton
-                onClose={hideHowToModal}
-                size="big"
-                title={t('howToFetchDataUsingTheAPI')}
-                className={css.modal}
-            >
-                <StackHowToFetchData
-                    configurePythonCommand={configurePythonCommand}
-                    configureRCommand={configureRCommand}
-
-                    data={{
-                        stack: `${user}/${stack}`,
-                        params: form,
-                    }}
-
-                    modalMode
-                />
-            </Modal>
         </div>
     );
 };

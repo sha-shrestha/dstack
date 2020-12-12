@@ -49,10 +49,12 @@ const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Pr
                             options={fields[key].options}
                             value={Array.isArray(form[key]) ? form[key] : [form[key]]}
                             disabled={disabled || fields[key].disabled}
+                            mode={fields[key].multiple ? 'multiple' : null}
                         />;
 
                     case 'checkbox':
                         return <CheckboxField
+                            appearance="switcher"
                             key={`checkbox-${key}`}
                             className={css.field}
                             onChange={onChange}

@@ -10,7 +10,6 @@ import Dropdown from '../../Dropdown';
 import ViewSwitcher from '../../ViewSwitcher';
 import SearchField from '../../SearchField';
 import StackListItem from '../ListItem';
-import Tooltip from '../../Tooltip';
 import useListViewSwitcher from '../../hooks/useListViewSwitcher';
 import Tabs from '../Details/components/Tabs';
 import getStackCategory from '../../utils/getStackCategory';
@@ -23,7 +22,6 @@ type Stack = {
 
 type Props = {
     deleteStack: Function,
-    renderUploadStack?: Function,
     data: Array<Stack>,
     loading: boolean,
     currentUser?: string,
@@ -35,7 +33,6 @@ const List = ({
     deleteStack,
     currentUser,
     user,
-    renderUploadStack = () => {},
 }: Props) => {
     const {t} = useTranslation();
 
@@ -67,7 +64,6 @@ const List = ({
     const [stacksByCategories, setStacksByCategories] = useState({});
     const [deletingStack, setDeletingStack] = useState(null);
     const [isShowWelcomeModal, setIsShowWelcomeModal] = useState(false);
-    const [isShowUploadStackModal, setIsShowUploadStackModal] = useState(false);
     const [search, setSearch] = useState('');
     const isInitialMount = useRef(true);
     const [sorting, setSorting] = useState(null);
@@ -116,14 +112,6 @@ const List = ({
                 setActiveTab(tabs[0].value);
         }
     }, [data]);
-
-
-    const showUploadStackModal = event => {
-        event.preventDefault();
-        setIsShowUploadStackModal(true);
-    };
-
-    const hideUploadStackModal = () => setIsShowUploadStackModal(false);
 
     const deleteItem = () => {
         deleteStack(deletingStack);
@@ -180,22 +168,6 @@ const List = ({
                                 onChange={onChangeSearch}
                             />
                         )}
-
-                        {renderUploadStack && (
-                            <Tooltip
-                                overlayContent={t('uploadTooltip')}
-                            >
-                                <Button
-                                    className={css.uploadButton}
-                                    onClick={showUploadStackModal}
-                                    color="primary"
-                                    variant="contained"
-                                    size="small"
-                                >
-                                    {t('createStack')}
-                                </Button>
-                            </Tooltip>
-                        )}
                     </div>
                 )}
             </div>
@@ -245,8 +217,6 @@ const List = ({
                     }
                 </div>
             )}
-
-            {!loading && !Boolean(data.length) && currentUser === user && renderUploadStack && renderUploadStack()}
 
             {!!tabs.length && (
                 <Tabs
@@ -322,17 +292,6 @@ const List = ({
                     </div>
                 </Modal>
             )}
-
-            {renderUploadStack && <Modal
-                isShow={isShowUploadStackModal}
-                withCloseButton
-                onClose={hideUploadStackModal}
-                size="big"
-                title={t('howToConnectYourDataWithDStack')}
-                className={css.modal}
-            >
-                {renderUploadStack()}
-            </Modal>}
         </div>
     );
 };

@@ -27,6 +27,7 @@ export default views => {
             }));
 
             fields[index].value = view.selected;
+            fields[index].multiple = view.multiple;
         }
 
         if (view.type === 'SliderView') {
