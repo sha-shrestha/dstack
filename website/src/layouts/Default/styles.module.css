@@ -1,7 +1,8 @@
 @import "styles/media.css";
 
 :root {
-    --sidebar-width: 228px;
+    --sidebar-width: 230px;
+    --compact-sidebar-width: 60px;
 }
 
 .layout {
@@ -12,11 +13,22 @@
     @media (--desktop) {
         height: 100vh;
         display: grid;
-        grid-template-columns: var(--sidebar-width) 1fr;
+        grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
+        transition: padding-left .4s ease-out;
         grid-template-areas:
-                "sidebar header"
-                "sidebar main  ";
+                "header"
+                "main  ";
+        padding-left: var(--sidebar-width);
+        &.compactSidebar {
+            padding-left: var(--compact-sidebar-width);
+            & .sidebar {
+                width: var(--compact-sidebar-width);
+            }
+        }
+        & .sidebar {
+            width: var(--sidebar-width);
+        }
     }
 }
 .sidebar {
@@ -24,7 +36,11 @@
 
     }
     @media (--desktop) {
-        grid-area: sidebar;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transition: width .4s ease-out;
     }
 }
 .progress {

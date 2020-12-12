@@ -33,6 +33,7 @@ var en = {
   'chooseAFile': 'Choose a file',
   'clickApplyToSeeTheResult': 'Click Apply to see the result',
   'close': 'Close',
+  'collapse': 'Ccollapse',
   'comments': 'Comments',
   'completed': 'Completed',
   'configureDStack': 'Configure dstack with your username and token (not needed if you run via dstack.ai jobs):',

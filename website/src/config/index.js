@@ -17,4 +17,6 @@ export default {
         return `dstack::configure(user = "${userName}", token = "${token}", persist = "global"`
             + `, server = "${origin}/api")`;
     },
+
+    SIDEBAR_COLLAPSE_STORAGE_KEY: 'sidebar-collapsed',
 };

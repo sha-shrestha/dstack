@@ -9,6 +9,7 @@ import {useOnClickOutside} from '@dstackai/dstack-react/dist/hooks';
 import config from 'config';
 import routes from 'routes';
 import logo from 'assets/logo.svg';
+import logoCompact from 'assets/logo-compact.svg';
 import css from './styles.module.css';
 import {fetchList as fetchStacksList} from 'Stacks/List/actions';
 
@@ -23,7 +24,7 @@ type Props = {
 
 const Sidebar = ({
     className, currentUser, isShow, toggleMenu, userLoading,
-    fetchStacksList,
+    fetchStacksList, compact, toggleCollapse,
 }: Props) => {
     const {t} = useTranslation();
     const {path} = useRouteMatch();
@@ -79,12 +80,13 @@ const Sidebar = ({
         },
     ];
 
-    return <div className={cx(css.sidebar, className, {show: isShow})} ref={sidebarRef}>
+    return <div className={cx(css.sidebar, className, {show: isShow, compact})} ref={sidebarRef}>
         <div className={cx(css.close, 'mdi mdi-close')} onClick={toggleMenu} />
 
         <div className={css.logo}>
             <Link to="/">
                 <img width="129" height="35" src={logo} alt="logo"/>
+                <img width="38" height="35" src={logoCompact} alt="logo"/>
             </Link>
         </div>
 
@@ -140,6 +142,11 @@ const Sidebar = ({
                 </a>
             </li>
         </ul>}
+
+        <button className={css.collapse} onClick={toggleCollapse}>
+            <span className={cx(css.icon, 'mdi mdi-chevron-double-left')} />
+            <span className={css.label}>{t('collapse')}</span>
+        </button>
     </div>;
 };
 
