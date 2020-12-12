@@ -17,25 +17,25 @@ export default () => {
     const [{apiUrl}] = useAppStore();
 
     const executeStack = (params: executeParams) => {
-        return new Promise(async resolve => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const request = await api.post(apiUrl + config.APPS_EXECUTE, params);
 
                 resolve(request.data);
             } catch (e) {
-                resolve({});
+                reject(e);
             }
         });
     };
 
     const pollStack = ({id}: {id: string}) => {
-        return new Promise(async resolve => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const request = await api.get(apiUrl + config.APPS_POLL + `?id=${id}`);
 
                 resolve(request.data);
             } catch (e) {
-                resolve({});
+                reject(e);
             }
         });
     };

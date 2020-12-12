@@ -889,6 +889,7 @@ var fetcher = function fetcher(url, responseDataFormat) {
 
 var typeMap = {
   'TextFieldView': 'text',
+  'LongTextFieldView': 'textarea',
   'ComboBoxView': 'select',
   'SliderView': 'slider',
   'CheckBoxView': 'checkbox',
@@ -899,7 +900,7 @@ var parseStackViews = (function (views) {
   views.forEach(function (view, index) {
     fields[index] = {
       label: view.label,
-      type: typeMap[view.type],
+      type: typeMap[(view["long"] ? 'Long' : '') + view.type],
       value: view.data,
       disabled: !view.enabled
     };
@@ -1547,7 +1548,39 @@ var SliderField = function SliderField(_ref) {
   }, label));
 };
 
-var css$i = {"filters":"_kiZkv","field":"_3_9Ku","buttons":"_1fRrD"};
+var css$i = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
+
+var TextAreaField = React.forwardRef(function (_ref, ref) {
+  var label = _ref.label,
+      className = _ref.className,
+      _ref$size = _ref.size,
+      size = _ref$size === void 0 ? 'normal' : _ref$size,
+      _ref$errors = _ref.errors,
+      errors = _ref$errors === void 0 ? [] : _ref$errors,
+      value = _ref.value,
+      props = _objectWithoutPropertiesLoose(_ref, ["label", "className", "size", "errors", "value"]);
+
+  var hasErrors = Boolean(errors.length);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$i.field, className, size, {
+      disabled: props.disabled
+    })
+  }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
+    className: css$i.label
+  }, label), /*#__PURE__*/React__default.createElement("div", {
+    className: css$i.textarea
+  }, /*#__PURE__*/React__default.createElement("textarea", _extends({
+    className: cx({
+      error: hasErrors
+    }),
+    value: value,
+    ref: ref
+  }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
+    className: css$i.error
+  }, errors.join(', '))));
+});
+
+var css$j = {"filters":"_kiZkv","field":"_3_9Ku","buttons":"_1fRrD"};
 
 var StackFilters = function StackFilters(_ref) {
   var className = _ref.className,
@@ -1562,14 +1595,28 @@ var StackFilters = function StackFilters(_ref) {
 
   if (!Object.keys(fields).length) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$i.filters, className)
+    className: cx(css$j.filters, className)
   }, Object.keys(fields).map(function (key) {
     switch (fields[key].type) {
       case 'text':
         return /*#__PURE__*/React__default.createElement(TextField, {
           size: "small",
           key: "text-" + key,
-          className: cx(css$i.field, css$i.text),
+          className: cx(css$j.field, css$j.text),
+          onChange: function onChange(event) {
+            return _onChange(key, event.target.value);
+          },
+          label: fields[key].label,
+          name: key,
+          value: form[key],
+          disabled: disabled || fields[key].disabled
+        });
+
+      case 'textarea':
+        return /*#__PURE__*/React__default.createElement(TextAreaField, {
+          size: "small",
+          key: "text-" + key,
+          className: cx(css$j.field, css$j.text),
           onChange: function onChange(event) {
             return _onChange(key, event.target.value);
           },
@@ -1583,7 +1630,7 @@ var StackFilters = function StackFilters(_ref) {
         return /*#__PURE__*/React__default.createElement(SelectField, {
           key: "select-" + key,
           align: "bottom",
-          className: cx(css$i.field, css$i.select),
+          className: cx(css$j.field, css$j.select),
           onChange: function onChange(value) {
             return _onChange(key, value);
           },
@@ -1599,7 +1646,7 @@ var StackFilters = function StackFilters(_ref) {
         return /*#__PURE__*/React__default.createElement(CheckboxField, {
           appearance: "switcher",
           key: "checkbox-" + key,
-          className: css$i.field,
+          className: css$j.field,
           onChange: _onChange,
           label: fields[key].label,
           name: key,
@@ -1610,7 +1657,7 @@ var StackFilters = function StackFilters(_ref) {
       case 'slider':
         return /*#__PURE__*/React__default.createElement(SliderField, {
           key: "slider-" + key,
-          className: cx(css$i.field, css$i.slider),
+          className: cx(css$j.field, css$j.slider),
           onChange: _onChange,
           align: "right",
           label: fields[key].label,
@@ -1626,7 +1673,7 @@ var StackFilters = function StackFilters(_ref) {
       case 'apply':
         return /*#__PURE__*/React__default.createElement("div", {
           key: "apply-" + key,
-          className: cx(css$i.field, css$i.buttons)
+          className: cx(css$j.field, css$j.buttons)
         }, onApply && /*#__PURE__*/React__default.createElement(Button, {
           size: "small",
           color: "primary",
@@ -1641,7 +1688,7 @@ var StackFilters = function StackFilters(_ref) {
   }));
 };
 
-var css$j = {"field":"_2DYF1","hidden":"_3z5o2"};
+var css$k = {"field":"_2DYF1","hidden":"_3z5o2"};
 
 var StretchTitleField = function StretchTitleField(_ref) {
   var propValue = _ref.value,
@@ -1664,18 +1711,18 @@ var StretchTitleField = function StretchTitleField(_ref) {
     set(propValue);
   }, [propValue]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$j.field, className)
+    className: cx(css$k.field, className)
   }, /*#__PURE__*/React__default.createElement("input", _extends({
     type: "text",
     placeholder: placeholder,
     value: value,
     onChange: onChange
   }, props)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$j.hidden
+    className: css$k.hidden
   }, value && value.length ? value : placeholder));
 };
 
-var css$k = {"fieldWrap":"_vED3t","field":"_1XqN9","hidden":"_38Nis"};
+var css$l = {"fieldWrap":"_vED3t","field":"_1XqN9","hidden":"_38Nis"};
 
 var StretchTextAreaField = React.forwardRef(function (_ref, ref) {
   var propValue = _ref.value,
@@ -1698,9 +1745,9 @@ var StretchTextAreaField = React.forwardRef(function (_ref, ref) {
     set(propValue);
   }, [propValue]);
   return /*#__PURE__*/React__default.createElement("div", {
-    className: css$k.fieldWrap
+    className: css$l.fieldWrap
   }, /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$k.field, className)
+    className: cx(css$l.field, className)
   }, /*#__PURE__*/React__default.createElement("textarea", _extends({
     rows: 1,
     placeholder: placeholder,
@@ -1708,11 +1755,11 @@ var StretchTextAreaField = React.forwardRef(function (_ref, ref) {
     onChange: onChange,
     ref: ref
   }, props)), /*#__PURE__*/React__default.createElement("div", {
-    className: css$k.hidden
+    className: css$l.hidden
   }, value && value.length ? value : placeholder, '\n')));
 });
 
-var css$l = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
+var css$m = {"tabs":"_-hQvT","tab":"_2dsXN","soon":"_2_DJa"};
 
 var Tabs = function Tabs(_ref) {
   var className = _ref.className,
@@ -1724,53 +1771,21 @@ var Tabs = function Tabs(_ref) {
       t = _useTranslation.t;
 
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$l.tabs, className)
+    className: cx(css$m.tabs, className)
   }, tabs.map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
-      className: cx(css$l.tab, {
+      className: cx(css$m.tab, {
         active: value === i.value
       }),
       onClick: function onClick() {
         return onChange(i.value);
       }
     }, i.label, i.soon && /*#__PURE__*/React__default.createElement("span", {
-      className: css$l.soon
+      className: css$m.soon
     }, t('soon')));
   }));
 };
-
-var css$m = {"field":"_3PgPN","textarea":"_2Ok_K","label":"_1qnsP","error":"_1C6bH"};
-
-var TextAreaField = React.forwardRef(function (_ref, ref) {
-  var label = _ref.label,
-      className = _ref.className,
-      _ref$size = _ref.size,
-      size = _ref$size === void 0 ? 'normal' : _ref$size,
-      _ref$errors = _ref.errors,
-      errors = _ref$errors === void 0 ? [] : _ref$errors,
-      value = _ref.value,
-      props = _objectWithoutPropertiesLoose(_ref, ["label", "className", "size", "errors", "value"]);
-
-  var hasErrors = Boolean(errors.length);
-  return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$m.field, className, size, {
-      disabled: props.disabled
-    })
-  }, /*#__PURE__*/React__default.createElement("label", null, label && /*#__PURE__*/React__default.createElement("div", {
-    className: css$m.label
-  }, label), /*#__PURE__*/React__default.createElement("div", {
-    className: css$m.textarea
-  }, /*#__PURE__*/React__default.createElement("textarea", _extends({
-    className: cx({
-      error: hasErrors
-    }),
-    value: value,
-    ref: ref
-  }, props))), hasErrors && /*#__PURE__*/React__default.createElement("div", {
-    className: css$m.error
-  }, errors.join(', '))));
-});
 
 var css$n = {"tooltip":"_rE8Jn"};
 
@@ -4139,14 +4154,14 @@ var actions$1 = (function () {
       apiUrl = _useAppStore[0].apiUrl;
 
   var executeStack = function executeStack(params) {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       try {
         var _temp2 = _catch(function () {
           return Promise.resolve(api$1.post(apiUrl + config.APPS_EXECUTE, params)).then(function (request) {
             resolve(request.data);
           });
-        }, function () {
-          resolve({});
+        }, function (e) {
+          reject(e);
         });
 
         return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
@@ -4158,14 +4173,14 @@ var actions$1 = (function () {
 
   var pollStack = function pollStack(_ref) {
     var id = _ref.id;
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       try {
         var _temp4 = _catch(function () {
           return Promise.resolve(api$1.get(apiUrl + config.APPS_POLL + ("?id=" + id))).then(function (request) {
             resolve(request.data);
           });
-        }, function () {
-          resolve({});
+        }, function (e) {
+          reject(e);
         });
 
         return Promise.resolve(_temp4 && _temp4.then ? _temp4.then(function () {}) : void 0);
@@ -4304,6 +4319,7 @@ var Details$1 = function Details(_ref) {
 
     setExecuting(true);
     if (apply) setCalculating(true);else setAppAttachment(null);
+    setError(null);
     executeStack({
       user: data.user,
       stack: data.name,
@@ -4346,6 +4362,14 @@ var Details$1 = function Details(_ref) {
         });
         if (typeof onChangeExecutionId === 'function') onChangeExecutionId(data.id);
       }
+    })["catch"](function () {
+      setExecuting(false);
+      setCalculating(false);
+      setError({
+        date: Date.now(),
+        status: null,
+        logs: null
+      });
     });
   };
 
@@ -4379,7 +4403,12 @@ var Details$1 = function Details(_ref) {
           setExecuting(false);
           updateExecuteData(data);
         })["catch"](function () {
-          return setExecuting(false);
+          setExecuting(false);
+          setError({
+            date: Date.now(),
+            status: null,
+            logs: null
+          });
         });
       } else {
         setExecuting(true);
@@ -4579,7 +4608,7 @@ var Details$1 = function Details(_ref) {
     className: "mdi mdi-alert-circle-outline"
   }), " ", t('appStackError')), /*#__PURE__*/React__default.createElement("div", {
     className: css$E.fromAgo
-  }, t('updated'), " ", moment(error.date).fromNow()), /*#__PURE__*/React__default.createElement("div", {
+  }, t('updated'), " ", moment(error.date).fromNow()), error.logs && /*#__PURE__*/React__default.createElement("div", {
     className: css$E.log
   }, error.logs))), data && /*#__PURE__*/React__default.createElement(Readme, {
     className: css$E.readme,

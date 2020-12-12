@@ -1,6 +1,6 @@
 // @flow
 
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import cx from 'classnames';
 import {isEqual, get} from 'lodash-es';
 import {useDebounce} from 'react-use';
@@ -131,6 +131,8 @@ const Details = ({
         else
             setAppAttachment(null);
 
+        setError(null);
+
         executeStack({
             user: data.user,
             stack: data.name,
@@ -167,6 +169,16 @@ const Details = ({
                     if (typeof onChangeExecutionId === 'function')
                         onChangeExecutionId(data.id);
                 }
+            })
+            .catch(() => {
+                setExecuting(false);
+                setCalculating(false);
+
+                setError({
+                    date: Date.now(),
+                    status: null,
+                    logs: null,
+                });
             });
     };
 
@@ -202,7 +214,15 @@ const Details = ({
                         setExecuting(false);
                         updateExecuteData(data);
                     })
-                    .catch(() => setExecuting(false));
+                    .catch(() => {
+                        setExecuting(false);
+
+                        setError({
+                            date: Date.now(),
+                            status: null,
+                            logs: null,
+                        });
+                    });
             } else {
                 setExecuting(true);
                 setCalculating(true);
@@ -436,7 +456,7 @@ const Details = ({
                                 <span className="mdi mdi-alert-circle-outline" /> {t('appStackError')}
                             </div>
                             <div className={css.fromAgo}>{t('updated')} {moment(error.date).fromNow()}</div>
-                            <div className={css.log}>{error.logs}</div>
+                            {error.logs && <div className={css.log}>{error.logs}</div>}
                         </div>
                     )}
                 </div>

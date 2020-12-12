@@ -6,6 +6,7 @@ import SelectField from '../SelectField';
 import CheckboxField from '../CheckboxField';
 import SliderField from '../SliderField';
 import TextField from '../TextField';
+import TextAreaField from '../TextAreaField';
 import Button from '../Button';
 import css from './styles.module.css';
 
@@ -28,6 +29,18 @@ const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Pr
                 switch (fields[key].type) {
                     case 'text':
                         return <TextField
+                            size="small"
+                            key={`text-${key}`}
+                            className={cx(css.field, css.text)}
+                            onChange={event => onChange(key, event.target.value)}
+                            label={fields[key].label}
+                            name={key}
+                            value={form[key]}
+                            disabled={disabled || fields[key].disabled}
+                        />;
+
+                    case 'textarea':
+                        return <TextAreaField
                             size="small"
                             key={`text-${key}`}
                             className={cx(css.field, css.text)}

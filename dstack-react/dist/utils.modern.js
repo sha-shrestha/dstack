@@ -348,6 +348,7 @@ var fetcher = function fetcher(url, responseDataFormat) {
 
 var typeMap = {
   'TextFieldView': 'text',
+  'LongTextFieldView': 'textarea',
   'ComboBoxView': 'select',
   'SliderView': 'slider',
   'CheckBoxView': 'checkbox',
@@ -358,7 +359,7 @@ var parseStackViews = (function (views) {
   views.forEach(function (view, index) {
     fields[index] = {
       label: view.label,
-      type: typeMap[view.type],
+      type: typeMap[(view["long"] ? 'Long' : '') + view.type],
       value: view.data,
       disabled: !view.enabled
     };

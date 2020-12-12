@@ -1,7 +1,7 @@
 @import "styles/variables.css";
 :root {
     --textarea-normal-height: 140px;
-    --textarea-small-height: 140px;
+    --textarea-small-height: 120px;
 }
 .field {
     position: relative;
