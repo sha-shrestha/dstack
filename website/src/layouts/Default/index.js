@@ -13,9 +13,16 @@ const DefaultLayout = ({children}) => {
     const toggleMenu = () => setIsShowMenu(!isShowMenu);
     const [{appProgress: {active, value}}] = useAppStore();
 
-    const [compact, setCompact] = useState(
-        localStorage.getItem(config.SIDEBAR_COLLAPSE_STORAGE_KEY) === 'true'
-    );
+    const [compact, setCompact] = useState(() => {
+        let isCompact = true;
+
+        const storageValue = localStorage.getItem(config.SIDEBAR_COLLAPSE_STORAGE_KEY);
+
+        if (storageValue)
+            isCompact = storageValue === 'true';
+
+        return isCompact;
+    });
 
     const toggleCollapse = () => {
         setCompact(value => {

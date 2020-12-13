@@ -147,7 +147,7 @@
     }
     a {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         color: var(--color-dark-gray);
         @media (--desktop) {
             &:not(:global(.active)) {
@@ -181,6 +181,7 @@
         & .icon {
             flex-shrink: 0;
             font-size: 20px;
+            height: 20px;
             transition: opacity .3s ease-out;
         }
         & .count {

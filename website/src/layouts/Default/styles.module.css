@@ -25,6 +25,9 @@
             & .sidebar {
                 width: var(--compact-sidebar-width);
             }
+            & .progress {
+                left: var(--compact-sidebar-width);
+            }
         }
         & .sidebar {
             width: var(--sidebar-width);

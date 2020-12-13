@@ -2702,28 +2702,6 @@ var Item = function Item(_ref) {
   })));
 };
 
-var useListViewSwitcher = (function (id, defaultValue) {
-  if (defaultValue === void 0) {
-    defaultValue = 'list';
-  }
-
-  var _useState = React.useState(null),
-      value = _useState[0],
-      setValue = _useState[1];
-
-  React.useEffect(function () {
-    var savedValue = localStorage.getItem("list-view-value-" + id);
-    if (savedValue) setValue(savedValue);else setValue(defaultValue);
-  }, []);
-
-  var onChange = function onChange(value) {
-    setValue(value);
-    localStorage.setItem("list-view-value-" + id, value);
-  };
-
-  return [value, onChange];
-});
-
 var css$u = {"tabs":"_gaP0O","tab":"_vQ7S6"};
 
 var Tabs$1 = function Tabs(_ref) {
@@ -2864,10 +2842,6 @@ var List = function List(_ref) {
     }
   };
 
-  var _useListViewSwitcher = useListViewSwitcher('stack-list'),
-      view = _useListViewSwitcher[0],
-      setView = _useListViewSwitcher[1];
-
   var _useState = React.useState([]),
       tabs = _useState[0],
       setTabs = _useState[1];
@@ -2894,7 +2868,9 @@ var List = function List(_ref) {
 
   var isInitialMount = React.useRef(true);
 
-  var _useState7 = React.useState(null);
+  var _useState7 = React.useState(null),
+      sorting = _useState7[0],
+      setSorting = _useState7[1];
 
   var sortingItems = {
     lastSource: {
@@ -2991,15 +2967,25 @@ var List = function List(_ref) {
     size: "small",
     value: search,
     onChange: onChangeSearch
-  }))), !(!loading && !Boolean(data.length)) && /*#__PURE__*/React__default.createElement("div", {
+  }))), !(!loading && !Boolean(data.length)) && false && /*#__PURE__*/React__default.createElement("div", {
     className: css$v.controls
-  }, /*#__PURE__*/React__default.createElement(ViewSwitcher, {
-    className: css$v.viewSwitcher,
-    value: view,
-    onChange: setView
-  }), false ), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v.itemList, view)
-  }, new Array(view === 'grid' ? 12 : 8).fill({}).map(function (i, index) {
+  }, /*#__PURE__*/React__default.createElement(Dropdown, {
+    className: css$v.sorting,
+    items: Object.keys(sortingItems).map(function (key) {
+      return {
+        title: sortingItems[key].title,
+        onClick: function onClick() {
+          return setSorting(key);
+        }
+      };
+    })
+  }, /*#__PURE__*/React__default.createElement("button", {
+    className: css$v.sortingButton
+  }, sorting ? sortingItems[sorting].title : t('sort'), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-chevron-down"
+  })))), loading && !Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$v.itemList)
+  }, new Array(12).fill({}).map(function (i, index) {
     return /*#__PURE__*/React__default.createElement("div", {
       key: index,
       className: css$v.loadingItem
@@ -3016,7 +3002,7 @@ var List = function List(_ref) {
       return setActiveTab(tab);
     }
   }), Boolean(data.length && items.length) && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$v.itemList, view)
+    className: css$v.itemList
   }, items.map(function (item, index) {
     return /*#__PURE__*/React__default.createElement(Item, {
       className: css$v.item,

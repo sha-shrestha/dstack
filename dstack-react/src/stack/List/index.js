@@ -7,10 +7,8 @@ import {useTranslation} from 'react-i18next';
 import Button from '../../Button';
 import Modal from '../../Modal';
 import Dropdown from '../../Dropdown';
-import ViewSwitcher from '../../ViewSwitcher';
 import SearchField from '../../SearchField';
 import StackListItem from '../ListItem';
-import useListViewSwitcher from '../../hooks/useListViewSwitcher';
 import Tabs from '../Details/components/Tabs';
 import getStackCategory from '../../utils/getStackCategory';
 import routes from '../../routes';
@@ -58,7 +56,6 @@ const List = ({
         },
     };
 
-    const [view, setView] = useListViewSwitcher('stack-list');
     const [tabs, setTabs] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
     const [stacksByCategories, setStacksByCategories] = useState({});
@@ -172,38 +169,30 @@ const List = ({
                 )}
             </div>
 
-            {!(!loading && !Boolean(data.length)) && (
+            {!(!loading && !Boolean(data.length)) && false && (
                 <div className={css.controls}>
-                    <ViewSwitcher
-                        className={css.viewSwitcher}
-                        value={view}
-                        onChange={setView}
-                    />
-
-                    {false && (
-                        <Dropdown
-                            className={css.sorting}
-                            items={
-                                Object.keys(sortingItems).map(key => ({
-                                    title: sortingItems[key].title,
-                                    onClick: () => setSorting(key),
-                                }))
-                            }
+                    <Dropdown
+                        className={css.sorting}
+                        items={
+                            Object.keys(sortingItems).map(key => ({
+                                title: sortingItems[key].title,
+                                onClick: () => setSorting(key),
+                            }))
+                        }
+                    >
+                        <button
+                            className={css.sortingButton}
                         >
-                            <button
-                                className={css.sortingButton}
-                            >
-                                {sorting ? sortingItems[sorting].title : t('sort')}
-                                <span className="mdi mdi-chevron-down" />
-                            </button>
-                        </Dropdown>
-                    )}
+                            {sorting ? sortingItems[sorting].title : t('sort')}
+                            <span className="mdi mdi-chevron-down" />
+                        </button>
+                    </Dropdown>
                 </div>
             )}
 
             {loading && !Boolean(data.length) && (
-                <div className={cn(css.itemList, view)}>
-                    {new Array(view === 'grid' ? 12 : 8).fill({}).map((i, index) => (
+                <div className={cn(css.itemList)}>
+                    {new Array(12).fill({}).map((i, index) => (
                         <div key={index} className={css.loadingItem} />
                     ))}
                 </div>
@@ -228,7 +217,7 @@ const List = ({
             )}
 
             {Boolean(data.length && items.length) && (
-                <div className={cn(css.itemList, view)}>
+                <div className={css.itemList}>
                     {items.map((item, index) => <StackListItem
                         className={css.item}
                         Component={Link}

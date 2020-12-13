@@ -114,6 +114,7 @@
     margin-top: 20px;
     display: grid;
     grid-auto-rows: max-content;
+    grid-gap: 40px;
     padding: 30px;
     border-radius: 4px;
     border: 1px solid rgb(233, 234, 238);
@@ -121,21 +122,10 @@
     @media (--mobile) {
         padding: 20px;
         min-height: 0;
+        grid-template-columns: repeat(auto-fill, minmax(var(--colum-size), 1fr));
     }
-    &:global(.list) {
-        row-gap: 18px;
-        @media (--mobile) {
-            grid-template-columns: 1fr;
-        }
-    }
-    &:global(.grid) {
-        grid-gap: 40px;
-        @media (--mobile) {
-            grid-template-columns: repeat(auto-fill, minmax(var(--colum-size), 1fr));
-        }
-        @media (--desktop) {
-            grid-template-columns: repeat(auto-fill, var(--colum-size));
-        }
+    @media (--desktop) {
+        grid-template-columns: repeat(auto-fill, var(--colum-size));
     }
 }
 

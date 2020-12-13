@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {Link, NavLink, useRouteMatch, useParams, useLocation} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import cx from 'classnames';
-import {useAppStore, appStoreActionTypes} from '@dstackai/dstack-react';
+import {useAppStore, appStoreActionTypes, Tooltip} from '@dstackai/dstack-react';
 import {isSignedIn} from '@dstackai/dstack-react/dist/utils';
 import {useOnClickOutside} from '@dstackai/dstack-react/dist/hooks';
 import config from 'config';
@@ -93,60 +93,95 @@ const Sidebar = ({
         {isSignedIn() && !userLoading && <ul className={css.links}>
             {menuItems.map((item, index) => (
                 <li key={index} className={css.item}>
-                    <NavLink
-                        onClick={getMenuItemClick(item)}
-                        to={item.to}
-                        activeClassName="active"
-                        isActive={item.isActive}
+                    <Tooltip
+                        overlayContent={item.label}
+                        placement="rightTop"
+                        trigger={compact ? ['hover'] : []}
+                        align={{offset: [20, -10]}}
                     >
-                        <span className={cx(css.icon, 'mdi', item.icon)} />
-                        <span className={css.label}>{item.label}</span>
-                        {/*<span className={css.count}>11</span>*/}
+                        <NavLink
+                            onClick={getMenuItemClick(item)}
+                            to={item.to}
+                            activeClassName="active"
+                            isActive={item.isActive}
+                        >
+                            <span className={cx(css.icon, 'mdi', item.icon)} />
+                            <span className={css.label}>{item.label}</span>
+                            {/*<span className={css.count}>11</span>*/}
 
-                        {item.beta && <sub className={cx(css.sub, 'green-text')}>
-                            {t('beta')}
-                        </sub>}
-                    </NavLink>
+                            {item.beta && <sub className={cx(css.sub, 'green-text')}>
+                                {t('beta')}
+                            </sub>}
+                        </NavLink>
+                    </Tooltip>
                 </li>
             ))}
 
             <li className={css.itemSeparator} />
 
             <li className={css.item}>
-                <NavLink
-                    activeClassName="active"
-                    to={routes.settings()}
+                <Tooltip
+                    overlayContent={t('settings')}
+                    placement="rightTop"
+                    trigger={compact ? ['hover'] : []}
+                    align={{offset: [20, -10]}}
                 >
-                    <span className={cx(css.icon, 'mdi mdi-settings')} />
-                    <span className={css.label}>{t('settings')}</span>
-                </NavLink>
+                    <NavLink
+                        activeClassName="active"
+                        to={routes.settings()}
+                    >
+                        <span className={cx(css.icon, 'mdi mdi-settings')} />
+                        <span className={css.label}>{t('settings')}</span>
+                    </NavLink>
+                </Tooltip>
             </li>
 
             <li className={css.item}>
-                <a
-                    href={config.DOCS_URL}
-                    target="_blank"
+                <Tooltip
+                    overlayContent={t('documentation')}
+                    placement="rightTop"
+                    trigger={compact ? ['hover'] : []}
+                    align={{offset: [20, -10]}}
                 >
-                    <span className={cx(css.icon, 'mdi mdi-file-document')} />
-                    <span className={css.label}>{t('documentation')}</span>
-                </a>
+                    <a
+                        href={config.DOCS_URL}
+                        target="_blank"
+                    >
+                        <span className={cx(css.icon, 'mdi mdi-file-document')} />
+                        <span className={css.label}>{t('documentation')}</span>
+                    </a>
+                </Tooltip>
             </li>
 
             <li className={css.item}>
-                <a
-                    href={config.DISCORD_URL}
-                    target="_blank"
+                <Tooltip
+                    overlayContent={t('discordChat')}
+                    placement="rightTop"
+                    trigger={compact ? ['hover'] : []}
+                    align={{offset: [20, -10]}}
                 >
-                    <span className={cx(css.icon, 'mdi mdi-discord')} />
-                    <span className={css.label}>{t('discordChat')}</span>
-                </a>
+                    <a
+                        href={config.DISCORD_URL}
+                        target="_blank"
+                    >
+                        <span className={cx(css.icon, 'mdi mdi-discord')} />
+                        <span className={css.label}>{t('discordChat')}</span>
+                    </a>
+                </Tooltip>
             </li>
         </ul>}
 
-        <button className={css.collapse} onClick={toggleCollapse}>
-            <span className={cx(css.icon, 'mdi mdi-chevron-double-left')} />
-            <span className={css.label}>{t('collapse')}</span>
-        </button>
+        <Tooltip
+            overlayContent={compact ? t('uncollapse') : t('collapse')}
+            placement="rightTop"
+            trigger={compact ? ['hover'] : []}
+            align={{offset: [20, -10]}}
+        >
+            <button className={css.collapse} onClick={toggleCollapse}>
+                <span className={cx(css.icon, 'mdi mdi-chevron-double-left')} />
+                <span className={css.label}>{t('collapse')}</span>
+            </button>
+        </Tooltip>
     </div>;
 };
 
