@@ -394,7 +394,7 @@ class UserResources {
     }
 
     @GET
-    @Path("list")
+    @Path("admin/list")
     @Produces(JSON_UTF8)
     fun users(@Context headers: HttpHeaders): Response {
         val session = headers.bearer?.let { sessionService.get(it) }
@@ -421,7 +421,7 @@ class UserResources {
     }
 
     @POST
-    @Path("/create")
+    @Path("admin/create")
     @Consumes(JSON_UTF8)
     @Produces(JSON_UTF8)
     fun create(payload: CreateUserPayload?, @Context headers: HttpHeaders): Response {
@@ -485,7 +485,7 @@ class UserResources {
     }
 
     @POST
-    @Path("/reset")
+    @Path("admin/reset")
     @Consumes(JSON_UTF8)
     @Produces(JSON_UTF8)
     fun reset(payload: ResetVerificationCodePayload?, @Context headers: HttpHeaders): Response {
@@ -519,7 +519,7 @@ class UserResources {
     }
 
     @POST
-    @Path("/delete")
+    @Path("admin/delete")
     @Consumes(JSON_UTF8)
     @Produces(JSON_UTF8)
     fun delete(payload: DeleteUserPayload?, @Context headers: HttpHeaders): Response {
