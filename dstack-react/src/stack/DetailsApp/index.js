@@ -131,8 +131,6 @@ const Details = ({
         else
             setAppAttachment(null);
 
-        setError(null);
-
         executeStack({
             user: data.user,
             stack: data.name,
@@ -161,6 +159,7 @@ const Details = ({
         })
             .then(data => {
                 setExecuting(false);
+                setError(null);
                 updateExecuteData(data);
 
                 if (apply) {
@@ -198,8 +197,8 @@ const Details = ({
     }, [executeData]);
 
     useEffect(() => {
-        if (data && frame && !loading) {
-            if (!executeData && !executionId) {
+        if (data?.user && data?.name && frame && !loading) {
+            if (!executionId || !isEqual(frame, prevFrame)) {
                 setExecuting(true);
                 setExecuteData(null);
                 setAppAttachment(null);
@@ -212,6 +211,7 @@ const Details = ({
                 })
                     .then(data => {
                         setExecuting(false);
+                        setError(null);
                         updateExecuteData(data);
                     })
                     .catch(() => {
@@ -353,6 +353,13 @@ const Details = ({
     if (loading)
         return <Loader />;
 
+    const withSidebar = Object.keys(fields).some((key, index) => {
+        if (fields[key].type === 'textarea')
+            return true;
+
+        return index >= 3;
+    });
+
     return (
         <div className={cx(css.details)}>
             <Yield name="header-yield">
@@ -424,13 +431,14 @@ const Details = ({
             </div>}
 
             {executeData && (
-                <div className={cx(css.container, {[css.withFilters]: Object.keys(fields).length})}>
+                <div className={cx(css.container, {[css.withSidebar]: withSidebar})}>
                     <StackFilters
                         fields={fields}
                         form={form}
                         onChange={onChange}
                         onApply={onApply}
                         className={cx(css.filters)}
+                        isSidebar={withSidebar}
                         disabled={executing || calculating}
                     />
 

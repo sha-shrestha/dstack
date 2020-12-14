@@ -1580,14 +1580,17 @@ var TextAreaField = React.forwardRef(function (_ref, ref) {
   }, errors.join(', '))));
 });
 
-var css$j = {"filters":"_kiZkv","field":"_3_9Ku","buttons":"_1fRrD"};
+var css$j = {"filters":"_kiZkv","sidebar":"_2hZRZ","field":"_3_9Ku","slider":"_3xe_A","switcher":"_8cgpK","buttons":"_1fRrD"};
 
 var StackFilters = function StackFilters(_ref) {
+  var _cx;
+
   var className = _ref.className,
       fields = _ref.fields,
       form = _ref.form,
       _onChange = _ref.onChange,
       onApply = _ref.onApply,
+      isSidebar = _ref.isSidebar,
       disabled = _ref.disabled;
 
   var _useTranslation = reactI18next.useTranslation(),
@@ -1595,7 +1598,7 @@ var StackFilters = function StackFilters(_ref) {
 
   if (!Object.keys(fields).length) return null;
   return /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$j.filters, className)
+    className: cx(css$j.filters, (_cx = {}, _cx[css$j.sidebar] = isSidebar, _cx), className)
   }, Object.keys(fields).map(function (key) {
     switch (fields[key].type) {
       case 'text':
@@ -1646,7 +1649,7 @@ var StackFilters = function StackFilters(_ref) {
         return /*#__PURE__*/React__default.createElement(CheckboxField, {
           appearance: "switcher",
           key: "checkbox-" + key,
-          className: css$j.field,
+          className: cx(css$j.field, css$j.switcher),
           onChange: _onChange,
           label: fields[key].label,
           name: key,
@@ -4182,7 +4185,7 @@ var actions$1 = (function () {
   };
 });
 
-var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withFilters":"_1Rz21","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ"};
+var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withSidebar":"_3dv-r","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ"};
 
 var REFRESH_INTERVAL = 1000;
 
@@ -4305,7 +4308,6 @@ var Details$1 = function Details(_ref) {
 
     setExecuting(true);
     if (apply) setCalculating(true);else setAppAttachment(null);
-    setError(null);
     executeStack({
       user: data.user,
       stack: data.name,
@@ -4339,6 +4341,7 @@ var Details$1 = function Details(_ref) {
       })
     }).then(function (data) {
       setExecuting(false);
+      setError(null);
       updateExecuteData(data);
 
       if (apply) {
@@ -4375,8 +4378,8 @@ var Details$1 = function Details(_ref) {
     }
   }, [executeData]);
   React.useEffect(function () {
-    if (data && frame && !loading) {
-      if (!executeData && !executionId) {
+    if ((data === null || data === void 0 ? void 0 : data.user) && (data === null || data === void 0 ? void 0 : data.name) && frame && !loading) {
+      if (!executionId || !lodashEs.isEqual(frame, prevFrame)) {
         setExecuting(true);
         setExecuteData(null);
         setAppAttachment(null);
@@ -4387,6 +4390,7 @@ var Details$1 = function Details(_ref) {
           attachment: attachmentIndex || 0
         }).then(function (data) {
           setExecuting(false);
+          setError(null);
           updateExecuteData(data);
         })["catch"](function () {
           setExecuting(false);
@@ -4518,6 +4522,10 @@ var Details$1 = function Details(_ref) {
   };
 
   if (loading) return /*#__PURE__*/React__default.createElement(Loader$1, null);
+  var withSidebar = Object.keys(fields).some(function (key, index) {
+    if (fields[key].type === 'textarea') return true;
+    return index >= 3;
+  });
   return /*#__PURE__*/React__default.createElement("div", {
     className: cx(css$E.details)
   }, /*#__PURE__*/React__default.createElement(Yield, {
@@ -4570,13 +4578,14 @@ var Details$1 = function Details(_ref) {
   }, /*#__PURE__*/React__default.createElement(Loader$2, {
     className: css$E.filterLoader
   })), executeData && /*#__PURE__*/React__default.createElement("div", {
-    className: cx(css$E.container, (_cx = {}, _cx[css$E.withFilters] = Object.keys(fields).length, _cx))
+    className: cx(css$E.container, (_cx = {}, _cx[css$E.withSidebar] = withSidebar, _cx))
   }, /*#__PURE__*/React__default.createElement(StackFilters, {
     fields: fields,
     form: form,
     onChange: onChange,
     onApply: onApply,
     className: cx(css$E.filters),
+    isSidebar: withSidebar,
     disabled: executing || calculating
   }), appAttachment && !calculating && /*#__PURE__*/React__default.createElement(Attachment, {
     className: css$E.attachment,

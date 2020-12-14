@@ -211,7 +211,7 @@ const Details = ({
             </Helmet>
 
             <DetailsComponent
-                loading={loading}
+                loading={loading || params?.stack !== data?.name}
                 currentFrameId={currentFrameId}
                 frame={frame}
                 attachmentIndex={attachmentIndex || 0}

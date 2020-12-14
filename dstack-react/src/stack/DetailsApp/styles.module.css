@@ -170,22 +170,19 @@
     }
     @media (--desktop) {
         padding: 11px;
-        display: grid;
-        grid-template-columns: var(--sidebar-width) 1fr;
-        grid-template-rows: auto 1fr;
-        grid-column-gap: 30px;
-        grid-template-areas: "content content";
-        &.withFilters {
+        &.withSidebar {
+            display: grid;
             grid-template-areas: "filters content";
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: auto 1fr;
+            grid-column-gap: 30px;
+            & .filters {
+                grid-area: filters;
+                margin-right: 30px;
+                padding: 12px 20px 20px;
+                background-color: #F8F7F9;
+            }
         }
-    }
-}
-.filters {
-    @media (--desktop) {
-        grid-area: filters;
-        margin-right: 30px;
-        padding: 12px 20px 20px;
-        background-color: #F8F7F9;
     }
 }
 .filterLoader {

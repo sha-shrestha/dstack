@@ -23,10 +23,15 @@ export default (state = initial, action) => {
             return {
                 ...state,
                 loading: false,
+
                 data: {
                     ...state.data,
                     [`${action.meta.stack}`]: action.payload,
                 },
+
+                loadingFrame: false,
+                frameError: null,
+                frame: action.payload.head,
             };
 
         case (actionsTypes.FETCH_FAIL):

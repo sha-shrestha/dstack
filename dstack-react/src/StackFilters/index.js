@@ -17,14 +17,14 @@ type Props = {
     className?: string,
 }
 
-const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Props) => {
+const StackFilters = ({className, fields, form, onChange, onApply, isSidebar, disabled}: Props) => {
     const {t} = useTranslation();
 
     if (!Object.keys(fields).length)
         return null;
 
     return (
-        <div className={cx(css.filters, className)}>
+        <div className={cx(css.filters, {[css.sidebar]: isSidebar}, className)}>
             {Object.keys(fields).map(key => {
                 switch (fields[key].type) {
                     case 'text':
@@ -69,7 +69,7 @@ const StackFilters = ({className, fields, form, onChange, onApply, disabled}: Pr
                         return <CheckboxField
                             appearance="switcher"
                             key={`checkbox-${key}`}
-                            className={css.field}
+                            className={cx(css.field, css.switcher)}
                             onChange={onChange}
                             label={fields[key].label}
                             name={key}

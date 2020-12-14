@@ -3078,9 +3078,33 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     line-height: 14px;
 }
 
-._kiZkv {
-
-}
+@media (min-width: 981px) {
+        ._kiZkv:not(._2hZRZ) {
+            display: flex;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: -20px;
+        }
+            ._kiZkv:not(._2hZRZ) ._3_9Ku {
+                margin-bottom: 20px;
+            }
+                ._kiZkv:not(._2hZRZ) ._3_9Ku:nth-last-child(n+2) {
+                    margin-right: 14px;
+                }
+                ._kiZkv:not(._2hZRZ) ._3_9Ku._3xe_A {
+                    min-height: 32px;
+                }
+                ._kiZkv:not(._2hZRZ) ._3_9Ku._8cgpK {
+                    position: relative;
+                    top: -6px;
+                }
+                ._kiZkv:not(._2hZRZ) ._3_9Ku._1fRrD {
+                    height: 32px;
+                }
+            ._kiZkv._2hZRZ ._3_9Ku {
+                margin-top: 16px;
+            }
+    }
 ._3_9Ku {
     padding-bottom: 0 !important;
     flex-wrap: wrap;
@@ -3088,11 +3112,6 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
 @media (max-width: 980px) {
 ._3_9Ku:nth-child(n+2) {
             margin-top: 10px
-    }
-        }
-@media (min-width: 981px) {
-._3_9Ku:nth-child(n+2) {
-            margin-top: 16px
     }
         }
 ._1fRrD {
@@ -4770,24 +4789,21 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     }
 @media (min-width: 981px) {
 ._2Ro1o {
-        padding: 11px;
-        display: grid;
-        grid-template-columns: 250px 1fr;
-        grid-template-rows: auto 1fr;
-        grid-column-gap: 30px;
-        grid-template-areas: "content content"
+        padding: 11px
 }
-        ._2Ro1o._1Rz21 {
+        ._2Ro1o._3dv-r {
+            display: grid;
             grid-template-areas: "filters content";
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: auto 1fr;
+            grid-column-gap: 30px;
         }
-    }
-@media (min-width: 981px) {
-._283Wj {
-        grid-area: filters;
-        margin-right: 30px;
-        padding: 12px 20px 20px;
-        background-color: #F8F7F9
-}
+            ._2Ro1o._3dv-r ._283Wj {
+                grid-area: filters;
+                margin-right: 30px;
+                padding: 12px 20px 20px;
+                background-color: #F8F7F9;
+            }
     }
 ._7OdCa {
     grid-column: 1 / -1;

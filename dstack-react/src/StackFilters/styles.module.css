@@ -1,7 +1,35 @@
 @import "styles/variables.css";
 @import "styles/media.css";
 .filters {
-
+    @media (--desktop) {
+        &:not(.sidebar) {
+            display: flex;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: -20px;
+            .field {
+                margin-bottom: 20px;
+                &:nth-last-child(n+2) {
+                    margin-right: 14px;
+                }
+                &.slider {
+                    min-height: 32px;
+                }
+                &.switcher {
+                    position: relative;
+                    top: -6px;
+                }
+                &.buttons {
+                    height: 32px;
+                }
+            }
+        }
+        &.sidebar {
+            .field {
+                margin-top: 16px;
+            }
+        }
+    }
 }
 .field {
     padding-bottom: 0 !important;
@@ -9,9 +37,6 @@
     &:nth-child(n+2) {
         @media (--mobile) {
             margin-top: 10px;
-        }
-        @media (--desktop) {
-            margin-top: 16px;
         }
     }
 }

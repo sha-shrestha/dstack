@@ -16,11 +16,6 @@ export const fetchDetails = (userName, stack, onSuccess?: Function) => async (di
             meta: {stack: `${userName}/${stack}`},
         });
 
-        dispatch({
-            type: actionsTypes.FETCH_FRAME_SUCCESS,
-            payload: request.data.stack.head,
-        });
-
         if (onSuccess)
             onSuccess();
     } catch (e) {
