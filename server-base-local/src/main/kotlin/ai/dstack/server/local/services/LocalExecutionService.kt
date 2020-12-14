@@ -2,10 +2,11 @@ package ai.dstack.server.local.services
 
 import ai.dstack.server.model.*
 import ai.dstack.server.services.*
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import java.io.*
 import java.util.zip.ZipInputStream
@@ -43,11 +44,12 @@ class LocalExecutionService @Autowired constructor(
                 sendCommand(p, command)
                 poll(id)!!
             } else {
-                val viewsJson = synchronized(p) {
+                val updatedViews = synchronized(p) {
                     sendCommand(p, command)
                     receiveResponse(p)
-                }
-                Execution(stackPath, id, viewsJson.toViews(), ExecutionStatus.Ready, null, null)
+                }.toUpdatedViews()
+
+                Execution(stackPath, id, updatedViews.views, ExecutionStatus.Ready, null, updatedViews.logs)
             }
         } else {
             Execution(stackPath, id = id, views = emptyList(), status = ExecutionStatus.Failed, output = null,
@@ -62,15 +64,24 @@ class LocalExecutionService @Autowired constructor(
         p.outputStream.flush()
     }
 
-    private fun String?.toViews() =
-            commandObjectMapper.readValue(this, object : TypeReference<List<Map<String, Any>>>() {})
+    data class UpdatedViews (
+        val views: List<Map<String, Any?>>,
+        val logs: String
+    )
+
+    private fun String?.toUpdatedViews() =
+            commandObjectMapper.readValue(this, UpdatedViews::class.java)
 
     private val processes = mutableMapOf<String, Process>()
 
     private fun getProcess(attachment: Attachment, stackPath: String): Process {
         val p = processes.getOrPut(attachment.filePath) {
             val executorFile = executorFile(attachment)
-            val commands = mutableListOf(config.pythonExecutable, executorFile.name, executionHome, stackPath)
+            val attachmentSettings = attachment.settings["function"] as Map<*, *>
+            val functionType = attachmentSettings["type"] as String
+            val functionData = attachmentSettings["data"] as String
+            val commands = mutableListOf(config.pythonExecutable, executorFile.name,
+                    executionHome, functionType, functionData)
             ProcessBuilder(commands).directory(destDir(attachment)).start().also {
                 LocalSchedulerService.ErrorLogger(it.errorStream).start()
             }
@@ -93,7 +104,9 @@ class LocalExecutionService @Autowired constructor(
     }
 
     private val executionFileObjectMapper = ObjectMapper()
+            .registerModule(KotlinModule())
     private val commandObjectMapper = ObjectMapper()
+            .registerModule(KotlinModule())
 
     private fun readExecution(executionFile: File, id: String): Execution {
         val execution = executionFileObjectMapper.readValue(executionFile, Map::class.java)
@@ -143,14 +156,14 @@ class LocalExecutionService @Autowired constructor(
         }
         val executorFile = executorFile(attachment)
         if (!executorFile.exists()) {
-            writeExecutorFile(attachment, executorFile)
+            writeExecutorFile(executorFile)
         }
     }
 
     private fun destDir(attachment: Attachment) =
             File(config.appDirectory + "/" + attachment.filePath)
 
-    private val executorVersion = 3
+    private val executorVersion = 4
 
     private fun executorFile(attachment: Attachment) = File(destDir(attachment), "execute_v${executorVersion}.py")
 
@@ -166,110 +179,7 @@ class LocalExecutionService @Autowired constructor(
         return destFile
     }
 
-    private fun writeExecutorFile(attachment: Attachment, executorFile: File) {
-        val functionSettings = attachment.settings["function"] as Map<*, *>
-
-        val loadFuncScript = if (functionSettings["type"] == "source") {
-            fun getModuleAndFunc(fullName: String): Pair<String, String> {
-                val path = fullName.split(".")
-                return Pair(path.subList(0, path.size - 2).joinToString("."), path.last())
-            }
-            val (module, name) = getModuleAndFunc(functionSettings["data"] as String)
-            "from $module import $name as func"
-        } else {
-            "with open(\"function.pickle\", \"rb\") as f:\n    func = cloudpickle.load(f)"
-        }
-
-        val script = """
-            |import cloudpickle
-            |import sys
-            |import json
-            |import traceback
-            |from pathlib import Path
-            |from dstack.controls import unpack_view
-            |from dstack import AutoHandler
-            |from dstack.controls import Apply
-            |
-            |executions_home = sys.argv[1]
-            |
-            |with open("controller.pickle", "rb") as f:
-            |    controller = cloudpickle.load(f)
-            |
-            |for c in controller.map.values():
-            |    for i in range(len(c._parents)):
-            |        c._parents[i] = controller.map[c._parents[i]._id]
-            |
-            |
-            |$loadFuncScript
-            |
-            |def apply(views, execution_id, stack_path):
-            |    executions = Path(executions_home)
-            |    executions.mkdir(exist_ok=True)
-            |    execution_file = executions / (execution_id + '.json')
-            |    
-            |    execution = {
-            |        'stack': stack_path,
-            |        'id': execution_id,
-            |        'status': 'RUNNING' if apply else 'READY'
-            |    }
-            |        
-            |    try:
-            |        has_dependant = False
-            |        has_apply = False
-            |        for c in controller.map.values():
-            |            if isinstance(c, Apply):
-            |                has_apply = True
-            |            if c.is_dependent():
-            |                has_dependant = True
-            |        if has_dependant and not has_apply:               
-            |            views = controller.list(views)
-            |            execution['views'] = [v.pack() for v in views]
-            |            execution_file.write_text(json.dumps(execution))
-            |        
-            |        result = controller.apply(func, views)
-            |        execution['status'] = 'FINISHED'
-            |        output = {}
-            |        encoder = AutoHandler()
-            |        frame_data = encoder.encode(result, None, None)
-            |        output['application'] = frame_data.application
-            |        output['content_type'] = frame_data.content_type
-            |        output['data'] = frame_data.data.base64value() 
-            |        execution['output'] = output
-            |    except Exception:
-            |        execution['status'] = 'FAILED'
-            |        execution['logs'] = str(traceback.format_exc())
-            |        
-            |    if 'views' not in execution:
-            |        execution['views'] = [v.pack() for v in views]
-            |    execution_file.write_text(json.dumps(execution))
-            |
-            |
-            |def parse_command(command):
-            |    command_json = json.loads(command)
-            |    _views = command_json.get("views")
-            |    execution_id = command_json.get("id")
-            |    views = [unpack_view(v) for v in _views] if _views else None
-            |    stack_path = command_json.get("stack")
-            |    return views, execution_id, stack_path
-            |
-            |
-            |def print_views_stdout(views):
-            |    sys.stdout.write(json.dumps([v.pack() for v in (views or [])], indent=None, separators=(",",":")) + "\n")
-            |    sys.stdout.flush()
-            |
-            |
-            |while True:
-            |    # TODO: Support timeout in future
-            |    command = sys.stdin.readline()
-            |    views, execution_id, stack_path = parse_command(command)
-            |    if views and execution_id and stack_path:
-            |        apply(views, execution_id, stack_path)
-            |    else:
-            |        # TODO: Make it possible to transport the views state without transporting the entire data
-            |        # TODO: Handle exceptions
-            |        print_views_stdout(controller.list(views))
-            |
-            """.trimMargin()
-        executorFile.writeText(script)
+    private fun writeExecutorFile(executorFile: File) {
+        ClassPathResource("executor.py", this.javaClass.classLoader).inputStream.copyTo(FileOutputStream(executorFile))
     }
 }
