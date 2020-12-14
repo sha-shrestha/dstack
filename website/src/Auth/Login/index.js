@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
+import {get} from 'lodash-es';
 import {useTranslation} from 'react-i18next';
 import Auth from 'Auth';
 import {TextField, Button, appStoreActionTypes, useAppStore} from '@dstackai/dstack-react';
@@ -20,7 +21,8 @@ type Props = {
 
 const Login = ({login, loading, errors, history: {push}, fetchUser}: Props) => {
     const {t} = useTranslation();
-    const [, dispatch] = useAppStore();
+    const [storeData, dispatch] = useAppStore();
+    const emailEnabled = get(storeData, 'configInfo.data.email_enabled');
 
     const [form, setForm] = useState({
         user: '',
@@ -93,9 +95,11 @@ const Login = ({login, loading, errors, history: {push}, fetchUser}: Props) => {
                     <Link to={routes.authForgetPassword()}>{t('forgotPassword')}</Link>
                 </p>
 
-                <p>
-                    {t('dontHaveAnAccount')} <Link to={routes.authSignUp()}>{t('signUp')}</Link>
-                </p>
+                {emailEnabled && (
+                    <p>
+                        {t('dontHaveAnAccount')} <Link to={routes.authSignUp()}>{t('signUp')}</Link>
+                    </p>
+                )}
             </form>
         </Auth>
     );

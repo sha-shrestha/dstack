@@ -70,31 +70,39 @@ const App = ({fetchUser, fetchConfigInfo, userData, userLoading, history: {push}
     const isInitialMount = useRef(true);
 
     useEffect(() => {
+        const requests = [
+            fetchConfigInfo().then(
+                data => dispatch({
+                    type: appStoreActionTypes.FETCH_CONFIG_INFO_SUCCESS,
+                    payload: data,
+                }),
+            ),
+        ];
+
         if (isSignedIn()) {
             dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER});
 
-            Promise.all([
-                fetchUser().then(
-                    data => dispatch({
-                        type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
-                        payload: data,
-                    }),
-                ),
+            requests.push(fetchUser().then(
+                data => dispatch({
+                    type: appStoreActionTypes.FETCH_CURRENT_USER_SUCCESS,
+                    payload: data,
+                }),
+            ));
+        }
 
-                fetchConfigInfo().then(
-                    data => dispatch({
-                        type: appStoreActionTypes.FETCH_CONFIG_INFO_SUCCESS,
-                        payload: data,
-                    }),
-                ),
-            ])
-                .catch(() => {
+
+        Promise.all(requests)
+            .then(() => {
+                if (!isSignedIn())
                     setLoading(false);
+            })
+            .catch(() => {
+                setLoading(false);
+                if (isSignedIn()) {
                     dispatch({type: appStoreActionTypes.FETCH_CURRENT_USER_FAIL});
-                    push(routes.authLogin());
-                });
-        } else
-            setLoading(false);
+                }
+                push(routes.authLogin());
+            });
     }, []);
 
     useEffect(() => {
