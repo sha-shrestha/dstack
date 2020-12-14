@@ -1438,7 +1438,6 @@ var SelectField = function SelectField(_ref) {
       props = _objectWithoutPropertiesLoose(_ref, ["align", "label", "disabled", "placeholder", "value", "className", "mode", "onChange", "options", "showSearch"]);
 
   var onChangeHandle = function onChangeHandle(value) {
-    console.log(value);
     if (Array.isArray(value) && value.indexOf(allValue) >= 0) if (value.length > options.length) value = [];else value = options.map(function (o) {
       return o.value;
     });
@@ -4286,6 +4285,21 @@ var Details$1 = function Details(_ref) {
     }, {});
   };
 
+  var setActiveExecutionId = function setActiveExecutionId(value) {
+    if (typeof onChangeExecutionId === 'function') onChangeExecutionId(value);
+
+    if (tabs.length && activeTab) {
+      var tabIndex = tabs.findIndex(function (t) {
+        return t.value === activeTab;
+      });
+
+      if (tabIndex >= 0) {
+        tabs[tabIndex].executionId = value;
+        setTabs(tabs);
+      }
+    }
+  };
+
   var updateExecuteData = function updateExecuteData(data) {
     var fields = parseStackViews(data.views);
     var form = getFormFromViews(data.views);
@@ -4307,7 +4321,10 @@ var Details$1 = function Details(_ref) {
     }
 
     setExecuting(true);
-    if (apply) setCalculating(true);else setAppAttachment(null);
+    if (apply) setCalculating(true);else {
+      setAppAttachment(null);
+      setActiveExecutionId(undefined);
+    }
     executeStack({
       user: data.user,
       stack: data.name,
@@ -4349,7 +4366,7 @@ var Details$1 = function Details(_ref) {
           id: data.id,
           isUpdateData: apply
         });
-        if (typeof onChangeExecutionId === 'function') onChangeExecutionId(data.id);
+        setActiveExecutionId(data.id);
       }
     })["catch"](function () {
       setExecuting(false);
@@ -4473,7 +4490,7 @@ var Details$1 = function Details(_ref) {
         var _attach$params$tab$va, _attach$params$tab$ke;
 
         if (tab && ((_attach$params$tab$va = attach.params[tab.value]) === null || _attach$params$tab$va === void 0 ? void 0 : _attach$params$tab$va.type) !== 'tab' && ((_attach$params$tab$ke = attach.params[tab.key]) === null || _attach$params$tab$ke === void 0 ? void 0 : _attach$params$tab$ke.title) !== tab.value) return false;
-        if (onChangeExecutionId) onChangeExecutionId(undefined);
+        if (onChangeExecutionId) onChangeExecutionId(tab.executionId);
         setExecuteData(null);
         onChangeAttachmentIndex(index);
         return true;

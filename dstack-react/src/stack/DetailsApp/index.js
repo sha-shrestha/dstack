@@ -107,6 +107,20 @@ const Details = ({
         }, {});
     };
 
+    const setActiveExecutionId = (value?: string) => {
+        if (typeof onChangeExecutionId === 'function')
+            onChangeExecutionId(value);
+
+        if (tabs.length && activeTab)  {
+            const tabIndex = tabs.findIndex(t => t.value === activeTab);
+
+            if (tabIndex >= 0) {
+                tabs[tabIndex].executionId = value;
+                setTabs(tabs);
+            }
+        }
+    };
+
     const updateExecuteData = data => {
         const fields = parseStackViews(data.views);
         const form = getFormFromViews(data.views);
@@ -128,8 +142,10 @@ const Details = ({
 
         if (apply)
             setCalculating(true);
-        else
+        else {
             setAppAttachment(null);
+            setActiveExecutionId(undefined);
+        }
 
         executeStack({
             user: data.user,
@@ -164,9 +180,7 @@ const Details = ({
 
                 if (apply) {
                     checkFinished({id: data.id, isUpdateData: apply});
-
-                    if (typeof onChangeExecutionId === 'function')
-                        onChangeExecutionId(data.id);
+                    setActiveExecutionId(data.id);
                 }
             })
             .catch(() => {
@@ -304,7 +318,7 @@ const Details = ({
                     return false;
 
                 if (onChangeExecutionId)
-                    onChangeExecutionId(undefined);
+                    onChangeExecutionId(tab.executionId);
 
                 setExecuteData(null);
                 onChangeAttachmentIndex(index);
