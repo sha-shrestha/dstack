@@ -463,7 +463,7 @@ class UserResources {
                                     payload.name
                             )
                             userService.create(user)
-                            if (config.emailEnabled) {
+                            if (config.emailEnabled && user.email != null) {
                                 emailService.sendVerificationEmail(user)
                             }
                             ok(VerificationCodeStatus(payload.name,
@@ -506,7 +506,41 @@ class UserResources {
                     val verificationCode =  UUID.randomUUID().toString()
                     user = user.copy(verificationCode = verificationCode)
                     userService.update(user)
-                    if (config.emailEnabled) {
+                    if (config.emailEnabled && user.email != null) {
+                        emailService.sendVerificationEmail(user)
+                    }
+                    ok(VerificationCodeStatus(user.name,
+                            "${config.address}/auth/verify?user=${payload.name}&code=${user.verificationCode}")
+                    )
+                }
+            }
+        }
+
+    }
+
+    @POST
+    @Path("admin/edit")
+    @Consumes(JSON_UTF8)
+    @Produces(JSON_UTF8)
+    fun reset(payload: EditUserPayload?, @Context headers: HttpHeaders): Response {
+        return if (payload.isMalformed) {
+            malformedRequest()
+        } else {
+            val session = headers.bearer?.let { sessionService.get(it) }
+            val u = session?.let { userService.get(it.userName) }
+            logger.debug { "session: ${headers.bearer}" }
+            return if (session == null || !session.valid || u == null || u.role != UserRole.Admin) {
+                badCredentials()
+            } else {
+                var user = userService.get(payload!!.name!!)
+                if (user == null) {
+                    userNotFound()
+                } else {
+                    sessionService.renew(session)
+                    user = user.copy(email = payload.email?.let { if (it.isBlank()) null else it } ?: user.email,
+                            role = payload.role?.let { UserRole.fromCode(it) } ?: user.role)
+                    userService.update(user)
+                    if (config.emailEnabled && !payload.email.isNullOrBlank()) {
                         emailService.sendVerificationEmail(user)
                     }
                     ok(VerificationCodeStatus(user.name,
@@ -567,6 +601,12 @@ val DeleteUserPayload?.isMalformed
 val ResetVerificationCodePayload?.isMalformed
     get() = this == null
             || this.name.isMalformedUserName
+
+val EditUserPayload?.isMalformed
+    get() = this == null
+            || this.name.isMalformedUserName
+            || (this.email == null && this.role == null)
+            || (this.role != null && UserRole.values().map { it.name.toUpperCase() }.contains(this.role.toUpperCase()))
 
 val String?.isMalformedEmail: Boolean
     get() {
