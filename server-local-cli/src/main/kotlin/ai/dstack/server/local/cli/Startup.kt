@@ -64,7 +64,7 @@ open class Startup {
         println("To access the application, open this URL in the browser: ${ANSI_BLUE}${ANSI_UNDERLINE}http://localhost:${appConfig.internalPort}/auth/verify?user=dstack&code=${user.verificationCode}&next=/${ANSI_RESET}")
         if (autoConfigure) {
             println()
-            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is already configured. You are welcome to push your data using Python or R packages.")
+            println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is already configured. You are welcome to push your applications using Python package.")
         } else {
             println()
             println("The ${ANSI_BOLD}default${ANSI_RESET} profile in \"$defaultConfigFile\" is not configured. To configure it, use this command:")
