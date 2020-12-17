@@ -7,7 +7,7 @@
 Installing and running `dstack` is very easy:
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ --upgrade --no-cache-dir --extra-index-url=https://pypi.org/simple/ dstack==0.6dev17
+pip install --index-url https://test.pypi.org/simple/ --upgrade --no-cache-dir --extra-index-url=https://pypi.org/simple/ dstack==0.6dev18
 dstack server start
 ```
 
@@ -81,58 +81,8 @@ For more details on the API and code samples, check out the [docs](https://docs.
 
 ## Contribution
 
-If you'd like to contribute, be sure to write us first in the [Discord channel](https://discord.gg/8xfhEYa). Our team will be very happy to 
-help you with onboarding, finding the areas where you can help best, and of course getting technical help!   
+The instructions on how to build dstack from sources can be found [here](CONTRIBUTING.md).
 
-### Building dstack from source
+## License
 
-#### 1. Set up your environment
-
-dstack is a Spring Boot application written in Kotlin, that bundles a pre-build React application written in JavaScript.
-In order to run the entire server with both front-end and back-end together, one must build both React and Spring applications.
-
-In order to build dstack locally, you'll need to have `Java`, `yarn`, and `npm`. Make sure you have them installed locally.
-
-#### 2. Building React application
-
-The code of the React application resides in the folder `website`. This application bundles using [microbundle](https://github.com/developit/microbundle) 
-the React component that resides in the `dstack-react` folder. The `website` React application consumes the `dstack-react` component by importing `@dstackai/dstack-react`.
-
-Before you can build the `website` React application, you first have to build the `dstack-react` React component by running 
-the following command from the folder `dstack-react`:
-
-```bash
-$ yarn install && npm run-script build
-```
-
-Now, you can build the React application folder by running the following command from the `website`:
-
-```bash
-$ yarn install && npm run-script build
-```
-
-#### 3. Building Spring Boot application
-
-Before building the Spring Boot application, you first have to copy the pre-built distributive of the React application 
-from `website/build` to `server-local-cli/src/main/resources/website`. This can be done by the following Gradle task:
-
-```bash
-$ ./gradlew copyWebsite
-```
-
-Now, that you've copied the front-end application, you can run the Spring Boot application the following way:
-
-```bash
-$ ./gradlew bootRun
-```
-
-That's it! You're all set 🎉 When you do it, you'll see the following output:
-
-```bash
-> Task :server-local-cli:bootRun
-To access the application, open this URL in the browser: http://localhost:8080/auth/verify?user=dstack&code=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&next=/
-```
-
-### Python client package
-
-Note, the source code of the Python client is currently available in a separate [GitHub repo](https://github.com/dstackai/dstack-py).
+dstack is an open-source library licensed under the Apache 2.0 license
