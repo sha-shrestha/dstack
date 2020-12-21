@@ -59,13 +59,7 @@ class StackResources {
     private lateinit var permissionService: PermissionService
 
     @Inject
-    private lateinit var emailService: EmailService
-
-    @Inject
     private lateinit var config: AppConfig
-
-    @Inject
-    private lateinit var cardService: CardService
 
     companion object : KLogging()
 
@@ -412,7 +406,6 @@ class StackResources {
         frameService.deleteByStackPath(stack.path)
         attachmentService.deleteByStackPath(stack.path)
         permissionService.deleteByPath(stack.path)
-        cardService.deleteByStackPath(stack.path)
         fileService.delete(stack.path)
     }
 
@@ -491,18 +484,7 @@ private val UpdateStackPayload?.isMalformed
             || stack.isMalformedStackPath
             || (private == null && head == null && readme == null)
 
-private val DeleteCommentPayload?.isMalformed
-    get() = this?.id.isNullOrBlank()
-
-private val EditCommentPayload?.isMalformed
-    get() = this?.id.isNullOrBlank() || this?.text.isNullOrBlank()
-
 const val STACK_NAME_PATTERN = "[a-zA-Z0-9-_/]{3,255}\$"
-
-val CreateCommentPayload?.isMalformed
-    get() = this == null
-            || this.stack.isMalformedStackPath
-            || this.text.isNullOrBlank()
 
 val UpdatePermissionPayload?.isMalformed
     get() = this == null

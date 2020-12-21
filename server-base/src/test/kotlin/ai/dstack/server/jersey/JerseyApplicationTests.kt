@@ -37,7 +37,6 @@ class JerseyApplicationTests : JerseyTest() {
     private lateinit var frameService: InMemoryFrameService
     private lateinit var attachmentService: InMemoryAttachmentService
     private lateinit var fileService: InMemoryFileService
-    private lateinit var cardService: InMemoryCardService
     private lateinit var jobService: InMemoryJobService
     private lateinit var userService: InMemoryUserService
     private lateinit var sessionService: InMemorySessionService
@@ -54,7 +53,6 @@ class JerseyApplicationTests : JerseyTest() {
         frameService = InMemoryFrameService()
         attachmentService = InMemoryAttachmentService()
         fileService = InMemoryFileService()
-        cardService = InMemoryCardService()
         userService = InMemoryUserService()
         jobService = InMemoryJobService()
         sessionService = InMemorySessionService()
@@ -64,7 +62,6 @@ class JerseyApplicationTests : JerseyTest() {
                     override fun configure() {
                         bind(appConfig).to(AppConfig::class.java)
                         bind(stackService).to(StackService::class.java)
-                        bind(cardService).to(CardService::class.java)
                         bind(sessionService).to(SessionService::class.java)
                         bind(frameService).to(FrameService::class.java)
                         bind(attachmentService).to(AttachmentService::class.java)
@@ -92,7 +89,6 @@ class JerseyApplicationTests : JerseyTest() {
                 newsletterService
         )
 
-        cardService.reset()
         stackService.reset()
         frameService.reset()
         attachmentService.reset()
