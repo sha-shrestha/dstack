@@ -19,9 +19,7 @@ function_data = sys.argv[3]
 with open("controller.pickle", "rb") as f:
     controller = cloudpickle.load(f)
 
-for c in controller.map.values():
-    for i in range(len(c._parents)):
-        c._parents[i] = controller.map[c._parents[i]._id]
+controller.init()
 
 if function_type == "source":
     t = function_data.rsplit(".", -1)
@@ -51,7 +49,7 @@ def apply(views, execution_id, stack_path, logs_handler):
         try:
             has_dependant = False
             has_apply = False
-            for c in controller.map.values():
+            for c in controller.controls_by_id.values():
                 if isinstance(c, Apply):
                     has_apply = True
                 if c.is_dependent():
