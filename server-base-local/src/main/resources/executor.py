@@ -37,46 +37,59 @@ else:
 
 
 def apply(views, execution_id, stack_path, logs_handler):
-    executions = Path(executions_home)
-    executions.mkdir(exist_ok=True)
-    execution_file = executions / (execution_id + '.json')
+    with redirect_stdout(logs_handler):
+        executions = Path(executions_home)
+        executions.mkdir(exist_ok=True)
+        execution_file = executions / (execution_id + '.json')
 
-    execution = {
-        'stack': stack_path,
-        'id': execution_id,
-        'status': 'RUNNING' if apply else 'READY'
-    }
+        execution = {
+            'stack': stack_path,
+            'id': execution_id,
+            'status': 'RUNNING' if apply else 'READY'
+        }
 
-    try:
-        has_dependant = False
-        has_apply = False
-        for c in controller.map.values():
-            if isinstance(c, Apply):
-                has_apply = True
-            if c.is_dependent():
-                has_dependant = True
-        if has_dependant and not has_apply:
-            views = controller.list(views)
-            execution['views'] = [v.pack() for v in views]
-            execution_file.write_text(json.dumps(execution))
+        try:
+            has_dependant = False
+            has_apply = False
+            for c in controller.map.values():
+                if isinstance(c, Apply):
+                    has_apply = True
+                if c.is_dependent():
+                    has_dependant = True
+            if has_dependant and not has_apply:
+                views = controller.list(views)
+                execution['views'] = [v.pack() for v in views]
+                execution_file.write_text(json.dumps(execution))
 
-        result = controller.apply(func, views)
-        execution['status'] = 'FINISHED'
-        output = {}
-        encoder = AutoHandler()
-        frame_data = encoder.encode(result, None, None)
-        output['application'] = frame_data.application
-        output['content_type'] = frame_data.content_type
-        output['data'] = frame_data.data.base64value()
-        execution['output'] = output
-    except Exception:
-        execution['status'] = 'FAILED'
-        execution['logs'] = str(traceback.format_exc())
+            result = controller.apply(func, views)
+            execution['status'] = 'FINISHED'
+            output = {}
+            encoder = AutoHandler()
+            frame_data = encoder.encode(result, None, None)
+            output['application'] = frame_data.application
+            output['content_type'] = frame_data.content_type
+            output['data'] = frame_data.data.base64value()
+            execution['output'] = output
+        except Exception:
+            execution['status'] = 'FAILED'
+            print(str(traceback.format_exc()))
 
     if 'views' not in execution:
         execution['views'] = [v.pack() for v in views]
     execution['logs'] = logs_handler.getvalue()
     execution_file.write_text(json.dumps(execution))
+
+
+def update(views):
+    with redirect_stdout(logs_handler):
+        try:
+            updated_views = controller.list(views)
+            status = 'READY'
+        except Exception:
+            updated_views = views
+            status = 'FAILED'
+            print(str(traceback.format_exc()))
+    print_views_stdout(updated_views, logs_handler, status)
 
 
 def parse_command(command):
@@ -104,16 +117,7 @@ while True:
     views, execution_id, stack_path = parse_command(command)
     logs_handler = StringIO()
     if views and execution_id and stack_path:
-        with redirect_stdout(logs_handler):
-            apply(views, execution_id, stack_path, logs_handler)
+        apply(views, execution_id, stack_path, logs_handler)
     else:
         # TODO: Make it possible to transport the views state without transporting the entire data
-        with redirect_stdout(logs_handler):
-            try:
-                updated_views = controller.list(views)
-                status = 'READY'
-            except Exception:
-                status = 'FAILED'
-                updated_views = views
-                print(str(traceback.format_exc()))
-        print_views_stdout(updated_views, logs_handler, status)
+        update(views)
