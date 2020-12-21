@@ -37,8 +37,7 @@ open class Startup {
                 role = UserRole.Admin,
                 createdDate = LocalDate.now(),
                 unverifiedName = "dstack",
-                settings = Settings(General(AccessLevel.Public),
-                    Notifications(false))
+                settings = Settings(General(AccessLevel.Public))
             )
             userService.create(user)
         }
