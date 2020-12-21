@@ -88,8 +88,9 @@ def parse_command(command):
     return views, execution_id, stack_path
 
 
-def print_views_stdout(views, logs_handler):
+def print_views_stdout(views, logs_handler, status):
     execution = {
+        'status': status,
         'views': [v.pack() for v in (views or [])],
         'logs': logs_handler.getvalue()
     }
@@ -107,7 +108,12 @@ while True:
             apply(views, execution_id, stack_path, logs_handler)
     else:
         # TODO: Make it possible to transport the views state without transporting the entire data
-        # TODO: Handle exceptions
         with redirect_stdout(logs_handler):
-            updated_views = controller.list(views)
-        print_views_stdout(updated_views, logs_handler)
+            try:
+                updated_views = controller.list(views)
+                status = 'READY'
+            except Exception:
+                status = 'FAILED'
+                updated_views = views
+                print(str(traceback.format_exc()))
+        print_views_stdout(updated_views, logs_handler, status)
