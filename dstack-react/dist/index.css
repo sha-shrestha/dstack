@@ -4789,13 +4789,15 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     }
 @media (min-width: 981px) {
 ._2Ro1o {
-        padding: 11px
+        padding: 20px
 }
         ._2Ro1o._3dv-r {
             display: grid;
-            grid-template-areas: "filters content";
+            grid-template-areas:
+                "filters content"
+                "filters logs"
+            ;
             grid-template-columns: 250px 1fr;
-            grid-template-rows: auto 1fr;
             grid-column-gap: 30px;
         }
             ._2Ro1o._3dv-r ._283Wj {
@@ -4836,26 +4838,49 @@ body ._14ngc-slide-up-leavebody ._14ngc-slide-up-leave-activebody ._14ngc-placem
     min-width: 0;
     grid-area: content;
     margin-top: 30px;
+
 }
 ._2FCD_ ._nbe6T {
         font-size: 14px;
         line-height: 17px;
         color: #AF4545;
     }
-._2FCD_ ._2urIx {
-        margin-top: 10px;
+._36zNW {
+    margin-top: 16px;
+    grid-area: logs;
+}
+._36zNW ._1K-0S {
+        padding: 0 !important;
+        outline: none;
+    }
+._36zNW ._1K-0S .mdi {
+            font-size: 14px;
+            padding-left: 4px;
+        }
+._36zNW ._1YGSB {
+        overflow: hidden;
+        transition: max-height .5s ease-out;
+    }
+._36zNW ._1YGSB:not(.open) {
+            max-height: 0;
+        }
+._36zNW ._1YGSB.open {
+            max-height: 440px;
+        }
+._36zNW ._2urIx {
+        padding-top: 16px;
         font-size: 13px;
         line-height: 16px;
         color: rgba(48, 52, 64, 0.5);
     }
-._2FCD_ ._3Aob9 {
+._36zNW ._3Aob9 {
         font-family: "Roboto Mono", monospace;
         margin-top: 6px;
         font-size: 13px;
         line-height: 18px;
         color: #303440;
-        white-space: pre;
-        overflow: auto;
+        white-space: pre-wrap;
+        overflow-y: auto;
         max-height: 412px;
     }
 ._19inZ {

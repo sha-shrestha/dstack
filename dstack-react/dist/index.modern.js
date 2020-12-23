@@ -4119,7 +4119,7 @@ var actions$1 = (function () {
   };
 });
 
-var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withSidebar":"_3dv-r","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ"};
+var css$E = {"details":"_ti47L","header":"_1-me2","title":"_1ZJdY","permissions":"_3X_XO","sideHeader":"_1w9C6","share":"_2sRwt","dropdown":"_1fs1J","description":"_3dUVb","label":"_1JQAe","label-tooltip":"_15gJa","actions":"_2mMuP","size":"_2GzG9","revisions":"_1t1sR","tabs":"_1iRHh","container":"_2Ro1o","withSidebar":"_3dv-r","filters":"_283Wj","filterLoader":"_7OdCa","attachment":"_1QLqg","progress":"_HhauM","emptyMessage":"_16j-R","error":"_2FCD_","message":"_nbe6T","logs":"_36zNW","logsButton":"_1K-0S","logsExpand":"_1YGSB","fromAgo":"_2urIx","log":"_3Aob9","readme":"_19inZ"};
 
 var REFRESH_INTERVAL = 1000;
 
@@ -4159,33 +4159,37 @@ var Details$1 = function Details(_ref) {
       fields = _useState[0],
       setFields = _useState[1];
 
-  var _useState2 = useState(null),
-      executeData = _useState2[0],
-      setExecuteData = _useState2[1];
+  var _useState2 = useState(false),
+      logsExpand = _useState2[0],
+      setExpandLogs = _useState2[1];
 
-  var _useState3 = useState(false),
-      executing = _useState3[0],
-      setExecuting = _useState3[1];
+  var _useState3 = useState(null),
+      executeData = _useState3[0],
+      setExecuteData = _useState3[1];
 
   var _useState4 = useState(false),
-      calculating = _useState4[0],
-      setCalculating = _useState4[1];
+      executing = _useState4[0],
+      setExecuting = _useState4[1];
 
-  var _useState5 = useState(null),
-      error = _useState5[0],
-      setError = _useState5[1];
+  var _useState5 = useState(false),
+      calculating = _useState5[0],
+      setCalculating = _useState5[1];
 
   var _useState6 = useState(null),
-      appAttachment = _useState6[0],
-      setAppAttachment = _useState6[1];
+      error = _useState6[0],
+      setError = _useState6[1];
 
-  var _useState7 = useState(),
-      activeTab = _useState7[0],
-      setActiveTab = _useState7[1];
+  var _useState7 = useState(null),
+      appAttachment = _useState7[0],
+      setAppAttachment = _useState7[1];
 
-  var _useState8 = useState([]),
-      tabs = _useState8[0],
-      setTabs = _useState8[1];
+  var _useState8 = useState(),
+      activeTab = _useState8[0],
+      setActiveTab = _useState8[1];
+
+  var _useState9 = useState([]),
+      tabs = _useState9[0],
+      setTabs = _useState9[1];
 
   var prevFrame = usePrevious(frame);
 
@@ -4240,7 +4244,9 @@ var Details$1 = function Details(_ref) {
     var form = getFormFromViews(data.views);
     setFields(fields);
     setForm(form);
-    setExecuteData(data);
+    setExecuteData(_extends({
+      lastUpdate: Date.now()
+    }, data));
   };
 
   var hasApplyButton = function hasApplyButton() {
@@ -4307,9 +4313,7 @@ var Details$1 = function Details(_ref) {
       setExecuting(false);
       setCalculating(false);
       setError({
-        date: Date.now(),
-        status: null,
-        logs: null
+        status: null
       });
     });
   };
@@ -4347,9 +4351,7 @@ var Details$1 = function Details(_ref) {
         })["catch"](function () {
           setExecuting(false);
           setError({
-            date: Date.now(),
-            status: null,
-            logs: null
+            status: null
           });
         });
       } else {
@@ -4462,12 +4464,15 @@ var Details$1 = function Details(_ref) {
         if (isUpdateData) {
           setExecuting(false);
           updateExecuteData(data);
+        } else {
+          setExecuteData(_extends({}, executeData, {
+            logs: data.logs,
+            date: Date.now()
+          }));
         }
 
         setError({
-          date: Date.now(),
-          status: data.status,
-          logs: data.logs
+          status: data.status
         });
       }
     });
@@ -4553,11 +4558,28 @@ var Details$1 = function Details(_ref) {
     className: css$E.message
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-alert-circle-outline"
-  }), " ", t('appStackError')), /*#__PURE__*/React__default.createElement("div", {
+  }), " ", t('appStackError'))), (executeData.logs || true) && /*#__PURE__*/React__default.createElement("div", {
+    className: css$E.logs
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    className: css$E.logsButton,
+    color: "primary",
+    onClick: function onClick() {
+      return setExpandLogs(function (value) {
+        return !value;
+      });
+    },
+    size: "small"
+  }, t('logs'), /*#__PURE__*/React__default.createElement("span", {
+    className: "mdi mdi-arrow-" + (logsExpand ? 'collapse' : 'expand')
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: cx(css$E.logsExpand, {
+      open: logsExpand
+    })
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: css$E.fromAgo
-  }, t('updated'), " ", moment(error.date).fromNow()), error.logs && /*#__PURE__*/React__default.createElement("div", {
+  }, t('updated'), " ", moment(executeData.date).fromNow()), /*#__PURE__*/React__default.createElement("div", {
     className: css$E.log
-  }, error.logs))), data && /*#__PURE__*/React__default.createElement(Readme, {
+  }, executeData.logs)))), data && /*#__PURE__*/React__default.createElement(Readme, {
     className: css$E.readme,
     data: data,
     onUpdate: onUpdateReadme

@@ -9,6 +9,7 @@ import moment from 'moment';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import Yield from '../../Yield';
+import Button from '../../Button';
 import BackButton from '../../BackButton';
 import Share from '../../Share';
 import PermissionUsers from '../../PermissionUsers';
@@ -72,6 +73,7 @@ const Details = ({
     const didMountRef = useRef(false);
     const {form, setForm, onChange} = useForm({});
     const [fields, setFields] = useState({});
+    const [logsExpand, setExpandLogs] = useState(false);
     const [executeData, setExecuteData] = useState(null);
     const [executing, setExecuting] = useState(false);
     const [calculating, setCalculating] = useState(false);
@@ -127,7 +129,10 @@ const Details = ({
 
         setFields(fields);
         setForm(form);
-        setExecuteData(data);
+        setExecuteData({
+            lastUpdate: Date.now(),
+            ...data,
+        });
     };
 
     const hasApplyButton = () => {
@@ -187,11 +192,7 @@ const Details = ({
                 setExecuting(false);
                 setCalculating(false);
 
-                setError({
-                    date: Date.now(),
-                    status: null,
-                    logs: null,
-                });
+                setError({status: null});
             });
     };
 
@@ -230,12 +231,7 @@ const Details = ({
                     })
                     .catch(() => {
                         setExecuting(false);
-
-                        setError({
-                            date: Date.now(),
-                            status: null,
-                            logs: null,
-                        });
+                        setError({status: null});
                     });
             } else {
                 setExecuting(true);
@@ -353,13 +349,15 @@ const Details = ({
                     if (isUpdateData) {
                         setExecuting(false);
                         updateExecuteData(data);
+                    } else {
+                        setExecuteData({
+                            ...executeData,
+                            logs: data.logs,
+                            date: Date.now(),
+                        });
                     }
 
-                    setError({
-                        date: Date.now(),
-                        status: data.status,
-                        logs: data.logs,
-                    });
+                    setError({status: data.status});
                 }
             });
     };
@@ -477,8 +475,28 @@ const Details = ({
                             <div className={css.message}>
                                 <span className="mdi mdi-alert-circle-outline" /> {t('appStackError')}
                             </div>
-                            <div className={css.fromAgo}>{t('updated')} {moment(error.date).fromNow()}</div>
-                            {error.logs && <div className={css.log}>{error.logs}</div>}
+                        </div>
+                    )}
+
+                    {(executeData.logs || true) && (
+                        <div className={css.logs}>
+                            <Button
+                                className={css.logsButton}
+                                color="primary"
+                                onClick={() => setExpandLogs(value => !value)}
+                                size="small"
+                            >
+                                {t('logs')}
+                                <span className={`mdi mdi-arrow-${logsExpand ? 'collapse' : 'expand'}`} />
+                            </Button>
+
+                            <div className={cx(css.logsExpand, {open: logsExpand})}>
+                                <div className={css.fromAgo}>{t('updated')} {moment(executeData.date).fromNow()}</div>
+
+                                <div className={css.log}>
+                                    {executeData.logs}
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
