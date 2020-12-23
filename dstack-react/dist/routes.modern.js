@@ -36,25 +36,21 @@ var routes = {
     }
 
     if (category === void 0) {
-      category = ':category';
+      category = ':category(applications|models)';
     }
 
     return "/" + user + "/" + category;
   },
-  stackDetails: function stackDetails(user, category, id) {
+  stackDetails: function stackDetails(user, id) {
     if (user === void 0) {
       user = ':user';
-    }
-
-    if (category === void 0) {
-      category = ':category';
     }
 
     if (id === void 0) {
       id = ':stack';
     }
 
-    return "/" + user + "/" + category + "/" + id + (id === ':stack' ? '+' : '');
+    return "/" + user + "/" + id + (id === ':stack' ? '+' : '');
   },
   reports: function reports(user) {
     if (user === void 0) {

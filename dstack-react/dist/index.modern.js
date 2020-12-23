@@ -2739,25 +2739,21 @@ var routes = {
     }
 
     if (category === void 0) {
-      category = ':category';
+      category = ':category(applications|models)';
     }
 
     return "/" + user + "/" + category;
   },
-  stackDetails: function stackDetails(user, category, id) {
+  stackDetails: function stackDetails(user, id) {
     if (user === void 0) {
       user = ':user';
-    }
-
-    if (category === void 0) {
-      category = ':category';
     }
 
     if (id === void 0) {
       id = ':stack';
     }
 
-    return "/" + user + "/" + category + "/" + id + (id === ':stack' ? '+' : '');
+    return "/" + user + "/" + id + (id === ':stack' ? '+' : '');
   },
   reports: function reports(user) {
     if (user === void 0) {
@@ -2926,7 +2922,7 @@ var List = function List(_ref) {
       Component: Link,
       key: index,
       data: item,
-      to: routes.stackDetails(item.user, category, item.name),
+      to: routes.stackDetails(item.user, item.name),
       deleteAction: currentUser === item.user && showDeleteConfirmation
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {

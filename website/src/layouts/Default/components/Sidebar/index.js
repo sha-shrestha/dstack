@@ -44,8 +44,8 @@ const Sidebar = ({
             item.onClick();
     };
 
-    const refreshStacks = () => {
-        if (pathname === routes.categoryStacks(params.user, params.category)) {
+    const getRefreshStacks = (category: 'applications' | 'category') => () => {
+        if (pathname === routes.categoryStacks(params.user, category)) {
             dispatch({type: appStoreActionTypes.START_PROGRESS});
             fetchStacksList(params.user, () => {
                 dispatch({type: appStoreActionTypes.COMPLETE_PROGRESS});
@@ -58,13 +58,13 @@ const Sidebar = ({
             svg: Apps,
             to: routes.categoryStacks(currentUser, 'applications'),
             label: t('application_plural'),
-            onClick: refreshStacks,
+            onClick: getRefreshStacks('applications'),
         },
         {
             svg: Models,
             to: routes.categoryStacks(currentUser, 'models'),
             label: t('mlModel_plural'),
-            onClick: refreshStacks,
+            onClick: getRefreshStacks('models'),
         },
     ];
 

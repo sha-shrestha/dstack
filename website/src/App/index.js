@@ -142,14 +142,14 @@ const App = ({fetchUser, fetchConfigInfo, userData, userLoading, history: {push}
                         <Switch>
                             <DefaultLayoutRoute path={routes.notFound()} component={NotFound} />
                             <DefaultLayoutRoute path={routes.settings()} component={Settings} />
-                            <DefaultLayoutRoute path={routes.categoryStacks()} component={Stacks} />
+                            <DefaultLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
                     )}
 
                     {!isSignedIn() && (
                         <Switch>
                             <UnAuthorizedLayoutRoute path={routes.notFound()} component={NotFound} />
-                            <UnAuthorizedLayoutRoute path={routes.categoryStacks()} component={Stacks} />
+                            <UnAuthorizedLayoutRoute path={routes.stacks()} component={Stacks} />
                         </Switch>
                     )}
 

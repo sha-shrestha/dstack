@@ -10,12 +10,8 @@ export default {
 
     // stacks
     stacks: (user = ':user') => `/${user}`,
-    categoryStacks: (user = ':user', category = ':category') => `/${user}/${category}`,
-    stackDetails: (
-        user = ':user',
-        category = ':category',
-        id = ':stack'
-    ) => `/${user}/${category}/${id}` + (id === ':stack' ? '+' : ''),
+    categoryStacks: (user = ':user', category = ':category(applications|models)') => `/${user}/${category}`,
+    stackDetails: (user = ':user', id = ':stack') => `/${user}/${id}` + (id === ':stack' ? '+' : ''),
 
     //reports
     reports: (user = ':user') => `/${user}/d`,

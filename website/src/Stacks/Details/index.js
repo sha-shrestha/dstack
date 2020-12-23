@@ -31,6 +31,11 @@ type Props = {
     updatePermissions: Function,
 }
 
+const categoryMap = {
+    app: 'applications',
+    mlModel: 'models',
+};
+
 const Details = ({
     fetchDetails,
     fetchFrame,
@@ -221,7 +226,7 @@ const Details = ({
                 currentUser={currentUser}
                 currentUserToken={currentUserToken}
                 toggleUpload={toggleUploadModal}
-                backUrl={routes.categoryStacks(currentUser, params.category)}
+                backUrl={routes.categoryStacks(currentUser, categoryMap[category])}
                 setPrivate={setPrivate}
                 updatePermissions={updatePermissions}
                 user={params.user}

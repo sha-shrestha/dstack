@@ -146,7 +146,7 @@ const List = ({
                         Component={Link}
                         key={index}
                         data={item}
-                        to={routes.stackDetails(item.user, category, item.name)}
+                        to={routes.stackDetails(item.user, item.name)}
                         deleteAction={currentUser === item.user && showDeleteConfirmation}
                     />)}
                 </div>
