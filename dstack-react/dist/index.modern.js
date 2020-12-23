@@ -4476,6 +4476,7 @@ var Details$1 = function Details(_ref) {
           }));
         }
 
+        setActiveExecutionId(null);
         setError({
           status: data.status
         });

@@ -191,7 +191,6 @@ const Details = ({
             .catch(() => {
                 setExecuting(false);
                 setCalculating(false);
-
                 setError({status: null});
             });
     };
@@ -363,6 +362,7 @@ const Details = ({
                         });
                     }
 
+                    setActiveExecutionId(null);
                     setError({status: data.status});
                 }
             });
