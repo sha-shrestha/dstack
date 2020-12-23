@@ -188,6 +188,9 @@
 .filterLoader {
     grid-column: 1 / -1;
 }
+.filters + .attachment {
+    margin-top: 20px;
+}
 .attachment {
     grid-area: content;
     min-width: 0;
