@@ -30,16 +30,31 @@ var routes = {
 
     return "/" + user;
   },
-  stackDetails: function stackDetails(user, id) {
+  categoryStacks: function categoryStacks(user, category) {
     if (user === void 0) {
       user = ':user';
+    }
+
+    if (category === void 0) {
+      category = ':category';
+    }
+
+    return "/" + user + "/" + category;
+  },
+  stackDetails: function stackDetails(user, category, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (category === void 0) {
+      category = ':category';
     }
 
     if (id === void 0) {
       id = ':stack';
     }
 
-    return "/" + user + "/" + id + (id === ':stack' ? '+' : '');
+    return "/" + user + "/" + category + "/" + id + (id === ':stack' ? '+' : '');
   },
   reports: function reports(user) {
     if (user === void 0) {
