@@ -1,20 +1,100 @@
 var routes = {
-  notFound: () => '/404',
-  auth: () => '/auth',
-  authLogin: () => '/auth/login',
-  verifyUser: () => '/auth/verify',
-  authSignUp: () => '/auth/signup',
-  authForgetPassword: () => '/auth/forget-password',
-  authResetPassword: () => '/auth/reset-password',
-  confirmEmailMessage: () => '/auth/confirm-message',
-  stacks: (user = ':user') => `/${user}`,
-  categoryStacks: (user = ':user', category = ':category') => `/${user}/${category}`,
-  stackDetails: (user = ':user', category = ':category', id = ':stack') => `/${user}/${category}/${id}` + (id === ':stack' ? '+' : ''),
-  reports: (user = ':user') => `/${user}/d`,
-  reportsDetails: (user = ':user', id = ':id') => `/${user}/d/${id}`,
-  jobs: (user = ':user') => `/${user}/j`,
-  jobsDetails: (user = ':user', id = ':id') => `/${user}/j/${id}`,
-  settings: () => '/settings'
+  notFound: function notFound() {
+    return '/404';
+  },
+  auth: function auth() {
+    return '/auth';
+  },
+  authLogin: function authLogin() {
+    return '/auth/login';
+  },
+  verifyUser: function verifyUser() {
+    return '/auth/verify';
+  },
+  authSignUp: function authSignUp() {
+    return '/auth/signup';
+  },
+  authForgetPassword: function authForgetPassword() {
+    return '/auth/forget-password';
+  },
+  authResetPassword: function authResetPassword() {
+    return '/auth/reset-password';
+  },
+  confirmEmailMessage: function confirmEmailMessage() {
+    return '/auth/confirm-message';
+  },
+  stacks: function stacks(user) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    return "/" + user;
+  },
+  categoryStacks: function categoryStacks(user, category) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (category === void 0) {
+      category = ':category';
+    }
+
+    return "/" + user + "/" + category;
+  },
+  stackDetails: function stackDetails(user, category, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (category === void 0) {
+      category = ':category';
+    }
+
+    if (id === void 0) {
+      id = ':stack';
+    }
+
+    return "/" + user + "/" + category + "/" + id + (id === ':stack' ? '+' : '');
+  },
+  reports: function reports(user) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    return "/" + user + "/d";
+  },
+  reportsDetails: function reportsDetails(user, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (id === void 0) {
+      id = ':id';
+    }
+
+    return "/" + user + "/d/" + id;
+  },
+  jobs: function jobs(user) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    return "/" + user + "/j";
+  },
+  jobsDetails: function jobsDetails(user, id) {
+    if (user === void 0) {
+      user = ':user';
+    }
+
+    if (id === void 0) {
+      id = ':id';
+    }
+
+    return "/" + user + "/j/" + id;
+  },
+  settings: function settings() {
+    return '/settings';
+  }
 };
 
 export default routes;
