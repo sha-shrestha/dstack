@@ -342,6 +342,12 @@ const Details = ({
                     if (isUpdateData) {
                         setExecuting(false);
                         updateExecuteData(data);
+                    } else {
+                        setExecuteData({
+                            ...executeData,
+                            logs: data.logs,
+                            date: Date.now(),
+                        });
                     }
                 }
 
@@ -478,7 +484,7 @@ const Details = ({
                         </div>
                     )}
 
-                    {(executeData.logs || true) && (
+                    {executeData.logs && (
                         <div className={css.logs}>
                             <Button
                                 className={css.logsButton}

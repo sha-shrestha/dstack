@@ -4460,6 +4460,11 @@ var Details$1 = function Details(_ref) {
         if (isUpdateData) {
           setExecuting(false);
           updateExecuteData(data);
+        } else {
+          setExecuteData(_extends({}, executeData, {
+            logs: data.logs,
+            date: Date.now()
+          }));
         }
       }
 
@@ -4561,7 +4566,7 @@ var Details$1 = function Details(_ref) {
     className: css$E.message
   }, /*#__PURE__*/React__default.createElement("span", {
     className: "mdi mdi-alert-circle-outline"
-  }), " ", t('appStackError'))), (executeData.logs || true) && /*#__PURE__*/React__default.createElement("div", {
+  }), " ", t('appStackError'))), executeData.logs && /*#__PURE__*/React__default.createElement("div", {
     className: css$E.logs
   }, /*#__PURE__*/React__default.createElement(Button, {
     className: css$E.logsButton,
