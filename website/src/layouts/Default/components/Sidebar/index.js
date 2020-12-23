@@ -164,17 +164,10 @@ const Sidebar = ({
             </li>
         </ul>}
 
-        <Tooltip
-            overlayContent={compact ? t('uncollapse') : t('collapse')}
-            placement="rightTop"
-            trigger={compact ? ['hover'] : []}
-            align={{offset: [20, -10]}}
-        >
-            <button className={css.collapse} onClick={toggleCollapse}>
-                <span className={cx(css.icon, 'mdi mdi-chevron-double-left')} />
-                <span className={css.label}>{t('collapse')}</span>
-            </button>
-        </Tooltip>
+        <button className={css.collapse} onClick={toggleCollapse}>
+            <span className={cx(css.icon, 'mdi mdi-chevron-double-left')} />
+            <span className={css.label}>{t('collapse')}</span>
+        </button>
     </div>;
 };
 
