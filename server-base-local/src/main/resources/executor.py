@@ -111,11 +111,12 @@ def print_views_stdout(views, logs_handler, status):
 
 while True:
     # TODO: Support timeout in future
-    command = sys.stdin.readline()
-    views, execution_id, stack_path = parse_command(command)
-    logs_handler = StringIO()
-    if views and execution_id and stack_path:
-        apply(views, execution_id, stack_path, logs_handler)
-    else:
-        # TODO: Make it possible to transport the views state without transporting the entire data
-        update(views)
+    command = sys.stdin.readline().strip()
+    if command:
+        views, execution_id, stack_path = parse_command(command)
+        logs_handler = StringIO()
+        if views and execution_id and stack_path:
+            apply(views, execution_id, stack_path, logs_handler)
+        else:
+            # TODO: Make it possible to transport the views state without transporting the entire data
+            update(views)
