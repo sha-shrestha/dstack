@@ -3780,12 +3780,8 @@ var css$B = {"details":"_3iAZb","header":"_2kekg","title":"_1zGvd","permissions"
 var Details = function Details(_ref) {
   var _data$head, _cx;
 
-  var currentFrameId = _ref.currentFrameId,
-      headId = _ref.headId,
-      onChangeHeadFrame = _ref.onChangeHeadFrame,
-      attachmentIndex = _ref.attachmentIndex,
+  var attachmentIndex = _ref.attachmentIndex,
       onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
-      onChangeFrame = _ref.onChangeFrame,
       onUpdateReadme = _ref.onUpdateReadme,
       data = _ref.data,
       frame = _ref.frame,
@@ -3960,14 +3956,7 @@ var Details = function Details(_ref) {
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
-  }))), /*#__PURE__*/React__default.createElement(Frames, {
-    frames: lodashEs.get(data, 'frames', []),
-    frame: currentFrameId,
-    headId: headId,
-    onMarkAsHead: onChangeHeadFrame,
-    onChange: onChangeFrame,
-    className: css$B.revisions
-  }), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
+  }))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
     className: css$B.tabs,
     onChange: onChangeTab,
     value: activeTab,
@@ -4133,14 +4122,10 @@ var REFRESH_INTERVAL = 1000;
 var Details$1 = function Details(_ref) {
   var _data$head, _cx;
 
-  var currentFrameId = _ref.currentFrameId,
-      headId = _ref.headId,
-      executionId = _ref.executionId,
+  var executionId = _ref.executionId,
       onChangeExecutionId = _ref.onChangeExecutionId,
-      onChangeHeadFrame = _ref.onChangeHeadFrame,
       attachmentIndex = _ref.attachmentIndex,
       onChangeAttachmentIndex = _ref.onChangeAttachmentIndex,
-      onChangeFrame = _ref.onChangeFrame,
       onUpdateReadme = _ref.onUpdateReadme,
       data = _ref.data,
       frame = _ref.frame,
@@ -4530,14 +4515,7 @@ var Details$1 = function Details(_ref) {
     onUpdatePermissions: function onUpdatePermissions(permissions) {
       return updatePermissions(user + "/" + stack, permissions);
     }
-  }))), /*#__PURE__*/React__default.createElement(Frames, {
-    frames: lodashEs.get(data, 'frames', []),
-    frame: currentFrameId,
-    headId: headId,
-    onMarkAsHead: onChangeHeadFrame,
-    onChange: onChangeFrame,
-    className: css$E.revisions
-  }), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
+  }))), Boolean(tabs.length) && /*#__PURE__*/React__default.createElement(Tabs$1, {
     className: css$E.tabs,
     onChange: onChangeTab,
     value: activeTab,
