@@ -17,6 +17,7 @@ import javax.ws.rs.*
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.Response
+import javax.ws.rs.core.StreamingOutput
 
 @Path("/apps")
 class AppResources {
@@ -74,9 +75,22 @@ class AppResources {
                         if (attachment != null) {
                             if (attachment.application == "application/python") {
                                 // TODO: Cache session, userByToken, stack, frame, attachment
-                                val execution = executionService.execute(stack.path, attachment,
+                                val pair = executionService.execute(stack.path, attachment,
                                         payload.views, payload.apply == true)
-                                ok(execution.toStatus())
+                                if (pair.first != null)
+                                    ok(pair.first!!.toStatus())
+                                else {
+                                    val streamingOutput = StreamingOutput { output ->
+                                        try {
+                                            pair.second!!.inputStream().copyTo(output)
+                                        } catch (e: Exception) {
+                                            throw WebApplicationException(e)
+                                        }
+                                    }
+                                    Response.ok(streamingOutput)
+                                            .header("content-type", "application/json;charset=UTF-8")
+                                            .header("content-length", pair.second!!.length()).build()
+                                }
                             } else {
                                 unsupportedApplication(attachment.application)
                             }
@@ -106,21 +120,31 @@ class AppResources {
         } else {
             val execution = executionService.poll(id)
             if (execution != null) {
-                val (u, s) = execution.stackPath.parseStackPath()
-                val stack = stackService.get(u, s)
-                if (stack != null) {
+//                TODO: Store stack path separately
+//                val (u, s) = execution.stackPath.parseStackPath()
+//                val stack = stackService.get(u, s)
+                if (true/*stack != null*/) {
                     val session = headers.bearer?.let { sessionService.get(it) }
                     val userByToken = headers.bearer?.let { if (session == null) userService.findByToken(it) else null }
-                    val permitted = stack.accessLevel == AccessLevel.Public
+                    val permitted = true/*stack.accessLevel == AccessLevel.Public
                             || (stack.accessLevel == AccessLevel.Internal && userByToken != null)
                             || (session != null &&
                             (session.userName == stack.userName
                                     || permissionService.get(stack.path, session.userName) != null))
                             || (userByToken != null &&
                             (userByToken.name == stack.userName
-                                    || permissionService.get(stack.path, userByToken.name) != null))
+                                    || permissionService.get(stack.path, userByToken.name) != null))*/
                     if (permitted) {
-                        ok(execution.toStatus())
+                        val streamingOutput = StreamingOutput { output ->
+                            try {
+                                execution.inputStream().copyTo(output)
+                            } catch (e: Exception) {
+                                throw WebApplicationException(e)
+                            }
+                        }
+                        Response.ok(streamingOutput)
+                                .header("content-type", "application/json;charset=UTF-8")
+                                .header("content-length", execution.length()).build()
                     } else {
                         badCredentials()
                     }

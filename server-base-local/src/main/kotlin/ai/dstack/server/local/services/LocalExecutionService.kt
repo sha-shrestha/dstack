@@ -25,12 +25,12 @@ class LocalExecutionService @Autowired constructor(
 
     private val executionHome = File(config.executionDirectory).absolutePath
 
-    override fun execute(stackPath: String, attachment: Attachment, views: List<Map<String, Any?>>?, apply: Boolean): Execution {
+    override fun execute(stackPath: String, attachment: Attachment, views: List<Map<String, Any?>>?, apply: Boolean): Pair<Execution?, File?> {
         val id = UUID.randomUUID().toString()
         return if (config.pythonExecutable != null) {
             extractApplicationIfMissing(attachment)
 
-            val executionFile = executionFile(id)
+            val executionFile = executionFile(id, "0")
             if (apply) {
                 writeExecutionFile(stackPath, executionFile, id, views)
             }
@@ -42,18 +42,17 @@ class LocalExecutionService @Autowired constructor(
                 command["id"] = id
                 command["stack"] = stackPath
                 sendCommand(p, command)
-                poll(id)!!
+                Pair(null, poll(id)!!)
             } else {
                 val updatedViews = synchronized(p) {
                     sendCommand(p, command)
                     receiveResponse(p)
                 }.toUpdatedViews()
-
-                Execution(stackPath, id, updatedViews.views, ExecutionStatus.fromCode(updatedViews.status), null, updatedViews.logs)
+                Pair(Execution(stackPath, id, updatedViews.views, ExecutionStatus.fromCode(updatedViews.status), null, updatedViews.logs), null)
             }
         } else {
-            Execution(stackPath, id = id, views = emptyList(), status = ExecutionStatus.Failed, output = null,
-                    logs = "The Python executable is not configured.")
+            Pair(Execution(stackPath, id = id, views = emptyList(), status = ExecutionStatus.Failed, output = null,
+                    logs = "The Python executable is not configured."), null)
         }
     }
 
@@ -95,12 +94,22 @@ class LocalExecutionService @Autowired constructor(
         }
     }
 
-    override fun poll(id: String): Execution? {
-        val executionFile = executionFile(id)
-        return if (executionFile.exists()) {
-            readExecution(executionFile, id)
+    override fun poll(id: String): File? {
+        val executionOFile = executionFile(id, "2")
+        return if (executionOFile.exists()) {
+            executionOFile
         } else {
-            null
+            val executionVFile = executionFile(id, "1")
+            if (executionVFile.exists()) {
+                executionVFile
+            } else {
+                val executionRFile = executionFile(id, "0")
+                if (executionRFile.exists()) {
+                    executionRFile
+                } else {
+                    null
+                }
+            }
         }
     }
 
@@ -108,20 +117,6 @@ class LocalExecutionService @Autowired constructor(
             .registerModule(KotlinModule())
     private val commandObjectMapper = ObjectMapper()
             .registerModule(KotlinModule())
-
-    private fun readExecution(executionFile: File, id: String): Execution {
-        val execution = executionFileObjectMapper.readValue(executionFile, Map::class.java)
-        val views = execution["views"] as List<Map<String, Any?>>?
-        return Execution(execution["stack"] as String, id, views,
-                ExecutionStatus.fromCode(execution["status"]!!.toString()),
-                execution["output"]?.let {
-                    val output = it as Map<*, *>
-                    ExecutionOutput(output["application"] as String,
-                            output["content_type"] as String,
-                            output["data"] as String?)
-                }, execution["logs"] as String?
-        )
-    }
 
     private fun writeExecutionFile(stackPath: String, executionFile: File, id: String, views: List<Map<String, Any?>>?) {
         executionFile.parentFile.mkdirs()
@@ -164,11 +159,11 @@ class LocalExecutionService @Autowired constructor(
     private fun destDir(attachment: Attachment) =
             File(config.appDirectory + "/" + attachment.filePath)
 
-    private val executorVersion = 6
+    private val executorVersion = 9
 
     private fun executorFile(attachment: Attachment) = File(destDir(attachment), "execute_v${executorVersion}.py")
 
-    private fun executionFile(id: String) = File(File(config.executionDirectory), "$id.json")
+    private fun executionFile(id: String, stage: String) = File(File(config.executionDirectory), "$id-$stage.json")
 
     private fun newFile(destinationDir: File, zipEntry: ZipEntry): File {
         val destFile = File(destinationDir, zipEntry.name)
