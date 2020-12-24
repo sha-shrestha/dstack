@@ -99,10 +99,10 @@ const List = ({
         <div className={css.list}>
             <div className={css.header}>
                 <div className={css.title}>
-                    {currentUser === user
-                        ? t('stacks')
-                        : t('stacksOf', {name: user})
-                    }
+                    {{
+                        applications: t('application_plural'),
+                        models: t('mlModel_plural'),
+                    }[category]}
                 </div>
 
                 {Boolean(data.length) && (
@@ -153,7 +153,10 @@ const List = ({
             )}
 
             {Boolean(data.length && !items.length) && <div className={css.text}>
-                {t('noStacksAreFoundedMatchedTheSearchCriteria')}
+                {{
+                    applications: t('noApplicationsMatchingTheSearchCriteria'),
+                    models: t('noMlModelsMatchingTheSearchCriteria'),
+                }[category]}
             </div>}
 
             <Modal

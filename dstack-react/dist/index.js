@@ -2894,9 +2894,10 @@ var List = function List(_ref) {
     className: css$u.header
   }, /*#__PURE__*/React__default.createElement("div", {
     className: css$u.title
-  }, currentUser === user ? t('stacks') : t('stacksOf', {
-    name: user
-  })), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
+  }, {
+    applications: t('application_plural'),
+    models: t('mlModel_plural')
+  }[category]), Boolean(data.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$u.headerSide
   }, Boolean(data.length) && /*#__PURE__*/React__default.createElement(SearchField, {
     className: css$u.search,
@@ -2930,7 +2931,10 @@ var List = function List(_ref) {
     });
   })), Boolean(data.length && !items.length) && /*#__PURE__*/React__default.createElement("div", {
     className: css$u.text
-  }, t('noStacksAreFoundedMatchedTheSearchCriteria')), /*#__PURE__*/React__default.createElement(Modal, {
+  }, {
+    applications: t('noApplicationsMatchingTheSearchCriteria'),
+    models: t('noMlModelsMatchingTheSearchCriteria')
+  }[category]), /*#__PURE__*/React__default.createElement(Modal, {
     isShow: Boolean(deletingStack),
     onClose: hideDeleteConfirmation,
     size: "confirmation",
