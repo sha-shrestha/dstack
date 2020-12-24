@@ -118,33 +118,32 @@ class AppResources {
         return if (id.isNullOrBlank()) {
             malformedRequest()
         } else {
-            val execution = executionService.poll(id)
-            if (execution != null) {
-//                TODO: Store stack path separately
-//                val (u, s) = execution.stackPath.parseStackPath()
-//                val stack = stackService.get(u, s)
-                if (true/*stack != null*/) {
+            val (stackPath, executionFile) = executionService.poll(id)
+            if (stackPath != null && executionFile != null) {
+                val (u, s) = stackPath.parseStackPath()
+                val stack = stackService.get(u, s)
+                if (stack != null) {
                     val session = headers.bearer?.let { sessionService.get(it) }
                     val userByToken = headers.bearer?.let { if (session == null) userService.findByToken(it) else null }
-                    val permitted = true/*stack.accessLevel == AccessLevel.Public
+                    val permitted = stack.accessLevel == AccessLevel.Public
                             || (stack.accessLevel == AccessLevel.Internal && userByToken != null)
                             || (session != null &&
                             (session.userName == stack.userName
                                     || permissionService.get(stack.path, session.userName) != null))
                             || (userByToken != null &&
                             (userByToken.name == stack.userName
-                                    || permissionService.get(stack.path, userByToken.name) != null))*/
+                                    || permissionService.get(stack.path, userByToken.name) != null))
                     if (permitted) {
                         val streamingOutput = StreamingOutput { output ->
                             try {
-                                execution.inputStream().copyTo(output)
+                                executionFile.inputStream().copyTo(output)
                             } catch (e: Exception) {
                                 throw WebApplicationException(e)
                             }
                         }
                         Response.ok(streamingOutput)
                                 .header("content-type", "application/json;charset=UTF-8")
-                                .header("content-length", execution.length()).build()
+                                .header("content-length", executionFile.length()).build()
                     } else {
                         badCredentials()
                     }
