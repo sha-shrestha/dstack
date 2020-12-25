@@ -426,8 +426,8 @@ class UserResources {
                 if (user != null && user.verified) {
                     userAlreadyExists()
                 } else {
-                    user = payload.email?.let { userService.findByEmail(it) }
-                    if (payload.email != null && user != null && user.verified) {
+                    user = if (!payload.email.isNullOrBlank()) userService.findByEmail(payload.email) else null
+                    if (user != null && user.verified) {
                         userEmailAlreadyRegistered()
                     } else {
                         try {
@@ -437,7 +437,7 @@ class UserResources {
                             val password = getRandomSpecialChars(8)
                             user = User(
                                     payload.name!!,
-                                    payload.email,
+                                    if (!payload.email.isNullOrBlank()) payload.email else null,
                                     password,
                                     token,
                                     verificationCode,
@@ -578,7 +578,6 @@ val RegisterPayload?.isMalformed
 val CreateUserPayload?.isMalformed
     get() = this == null
             || this.name.isMalformedUserName
-            || (this.email != null && this.email.isMalformedEmail)
             || this.role == null
 
 val DeleteUserPayload?.isMalformed
