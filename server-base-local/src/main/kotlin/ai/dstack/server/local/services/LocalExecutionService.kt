@@ -29,6 +29,7 @@ class LocalExecutionService @Autowired constructor(
 
     private val executionHome = File(config.executionDirectory).absolutePath
 
+    // TODO: Split into update (returning UpdateStatus) and apply (returning ExecutionStatus (stack, InputStream, and length))
     override fun execute(stackPath: String, attachment: Attachment, views: List<Map<String, Any?>>?, apply: Boolean): Pair<Execution?, File?> {
         val id = UUID.randomUUID().toString()
         return if (config.pythonExecutable != null) {
@@ -40,6 +41,7 @@ class LocalExecutionService @Autowired constructor(
                 writeExecutionFile(executionFile, id, views)
             }
 
+            // TODO: Move to to ExecutionProcess and ExecutionProcessFactory
             val p = getProcess(attachment, stackPath)
             val command = mutableMapOf<String, Any?>()
             command["views"] = views
@@ -98,6 +100,7 @@ class LocalExecutionService @Autowired constructor(
         }
     }
 
+    // TODO: Introduce ExecutionStatus (stack, InputStream, and length)
     override fun poll(id: String): Pair<String?, File?> {
         return Pair(stackPath(id), executionFileIfExists(id, EXECUTION_STAGE_FINAL)
                 ?: executionFileIfExists(id, EXECUTION_STAGE_UPDATED)
