@@ -54,6 +54,15 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+    build-base-image:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Grant execute permission to build scripts
+          run: chmod +x ./docker/base-image/build.sh && chmod +x ./docker/base-image/variables.sh
+        - name: Build base image
+          run: ./docker/base-image/build.sh
+
   publish-snapshot:
     needs: build-server
     runs-on: ubuntu-latest
