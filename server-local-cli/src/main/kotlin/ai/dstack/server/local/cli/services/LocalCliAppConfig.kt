@@ -97,14 +97,19 @@ class LocalCliAppConfig : AppConfig {
             return System.getenv("dstack_smtp_from")
         }
 
+    override val user: String?
+        get() {
+            return System.getenv("dstack_user") ?: defaultUser
+        }
+
+    override val password: String?
+        get() {
+            return System.getenv("dstack_password") ?: defaultPassword
+        }
+
     override val pythonExecutable: String?
         get() {
             return System.getenv("dstack_python_executable") ?: defaultPythonExecutable
-        }
-
-    override val rscriptExecutable: String?
-        get() {
-            return System.getenv("dstack_rscript_executable") ?: defaultRscriptExecutable
         }
 
     override val emailEnabled: Boolean
@@ -113,9 +118,10 @@ class LocalCliAppConfig : AppConfig {
         }
 
     companion object {
+        var defaultUser: String? = null
+        var defaultPassword: String? = null
         var defaultInternalPort: String = "8080"
         var defaultHomeDirectory: String? = System.getProperty("user.home")
         var defaultPythonExecutable: String? = null
-        var defaultRscriptExecutable: String? = null
     }
 }
