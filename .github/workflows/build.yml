@@ -58,6 +58,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v2
       - name: Grant execute permission to build scripts
         run: chmod +x docker/base-image/build.sh && chmod +x docker/base-image/variables.sh
       - name: Build base image
