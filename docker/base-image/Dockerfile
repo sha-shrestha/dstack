@@ -2,14 +2,10 @@ FROM python:3.8
 
 ADD requirements.txt /
 
-RUN mkdir -p /examples
-ADD examples/* /examples/
-
 ENV DSTACK_PORT=""
 
 RUN uname -r \
   && cat /etc/os-release \
-  && ls -ltr /examples \
   && python3 --version \
   && pip3 --version \
   && apt-get update \
@@ -25,13 +21,6 @@ RUN uname -r \
   && pip3 install -r /requirements.txt \
   && pip3 install --index-url https://test.pypi.org/simple/ --upgrade --no-cache-dir --extra-index-url=https://pypi.org/simple/ dstack==0.6dev18  \
   && dstack server update \
-  && nohup bash -c "dstack server start &" \
-  && sleep 30 \
-  && ps -ef | grep dstack \
-  && python3 --version \
-  && pip3 --version \
-  && cat /root/.dstack/config.yaml \
-  && python3 /examples/app1.py \ 
-  && python3 /examples/app2.py
+  && cat /root/.dstack/config.yaml
 
 ENTRYPOINT dstack server start --port ${DSTACK_PORT:-80}
