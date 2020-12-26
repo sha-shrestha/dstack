@@ -64,6 +64,8 @@ jobs:
           chmod +x docker/base-image/variables.sh
           chmod +x docker/base-image/build.sh 
           chmod +x docker/base-image/publish.sh
+        env:
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build base image
         run: docker/base-image/build.sh
       - name: Publish base image
@@ -80,6 +82,8 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           chmod +x docker/base-image/variables.sh
           chmod +x docker/base-image/release.sh
+        env:
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Release base image
         run: docker/base-image/release.sh
 
