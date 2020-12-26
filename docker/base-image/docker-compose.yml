@@ -1,0 +1,8 @@
+version: '3'
+services:
+  dstack:
+    image: "dstack-base:latest"
+    ports:
+      - "8080:8081"
+    environment:
+      - DSTACK_PORT=8081
