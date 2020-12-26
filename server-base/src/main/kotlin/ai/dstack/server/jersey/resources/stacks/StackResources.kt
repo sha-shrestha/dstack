@@ -172,7 +172,6 @@ class StackResources {
     }
 
     @GET
-    @Path("/")
     @Produces(JSON_UTF8)
     fun stacksNoUser(@Context headers: HttpHeaders): Response {
         return stacks(headers)
