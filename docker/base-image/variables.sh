@@ -2,7 +2,7 @@
 
 TIMESTAMP=$(date +%Y%m%d%H%M%S)  
 DOCKER=docker
-IMAGE_NAME=dstack-base
+IMAGE_NAME=dstack
 TIMESTAMPED_TAG=$TIMESTAMP
 LATEST_TAG=latest
 DOCKER_USER=AWS
