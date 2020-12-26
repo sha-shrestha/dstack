@@ -53,16 +53,36 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-
-  build-base-image:
+  
+  publish-docker-snaphost:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - uses: actions/checkout@v2
       - name: Grant execute permission to build scripts
-        run: chmod +x docker/base-image/build.sh && chmod +x docker/base-image/variables.sh
+        run: |
+          chmod +x docker/base-image/variables.sh
+          chmod +x docker/base-image/build.sh 
+          chmod +x docker/base-image/publish.sh
       - name: Build base image
         run: docker/base-image/build.sh
+      - name: Publish base image
+        run: docker/base-image/publish.sh
+
+  publish-docker-release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Grant execute permission to build scripts
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          chmod +x docker/base-image/variables.sh
+          chmod +x docker/base-image/release.sh
+      - name: Release base image
+        run: docker/base-image/release.sh
 
   publish-snapshot:
     needs: build-server
