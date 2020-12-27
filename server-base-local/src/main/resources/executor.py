@@ -98,7 +98,7 @@ def parse_command(command):
     command_json = json.loads(command)
     _views = command_json.get("views")
     execution_id = command_json.get("id")
-    views = [unpack_view(v) for v in _views] if _views else None
+    views = [unpack_view(v) for v in _views] if _views is not None else None
     return views, execution_id
 
 
@@ -117,7 +117,7 @@ while True:
     command = sys.stdin.readline().strip()
     views, execution_id = parse_command(command)
     logs_handler = StringIO()
-    if views and execution_id:
+    if execution_id:
         apply(views, execution_id, logs_handler)
     else:
         # TODO: Make it possible to transport the views state without transporting the entire data
