@@ -19,7 +19,7 @@ RUN uname -r \
   && pip3 install requests \
   && pip3 install deprecation \
   && pip3 install -r /requirements.txt \
-  && pip3 install --index-url https://test.pypi.org/simple/ --upgrade --no-cache-dir --extra-index-url=https://pypi.org/simple/ dstack==0.6dev18  \
+  && pip3 install --index-url https://test.pypi.org/simple/ --upgrade --no-cache-dir --extra-index-url=https://pypi.org/simple/ dstack==0.6dev22  \
   && dstack server update \
   && cat /root/.dstack/config.yaml
 
