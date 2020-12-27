@@ -3,6 +3,8 @@ services:
   dstack:
     image: "dstack:latest"
     ports:
-      - "8080:8081"
+      - "${DSTACK_PORT}:${DSTACK_PORT}"
     environment:
-      - DSTACK_PORT=8081
+      - DSTACK_PORT
+      - DSTACK_USER
+      - DSTACK_PASSWORD
