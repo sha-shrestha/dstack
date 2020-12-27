@@ -54,8 +54,22 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
   
+  build-docker-snaphost:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Grant execute permission to build scripts
+        run: |
+          chmod +x docker/base-image/variables.sh
+          chmod +x docker/base-image/build.sh 
+      - name: Build base image
+        run: docker/base-image/build.sh
+  
+  
   publish-docker-snaphost:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - uses: actions/checkout@v2
